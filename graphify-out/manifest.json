@@ -75,9 +75,9 @@
     "semantic_hash": "963653043aa20d2f12c37d8dfb58702c"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/ui/PropertiesPanel.tsx": {
-    "mtime": 1779881164.8548362,
-    "ast_hash": "15ccbb0f1a1caf8a99039d27c7071fba",
-    "semantic_hash": "15ccbb0f1a1caf8a99039d27c7071fba"
+    "mtime": 1780322101.746128,
+    "ast_hash": "84ba277a5ff1473a6b379ae6f5c51e28",
+    "semantic_hash": ""
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/ui/FontPicker.tsx": {
     "mtime": 1779488790.7101502,
@@ -240,9 +240,9 @@
     "semantic_hash": "01cbe4d4c7faa5ab44e929224cee55d8"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/canvas/useCanvasStore.ts": {
-    "mtime": 1779804982.6105232,
-    "ast_hash": "2b7a369ff5f79f0bf82e454846594735",
-    "semantic_hash": "2b7a369ff5f79f0bf82e454846594735"
+    "mtime": 1780322021.5360198,
+    "ast_hash": "3af69dd2528196a13b2930dc1da3a39e",
+    "semantic_hash": ""
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/canvas/CanvasTextNode.tsx": {
     "mtime": 1779881018.1276028,
