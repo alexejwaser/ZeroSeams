@@ -39,5 +39,8 @@ interface Window {
     onExternalImageChanged(
       cb: (data: { objectId: string; base64: string }) => void,
     ): () => void
+    saveVideoFile(filename: string, base64: string): Promise<{ success: boolean; error?: string }>
+    resolveVideoPath(relativeFilePath: string, projectFilePath: string): Promise<{ filePath: string }>
+    makeRelativePath(fromDir: string, toPath: string): Promise<{ relativePath: string }>
   }
 }

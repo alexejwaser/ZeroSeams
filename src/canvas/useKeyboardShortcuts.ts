@@ -5,6 +5,7 @@ import { useSaveStatusStore } from '@/ui/useSaveStatusStore'
 import type { CarouselProject } from '@/types/project'
 import type { ImageObject, PathObject, ShapeObject } from '@/types/canvas'
 import { computePathBBox } from './CanvasPathNode'
+import { relativizeVideoObjects } from './pathUtils'
 
 function buildProjectSnapshot(
   state: ReturnType<typeof useCanvasStore.getState>,
@@ -19,7 +20,7 @@ function buildProjectSnapshot(
     frameCount: state.frameCount,
     frames: state.frames,
     backgroundColor: state.backgroundColor,
-    objects: state.objects,
+    objects: relativizeVideoObjects(state.objects, saveStore.currentFilePath),
     objectOrder: state.objectOrder,
     createdAt: saveStore.createdAt,
     updatedAt: new Date().toISOString(),

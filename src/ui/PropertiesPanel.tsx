@@ -6,7 +6,7 @@ import { useAIStore } from '@/ai'
 import { useExternalEdit } from '@/canvas/useExternalEdit'
 import { useSaveStatusStore } from './useSaveStatusStore'
 import type { BackgroundRemovalOperation } from '@/types/ai'
-import type { ImageObject, TextObject, ShapeObject, PathObject, FontStyle, MaskData, PhotoAdjustments, LayerEffect } from '@/types/canvas'
+import type { ImageObject, TextObject, ShapeObject, PathObject, VideoObject, FontStyle, MaskData, PhotoAdjustments, LayerEffect } from '@/types/canvas'
 import { DEFAULT_ADJUSTMENTS } from '@/types/canvas'
 import { getAllEffectDefinitions, getEffectDefinition } from '@/canvas/effects'
 import {
@@ -17,7 +17,7 @@ import {
 import { FontPicker } from './FontPicker'
 import Tooltip from './Tooltip'
 import { iconBtnStyle } from './iconBtnStyle'
-import { PenTool, Square, Circle, Trash2, Pencil, Eye, EyeOff, AlignLeft, AlignCenter, AlignRight, Power, Plus, X, ChevronDown, ChevronRight } from 'lucide-react'
+import { PenTool, Square, Circle, Trash2, Pencil, Eye, EyeOff, AlignLeft, AlignCenter, AlignRight, Power, Plus, X, ChevronDown, ChevronRight, Volume2, VolumeX } from 'lucide-react'
 import './adjustments.css'
 
 // ---------------------------------------------------------------------------
@@ -457,7 +457,7 @@ function AlignDistributeSection({
     const obj = objects[id]
     if (!obj) return `Object ${idx + 1}`
     if (obj.name) return obj.name
-    const typeLabel = obj.type === 'image' ? 'Image' : obj.type === 'text' ? 'Text' : obj.type === 'shape' ? 'Shape' : obj.type === 'path' ? 'Path' : 'Object'
+    const typeLabel = obj.type === 'image' ? 'Image' : obj.type === 'text' ? 'Text' : obj.type === 'shape' ? 'Shape' : obj.type === 'path' ? 'Path' : obj.type === 'video' ? 'Video' : 'Object'
     return `${typeLabel} ${idx + 1}`
   }
 
@@ -1239,6 +1239,117 @@ function AdjustmentsSection({ imgObj, selectedId: _selectedId, bypass, onToggleB
 }
 
 // ---------------------------------------------------------------------------
+// VideoSection — properties for video objects
+// ---------------------------------------------------------------------------
+
+interface VideoSectionProps {
+  videoObj: VideoObject
+  selectedId: string
+  onStartDrag: () => void
+  onUpdate: (id: string, partial: Partial<VideoObject>) => void
+  onCommit: (id: string, partial: Partial<VideoObject>) => void
+}
+
+function formatDuration(seconds: number): string {
+  const m = Math.floor(seconds / 60)
+  const s = Math.floor(seconds % 60)
+  return `${m}:${s.toString().padStart(2, '0')}`
+}
+
+function VideoSection({
+  videoObj,
+  selectedId,
+  onStartDrag,
+  onUpdate,
+  onCommit,
+}: VideoSectionProps): React.ReactElement {
+  return (
+    <div style={{ padding: '12px 12px 0' }}>
+      {/* Read-only info */}
+      <div style={sectionLabelStyle}>Info</div>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6, gap: 8 }}>
+        <span style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Duration</span>
+        <span style={{ color: '#ddd', fontSize: 12 }}>{formatDuration(videoObj.naturalDuration)}</span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10, gap: 8 }}>
+        <span style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Dimensions</span>
+        <span style={{ color: '#ddd', fontSize: 12 }}>{videoObj.naturalWidth} × {videoObj.naturalHeight}</span>
+      </div>
+
+      {/* Mute toggle */}
+      <div style={sectionLabelStyle}>Audio</div>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10, gap: 8 }}>
+        <span style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>
+          {videoObj.muted ? 'Muted' : 'Unmuted'}
+        </span>
+        <Tooltip label={videoObj.muted ? 'Unmute' : 'Mute'}>
+          <button
+            style={iconBtnStyle(!videoObj.muted)}
+            onClick={() => onCommit(selectedId, { muted: !videoObj.muted })}
+          >
+            {videoObj.muted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+          </button>
+        </Tooltip>
+      </div>
+
+      {/* Rotation slider + numeric input */}
+      <div style={sectionLabelStyle}>Transform</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+        <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
+        <input
+          type="range" min={-360} max={360} step={1}
+          value={Math.round(videoObj.rotation ?? 0)}
+          onChange={e => {
+            const newRot = Number(e.target.value)
+            const { x: fx, y: fy, rotation } = rotateAroundCenter(
+              videoObj.frameX, videoObj.frameY, videoObj.frameWidth, videoObj.frameHeight,
+              videoObj.rotation ?? 0, newRot,
+            )
+            onCommit(selectedId, { rotation, frameX: fx, frameY: fy, x: fx, y: fy })
+          }}
+          style={{ flex: 1 }}
+        />
+        <input
+          type="number" min={-360} max={360} step={1}
+          value={Math.round(videoObj.rotation ?? 0)}
+          onChange={e => {
+            const newRot = Math.max(-360, Math.min(360, Number(e.target.value)))
+            const { x: fx, y: fy, rotation } = rotateAroundCenter(
+              videoObj.frameX, videoObj.frameY, videoObj.frameWidth, videoObj.frameHeight,
+              videoObj.rotation ?? 0, newRot,
+            )
+            onCommit(selectedId, { rotation, frameX: fx, frameY: fy, x: fx, y: fy })
+          }}
+          style={numInputStyle(48)}
+        />
+      </div>
+
+      {/* Opacity slider + numeric input */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+        <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
+        <input
+          type="range" min={0} max={100} step={1}
+          value={Math.round((videoObj.opacity ?? 1) * 100)}
+          onMouseDown={onStartDrag}
+          onChange={e => onUpdate(selectedId, { opacity: Number(e.target.value) / 100 })}
+          onMouseUp={e => onCommit(selectedId, { opacity: Number((e.target as HTMLInputElement).value) / 100 })}
+          style={{ flex: 1 }}
+        />
+        <input
+          type="number" min={0} max={100} step={1}
+          value={Math.round((videoObj.opacity ?? 1) * 100)}
+          onChange={e => {
+            const v = Math.max(0, Math.min(100, Number(e.target.value)))
+            onCommit(selectedId, { opacity: v / 100 })
+          }}
+          style={numInputStyle(44)}
+        />
+      </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // PropertiesPanel (root export)
 // ---------------------------------------------------------------------------
 
@@ -1289,6 +1400,7 @@ export function PropertiesPanel(): React.ReactElement {
   const isText = selectedObj?.type === 'text'
   const isShape = selectedObj?.type === 'shape'
   const isPath = selectedObj?.type === 'path'
+  const isVideo = selectedObj?.type === 'video'
   const isMultiSelect = selectedIds.length > 1
   const isNoneSelected = selectedId === null && selectedIds.length === 0
 
@@ -1395,7 +1507,7 @@ export function PropertiesPanel(): React.ReactElement {
         )}
 
         {/* Single object selected: per-object properties */}
-        {!isMultiSelect && selectedObj !== null && !isImage && !isText && !isShape && !isPath && (
+        {!isMultiSelect && selectedObj !== null && !isImage && !isText && !isShape && !isPath && !isVideo && (
           <div
             style={{
               padding: '20px 12px',
@@ -1405,6 +1517,17 @@ export function PropertiesPanel(): React.ReactElement {
           >
             No properties
           </div>
+        )}
+
+        {/* Video object */}
+        {!isMultiSelect && selectedObj !== null && isVideo && selectedId !== null && (
+          <VideoSection
+            videoObj={selectedObj as VideoObject}
+            selectedId={selectedId}
+            onStartDrag={startDrag}
+            onUpdate={updateObject}
+            onCommit={commitUpdate}
+          />
         )}
 
         {/* Text object */}

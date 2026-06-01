@@ -1,4 +1,7 @@
 import type Konva from 'konva'
+import type { CanvasObject, VideoObject } from '../types/canvas'
+import { getVideoElement } from './videoElementRegistry'
+import { encodeVideoFrames, encodeVideoWithAudio } from './videoExport'
 
 /**
  * Exports each carousel frame as a PNG Blob at 2x pixel ratio (2160×2160 for
@@ -131,4 +134,185 @@ export async function downloadFrames(blobs: Blob[]): Promise<void> {
       `[download] ${filename}: ${result.success ? 'saved to ~/Downloads' : 'ERROR: ' + result.error}`,
     )
   }
+}
+
+export type ExportResult =
+  | { frameIndex: number; type: 'png'; blob: Blob }
+  | { frameIndex: number; type: 'mp4'; blob: Blob }
+
+const EXPORT_FPS = 30
+
+async function captureVideoFrameSequence(
+  stage: Konva.Stage,
+  frameIndex: number,
+  frameWidth: number,
+  frameHeight: number,
+  fps: number,
+  durationSeconds: number,
+  videoElements: HTMLVideoElement[],
+): Promise<Blob[]> {
+  const PIXEL_RATIO = 2
+  const totalFrames = Math.ceil(durationSeconds * fps)
+  const pngBlobs: Blob[] = []
+
+  for (let f = 0; f < totalFrames; f++) {
+    const t = f / fps
+    await Promise.all(
+      videoElements.map(
+        (v) =>
+          new Promise<void>((resolve) => {
+            v.onseeked = () => resolve()
+            v.currentTime = t
+          }),
+      ),
+    )
+    stage.draw()
+    const full = stage.toCanvas({ pixelRatio: PIXEL_RATIO })
+    const cropCanvas = document.createElement('canvas')
+    cropCanvas.width = frameWidth * PIXEL_RATIO
+    cropCanvas.height = frameHeight * PIXEL_RATIO
+    const ctx = cropCanvas.getContext('2d')
+    if (!ctx) throw new Error(`No 2d context for video frame ${f}`)
+    ctx.drawImage(
+      full,
+      frameIndex * frameWidth * PIXEL_RATIO, 0,
+      frameWidth * PIXEL_RATIO, frameHeight * PIXEL_RATIO,
+      0, 0,
+      frameWidth * PIXEL_RATIO, frameHeight * PIXEL_RATIO,
+    )
+    const blob = await new Promise<Blob | null>((resolve) => {
+      cropCanvas.toBlob((b) => resolve(b), 'image/png')
+    })
+    if (blob) pngBlobs.push(blob)
+  }
+
+  return pngBlobs
+}
+
+export async function exportMixedFrames(
+  stage: Konva.Stage,
+  objects: Record<string, CanvasObject>,
+  frameCount: number,
+  frameWidth: number,
+  frameHeight: number,
+  startFrame?: number,
+  endFrame?: number,
+): Promise<ExportResult[]> {
+  const start = startFrame ?? 0
+  const end = endFrame ?? frameCount - 1
+
+  const transformers = stage.find<Konva.Transformer>('Transformer')
+  transformers.forEach((t) => t.hide())
+  const textNodes = stage.find<Konva.Text>('Text')
+  textNodes.forEach((n) => {
+    const userOpacity = n.getAttr('userOpacity') as number | undefined
+    n.opacity(userOpacity ?? 1)
+  })
+  const guidesLayer = stage.findOne<Konva.Layer>('.guides')
+  if (guidesLayer) guidesLayer.hide()
+  const dividersLayer = stage.findOne<Konva.Layer>('.frame-dividers')
+  if (dividersLayer) dividersLayer.hide()
+
+  const origWidth = stage.width()
+  const origHeight = stage.height()
+  const origScaleX = stage.scaleX()
+  const origScaleY = stage.scaleY()
+  const origX = stage.x()
+  const origY = stage.y()
+
+  stage.width(frameCount * frameWidth)
+  stage.height(frameHeight)
+  stage.scaleX(1)
+  stage.scaleY(1)
+  stage.x(0)
+  stage.y(0)
+  stage.draw()
+
+  const results: ExportResult[] = []
+
+  try {
+    const PIXEL_RATIO = 2
+
+    for (let i = start; i <= end; i++) {
+      const frameLeft = i * frameWidth
+      const frameRight = (i + 1) * frameWidth
+
+      const videoObjectsInFrame = Object.values(objects).filter(
+        (obj): obj is VideoObject =>
+          obj.type === 'video' &&
+          obj.visible &&
+          obj.frameX < frameRight &&
+          obj.frameX + obj.frameWidth > frameLeft,
+      )
+
+      if (videoObjectsInFrame.length === 0) {
+        // Static frame — PNG export
+        const fullCanvas = stage.toCanvas({ pixelRatio: PIXEL_RATIO })
+        const cropCanvas = document.createElement('canvas')
+        cropCanvas.width = frameWidth * PIXEL_RATIO
+        cropCanvas.height = frameHeight * PIXEL_RATIO
+        const ctx = cropCanvas.getContext('2d')
+        if (!ctx) throw new Error(`No 2d context for frame ${i}`)
+        ctx.drawImage(
+          fullCanvas,
+          i * frameWidth * PIXEL_RATIO, 0,
+          frameWidth * PIXEL_RATIO, frameHeight * PIXEL_RATIO,
+          0, 0,
+          frameWidth * PIXEL_RATIO, frameHeight * PIXEL_RATIO,
+        )
+        const blob = await new Promise<Blob | null>((resolve) => {
+          cropCanvas.toBlob((b) => resolve(b), 'image/png')
+        })
+        if (blob) results.push({ frameIndex: i, type: 'png', blob })
+      } else {
+        // Video frame — capture frame sequence and encode to MP4
+        const videoEls = videoObjectsInFrame
+          .map((obj) => getVideoElement(obj.id))
+          .filter((el): el is HTMLVideoElement => el !== undefined)
+
+        // Use the longest video duration visible in this frame
+        const duration = Math.max(...videoObjectsInFrame.map((obj) => obj.naturalDuration))
+
+        // Pause all video elements during seek-based capture
+        videoEls.forEach((v) => v.pause())
+
+        const pngBlobs = await captureVideoFrameSequence(
+          stage,
+          i,
+          frameWidth,
+          frameHeight,
+          EXPORT_FPS,
+          duration,
+          videoEls,
+        )
+
+        // Resume playback after capture
+        videoEls.forEach((v) => void v.play())
+
+        // Find first unmuted video object to mix in audio
+        const audioSource = videoObjectsInFrame.find((obj) => !obj.muted)
+        let mp4Blob: Blob
+        if (audioSource) {
+          mp4Blob = await encodeVideoWithAudio(pngBlobs, EXPORT_FPS, frameWidth, frameHeight, audioSource.filePath)
+        } else {
+          mp4Blob = await encodeVideoFrames(pngBlobs, EXPORT_FPS, frameWidth, frameHeight)
+        }
+        results.push({ frameIndex: i, type: 'mp4', blob: mp4Blob })
+      }
+    }
+  } finally {
+    stage.width(origWidth)
+    stage.height(origHeight)
+    stage.scaleX(origScaleX)
+    stage.scaleY(origScaleY)
+    stage.x(origX)
+    stage.y(origY)
+    stage.draw()
+    if (guidesLayer) guidesLayer.show()
+    if (dividersLayer) dividersLayer.show()
+    transformers.forEach((t) => t.show())
+    textNodes.forEach((n) => n.opacity(0))
+  }
+
+  return results
 }

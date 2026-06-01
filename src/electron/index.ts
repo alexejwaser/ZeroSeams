@@ -1,6 +1,7 @@
-import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron'
-import { join, dirname, basename, extname } from 'path'
+import { app, BrowserWindow, ipcMain, dialog, shell, protocol } from 'electron'
+import { join, dirname, basename, extname, relative } from 'path'
 import { writeFile, readFile, readdir, stat, mkdir } from 'fs/promises'
+import { createReadStream } from 'fs'
 import { homedir, tmpdir } from 'os'
 import { spawn } from 'child_process'
 import chokidar from 'chokidar'
@@ -294,6 +295,38 @@ ipcMain.handle(
   },
 )
 
+ipcMain.handle(
+  'save-video-file',
+  async (_event, { filename, base64 }: { filename: string; base64: string }) => {
+    const win = BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0]
+    const { canceled, filePath } = await dialog.showSaveDialog(win, {
+      defaultPath: join(app.getPath('downloads'), filename),
+      filters: [{ name: 'MP4 Video', extensions: ['mp4'] }],
+    })
+    if (canceled || !filePath) return { success: false, error: 'cancelled' }
+    try {
+      await writeFile(filePath, Buffer.from(base64, 'base64'))
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: String(error) }
+    }
+  },
+)
+
+ipcMain.handle(
+  'resolve-video-path',
+  async (_event, { relativeFilePath, projectFilePath }: { relativeFilePath: string; projectFilePath: string }) => {
+    return { filePath: join(dirname(projectFilePath), relativeFilePath) }
+  },
+)
+
+ipcMain.handle(
+  'make-relative-path',
+  async (_event, { fromDir, toPath }: { fromDir: string; toPath: string }) => {
+    return { relativePath: relative(fromDir, toPath) }
+  },
+)
+
 ipcMain.handle('stop-external-edit', async (_event, { objectId }: { objectId: string }) => {
   const watcher = watchers.get(objectId)
   if (watcher) {
@@ -304,7 +337,67 @@ ipcMain.handle('stop-external-edit', async (_event, { objectId }: { objectId: st
   return { success: true }
 })
 
-app.whenReady().then(createWindow)
+app.whenReady().then(() => {
+  // Serve local video files via zeroseams-media:///absolute/path.
+  // Needed because the renderer loads from http://localhost in dev mode, and
+  // Chromium blocks file:// media requests as cross-origin from http://.
+  // <video> requires Range request support for seeking — net.fetch('file://')
+  // doesn't expose that, so we implement it manually with createReadStream.
+  const MEDIA_MIME: Record<string, string> = {
+    mp4: 'video/mp4', mov: 'video/quicktime', m4v: 'video/mp4',
+    webm: 'video/webm', ogg: 'video/ogg',
+  }
+  protocol.handle('zeroseams-media', async (request) => {
+    const pathname = decodeURIComponent(new URL(request.url).pathname)
+    const ext = pathname.split('.').pop()?.toLowerCase() ?? ''
+    const mime = MEDIA_MIME[ext] ?? 'video/mp4'
+
+    let fileSize: number
+    try {
+      fileSize = (await stat(pathname)).size
+    } catch {
+      return new Response('Not found', { status: 404 })
+    }
+
+    const rangeHeader = request.headers.get('range')
+    const start = rangeHeader ? parseInt(rangeHeader.replace(/bytes=(\d+)-.*/, '$1'), 10) : 0
+    const endRaw = rangeHeader ? rangeHeader.replace(/bytes=\d+-(\d*)/, '$1') : ''
+    const end = endRaw ? parseInt(endRaw, 10) : fileSize - 1
+
+    const nodeStream = createReadStream(pathname, { start, end })
+    const body = new ReadableStream({
+      start(controller) {
+        nodeStream.on('data', (chunk) =>
+          controller.enqueue(chunk instanceof Buffer ? chunk : Buffer.from(chunk as string)),
+        )
+        nodeStream.on('end', () => controller.close())
+        nodeStream.on('error', (err) => controller.error(err))
+      },
+      cancel() { nodeStream.destroy() },
+    })
+
+    if (rangeHeader) {
+      return new Response(body, {
+        status: 206,
+        headers: {
+          'Content-Type': mime,
+          'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+          'Content-Length': String(end - start + 1),
+          'Accept-Ranges': 'bytes',
+        },
+      })
+    }
+    return new Response(body, {
+      status: 200,
+      headers: {
+        'Content-Type': mime,
+        'Content-Length': String(fileSize),
+        'Accept-Ranges': 'bytes',
+      },
+    })
+  })
+  createWindow()
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()

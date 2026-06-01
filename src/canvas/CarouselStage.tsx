@@ -15,6 +15,8 @@ import { SnapGuides } from './SnapGuides'
 import { useSnapGuides } from './useSnapGuides'
 import type { SnapGuide } from './useSnapGuides'
 import { useImageDrop } from './useImageDrop'
+import { useVideoDrop } from './useVideoDrop'
+import { CanvasVideoNode } from './CanvasVideoNode'
 import { useAutosave } from './useAutosave'
 import { useKeyboardShortcuts } from './useKeyboardShortcuts'
 import { useThumbnailGenerator } from './useThumbnailStore'
@@ -164,6 +166,7 @@ export function CarouselStage(): React.ReactElement {
   const spacePanActiveRef = useRef(false)
 
   useImageDrop(containerRef)
+  useVideoDrop(containerRef)
   useAutosave()
   useKeyboardShortcuts()
   useThumbnailGenerator()
@@ -1185,6 +1188,16 @@ export function CarouselStage(): React.ReactElement {
             if (type === 'path') {
               return (
                 <CanvasPathNode
+                  key={id}
+                  id={id}
+                  onGuidesChange={setActiveGuides}
+                  nodeRef={getOrCreateNodeRef(id)}
+                />
+              )
+            }
+            if (type === 'video') {
+              return (
+                <CanvasVideoNode
                   key={id}
                   id={id}
                   onGuidesChange={setActiveGuides}

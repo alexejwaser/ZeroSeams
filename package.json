@@ -13,6 +13,8 @@
     "lint": "eslint src --ext .ts,.tsx"
   },
   "dependencies": {
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
     "@imgly/background-removal": "^1.4.5",
     "chokidar": "^3.6.0",
     "konva": "^9.3.15",

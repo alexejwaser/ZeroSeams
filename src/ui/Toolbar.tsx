@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
 import { getStageInstance } from '@/canvas/CarouselStage'
-import { exportFrames, downloadFrames } from '@/canvas/exportFrames'
+import { exportMixedFrames } from '@/canvas/exportFrames'
 import { useSaveStatusStore, type SaveStatus } from './useSaveStatusStore'
 import type { CarouselProject } from '@/types/project'
 import type { ShapeKind } from '@/types/canvas'
+import { relativizeVideoObjects, resolveVideoObjects } from '@/canvas/pathUtils'
 import {
   MousePointer2, Type, Square, Circle, Minus, PenTool,
   Undo2, Redo2, FolderOpen, Save, ImageDown,
@@ -68,6 +69,18 @@ function SaveStatusPill({ status }: { status: SaveStatus }): React.ReactElement 
 const divider = (
   <div style={{ width: 1, height: 20, background: '#3a3a3a', margin: '0 6px' }} />
 )
+
+async function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const dataUrl = reader.result as string
+      resolve(dataUrl.split(',')[1])
+    }
+    reader.onerror = () => reject(new Error('FileReader failed'))
+    reader.readAsDataURL(blob)
+  })
+}
 
 export function Toolbar(): React.ReactElement {
   const activeTool = useCanvasStore((s) => s.activeTool)
@@ -176,8 +189,21 @@ export function Toolbar(): React.ReactElement {
 
     setExporting(true)
     try {
-      const blobs = await exportFrames(stage, frameCount, frameWidth, frameHeight, start, end)
-      await downloadFrames(blobs)
+      const currentObjects = useCanvasStore.getState().objects
+      const results = await exportMixedFrames(stage, currentObjects, frameCount, frameWidth, frameHeight, start, end)
+      for (const result of results) {
+        const frameNum = result.frameIndex + 1
+        const base64 = await blobToBase64(result.blob)
+        if (result.type === 'mp4') {
+          const filename = `frame-${frameNum}.mp4`
+          const saveResult = await window.electronAPI.saveVideoFile(filename, base64)
+          console.log(`[export] ${filename}: ${saveResult.success ? 'saved' : 'ERROR: ' + saveResult.error}`)
+        } else {
+          const filename = `frame-${frameNum}.png`
+          const saveResult = await window.electronAPI.saveFile(filename, base64)
+          console.log(`[export] ${filename}: ${saveResult.success ? 'saved' : 'ERROR: ' + saveResult.error}`)
+        }
+      }
     } catch (err) {
       console.error('[export] failed:', err)
       alert(`Export failed: ${String(err)}`)
@@ -193,6 +219,9 @@ export function Toolbar(): React.ReactElement {
       const result = await window.electronAPI.openProject()
       if (!result.success || result.json == null) return
       const project = JSON.parse(result.json) as CarouselProject
+      if (result.filePath) {
+        project.objects = resolveVideoObjects(project.objects, result.filePath)
+      }
       loadProject(project)
       const filename = project.name.toLowerCase().replace(/\s+/g, '-')
       setProjectMeta(project.id, project.name, filename, project.createdAt)
@@ -237,7 +266,7 @@ export function Toolbar(): React.ReactElement {
       frameCount: state.frameCount,
       frames: state.frames,
       backgroundColor: state.backgroundColor,
-      objects: state.objects,
+      objects: relativizeVideoObjects(state.objects, saveStore.currentFilePath),
       objectOrder: state.objectOrder,
       createdAt: saveStore.createdAt,
       updatedAt: new Date().toISOString(),

@@ -1,9 +1,10 @@
 import React, { useRef, useState } from 'react'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
 import { useThumbnailStore } from '@/canvas/useThumbnailStore'
-import type { CanvasObject, CanvasObjectType, ImageObject } from '@/types/canvas'
+import type { CanvasObject, CanvasObjectType, ImageObject, VideoObject } from '@/types/canvas'
 import Tooltip from './Tooltip'
-import { Link2, Star, Lock, LockOpen, Eye, EyeOff } from 'lucide-react'
+import { iconBtnStyle } from './iconBtnStyle'
+import { Link2, Star, Lock, LockOpen, Eye, EyeOff, Volume2, VolumeX } from 'lucide-react'
 
 function typeLabel(type: CanvasObjectType): string {
   switch (type) {
@@ -12,6 +13,7 @@ function typeLabel(type: CanvasObjectType): string {
     case 'shape': return 'Shape'
     case 'group': return 'Group'
     case 'path': return 'Path'
+    case 'video': return 'Video'
   }
 }
 
@@ -25,6 +27,7 @@ export function LayerPanel(): React.ReactElement {
   const addToSelection = useCanvasStore((s) => s.addToSelection)
   const setAnchor = useCanvasStore((s) => s.setAnchor)
   const updateObject = useCanvasStore((s) => s.updateObject)
+  const commitUpdate = useCanvasStore((s) => s.commitUpdate)
   const reorderObjects = useCanvasStore((s) => s.reorderObjects)
   const toggleLock = useCanvasStore((s) => s.toggleLock)
   const enterMaskEditMode = useCanvasStore((s) => s.enterMaskEditMode)
@@ -54,6 +57,11 @@ export function LayerPanel(): React.ReactElement {
   function handleLockClick(e: React.MouseEvent<HTMLButtonElement>, id: string): void {
     e.stopPropagation()
     toggleLock(id)
+  }
+
+  function handleMuteClick(e: React.MouseEvent<HTMLButtonElement>, obj: VideoObject): void {
+    e.stopPropagation()
+    commitUpdate(obj.id, { muted: !obj.muted })
   }
 
   function getDisplayName(id: string, originalIndex: number): string {
@@ -120,6 +128,7 @@ export function LayerPanel(): React.ReactElement {
           const isDropBefore = dropPos?.id === id && dropPos.side === 'before'
           const isDropAfter = dropPos?.id === id && dropPos.side === 'after'
           const canBeAnchor = selectedIds.length > 1 && selectedIds.includes(id)
+          const isVideo = obj.type === 'video'
 
           return (
             <div
@@ -254,6 +263,28 @@ export function LayerPanel(): React.ReactElement {
                     }}
                   >
                     <Star size={13} strokeWidth={1.5} fill={isAnchor ? 'gold' : 'none'} color={isAnchor ? 'gold' : '#666'}/>
+                  </button>
+                </Tooltip>
+              )}
+
+              {/* Mute toggle — video rows only */}
+              {isVideo && (
+                <Tooltip label={(obj as VideoObject).muted ? 'Unmute' : 'Mute'}>
+                  <button
+                    draggable={false}
+                    onClick={(e) => handleMuteClick(e, obj as VideoObject)}
+                    style={{
+                      ...iconBtnStyle(false),
+                      width: 22,
+                      height: 22,
+                      flexShrink: 0,
+                      background: 'none',
+                      opacity: (obj as VideoObject).muted ? 1 : 0.4,
+                    }}
+                  >
+                    {(obj as VideoObject).muted
+                      ? <VolumeX size={12} strokeWidth={1.5}/>
+                      : <Volume2 size={12} strokeWidth={1.5}/>}
                   </button>
                 </Tooltip>
               )}

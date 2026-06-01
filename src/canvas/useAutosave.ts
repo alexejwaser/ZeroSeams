@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useCanvasStore } from './useCanvasStore'
 import type { CarouselProject } from '@/types/project'
 import { useSaveStatusStore, type SaveStatus } from '@/ui/useSaveStatusStore'
+import { relativizeVideoObjects } from './pathUtils'
 
 export function useAutosave(): { status: SaveStatus; lastSavedAt: string | null } {
   const setStoreStatus = useSaveStatusStore((s) => s.setStatus)
@@ -54,7 +55,7 @@ export function useAutosave(): { status: SaveStatus; lastSavedAt: string | null 
           frameCount,
           frames: state.frames,
           backgroundColor: state.backgroundColor,
-          objects,
+          objects: relativizeVideoObjects(objects, saveStore.currentFilePath),
           objectOrder,
           createdAt: saveStore.createdAt,
           updatedAt: new Date().toISOString(),

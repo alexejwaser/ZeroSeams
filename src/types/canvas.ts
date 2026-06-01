@@ -1,7 +1,7 @@
 // CanvasObject — every element that lives on the carousel canvas.
 // Agents must use this interface; never use `any` for canvas objects.
 
-export type CanvasObjectType = 'image' | 'text' | 'shape' | 'group' | 'path'
+export type CanvasObjectType = 'image' | 'text' | 'shape' | 'group' | 'path' | 'video'
 
 export type CanvasObjectScope =
   | 'global'   // spans the full canvas freely
@@ -195,4 +195,33 @@ export interface GroupObject extends BaseCanvasObject {
   childIds: string[]
 }
 
-export type CanvasObject = ImageObject | TextObject | ShapeObject | GroupObject | PathObject
+export interface VideoObject extends BaseCanvasObject {
+  type: 'video'
+  /** Absolute path at runtime; converted to relativeFilePath on save */
+  filePath: string
+  /** Path relative to the .zeroseams file; used for project portability */
+  relativeFilePath?: string
+  /** Whether audio is muted on export */
+  muted: boolean
+  /** Intrinsic pixel dimensions of the video */
+  naturalWidth: number
+  naturalHeight: number
+  /** Video duration in seconds */
+  naturalDuration: number
+
+  // x/y/width/height from BaseCanvasObject kept in sync with frame fields
+  frameX: number
+  frameY: number
+  frameWidth: number
+  frameHeight: number
+
+  contentOffsetX: number
+  contentOffsetY: number
+  contentWidth: number
+  contentHeight: number
+
+  /** When true, transformer targets content inside the frame rather than the frame itself */
+  contentEditMode: boolean
+}
+
+export type CanvasObject = ImageObject | TextObject | ShapeObject | GroupObject | PathObject | VideoObject
