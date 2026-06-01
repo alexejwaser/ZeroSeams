@@ -132,6 +132,10 @@ interface CanvasState {
     originPos: { x: number; y: number } | { frameX: number; frameY: number },
     finalPos: { x: number; y: number } | { frameX: number; frameY: number },
   ) => void
+  /** Transient — captures pre-drag object state so commitUpdate can save the correct pre-drag snapshot. Not in history. */
+  _dragStartObjects: Record<string, CanvasObject> | null
+  /** Call onMouseDown before any updateObject drag calls. commitUpdate will use this snapshot for the history entry. */
+  startDrag: () => void
 }
 
 function normalizeObjectsForSnapshot(objects: Record<string, CanvasObject>): Record<string, CanvasObject> {
@@ -205,6 +209,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
     captureTextSelection: null,
     maskDrawMode: null,
     maskModeActive: false,
+    _dragStartObjects: null,
 
     addObject: (obj) => {
       let normalized = obj
@@ -238,15 +243,22 @@ export const useCanvasStore = create<CanvasState>((set) => {
       set((state) => {
         const existing = state.objects[id]
         if (!existing) return state
+        // Use pre-drag snapshot when available so undo reaches the state before the drag started,
+        // not the live-preview-mutated state that updateObject left behind.
+        const snapshotObjects = state._dragStartObjects ?? state.objects
         return {
-          past: pushHistoryFrom(state),
+          past: pushHistoryFrom({ ...state, objects: snapshotObjects }),
           future: [],
+          _dragStartObjects: null,
           objects: {
             ...state.objects,
             [id]: { ...existing, ...patch } as CanvasObject,
           },
         }
       }),
+
+    startDrag: () =>
+      set((state) => ({ _dragStartObjects: state.objects })),
 
     removeObject: (id) =>
       set((state) => {
@@ -372,7 +384,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
         // 'after' in panel (insert below target visually) = insert BEFORE toId in objectOrder
         const insertAt = side === 'before' ? toIndex + 1 : toIndex
         order.splice(insertAt, 0, fromId)
-        return { objectOrder: order }
+        return { past: pushHistoryFrom(state), future: [], objectOrder: order }
       }),
 
     toggleLock: (id) =>

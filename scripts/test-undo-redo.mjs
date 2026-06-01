@@ -1,0 +1,658 @@
+/**
+ * Playwright/Electron E2E test for undo/redo history (issue #38).
+ * Tests all undo/redo-sensitive actions for correct history behavior.
+ *
+ * Run: node scripts/test-undo-redo.mjs
+ * Requires: npm run build first
+ */
+import { _electron as electron } from 'playwright'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import fs from 'node:fs'
+
+const ROOT = path.resolve(fileURLToPath(import.meta.url), '../..')
+const ELECTRON_BIN = path.join(ROOT, 'node_modules/electron/dist/Electron.app/Contents/MacOS/Electron')
+const SHOTS = '/tmp/zeroseams-undo-redo-tests'
+fs.mkdirSync(SHOTS, { recursive: true })
+
+// ─── Test runner ─────────────────────────────────────────────────────────────
+let passed = 0, failed = 0
+const failures = []
+
+function ok(cond, msg) {
+  if (cond) { console.log(`  ✓ ${msg}`); passed++ }
+  else       { console.log(`  ✗ ${msg}`); failed++; failures.push(msg) }
+}
+function eq(a, b, msg) {
+  const pass = a === b
+  ok(pass, pass ? msg : `${msg} — got ${JSON.stringify(a)}, want ${JSON.stringify(b)}`)
+}
+
+// ─── Launch ───────────────────────────────────────────────────────────────────
+console.log('Launching app…')
+const app = await electron.launch({
+  executablePath: ELECTRON_BIN,
+  args: [path.join(ROOT, 'out/main/index.js')],
+  timeout: 30_000,
+})
+const page = app.windows().find(w => !w.url().startsWith('devtools://')) ?? await app.firstWindow()
+page.on('console', m => { if (m.type() === 'error') console.error(`  [renderer error] ${m.text()}`) })
+
+const ss   = (n) => page.screenshot({ path: `${SHOTS}/${n}.png` }).then(() => console.log(`    📸 ${n}`))
+const wait = (ms) => new Promise(r => setTimeout(r, ms))
+
+await page.waitForSelector('canvas', { timeout: 12_000 })
+await wait(1500)
+
+// ─── Store verification ───────────────────────────────────────────────────────
+const storeReady = await page.evaluate(() => typeof window.__canvasStore__ !== 'undefined')
+if (!storeReady) {
+  console.error('FATAL: __canvasStore__ not exposed on window')
+  await app.close()
+  process.exit(1)
+}
+console.log('✓ Store exposed\n')
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+const getState = () => page.evaluate(() => {
+  const s = window.__canvasStore__.getState()
+  return {
+    objects: s.objects,
+    objectOrder: s.objectOrder,
+    pastLen: s.past.length,
+    futureLen: s.future.length,
+    frameCount: s.frameCount,
+    backgroundColor: s.backgroundColor,
+    ratio: s.ratio,
+  }
+})
+
+const undo = () => page.evaluate(() => window.__canvasStore__.getState().undo())
+const redo = () => page.evaluate(() => window.__canvasStore__.getState().redo())
+
+// Minimal 10×10 white PNG data URL (same as test-multiselect-transform.mjs)
+const TEST_IMG_SRC = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mNk+M9Qz0AEYBxVSF+FAAhKDveksOjmAAAAAElFTkSuQmCC'
+
+const addShape = () => page.evaluate(() => {
+  const id = crypto.randomUUID()
+  window.__canvasStore__.getState().addObject({
+    id, type: 'shape', kind: 'rect', scope: 'global',
+    x: 100, y: 100, width: 100, height: 100,
+    fill: '#ff0000', stroke: '#000000', strokeWidth: 1,
+    opacity: 1, rotation: 0, visible: true, locked: false, zIndex: 0,
+    scaleX: 1, scaleY: 1,
+  })
+  return id
+})
+
+const addText = () => page.evaluate(() => {
+  const id = crypto.randomUUID()
+  window.__canvasStore__.getState().addObject({
+    id, type: 'text', scope: 'global',
+    x: 200, y: 200, width: 200, height: 50,
+    fontFamily: 'sans-serif', fontSize: 24, fontStyle: 'normal',
+    fill: '#000000', align: 'left', letterSpacing: 0, lineHeight: 1.2,
+    spans: [{ text: 'Hello' }],
+    opacity: 1, rotation: 0, visible: true, locked: false, zIndex: 0,
+    scaleX: 1, scaleY: 1,
+  })
+  return id
+})
+
+const addPath = () => page.evaluate(() => {
+  const id = crypto.randomUUID()
+  window.__canvasStore__.getState().addObject({
+    id, type: 'path', scope: 'global',
+    x: 300, y: 300, width: 100, height: 100,
+    anchors: [
+      { x: 300, y: 300, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 30, dy: 0 } },
+      { x: 400, y: 300, handleIn: { dx: -30, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
+      { x: 400, y: 400, handleIn: { dx: 0, dy: -30 }, handleOut: { dx: 0, dy: 0 } },
+    ],
+    closed: true, fill: '#0000ff', stroke: '#000000', strokeWidth: 1,
+    pathEditMode: false,
+    opacity: 1, rotation: 0, visible: true, locked: false, zIndex: 0,
+    scaleX: 1, scaleY: 1,
+  })
+  return id
+})
+
+const addImage = (src) => page.evaluate((s) => {
+  const id = crypto.randomUUID()
+  window.__canvasStore__.getState().addObject({
+    id, type: 'image', scope: 'global',
+    x: 50, y: 50, width: 200, height: 200,
+    frameX: 50, frameY: 50, frameWidth: 200, frameHeight: 200,
+    contentOffsetX: 0, contentOffsetY: 0, contentWidth: 200, contentHeight: 200,
+    naturalWidth: 10, naturalHeight: 10,
+    src: s, backgroundRemoved: false,
+    contentEditMode: false, maskEditMode: false,
+    opacity: 1, rotation: 0, visible: true, locked: false, zIndex: 0,
+    scaleX: 1, scaleY: 1,
+  })
+  return id
+}, src)
+
+// Select an object and wait for PropertiesPanel to render
+const selectObj = (id) => page.evaluate((id) => {
+  window.__canvasStore__.getState().setSelected(id)
+}, id)
+
+// Simulate opacity range slider: mousedown + N input events + mouseup.
+// Returns { inputDelta, mouseupDelta } — change in pastLen at each point.
+const simulateOpacitySlider = (targetVal) => page.evaluate((tv) => {
+  function findOpacitySlider() {
+    const labels = [...document.querySelectorAll('label')]
+    const lbl = labels.find(l => l.textContent.trim() === 'Opacity')
+    if (!lbl) return null
+    return lbl.parentElement?.querySelector('input[type="range"]') ?? null
+  }
+  const slider = findOpacitySlider()
+  if (!slider) return { error: 'opacity slider not found' }
+
+  const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set
+
+  // Simulate mousedown (triggers onMouseDown=startDrag, capturing pre-drag state)
+  slider.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+  const before = window.__canvasStore__.getState().past.length
+
+  // Simulate 3 incremental input events (drag in progress)
+  for (const v of [tv - 20, tv - 10, tv]) {
+    setter.call(slider, String(Math.max(0, v)))
+    slider.dispatchEvent(new Event('input', { bubbles: true }))
+  }
+  const afterInputs = window.__canvasStore__.getState().past.length
+
+  // Simulate mouseup (end of drag — triggers commitUpdate with pre-drag snapshot)
+  slider.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
+  const afterMouseup = window.__canvasStore__.getState().past.length
+
+  return {
+    inputDelta: afterInputs - before,
+    mouseupDelta: afterMouseup - before,
+  }
+}, targetVal)
+
+// ─── Baseline: clear any leftover objects ────────────────────────────────────
+await page.evaluate(() => {
+  const s = window.__canvasStore__.getState()
+  for (const id of [...s.objectOrder]) s.removeObject(id)
+})
+await wait(200)
+
+// ── A. Object lifecycle ───────────────────────────────────────────────────────
+console.log('── A. Object lifecycle ──')
+
+{
+  const s0 = await getState()
+  const id = await addShape()
+  const s1 = await getState()
+  eq(s1.pastLen - s0.pastLen, 1, 'addObject pushes 1 history entry')
+  ok(s1.objects[id] !== undefined, 'object exists after add')
+
+  await undo()
+  await wait(100)
+  const s2 = await getState()
+  ok(s2.objects[id] === undefined, 'undo removes added object')
+  eq(s2.futureLen, 1, 'undo moves entry to future')
+
+  await redo()
+  await wait(100)
+  const s3 = await getState()
+  ok(s3.objects[id] !== undefined, 'redo re-adds object')
+
+  // Delete
+  await page.evaluate((id) => window.__canvasStore__.getState().removeObject(id), id)
+  await wait(100)
+  const s4 = await getState()
+  eq(s4.pastLen - s3.pastLen, 1, 'removeObject pushes 1 history entry')
+  ok(s4.objects[id] === undefined, 'object gone after delete')
+
+  await undo()
+  await wait(100)
+  const s5 = await getState()
+  ok(s5.objects[id] !== undefined, 'undo restores deleted object')
+
+  // Duplicate
+  await page.evaluate((id) => window.__canvasStore__.getState().duplicateObject(id), id)
+  await wait(100)
+  const s6 = await getState()
+  eq(s6.pastLen - s5.pastLen, 1, 'duplicateObject pushes 1 history entry')
+  eq(s6.objectOrder.length, s5.objectOrder.length + 1, 'duplicate added to order')
+
+  await undo()
+  await wait(100)
+  const s7 = await getState()
+  eq(s7.objectOrder.length, s5.objectOrder.length, 'undo removes duplicate')
+
+  // Lock
+  await page.evaluate((id) => window.__canvasStore__.getState().toggleLock(id), id)
+  await wait(100)
+  const s8 = await getState()
+  eq(s8.pastLen - s7.pastLen, 1, 'toggleLock pushes 1 history entry')
+  ok(s8.objects[id]?.locked === true, 'object is locked')
+
+  await undo()
+  await wait(100)
+  const s9 = await getState()
+  ok(s9.objects[id]?.locked === false, 'undo unlocks object')
+
+  // Cleanup
+  await page.evaluate((id) => window.__canvasStore__.getState().removeObject(id), id)
+  await wait(100)
+}
+
+// ── B. Z-order ────────────────────────────────────────────────────────────────
+console.log('\n── B. Z-order ──')
+
+{
+  const id1 = await addShape()
+  const id2 = await addShape()
+  await wait(100)
+
+  const s0 = await getState()
+  const orderBefore = [...s0.objectOrder]
+
+  // bringForward
+  await page.evaluate((id) => window.__canvasStore__.getState().bringForward(id), id1)
+  await wait(100)
+  const s1 = await getState()
+  eq(s1.pastLen - s0.pastLen, 1, 'bringForward pushes 1 history entry')
+  ok(s1.objectOrder.join() !== orderBefore.join(), 'order changed after bringForward')
+
+  await undo()
+  await wait(100)
+  const s2 = await getState()
+  eq(s2.objectOrder.join(), orderBefore.join(), 'undo reverts bringForward')
+
+  // sendBackward
+  await page.evaluate((id) => window.__canvasStore__.getState().sendBackward(id), id2)
+  await wait(100)
+  const s3 = await getState()
+  eq(s3.pastLen - s2.pastLen, 1, 'sendBackward pushes 1 history entry')
+
+  await undo()
+  await wait(100)
+
+  // reorderObjects (layer panel drag) — previously had no history entry
+  const s4 = await getState()
+  const orderBefore2 = [...s4.objectOrder]
+  await page.evaluate(([from, to]) => {
+    window.__canvasStore__.getState().reorderObjects(from, to, 'before')
+  }, [id1, id2])
+  await wait(100)
+  const s5 = await getState()
+  eq(s5.pastLen - s4.pastLen, 1, 'reorderObjects pushes 1 history entry')
+
+  await undo()
+  await wait(100)
+  const s6 = await getState()
+  eq(s6.objectOrder.join(), orderBefore2.join(), 'undo reverts layer panel reorder')
+
+  // Cleanup
+  await page.evaluate(([a, b]) => {
+    const s = window.__canvasStore__.getState()
+    s.removeObject(a)
+    s.removeObject(b)
+  }, [id1, id2])
+  await wait(100)
+}
+
+// ── C. Opacity sliders ────────────────────────────────────────────────────────
+console.log('\n── C. Opacity sliders ──')
+
+for (const [label, addFn] of [
+  ['shape', addShape],
+  ['text', addText],
+  ['path', addPath],
+  ['image', () => addImage(TEST_IMG_SRC)],
+]) {
+  const id = await addFn()
+  await wait(100)
+  await selectObj(id)
+  await wait(400) // wait for PropertiesPanel to render
+
+  const result = await simulateOpacitySlider(60)
+
+  if (result.error) {
+    ok(false, `${label}: opacity slider found in PropertiesPanel`)
+  } else {
+    eq(result.inputDelta, 0, `${label}: input events don't flood history (delta=${result.inputDelta})`)
+    eq(result.mouseupDelta, 1, `${label}: mouseup commits exactly 1 history entry (delta=${result.mouseupDelta})`)
+  }
+
+  // Undo should revert opacity back to 1
+  await undo()
+  await wait(100)
+  const s = await getState()
+  const opacity = s.objects[id]?.opacity ?? -1
+  ok(Math.abs(opacity - 1) < 0.01, `${label}: undo reverts opacity to 1 (got ${opacity.toFixed(2)})`)
+
+  await page.evaluate((id) => window.__canvasStore__.getState().removeObject(id), id)
+  await wait(100)
+}
+
+// ── D. Photo adjustment sliders ───────────────────────────────────────────────
+console.log('\n── D. Photo adjustment sliders ──')
+
+{
+  const id = await addImage(TEST_IMG_SRC)
+  await wait(100)
+  await selectObj(id)
+  await wait(500)
+
+  // Simulate one drag gesture: startDrag + updateObject calls + commitUpdate.
+  // Must call gs() fresh each time — Zustand set() returns a new state object,
+  // a cached reference goes stale after any action call.
+  const ZERO_ADJ = { exposure: 0, contrast: 0, highlights: 0, shadows: 0, whites: 0, blacks: 0, temperature: 0, tint: 0, saturation: 0, vibrance: 0, clarity: 0, dehaze: 0 }
+
+  const adjResult = await page.evaluate(([imgId, zero]) => {
+    const gs = () => window.__canvasStore__.getState()
+    const before = gs().past.length
+
+    gs().startDrag()
+    gs().updateObject(imgId, { adjustments: { ...zero, exposure: 1 } })
+    gs().updateObject(imgId, { adjustments: { ...zero, exposure: 2 } })
+    const afterUpdates = gs().past.length
+
+    gs().commitUpdate(imgId, { adjustments: { ...zero, exposure: 2 } })
+    const afterCommit = gs().past.length
+
+    return { updateDelta: afterUpdates - before, commitDelta: afterCommit - before }
+  }, [id, ZERO_ADJ])
+
+  eq(adjResult.updateDelta, 0, 'adjustment updateObject calls don\'t flood history')
+  eq(adjResult.commitDelta, 1, 'adjustment commitUpdate adds exactly 1 entry')
+
+  // Two sequential slider gestures = 2 history entries
+  const twoGestureResult = await page.evaluate(([imgId, zero]) => {
+    const gs = () => window.__canvasStore__.getState()
+    const before = gs().past.length
+    gs().startDrag()
+    gs().updateObject(imgId, { adjustments: { ...zero, exposure: 1 } })
+    gs().commitUpdate(imgId, { adjustments: { ...zero, exposure: 1 } })
+    gs().startDrag()
+    gs().updateObject(imgId, { adjustments: { ...zero, exposure: 2 } })
+    gs().commitUpdate(imgId, { adjustments: { ...zero, exposure: 2 } })
+    return gs().past.length - before
+  }, [id, ZERO_ADJ])
+  eq(twoGestureResult, 2, 'two adjustment gestures = 2 history entries')
+
+  // Undo steps back through pre-drag snapshots.
+  // History at this point: [..., {exposure=0 from adjResult startDrag},
+  //   {exposure=2 from pre-gesture1}, {exposure=1 from pre-gesture2}]
+  // Current = exposure=2. Three undos reach 0.
+  await undo()
+  await wait(100)
+  const s1 = await getState()
+  eq(s1.objects[id]?.adjustments?.exposure ?? -1, 1, 'undo 1: reverts to exposure=1 (gesture2 undone)')
+
+  await undo()
+  await wait(100)
+  const s2 = await getState()
+  eq(s2.objects[id]?.adjustments?.exposure ?? -1, 2, 'undo 2: reverts to pre-gesture1 state (exposure=2)')
+
+  await undo()
+  await wait(100)
+  const s3 = await getState()
+  eq(s3.objects[id]?.adjustments?.exposure ?? 0, 0, 'undo 3: reverts to pre-adjResult state (exposure=0)')
+
+  await page.evaluate((id) => window.__canvasStore__.getState().removeObject(id), id)
+  await wait(100)
+}
+
+// ── E. Object properties ──────────────────────────────────────────────────────
+console.log('\n── E. Object properties ──')
+
+{
+  const id = await addShape()
+  await wait(100)
+
+  // Fill color
+  await page.evaluate((id) => window.__canvasStore__.getState().commitUpdate(id, { fill: '#00ff00' }), id)
+  const s1 = await getState()
+  eq(s1.objects[id]?.fill, '#00ff00', 'fill updated')
+  await undo()
+  await wait(100)
+  const s2 = await getState()
+  eq(s2.objects[id]?.fill, '#ff0000', 'undo reverts fill to original')
+
+  // Stroke width
+  await page.evaluate((id) => window.__canvasStore__.getState().commitUpdate(id, { strokeWidth: 5 }), id)
+  await undo()
+  await wait(100)
+  const s3 = await getState()
+  eq(s3.objects[id]?.strokeWidth, 1, 'undo reverts strokeWidth')
+
+  // Corner radius
+  await page.evaluate((id) => window.__canvasStore__.getState().commitUpdate(id, { cornerRadius: 12 }), id)
+  await undo()
+  await wait(100)
+  const s4 = await getState()
+  ok((s4.objects[id]?.cornerRadius ?? 0) === 0, 'undo reverts cornerRadius')
+
+  await page.evaluate((id) => window.__canvasStore__.getState().removeObject(id), id)
+  await wait(100)
+}
+
+// ── F. Mask ───────────────────────────────────────────────────────────────────
+console.log('\n── F. Mask ──')
+
+{
+  const id = await addImage(TEST_IMG_SRC)
+  await wait(100)
+
+  // Add a mask via commitUpdate
+  const mask = { anchors: [], feather: 0, inverted: false, visible: true, kind: 'rect' }
+  await page.evaluate(([id, mask]) => window.__canvasStore__.getState().commitUpdate(id, { mask }), [id, mask])
+  const s1 = await getState()
+  ok(s1.objects[id]?.mask !== undefined, 'mask added')
+
+  // Change feather (slider: startDrag on mouseDown, updateObject on drag, commitUpdate on mouseUp)
+  await page.evaluate((id) => {
+    const gs = () => window.__canvasStore__.getState()
+    const m = gs().objects[id].mask
+    gs().startDrag()
+    gs().updateObject(id, { mask: { ...m, feather: 5 } })
+    gs().updateObject(id, { mask: { ...m, feather: 10 } })
+  }, id)
+  const s2 = await getState()
+  eq(s2.pastLen - s1.pastLen, 0, 'feather updateObject calls don\'t push history')
+
+  await page.evaluate((id) => {
+    const gs = () => window.__canvasStore__.getState()
+    const m = gs().objects[id].mask
+    gs().commitUpdate(id, { mask: { ...m, feather: 10 } })
+  }, id)
+  const s3 = await getState()
+  eq(s3.pastLen - s1.pastLen, 1, 'feather commitUpdate pushes 1 entry')
+
+  await undo()
+  await wait(100)
+  const s4 = await getState()
+  eq(s4.objects[id]?.mask?.feather ?? -1, 0, 'undo reverts feather to 0')
+
+  // Toggle mask visibility
+  await page.evaluate((id) => {
+    const s = window.__canvasStore__.getState()
+    const m = s.objects[id].mask
+    s.commitUpdate(id, { mask: { ...m, visible: false } })
+  }, id)
+  await undo()
+  await wait(100)
+  const s5 = await getState()
+  ok(s5.objects[id]?.mask?.visible === true, 'undo restores mask visibility')
+
+  // Delete mask
+  await page.evaluate((id) => window.__canvasStore__.getState().commitUpdate(id, { mask: undefined }), id)
+  const s6 = await getState()
+  ok(s6.objects[id]?.mask === undefined, 'mask deleted')
+  await undo()
+  await wait(100)
+  const s7 = await getState()
+  ok(s7.objects[id]?.mask !== undefined, 'undo restores deleted mask')
+
+  await page.evaluate((id) => window.__canvasStore__.getState().removeObject(id), id)
+  await wait(100)
+}
+
+// ── G. Canvas-level ───────────────────────────────────────────────────────────
+console.log('\n── G. Canvas-level ──')
+
+{
+  const s0 = await getState()
+
+  // Background color
+  await page.evaluate(() => window.__canvasStore__.getState().setCanvasBackground('#123456'))
+  await wait(100)
+  const s1 = await getState()
+  eq(s1.pastLen - s0.pastLen, 1, 'setCanvasBackground pushes 1 history entry')
+  eq(s1.backgroundColor, '#123456', 'background color updated')
+
+  await undo()
+  await wait(100)
+  const s2 = await getState()
+  eq(s2.backgroundColor, s0.backgroundColor, 'undo reverts background color')
+
+  // Frame count
+  const origCount = s2.frameCount
+  await page.evaluate(() => window.__canvasStore__.getState().setFrameCount(4))
+  await wait(100)
+  const s3 = await getState()
+  eq(s3.pastLen - s2.pastLen, 1, 'setFrameCount pushes 1 history entry')
+  eq(s3.frameCount, 4, 'frame count updated to 4')
+
+  await undo()
+  await wait(100)
+  const s4 = await getState()
+  eq(s4.frameCount, origCount, 'undo reverts frame count')
+
+  // Ratio
+  await page.evaluate(() => window.__canvasStore__.getState().setRatio('portrait'))
+  await wait(100)
+  const s5 = await getState()
+  eq(s5.pastLen - s4.pastLen, 1, 'setRatio pushes 1 history entry')
+  eq(s5.ratio, 'portrait', 'ratio updated')
+
+  await undo()
+  await wait(100)
+  const s6 = await getState()
+  eq(s6.ratio, s0.ratio, 'undo reverts ratio')
+}
+
+// ── H. Multi-select ───────────────────────────────────────────────────────────
+console.log('\n── H. Multi-select ──')
+
+{
+  const id1 = await addShape()
+  const id2 = await addShape()
+  await wait(100)
+
+  // Align — commitMultipleUpdates = exactly 1 history entry
+  const s0 = await getState()
+  await page.evaluate(([a, b]) => {
+    const s = window.__canvasStore__.getState()
+    s.setSelected(a)
+    s.addToSelection(b)
+    s.alignObjects('left')
+  }, [id1, id2])
+  await wait(100)
+  const s1 = await getState()
+  eq(s1.pastLen - s0.pastLen, 1, 'alignObjects pushes exactly 1 history entry')
+
+  await undo()
+  await wait(100)
+  const s2 = await getState()
+  eq(s2.objects[id1]?.x, s0.objects[id1]?.x, 'undo reverts id1 x after align')
+  eq(s2.objects[id2]?.x, s0.objects[id2]?.x, 'undo reverts id2 x after align')
+
+  // Delete multiple — exactly 1 entry
+  const s3 = await getState()
+  await page.evaluate(([a, b]) => window.__canvasStore__.getState().removeMultipleObjects([a, b]), [id1, id2])
+  await wait(100)
+  const s4 = await getState()
+  eq(s4.pastLen - s3.pastLen, 1, 'removeMultipleObjects pushes exactly 1 history entry')
+  ok(s4.objects[id1] === undefined && s4.objects[id2] === undefined, 'both objects deleted')
+
+  await undo()
+  await wait(100)
+  const s5 = await getState()
+  ok(s5.objects[id1] !== undefined && s5.objects[id2] !== undefined, 'undo restores both deleted objects')
+
+  await page.evaluate(([a, b]) => {
+    const s = window.__canvasStore__.getState()
+    s.removeObject(a)
+    s.removeObject(b)
+  }, [id1, id2])
+  await wait(100)
+}
+
+// ── I. Edge cases ─────────────────────────────────────────────────────────────
+console.log('\n── I. Edge cases ──')
+
+{
+  // Undo at empty history — no crash
+  // Use gs() fresh each call — stale s reference won't see past.length shrink
+  await page.evaluate(() => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+  })
+  await wait(100)
+  let threw = false
+  try {
+    await page.evaluate(() => window.__canvasStore__.getState().undo()) // should be no-op
+    await wait(50)
+  } catch (e) {
+    threw = true
+  }
+  ok(!threw, 'undo at empty history does not crash')
+  const s0 = await getState()
+  eq(s0.pastLen, 0, 'past is empty after undo-to-limit')
+
+  // Redo at end of future — no crash
+  await page.evaluate(() => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().future.length > 0) gs().redo()
+  })
+  await wait(100)
+  threw = false
+  try {
+    await page.evaluate(() => window.__canvasStore__.getState().redo())
+    await wait(50)
+  } catch (e) {
+    threw = true
+  }
+  ok(!threw, 'redo at empty future does not crash')
+
+  // New action after undo clears redo stack
+  const id = await addShape()
+  await wait(100)
+  await undo()
+  await wait(100)
+  const s1 = await getState()
+  ok(s1.futureLen > 0, 'future has entries after undo')
+
+  await addShape() // new action
+  await wait(100)
+  const s2 = await getState()
+  eq(s2.futureLen, 0, 'new action clears future (redo stack)')
+
+  // Cleanup
+  await page.evaluate(() => {
+    const s = window.__canvasStore__.getState()
+    for (const id of [...s.objectOrder]) s.removeObject(id)
+  })
+  await wait(100)
+}
+
+// ─── Results ──────────────────────────────────────────────────────────────────
+console.log('\n' + '─'.repeat(50))
+console.log(`Results: ${passed} passed, ${failed} failed`)
+if (failures.length > 0) {
+  console.log('\nFailed:')
+  failures.forEach(f => console.log(`  ✗ ${f}`))
+}
+
+await ss('final')
+await app.close()
+process.exit(failed > 0 ? 1 : 0)

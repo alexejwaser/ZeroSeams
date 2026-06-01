@@ -586,6 +586,8 @@ interface TextSectionProps {
   selectedId: string
   textEditingId: string | null
   textSelection: { start: number; end: number } | null
+  onStartDrag: () => void
+  onUpdate: (id: string, patch: Partial<TextObject>) => void
   onCommit: (id: string, patch: Partial<TextObject>) => void
 }
 
@@ -594,6 +596,8 @@ function TextSection({
   selectedId,
   textEditingId,
   textSelection,
+  onStartDrag,
+  onUpdate,
   onCommit,
 }: TextSectionProps): React.ReactElement {
   // Determine whether we are in span-selection mode:
@@ -714,7 +718,9 @@ function TextSection({
         <input
           type="range" min={0} max={100} step={1}
           value={Math.round((textObj.opacity ?? 1) * 100)}
-          onChange={e => onCommit(selectedId, { opacity: Number(e.target.value) / 100 } as Partial<TextObject>)}
+          onMouseDown={onStartDrag}
+          onChange={e => onUpdate(selectedId, { opacity: Number(e.target.value) / 100 } as Partial<TextObject>)}
+          onMouseUp={e => onCommit(selectedId, { opacity: Number((e.target as HTMLInputElement).value) / 100 } as Partial<TextObject>)}
           style={{ flex: 1 }}
         />
         <input
@@ -1101,6 +1107,7 @@ interface AdjustmentsSectionProps {
   selectedId: string
   bypass: boolean
   onToggleBypass: () => void
+  onStartDrag: () => void
   onUpdate: (adj: PhotoAdjustments) => void
   onCommit: (adj: PhotoAdjustments) => void
 }
@@ -1130,7 +1137,7 @@ const TRACK_GRADIENT: Record<keyof PhotoAdjustments, string> = {
   dehaze:      'linear-gradient(to right, #6080a8 0%, #e8c060 100%)',
 }
 
-function AdjustmentsSection({ imgObj, selectedId: _selectedId, bypass, onToggleBypass, onUpdate, onCommit }: AdjustmentsSectionProps): React.ReactElement {
+function AdjustmentsSection({ imgObj, selectedId: _selectedId, bypass, onToggleBypass, onStartDrag, onUpdate, onCommit }: AdjustmentsSectionProps): React.ReactElement {
   const adj = imgObj.adjustments ?? DEFAULT_ADJUSTMENTS
 
   function makeSlider(
@@ -1157,6 +1164,7 @@ function AdjustmentsSection({ imgObj, selectedId: _selectedId, bypass, onToggleB
           step={step}
           value={value}
           className="adj-slider"
+          onMouseDown={onStartDrag}
           onChange={(e) => onUpdate({ ...adj, [key]: Number(e.target.value) })}
           onMouseUp={(e) => onCommit({ ...adj, [key]: Number((e.target as HTMLInputElement).value) })}
           onDoubleClick={() => onCommit({ ...adj, [key]: 0 })}
@@ -1240,6 +1248,7 @@ export function PropertiesPanel(): React.ReactElement {
   const selectedIds = useCanvasStore((s) => s.selectedIds)
   const updateObject = useCanvasStore((s) => s.updateObject)
   const commitUpdate = useCanvasStore((s) => s.commitUpdate)
+  const startDrag = useCanvasStore((s) => s.startDrag)
   const adjustmentsBypass = useCanvasStore((s) => s.adjustmentsBypass)
   const toggleAdjustmentsBypass = useCanvasStore((s) => s.toggleAdjustmentsBypass)
   const enterMaskEditMode = useCanvasStore((s) => s.enterMaskEditMode)
@@ -1406,6 +1415,8 @@ export function PropertiesPanel(): React.ReactElement {
               selectedId={selectedId}
               textEditingId={textEditingId}
               textSelection={textSelection}
+              onStartDrag={startDrag}
+              onUpdate={updateObject}
               onCommit={commitUpdate}
             />
             <div style={{ padding: '0 12px' }}>
@@ -1465,7 +1476,9 @@ export function PropertiesPanel(): React.ReactElement {
                 <input
                   type="range" min={0} max={100} step={1}
                   value={Math.round((shapeObj.opacity ?? 1) * 100)}
+                  onMouseDown={startDrag}
                   onChange={e => patch({ opacity: Number(e.target.value) / 100 })}
+                  onMouseUp={e => commitUpdate(shapeObj.id, { opacity: Number((e.target as HTMLInputElement).value) / 100 })}
                   style={{ flex: 1 }}
                 />
                 <input
@@ -1518,7 +1531,9 @@ export function PropertiesPanel(): React.ReactElement {
                 <input
                   type="range" min={0} max={100} step={1}
                   value={Math.round((pathObj.opacity ?? 1) * 100)}
+                  onMouseDown={startDrag}
                   onChange={e => patch({ opacity: Number(e.target.value) / 100 })}
+                  onMouseUp={e => commitUpdate(pathObj.id, { opacity: Number((e.target as HTMLInputElement).value) / 100 })}
                   style={{ flex: 1 }}
                 />
                 <span style={{ minWidth: 32, textAlign: 'right', fontSize: 11, color: '#aaa' }}>
@@ -1596,7 +1611,9 @@ export function PropertiesPanel(): React.ReactElement {
                   <input
                     type="range" min={0} max={100} step={1}
                     value={Math.round((imgObj.opacity ?? 1) * 100)}
+                    onMouseDown={startDrag}
                     onChange={e => patch({ opacity: Number(e.target.value) / 100 })}
+                    onMouseUp={e => commitUpdate(imgObj.id, { opacity: Number((e.target as HTMLInputElement).value) / 100 })}
                     style={{ flex: 1 }}
                   />
                   <input
@@ -1771,6 +1788,7 @@ export function PropertiesPanel(): React.ReactElement {
                           max={50}
                           step={1}
                           value={imgObj.mask.feather}
+                          onMouseDown={startDrag}
                           onChange={(e) => {
                             if (!selectedId) return
                             updateObject(selectedId, { mask: { ...imgObj.mask!, feather: Number(e.target.value) } })
@@ -1805,6 +1823,7 @@ export function PropertiesPanel(): React.ReactElement {
                   selectedId={selectedId!}
                   bypass={adjustmentsBypass}
                   onToggleBypass={toggleAdjustmentsBypass}
+                  onStartDrag={startDrag}
                   onUpdate={(adj) => updateObject(selectedId!, { adjustments: adj })}
                   onCommit={(adj) => commitUpdate(selectedId!, { adjustments: adj })}
                 />
