@@ -150,12 +150,14 @@ async function captureVideoFrameSequence(
   fps: number,
   durationSeconds: number,
   videoElements: HTMLVideoElement[],
+  onFrame?: (f: number) => void,
 ): Promise<Blob[]> {
   const PIXEL_RATIO = 2
   const totalFrames = Math.ceil(durationSeconds * fps)
   const pngBlobs: Blob[] = []
 
   for (let f = 0; f < totalFrames; f++) {
+    onFrame?.(f + 1)
     const t = f / fps
     await Promise.all(
       videoElements.map(
@@ -197,6 +199,8 @@ export async function exportMixedFrames(
   frameHeight: number,
   startFrame?: number,
   endFrame?: number,
+  onStatus?: (msg: string) => void,
+  isCancelled?: () => boolean,
 ): Promise<ExportResult[]> {
   const start = startFrame ?? 0
   const end = endFrame ?? frameCount - 1
@@ -234,6 +238,7 @@ export async function exportMixedFrames(
     const PIXEL_RATIO = 2
 
     for (let i = start; i <= end; i++) {
+      if (isCancelled?.()) throw new Error('Export cancelled')
       const frameLeft = i * frameWidth
       const frameRight = (i + 1) * frameWidth
 
@@ -266,15 +271,25 @@ export async function exportMixedFrames(
         if (blob) results.push({ frameIndex: i, type: 'png', blob })
       } else {
         // Video frame — capture frame sequence and encode to MP4
+        onStatus?.(`Rendering video frame ${i + 1}…`)
         const videoEls = videoObjectsInFrame
           .map((obj) => getVideoElement(obj.id))
           .filter((el): el is HTMLVideoElement => el !== undefined)
 
-        // Use the longest video duration visible in this frame
-        const duration = Math.max(...videoObjectsInFrame.map((obj) => obj.naturalDuration))
+        // Use the longest video duration visible in this frame.
+        // Fall back to the live video element's duration if naturalDuration was stored as 0/NaN.
+        let duration = Math.max(...videoObjectsInFrame.map((obj) => obj.naturalDuration))
+        if (!isFinite(duration) || duration <= 0) {
+          duration = Math.max(...videoEls.map((v) => v.duration).filter(isFinite))
+        }
+        if (!isFinite(duration) || duration <= 0) duration = 5 // last resort: 5s snapshot
 
         // Pause all video elements during seek-based capture
         videoEls.forEach((v) => v.pause())
+
+        const totalFramesToCapture = Math.ceil(duration * EXPORT_FPS)
+        console.log(`[exportFrames] frame ${i}: capturing ${totalFramesToCapture} video frames (${duration.toFixed(2)}s @ ${EXPORT_FPS}fps)`)
+        onStatus?.(`Capturing frame ${i + 1} (0/${totalFramesToCapture})…`)
 
         const pngBlobs = await captureVideoFrameSequence(
           stage,
@@ -284,7 +299,9 @@ export async function exportMixedFrames(
           EXPORT_FPS,
           duration,
           videoEls,
+          (f) => onStatus?.(`Capturing frame ${i + 1} (${f}/${totalFramesToCapture})…`),
         )
+        console.log(`[exportFrames] frame ${i}: captured ${pngBlobs.length} PNG blobs`)
 
         // Resume playback after capture
         videoEls.forEach((v) => void v.play())
@@ -293,9 +310,9 @@ export async function exportMixedFrames(
         const audioSource = videoObjectsInFrame.find((obj) => !obj.muted)
         let mp4Blob: Blob
         if (audioSource) {
-          mp4Blob = await encodeVideoWithAudio(pngBlobs, EXPORT_FPS, frameWidth, frameHeight, audioSource.filePath)
+          mp4Blob = await encodeVideoWithAudio(pngBlobs, EXPORT_FPS, frameWidth, frameHeight, audioSource.filePath, onStatus)
         } else {
-          mp4Blob = await encodeVideoFrames(pngBlobs, EXPORT_FPS, frameWidth, frameHeight)
+          mp4Blob = await encodeVideoFrames(pngBlobs, EXPORT_FPS, frameWidth, frameHeight, onStatus)
         }
         results.push({ frameIndex: i, type: 'mp4', blob: mp4Blob })
       }

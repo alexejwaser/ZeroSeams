@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog, shell, protocol } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog, shell, protocol, session } from 'electron'
 import { join, dirname, basename, extname, relative } from 'path'
 import { writeFile, readFile, readdir, stat, mkdir } from 'fs/promises'
 import { createReadStream } from 'fs'
@@ -54,6 +54,22 @@ const watchers = new Map<string, chokidar.FSWatcher>()
 const tempFiles = new Map<string, string>()
 
 let mainWindow: BrowserWindow | null = null
+
+// Must run synchronously before app.ready so Chromium treats zeroseams-media:
+// as a standard secure scheme — required for <video> src to load via our handler.
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'zeroseams-media',
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      stream: true,
+      bypassCSP: true,
+      corsEnabled: true,
+    },
+  },
+])
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -128,6 +144,16 @@ ipcMain.handle('open-project', async () => {
     console.error(`[main] open-project error:`, error)
     return { success: false, error: String(error) }
   }
+})
+
+ipcMain.handle('open-video-file', async () => {
+  const win = BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0]
+  const { canceled, filePaths } = await dialog.showOpenDialog(win, {
+    filters: [{ name: 'Video', extensions: ['mp4', 'mov', 'm4v', 'webm'] }],
+    properties: ['openFile'],
+  })
+  if (canceled || filePaths.length === 0) return { canceled: true }
+  return { canceled: false, filePath: filePaths[0] }
 })
 
 ipcMain.handle(
@@ -327,6 +353,16 @@ ipcMain.handle(
   },
 )
 
+const EXPORT_LOG = '/tmp/zeroseams-export.log'
+ipcMain.handle('append-export-log', async (_event, { line }: { line: string }) => {
+  console.log('[export-log]', line)
+  await writeFile(EXPORT_LOG, line + '\n', { flag: 'a' })
+})
+ipcMain.handle('clear-export-log', async () => {
+  console.log('[export-log] --- new export ---')
+  await writeFile(EXPORT_LOG, '--- new export ---\n')
+})
+
 ipcMain.handle('stop-external-edit', async (_event, { objectId }: { objectId: string }) => {
   const watcher = watchers.get(objectId)
   if (watcher) {
@@ -376,6 +412,11 @@ app.whenReady().then(() => {
       cancel() { nodeStream.destroy() },
     })
 
+    const corpHeaders = {
+      'Cross-Origin-Resource-Policy': 'cross-origin',
+      'Access-Control-Allow-Origin': '*',
+    }
+
     if (rangeHeader) {
       return new Response(body, {
         status: 206,
@@ -384,6 +425,7 @@ app.whenReady().then(() => {
           'Content-Range': `bytes ${start}-${end}/${fileSize}`,
           'Content-Length': String(end - start + 1),
           'Accept-Ranges': 'bytes',
+          ...corpHeaders,
         },
       })
     }
@@ -393,9 +435,22 @@ app.whenReady().then(() => {
         'Content-Type': mime,
         'Content-Length': String(fileSize),
         'Accept-Ranges': 'bytes',
+        ...corpHeaders,
       },
     })
   })
+  // Inject COOP/COEP headers so SharedArrayBuffer is available for FFmpeg WASM.
+  // Without these, ffmpeg.load() hangs silently in Chromium.
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Cross-Origin-Opener-Policy': ['same-origin'],
+        'Cross-Origin-Embedder-Policy': ['require-corp'],
+      },
+    })
+  })
+
   createWindow()
 })
 

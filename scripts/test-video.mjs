@@ -370,14 +370,53 @@ console.log('\n── Scenario 10: removeObject removes VideoObject ──')
 // ── Scenario 11: No renderer errors throughout tests ─────────────────────────
 console.log('\n── Scenario 11: No renderer errors ──')
 {
-  const videoRelatedErrors = errors.filter(e =>
-    e.includes('video') || e.includes('Video') || e.includes('Cannot read') || e.includes('undefined')
+  // Exclude video load errors — those are expected for fake paths used in earlier
+  // scenarios (/tmp/test-clip.mp4 etc). The protocol integration is tested in Scenario 6.
+  const nonProtocolErrors = errors.filter(e =>
+    !e.includes('[CanvasVideoNode] video load error') &&
+    (e.includes('Video') || e.includes('Cannot read') || e.includes('undefined'))
   )
-  ok(videoRelatedErrors.length === 0,
-    videoRelatedErrors.length === 0
+  ok(nonProtocolErrors.length === 0,
+    nonProtocolErrors.length === 0
       ? 'no renderer errors during video tests'
-      : `renderer errors: ${videoRelatedErrors.slice(0, 3).join(' | ')}`
+      : `renderer errors: ${nonProtocolErrors.slice(0, 3).join(' | ')}`
   )
+}
+
+// ── Scenario 6: video renders on canvas (protocol integration) ───────────────
+console.log('── Scenario 6: video renders on canvas (protocol integration) ──')
+{
+  const testVideoPath = path.resolve(ROOT, 'testvideo.mp4')
+  const videoObj = makeVideoObject({
+    id: 'test-vid-render',
+    name: 'render-test',
+    filePath: testVideoPath,
+    naturalWidth: 1920, naturalHeight: 1080,
+    frameWidth: 540, frameHeight: 304,
+    contentWidth: 540, contentHeight: 304,
+    width: 540, height: 304,
+  })
+  const errorsBeforeScenario6 = errors.length
+  await page.evaluate((obj) => {
+    window.__canvasStore__.getState().addObject(obj)
+    window.__canvasStore__.getState().setSelected(obj.id)
+  }, videoObj)
+  await wait(2500)
+  await ss('scenario6-video-on-canvas')
+
+  const state = await getState()
+  const vid = state.objects['test-vid-render']
+  ok(vid && vid.type === 'video', 'VideoObject present in store')
+  ok(vid && vid.visible === true, 'VideoObject is visible')
+
+  // Only check errors that appeared during this scenario (not fake-path errors from earlier scenarios)
+  const newVideoErrors = errors.slice(errorsBeforeScenario6).filter(e => e.includes('[CanvasVideoNode] video load error'))
+  ok(newVideoErrors.length === 0, `no video load errors for testvideo.mp4 (found: ${newVideoErrors.join('; ')})`)
+
+  // Clean up
+  await page.evaluate(() => {
+    window.__canvasStore__.getState().removeObject('test-vid-render')
+  })
 }
 
 // ─── Results ─────────────────────────────────────────────────────────────────

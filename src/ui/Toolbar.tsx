@@ -9,11 +9,12 @@ import { relativizeVideoObjects, resolveVideoObjects } from '@/canvas/pathUtils'
 import {
   MousePointer2, Type, Square, Circle, Minus, PenTool,
   Undo2, Redo2, FolderOpen, Save, ImageDown,
-  ChevronDown, Plus, LayoutTemplate, Check, AlertTriangle,
+  ChevronDown, Plus, LayoutTemplate, Check, AlertTriangle, Film,
 } from 'lucide-react'
 import Tooltip from './Tooltip'
 import { iconBtnStyle } from './iconBtnStyle'
 import { FrameSettingsPopover } from './FrameSettingsPopover'
+import { useExportStore } from './useExportStore'
 
 type ActiveTool = 'select' | 'text' | 'shape' | 'pen'
 
@@ -109,6 +110,8 @@ export function Toolbar(): React.ReactElement {
   const setSelected = useCanvasStore((s) => s.setSelected)
   const maskModeActive = useCanvasStore((s) => s.maskModeActive)
   const setMaskModeActive = useCanvasStore((s) => s.setMaskModeActive)
+  const addObject = useCanvasStore((s) => s.addObject)
+  const objectOrder = useCanvasStore((s) => s.objectOrder)
 
   const selectedObj = selectedId != null ? objects[selectedId] : undefined
 
@@ -117,7 +120,9 @@ export function Toolbar(): React.ReactElement {
   const [exportSingle, setExportSingle] = useState(1)
   const [exportFrom, setExportFrom] = useState(1)
   const [exportTo, setExportTo] = useState(frameCount)
-  const [exporting, setExporting] = useState(false)
+  const exporting = useExportStore((s) => s.exporting)
+  const exportStatus = useExportStore((s) => s.exportStatus)
+  const { setExporting, setExportStatus, reset: resetExport } = useExportStore.getState()
   const [recentOpen, setRecentOpen] = useState(false)
   const [recentFiles, setRecentFiles] = useState<Array<{ name: string; path: string; modifiedAt: string }>>([])
   const [loadingProject, setLoadingProject] = useState(false)
@@ -188,9 +193,16 @@ export function Toolbar(): React.ReactElement {
     }
 
     setExporting(true)
+    setExportStatus('Exporting…')
+    useExportStore.setState({ cancelRequested: false })
+    void window.electronAPI.clearExportLog()
     try {
       const currentObjects = useCanvasStore.getState().objects
-      const results = await exportMixedFrames(stage, currentObjects, frameCount, frameWidth, frameHeight, start, end)
+      const results = await exportMixedFrames(
+        stage, currentObjects, frameCount, frameWidth, frameHeight, start, end,
+        setExportStatus,
+        () => useExportStore.getState().cancelRequested,
+      )
       for (const result of results) {
         const frameNum = result.frameIndex + 1
         const base64 = await blobToBase64(result.blob)
@@ -205,10 +217,13 @@ export function Toolbar(): React.ReactElement {
         }
       }
     } catch (err) {
-      console.error('[export] failed:', err)
-      alert(`Export failed: ${String(err)}`)
+      const msg = String(err)
+      if (!msg.includes('cancelled')) {
+        console.error('[export] failed:', err)
+        alert(`Export failed: ${msg}`)
+      }
     } finally {
-      setExporting(false)
+      resetExport()
       setExportOpen(false)
     }
   }
@@ -273,6 +288,54 @@ export function Toolbar(): React.ReactElement {
       version: 1,
     }
     return JSON.stringify(project)
+  }
+
+  async function handleAddVideo(): Promise<void> {
+    const result = await window.electronAPI.openVideoFile()
+    if (result.canceled || !result.filePath) return
+    const filePath = result.filePath
+    const rawName = filePath.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'video'
+
+    await new Promise<void>((resolve) => {
+      const vid = document.createElement('video')
+      vid.preload = 'metadata'
+      const onMeta = () => {
+        // durationchange fires after loadedmetadata when duration becomes finite
+        if (!isFinite(vid.duration) || vid.duration <= 0) return
+        vid.removeEventListener('durationchange', onMeta)
+        const MAX_SIZE = 600
+        const scale = Math.min(1, MAX_SIZE / Math.max(vid.videoWidth, vid.videoHeight))
+        const w = Math.round(vid.videoWidth * scale)
+        const h = Math.round(vid.videoHeight * scale)
+        const fx = frameWidth / 2 - w / 2
+        const fy = frameHeight / 2 - h / 2
+        vid.src = ''
+        addObject({
+          id: crypto.randomUUID(),
+          type: 'video',
+          scope: 'global',
+          name: rawName,
+          filePath,
+          muted: false,
+          naturalWidth: vid.videoWidth,
+          naturalHeight: vid.videoHeight,
+          naturalDuration: vid.duration,
+          frameX: fx, frameY: fy,
+          frameWidth: w, frameHeight: h,
+          contentOffsetX: 0, contentOffsetY: 0,
+          contentWidth: w, contentHeight: h,
+          contentEditMode: false,
+          x: fx, y: fy, width: w, height: h,
+          rotation: 0, scaleX: 1, scaleY: 1,
+          opacity: 1, visible: true, locked: false,
+          zIndex: objectOrder.length,
+        })
+        resolve()
+      }
+      vid.addEventListener('durationchange', onMeta)
+      vid.onerror = () => resolve()
+      vid.src = `zeroseams-media://localhost${filePath}`
+    })
   }
 
   const undoDisabled = past.length === 0
@@ -628,6 +691,15 @@ export function Toolbar(): React.ReactElement {
           </button>
         </Tooltip>
 
+        <Tooltip label="Add video">
+          <button
+            onClick={() => { void handleAddVideo() }}
+            style={iconBtnStyle(false)}
+          >
+            <Film size={15} />
+          </button>
+        </Tooltip>
+
         {selectedObj?.type === 'image' && (
           <Tooltip label="Mask mode" description="Next stroke becomes a mask">
             <button
@@ -909,7 +981,7 @@ export function Toolbar(): React.ReactElement {
                   fontWeight: 'bold',
                 }}
               >
-                {exporting ? 'Exporting…' : 'Export Frames'}
+                {exporting ? (exportStatus || 'Exporting…') : 'Export Frames'}
               </button>
             </div>
           )}

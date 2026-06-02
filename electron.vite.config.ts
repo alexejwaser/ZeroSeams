@@ -32,5 +32,8 @@ export default defineConfig({
       },
     },
     plugins: [react()],
+    optimizeDeps: {
+      exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
+    },
   },
 })

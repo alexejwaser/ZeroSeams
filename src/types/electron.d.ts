@@ -42,5 +42,8 @@ interface Window {
     saveVideoFile(filename: string, base64: string): Promise<{ success: boolean; error?: string }>
     resolveVideoPath(relativeFilePath: string, projectFilePath: string): Promise<{ filePath: string }>
     makeRelativePath(fromDir: string, toPath: string): Promise<{ relativePath: string }>
+    openVideoFile(): Promise<{ canceled: boolean; filePath?: string }>
+    appendExportLog(line: string): Promise<void>
+    clearExportLog(): Promise<void>
   }
 }

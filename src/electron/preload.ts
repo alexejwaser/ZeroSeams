@@ -43,6 +43,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('external-image-changed', handler)
     return () => { ipcRenderer.removeListener('external-image-changed', handler) }
   },
+  openVideoFile: (): Promise<{ canceled: boolean; filePath?: string }> =>
+    ipcRenderer.invoke('open-video-file'),
+  appendExportLog: (line: string): Promise<void> =>
+    ipcRenderer.invoke('append-export-log', { line }),
+  clearExportLog: (): Promise<void> =>
+    ipcRenderer.invoke('clear-export-log'),
   saveVideoFile: (filename: string, base64: string): Promise<{ success: boolean; error?: string }> =>
     ipcRenderer.invoke('save-video-file', { filename, base64 }),
   resolveVideoPath: (relativeFilePath: string, projectFilePath: string): Promise<{ filePath: string }> =>

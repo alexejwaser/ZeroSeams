@@ -21,12 +21,65 @@ export function useImageDrop(containerRef: React.RefObject<HTMLDivElement>): voi
       e.preventDefault()
       e.stopPropagation()
 
-      const file = Array.from(e.dataTransfer?.files ?? []).find((f) =>
-        f.type.startsWith('image/'),
-      )
-      if (!file) return
+      const files = Array.from(e.dataTransfer?.files ?? [])
 
-      const rawName = file.name.replace(/\.[^.]+$/, '')
+      const videoFile = files.find((f) => f.type.startsWith('video/'))
+      if (videoFile) {
+        const filePath = (videoFile as File & { path: string }).path
+        if (!filePath) return
+        const rawName = videoFile.name.replace(/\.[^.]+$/, '')
+
+        const vid = document.createElement('video')
+        vid.preload = 'metadata'
+        vid.onloadedmetadata = () => {
+          const MAX_SIZE = 600
+          const scale = Math.min(1, MAX_SIZE / Math.max(vid.videoWidth, vid.videoHeight))
+          const w = Math.round(vid.videoWidth * scale)
+          const h = Math.round(vid.videoHeight * scale)
+          const frameX = frameWidth / 2 - w / 2
+          const frameY = frameHeight / 2 - h / 2
+          vid.src = ''
+
+          addObject({
+            id: crypto.randomUUID(),
+            type: 'video',
+            scope: 'global',
+            name: rawName,
+            filePath,
+            muted: false,
+            naturalWidth: vid.videoWidth,
+            naturalHeight: vid.videoHeight,
+            naturalDuration: vid.duration,
+            frameX,
+            frameY,
+            frameWidth: w,
+            frameHeight: h,
+            contentOffsetX: 0,
+            contentOffsetY: 0,
+            contentWidth: w,
+            contentHeight: h,
+            contentEditMode: false,
+            x: frameX,
+            y: frameY,
+            width: w,
+            height: h,
+            rotation: 0,
+            scaleX: 1,
+            scaleY: 1,
+            opacity: 1,
+            visible: true,
+            locked: false,
+            zIndex: objectOrder.length,
+          })
+        }
+        vid.src = `zeroseams-media://localhost${filePath}`
+        return
+      }
+
+      const imageFile = files.find((f) => f.type.startsWith('image/'))
+      if (!imageFile) return
+
+      const rawName = imageFile.name.replace(/\.[^.]+$/, '')
 
       const reader = new FileReader()
       reader.onload = (readerEvent) => {
@@ -79,7 +132,7 @@ export function useImageDrop(containerRef: React.RefObject<HTMLDivElement>): voi
         }
         img.src = dataUrl
       }
-      reader.readAsDataURL(file)
+      reader.readAsDataURL(imageFile)
     }
 
     container.addEventListener('dragover', handleDragOver)

@@ -64,15 +64,28 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     vid.loop = true
     vid.playsInline = true
     vid.muted = true
+    vid.crossOrigin = 'anonymous'
     videoElRef.current = vid
 
     function onLoaded(): void {
       setVideoEl(vid)
       registerVideoElement(id, vid)
-      void vid.play()
+      // canplay guarantees readyState ≥ HAVE_FUTURE_DATA so ctx.drawImage has a frame.
+      // Muted videos are allowed by Chromium autoplay policy; log if rejected anyway.
+      vid.play().catch((e: unknown) => {
+        console.warn('[CanvasVideoNode] play() rejected:', e)
+      })
     }
-    vid.addEventListener('loadedmetadata', onLoaded, { once: true })
-    vid.src = `zeroseams-media://${obj.filePath}`
+    // canplay fires when the browser has decoded at least one frame and can start playing.
+    // loadedmetadata only guarantees readyState=1 (no pixel data) — drawImage paints nothing.
+    vid.addEventListener('canplay', onLoaded, { once: true })
+    vid.addEventListener('error', () => {
+      console.error('[CanvasVideoNode] video load error', vid.error?.message, 'src:', vid.src)
+    }, { once: true })
+    // Use localhost as an explicit host — Chromium with standard: true normalizes
+    // triple-slash URLs (zeroseams-media:///path) by treating the first path segment
+    // as hostname, which drops and lowercases it. localhost avoids that.
+    vid.src = `zeroseams-media://localhost${obj.filePath}`
     vid.load()
 
     return () => {

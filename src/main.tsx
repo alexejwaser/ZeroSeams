@@ -2,9 +2,14 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { CarouselStage } from '@/canvas'
 import { Toolbar, LayerPanel, PropertiesPanel, ContextMenu } from '@/ui'
+import { useExportStore } from '@/ui/useExportStore'
 import { AIProvider } from '@/ai'
 
 function App(): React.ReactElement {
+  const exporting = useExportStore((s) => s.exporting)
+  const exportStatus = useExportStore((s) => s.exportStatus)
+  const requestCancel = useExportStore((s) => s.requestCancel)
+
   return (
     <div
       style={{
@@ -40,9 +45,44 @@ function App(): React.ReactElement {
             padding: 24,
             background: '#111',
             boxSizing: 'border-box',
+            position: 'relative',
           }}
         >
           <CarouselStage />
+
+          {exporting && (
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'rgba(0,0,0,0.6)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 16,
+                zIndex: 500,
+              }}
+            >
+              <div style={{ color: '#fff', fontSize: 15, fontWeight: 600 }}>
+                {exportStatus || 'Exporting…'}
+              </div>
+              <button
+                onClick={requestCancel}
+                style={{
+                  padding: '6px 18px',
+                  background: '#333',
+                  color: '#fff',
+                  border: '1px solid #555',
+                  borderRadius: 6,
+                  cursor: 'pointer',
+                  fontSize: 13,
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          )}
         </div>
 
         <PropertiesPanel />
