@@ -71,6 +71,7 @@ Electron + React + TypeScript · Konva.js/react-konva · Zustand · @imgly/backg
 - `reorderObjects` (layer panel drag) pushes history — fully undoable via Cmd+Z
 - Thumbnails: `useThumbnailStore`, HTML Canvas 2D, triggered on `past.length` changes + mount
 - `iconBtnStyle` shared helper in `src/ui/iconBtnStyle.ts`; `Tooltip` component in `src/ui/Tooltip.tsx`
+- Export overlay: `useExportStore` (Zustand, `src/ui/useExportStore.ts`) — `exporting/exportStatus/cancelRequested`; canvas area shows greyed overlay + Cancel button while exporting; status message flows from `exportMixedFrames` → Toolbar button label
 - Frame labels: HTML div strip absolutely positioned at `top: Math.max(4, panY - 22)` in CarouselStage (not Konva Text)
 - Masking: `MaskData.kind: 'pen'|'rect'|'ellipse'`; rect/ellipse masks use Konva Transformer in edit mode; `maskModeActive` in store (transient, not in history)
 - Save: `currentFilePath` in `useSaveStatusStore`; autosave forks on it; `recentFiles.json` tracks all opened/saved locations
@@ -120,8 +121,18 @@ Canvas scaffold + Electron shell · Image frame/content model (InDesign crop/zoo
 - Outer is `React.memo`-wrapped — stable `id`/`onGuidesChange`/`nodeRef` props mean CarouselStage re-renders do not cascade to nodes during drag
 - Inner subscribes to `s.selectedId === id` for `isSelected`; calls `useCanvasStore.getState().setSelected(id)` directly in handlers (no `onSelect` prop)
 
+**Video Layer** (`CanvasVideoNode.tsx`, `videoExport.ts`, `exportFrames.ts`):
+- `VideoObject` has `filePath` (absolute), `naturalWidth/Height/Duration`, `muted`, frame/content model identical to ImageObject
+- Import: drag-and-drop in `useImageDrop.ts` (uses `file.path` Electron API) + "Add Video" toolbar button (Film icon) via `openVideoFile` IPC
+- Rendering: `<video>` element created imperatively with `crossOrigin='anonymous'`; src = `zeroseams-media://localhost<path>`; waits for `canplay` (not `loadedmetadata`); RAF loop calls `layer.batchDraw()` for playback animation
+- `zeroseams-media://` scheme: registered with `corsEnabled:true, standard:true, secure:true, supportFetchAPI:true, stream:true`; handler supports Range requests; responses include `CORP: cross-origin` + `ACAO: *` headers
+- COOP/COEP: injected on all session responses via `session.defaultSession.webRequest.onHeadersReceived` — enables `SharedArrayBuffer` for FFmpeg WASM
+- FFmpeg WASM: `@ffmpeg/core` + `@ffmpeg/ffmpeg` — core files copied to `public/ffmpeg/`; `ffmpeg.load()` called with `classWorkerURL`, `coreURL`, `wasmURL` as blob URLs; `optimizeDeps.exclude` prevents Vite bundling the worker
+- Export: `exportMixedFrames` detects visible VideoObjects per frame; video frames → `captureVideoFrameSequence` (seek-based PNG capture) → `encodeVideoWithAudio` or `encodeVideoFrames`; explicit `-map 0:v:0 -map 1:a:0` prevents wrong stream selection
+- Duration fallback: export reads live `videoEl.duration` if `naturalDuration` is 0/NaN; import uses `durationchange` event (not `loadedmetadata`) to ensure finite duration
+
 ## Upcoming
-AI: background removal UI, SAM segmentation, LaMa inpainting · Font picker + Google Fonts · Templates/presets · Publish/share · Windows packaging + auto-update
+AI: background removal UI, SAM segmentation, LaMa inpainting · Font picker + Google Fonts · Templates/presets · Publish/share · Windows packaging + auto-update · Fix video export composite (issue #40)
 
 ## graphify
 
