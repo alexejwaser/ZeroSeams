@@ -49,29 +49,29 @@ function build3DLUT(
 }
 
 function sample3DLUT(lut: Float32Array, r: number, g: number, b: number): [number, number, number] {
-  const rf = r / LUT3D_STEP
-  const gf = g / LUT3D_STEP
-  const bf = b / LUT3D_STEP
+  const rf = r / LUT3D_STEP, gf = g / LUT3D_STEP, bf = b / LUT3D_STEP
   const r0 = Math.min(LUT3D_N - 2, rf | 0), r1 = r0 + 1
   const g0 = Math.min(LUT3D_N - 2, gf | 0), g1 = g0 + 1
   const b0 = Math.min(LUT3D_N - 2, bf | 0), b1 = b0 + 1
   const fr = rf - r0, fg = gf - g0, fb = bf - b0
   const N = LUT3D_N, N2 = N * N
-  function lerp3(ci: number): number {
-    const c000 = lut[(r0*N2 + g0*N + b0)*3 + ci]
-    const c001 = lut[(r0*N2 + g0*N + b1)*3 + ci]
-    const c010 = lut[(r0*N2 + g1*N + b0)*3 + ci]
-    const c011 = lut[(r0*N2 + g1*N + b1)*3 + ci]
-    const c100 = lut[(r1*N2 + g0*N + b0)*3 + ci]
-    const c101 = lut[(r1*N2 + g0*N + b1)*3 + ci]
-    const c110 = lut[(r1*N2 + g1*N + b0)*3 + ci]
-    const c111 = lut[(r1*N2 + g1*N + b1)*3 + ci]
-    return (c000*(1-fr)*(1-fg)*(1-fb) + c001*(1-fr)*(1-fg)*fb +
-            c010*(1-fr)*fg*(1-fb)     + c011*(1-fr)*fg*fb +
-            c100*fr*(1-fg)*(1-fb)     + c101*fr*(1-fg)*fb +
-            c110*fr*fg*(1-fb)         + c111*fr*fg*fb)
-  }
-  return [Math.round(lerp3(0)), Math.round(lerp3(1)), Math.round(lerp3(2))]
+  // Precompute all 8 trilinear weights and base indices — no inner function.
+  const w000 = (1-fr)*(1-fg)*(1-fb), w001 = (1-fr)*(1-fg)*fb
+  const w010 = (1-fr)*fg*(1-fb),     w011 = (1-fr)*fg*fb
+  const w100 = fr*(1-fg)*(1-fb),     w101 = fr*(1-fg)*fb
+  const w110 = fr*fg*(1-fb),         w111 = fr*fg*fb
+  const i000 = (r0*N2 + g0*N + b0)*3, i001 = (r0*N2 + g0*N + b1)*3
+  const i010 = (r0*N2 + g1*N + b0)*3, i011 = (r0*N2 + g1*N + b1)*3
+  const i100 = (r1*N2 + g0*N + b0)*3, i101 = (r1*N2 + g0*N + b1)*3
+  const i110 = (r1*N2 + g1*N + b0)*3, i111 = (r1*N2 + g1*N + b1)*3
+  return [
+    Math.round(lut[i000]*w000 + lut[i001]*w001 + lut[i010]*w010 + lut[i011]*w011 +
+               lut[i100]*w100 + lut[i101]*w101 + lut[i110]*w110 + lut[i111]*w111),
+    Math.round(lut[i000+1]*w000 + lut[i001+1]*w001 + lut[i010+1]*w010 + lut[i011+1]*w011 +
+               lut[i100+1]*w100 + lut[i101+1]*w101 + lut[i110+1]*w110 + lut[i111+1]*w111),
+    Math.round(lut[i000+2]*w000 + lut[i001+2]*w001 + lut[i010+2]*w010 + lut[i011+2]*w011 +
+               lut[i100+2]*w100 + lut[i101+2]*w101 + lut[i110+2]*w110 + lut[i111+2]*w111),
+  ]
 }
 
 // ---------------------------------------------------------------------------
