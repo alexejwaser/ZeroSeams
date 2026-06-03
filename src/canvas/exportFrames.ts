@@ -153,7 +153,7 @@ async function captureVideoFrameSequence(
   onFrame?: (f: number) => void,
   clipStart = 0,
 ): Promise<Blob[]> {
-  const PIXEL_RATIO = 2
+  const PIXEL_RATIO = 1
   const totalFrames = Math.ceil(durationSeconds * fps)
   const pngBlobs: Blob[] = []
 
