@@ -245,6 +245,7 @@ export function Toolbar(): React.ReactElement {
   const saveStatus = useSaveStatusStore((s) => s.status)
   const frameWidth = useCanvasStore((s) => s.frameWidth)
   const frameHeight = useCanvasStore((s) => s.frameHeight)
+  const platform = useCanvasStore((s) => s.platform)
   const resizeMode = useCanvasStore((s) => s.resizeMode)
   const setResizeMode = useCanvasStore((s) => s.setResizeMode)
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
