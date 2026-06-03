@@ -309,13 +309,15 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     }
   }, [obj.mask, obj.contentOffsetX, obj.contentOffsetY, obj.contentWidth, obj.contentHeight, videoEl])
 
-  // When all filters are removed, clear the videoImageRef cache so the node
-  // reverts to direct live rendering. The RAF tick handles caching when filters
-  // are active — we never cache via a one-time effect (would freeze the frame).
+  // When filters change, reset the RAF frame-guard so the next tick re-caches
+  // even if the video is paused (currentTime unchanged). When all filters are
+  // removed, clear the cache immediately so the node reverts to live rendering.
   useEffect(() => {
     if (allFilters.length === 0) {
       videoImageRef.current?.clearCache()
       videoImageRef.current?.getLayer()?.batchDraw()
+    } else {
+      lastCachedTimeRef.current = -1
     }
   }, [allFilters])
 
