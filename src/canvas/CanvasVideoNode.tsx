@@ -71,6 +71,8 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   const startOffsetRemainingRef = useRef(0)
   // Timestamp of the last RAF tick for delta-time calculation.
   const lastTickTimeRef = useRef<number | null>(null)
+  // Last video.currentTime at which cache() ran — skip re-cache when frame unchanged.
+  const lastCachedTimeRef = useRef<number>(-1)
 
   // The video element is created imperatively and passed as Konva image source.
   // videoEl state triggers a re-render so KonvaImage picks up the element after
@@ -155,20 +157,22 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
           if (store.videoPlayingIds.has(id)) store.toggleVideoPlay(id)
         }
       }
-      // Re-cache strategy:
-      // - Mask active: always re-cache innerGroupRef each tick (keeps video live through mask).
-      //   If filters are also active, first re-cache videoImageRef so the inner group
-      //   captures a fresh filtered frame rather than a frozen snapshot.
-      // - Filters only (no mask): re-cache videoImageRef each tick so filters show current frame.
-      const bounds = innerCacheBoundsRef.current
-      if (bounds) {
-        if (allFiltersRef.current.length > 0) videoImageRef.current?.cache()
-        innerGroupRef.current?.cache(bounds)
-      } else if (allFiltersRef.current.length > 0) {
-        videoImageRef.current?.cache()
+      // Re-cache only when a new video frame has been decoded — skips redundant
+      // cache() calls at 60fps when the video is paused or running below 60fps.
+      const currentTime = videoEl.currentTime
+      const frameChanged = currentTime !== lastCachedTimeRef.current
+      if (frameChanged) {
+        lastCachedTimeRef.current = currentTime
+        const bounds = innerCacheBoundsRef.current
+        if (bounds) {
+          if (allFiltersRef.current.length > 0) videoImageRef.current?.cache()
+          innerGroupRef.current?.cache(bounds)
+        } else if (allFiltersRef.current.length > 0) {
+          videoImageRef.current?.cache()
+        }
       }
       const layer = groupRef.current?.getLayer()
-      if (layer) layer.batchDraw()
+      if (layer && frameChanged) layer.batchDraw()
       rafRef.current = requestAnimationFrame(tick)
     }
     rafRef.current = requestAnimationFrame(tick)
