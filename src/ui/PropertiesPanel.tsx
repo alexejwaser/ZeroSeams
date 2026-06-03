@@ -1276,6 +1276,11 @@ function VideoSection({
 }: VideoSectionProps): React.ReactElement {
   const isPlaying = useCanvasStore((s) => s.videoPlayingIds.has(videoObj.id))
   const toggleVideoPlay = useCanvasStore((s) => s.toggleVideoPlay)
+  const enterMaskEditModeV = useCanvasStore((s) => s.enterMaskEditMode)
+  const maskDrawModeV = useCanvasStore((s) => s.maskDrawMode)
+  const enterMaskDrawModeV = useCanvasStore((s) => s.enterMaskDrawMode)
+  const clearMaskDrawModeV = useCanvasStore((s) => s.clearMaskDrawMode)
+  const thumbnailsV = useThumbnailStore((s) => s.thumbnails)
 
   const [currentTime, setCurrentTime] = useState(0)
   useEffect(() => {
@@ -1470,6 +1475,193 @@ function VideoSection({
           }}
           style={numInputStyle(44)}
         />
+      </div>
+
+      {/* Mask section */}
+      <div style={{ borderTop: '1px solid #333', paddingTop: 10, marginTop: 4, marginBottom: 10 }}>
+        <div style={{ color: '#aaa', fontSize: 11, fontWeight: 'bold', letterSpacing: '0.08em',
+          textTransform: 'uppercase' as const, marginBottom: 8 }}>Mask</div>
+
+        {videoObj.maskEditMode ? (
+          /* Mask edit mode active banner */
+          <div style={{
+            background: '#1e3a2f',
+            border: '1px solid #2d6a4f',
+            borderRadius: 4,
+            padding: '6px 10px',
+            marginBottom: 8,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+            <span style={{ color: '#52b788', fontSize: 11 }}>Editing mask path</span>
+            <button
+              onClick={() => {
+                onCommit(selectedId, { maskEditMode: false })
+              }}
+              style={{
+                background: '#2d6a4f',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 3,
+                padding: '2px 8px',
+                cursor: 'pointer',
+                fontSize: 11,
+              }}
+            >
+              Done
+            </button>
+          </div>
+        ) : videoObj.mask == null ? (
+          /* No mask — draw mode picker or active draw banner */
+          maskDrawModeV?.id === selectedId ? (
+            /* Draw in progress for this video */
+            <div>
+              <div style={{ color: '#0af', fontSize: 11, marginBottom: 8 }}>
+                Drawing {maskDrawModeV.tool} mask —{'  '}
+                {maskDrawModeV.tool === 'pen'
+                  ? 'click to add points, close path to finish'
+                  : 'drag to define shape'}
+              </div>
+              <button
+                onClick={() => clearMaskDrawModeV()}
+                style={{
+                  width: '100%',
+                  height: 28,
+                  background: '#3a2020',
+                  color: '#f88',
+                  border: '1px solid #6a2020',
+                  borderRadius: 4,
+                  cursor: 'pointer',
+                  fontSize: 12,
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            /* Tool picker — icon-only buttons */
+            <div>
+              <div style={{ color: '#777', fontSize: 11, marginBottom: 6 }}>Add mask:</div>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <Tooltip label="Pen mask">
+                  <button
+                    title="Pen mask"
+                    onClick={() => { enterMaskDrawModeV(selectedId, 'pen') }}
+                    style={iconBtnStyle()}
+                  >
+                    <PenTool size={14} />
+                  </button>
+                </Tooltip>
+                <Tooltip label="Rectangle mask">
+                  <button
+                    title="Rectangle mask"
+                    onClick={() => { enterMaskDrawModeV(selectedId, 'rect') }}
+                    style={iconBtnStyle()}
+                  >
+                    <Square size={14} />
+                  </button>
+                </Tooltip>
+                <Tooltip label="Oval mask">
+                  <button
+                    title="Oval mask"
+                    onClick={() => { enterMaskDrawModeV(selectedId, 'ellipse') }}
+                    style={iconBtnStyle()}
+                  >
+                    <Circle size={14} />
+                  </button>
+                </Tooltip>
+              </div>
+            </div>
+          )
+        ) : (
+          /* Mask controls */
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+              {thumbnailsV[`${selectedId}__mask`] != null && (
+                <div style={{
+                  width: 36, height: 36, flexShrink: 0, borderRadius: 3,
+                  overflow: 'hidden', border: '1px solid #3a3a3a', background: '#000',
+                }}>
+                  <img
+                    src={thumbnailsV[`${selectedId}__mask`]}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    alt="mask"
+                    draggable={false}
+                  />
+                </div>
+              )}
+              <Tooltip label="Edit mask">
+                <button
+                  title="Edit mask"
+                  onClick={() => { enterMaskEditModeV(selectedId) }}
+                  style={{ ...iconBtnStyle(), flex: 1, width: 'auto' }}
+                >
+                  <Pencil size={14} />
+                </button>
+              </Tooltip>
+              <Tooltip label={videoObj.mask.visible ? 'Hide mask' : 'Show mask'}>
+                <button
+                  title={videoObj.mask.visible ? 'Hide mask' : 'Show mask'}
+                  onClick={() => {
+                    onCommit(selectedId, { mask: { ...videoObj.mask!, visible: !videoObj.mask!.visible } })
+                  }}
+                  style={iconBtnStyle()}
+                >
+                  {videoObj.mask.visible
+                    ? <Eye size={14} />
+                    : <EyeOff size={14} />}
+                </button>
+              </Tooltip>
+              <Tooltip label="Delete mask">
+                <button
+                  title="Delete mask"
+                  onClick={() => {
+                    onCommit(selectedId, { mask: undefined })
+                  }}
+                  style={iconBtnStyle()}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </Tooltip>
+            </div>
+
+            {/* Feather */}
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: 8 }}>
+              <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Feather</label>
+              <input
+                type="range"
+                min={0}
+                max={50}
+                step={1}
+                value={videoObj.mask.feather}
+                onMouseDown={onStartDrag}
+                onChange={(e) => {
+                  onUpdate(selectedId, { mask: { ...videoObj.mask!, feather: Number(e.target.value) } })
+                }}
+                onMouseUp={(e) => {
+                  onCommit(selectedId, { mask: { ...videoObj.mask!, feather: Number((e.target as HTMLInputElement).value) } })
+                }}
+                style={{ flex: 1 }}
+              />
+              <span style={{ color: '#ccc', fontSize: 12, width: 24, textAlign: 'right' }}>
+                {videoObj.mask.feather}
+              </span>
+            </div>
+
+            {/* Invert */}
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: 8 }}>
+              <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Invert</label>
+              <input
+                type="checkbox"
+                checked={videoObj.mask.inverted}
+                onChange={() => {
+                  onCommit(selectedId, { mask: { ...videoObj.mask!, inverted: !videoObj.mask!.inverted } })
+                }}
+              />
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
