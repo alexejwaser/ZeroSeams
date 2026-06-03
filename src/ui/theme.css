@@ -20,7 +20,13 @@
   --font: 'Uncut Sans Variable', system-ui, sans-serif;
 }
 
-/* ─── Global range input styling ─────────────────────────────────────────── */
+/* ─── Global font — cascade to every element ───────────────────────────────── */
+body {
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Range inputs ─────────────────────────────────────────────────────────── */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -28,7 +34,13 @@ input[type="range"] {
   border-radius: 2px;
   cursor: pointer;
   outline: none;
-  background: transparent; /* track background set per-slider via inline style */
+  background: #e8e0d5;  /* warm neutral default track */
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: inherit;  /* picks up inline background (adj-sliders) or the default above */
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -47,20 +59,30 @@ input[type="range"]:active::-webkit-slider-thumb {
   background: linear-gradient(145deg, #ffffff, #e8e0d5);
 }
 
-/* ─── Color swatch inputs ────────────────────────────────────────────────── */
+/* ─── Color inputs ─────────────────────────────────────────────────────────── */
 input[type="color"] {
-  border-radius: 6px;
-  overflow: hidden;
-  cursor: pointer;
-  padding: 0;
+  -webkit-appearance: none;
+  appearance: none;
   border: 1px solid var(--stroke);
+  border-radius: 6px;
+  padding: 2px;
+  cursor: pointer;
+  background: none;
 }
 
-/* ─── Raised / shadow buttons — press-down animation ────────────────────── */
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 3px;
+}
+
+/* ─── Raised / shadow buttons — press-down animation ──────────────────────── */
 .btn-raised {
   box-shadow: 2px 4px 0 #000000;
   transition: transform 0.08s ease, box-shadow 0.08s ease;
-  /* Extra bottom padding so the shadow doesn't clip */
   margin-bottom: 4px;
 }
 .btn-raised:hover {

@@ -37,7 +37,7 @@ function MenuItem({ label, kbd, disabled = false, destructive = false, onClick }
         margin: '0 4px',
         borderRadius: 8,
         fontSize: 13,
-        fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
+        fontFamily: 'var(--font)',
         color: disabled ? '#aaaaaa' : destructive ? '#f94608' : '#333333',
         cursor: disabled ? 'default' : 'pointer',
         background: hovered && !disabled ? '#f5ede2' : 'transparent',

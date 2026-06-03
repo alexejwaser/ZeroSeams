@@ -250,24 +250,12 @@ function ColorInput({ value, onChange }: ColorInputProps): React.ReactElement {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-      <div style={{ width: 32, height: 24, borderRadius: 6, overflow: 'hidden', flexShrink: 0, border: '1px solid #d4ccc2' }}>
       <input
         type="color"
         value={value}
         onChange={handleSwatchChange}
-        style={{
-          width: '110%',
-          height: '110%',
-          border: 'none',
-          borderRadius: 0,
-          cursor: 'pointer',
-          padding: 0,
-          background: 'none',
-          marginLeft: '-5%',
-          marginTop: '-5%',
-        }}
+        style={{ width: 32, height: 24, flexShrink: 0 }}
       />
-      </div>
       <input
         type="text"
         value={hexText}
@@ -284,7 +272,7 @@ function ColorInput({ value, onChange }: ColorInputProps): React.ReactElement {
           padding: '3px 6px',
           boxSizing: 'border-box',
           outline: 'none',
-          fontFamily: 'monospace',
+          fontFamily: 'var(--font)',
         }}
       />
     </div>
@@ -337,22 +325,12 @@ function MixedColorInput({ value, onChange }: MixedColorInputProps): React.React
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-      <div style={{ position: 'relative', flexShrink: 0, width: 32, height: 24, borderRadius: 6, overflow: 'hidden', border: '1px solid #d4ccc2', opacity: isMixed ? 0.4 : 1 }}>
+      <div style={{ position: 'relative', flexShrink: 0 }}>
         <input
           type="color"
           value={displayValue}
           onChange={handleSwatchChange}
-          style={{
-            width: '110%',
-            height: '110%',
-            border: 'none',
-            borderRadius: 0,
-            cursor: 'pointer',
-            padding: 0,
-            background: 'none',
-            marginLeft: '-5%',
-            marginTop: '-5%',
-          }}
+          style={{ width: 32, height: 24, opacity: isMixed ? 0.4 : 1 }}
         />
         {isMixed && (
           <span
@@ -388,7 +366,7 @@ function MixedColorInput({ value, onChange }: MixedColorInputProps): React.React
           padding: '3px 6px',
           boxSizing: 'border-box',
           outline: 'none',
-          fontFamily: 'monospace',
+          fontFamily: 'var(--font)',
         }}
       />
     </div>
@@ -405,7 +383,7 @@ const sectionLabelStyle: React.CSSProperties = {
   fontWeight: 700,
   letterSpacing: '1.5px',
   textTransform: 'uppercase',
-  fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
+  fontFamily: 'var(--font)',
   marginTop: 12,
   marginBottom: 6,
 }
@@ -1083,15 +1061,13 @@ function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): R
                     return (
                       <div key={ctrl.key} style={{ display: 'flex', alignItems: 'center', marginBottom: 5, gap: 6 }}>
                         <label style={{ color: '#555555', fontSize: 11, width: 68, flexShrink: 0 }}>{ctrl.label}</label>
-                        <div style={{ width: 36, height: 22, borderRadius: 6, overflow: 'hidden', border: '1px solid #d4ccc2' }}>
-                          <input
-                            type="color"
-                            value={val as string}
-                            onChange={e => updateParam(effect.id, ctrl.key, e.target.value, false)}
-                            onBlur={e => updateParam(effect.id, ctrl.key, e.target.value, true)}
-                            style={{ width: '110%', height: '110%', border: 'none', background: 'none', cursor: 'pointer', padding: 0, marginLeft: '-5%', marginTop: '-5%' }}
-                          />
-                        </div>
+                        <input
+                          type="color"
+                          value={val as string}
+                          onChange={e => updateParam(effect.id, ctrl.key, e.target.value, false)}
+                          onBlur={e => updateParam(effect.id, ctrl.key, e.target.value, true)}
+                          style={{ width: 36, height: 22 }}
+                        />
                       </div>
                     )
                   }
@@ -1588,7 +1564,7 @@ function VideoSection({
       {/* Mask section */}
       <div style={{ borderTop: '1px solid #e8e0d5', paddingTop: 10, marginTop: 4, marginBottom: 10 }}>
         <div style={{ color: '#555555', fontSize: 9, fontWeight: 700, letterSpacing: '1.5px',
-          textTransform: 'uppercase' as const, fontFamily: "'Uncut Sans Variable', system-ui, sans-serif", marginBottom: 8 }}>Mask</div>
+          textTransform: 'uppercase' as const, fontFamily: 'var(--font)', marginBottom: 8 }}>Mask</div>
 
         {videoObj.maskEditMode ? (
           /* Mask edit mode active banner */
@@ -1897,7 +1873,7 @@ export function PropertiesPanel(): React.ReactElement {
           fontWeight: 700,
           letterSpacing: '1.5px',
           textTransform: 'uppercase',
-          fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
+          fontFamily: 'var(--font)',
           borderBottom: '1px solid #e8e0d5',
           flexShrink: 0,
         }}
@@ -2183,7 +2159,7 @@ export function PropertiesPanel(): React.ReactElement {
                 {/* Mask section */}
                 <div style={{ borderTop: '1px solid #e8e0d5', paddingTop: 10, marginTop: 4, marginBottom: 10 }}>
                   <div style={{ color: '#555555', fontSize: 9, fontWeight: 700, letterSpacing: '1.5px',
-                    textTransform: 'uppercase' as const, fontFamily: "'Uncut Sans Variable', system-ui, sans-serif", marginBottom: 8 }}>Mask</div>
+                    textTransform: 'uppercase' as const, fontFamily: 'var(--font)', marginBottom: 8 }}>Mask</div>
 
                   {imgObj.maskEditMode ? (
                     /* Mask edit mode active banner */
@@ -2405,7 +2381,7 @@ export function PropertiesPanel(): React.ReactElement {
               </div>
 
               <div style={{ color: '#555555', fontSize: 9, fontWeight: 700, letterSpacing: '1.5px',
-                textTransform: 'uppercase' as const, fontFamily: "'Uncut Sans Variable', system-ui, sans-serif", marginBottom: 6 }}>Content</div>
+                textTransform: 'uppercase' as const, fontFamily: 'var(--font)', marginBottom: 6 }}>Content</div>
               <NumberField
                 label="Offset X"
                 value={imgObj.contentOffsetX}
@@ -2549,7 +2525,7 @@ export function PropertiesPanel(): React.ReactElement {
                 fontWeight: 700,
                 letterSpacing: '1.5px',
                 textTransform: 'uppercase',
-                fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
+                fontFamily: 'var(--font)',
                 marginBottom: 8,
               }}
             >
@@ -2617,7 +2593,7 @@ export function PropertiesPanel(): React.ReactElement {
                 fontWeight: 700,
                 letterSpacing: '1.5px',
                 textTransform: 'uppercase',
-                fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
+                fontFamily: 'var(--font)',
                 marginBottom: 8,
               }}
             >

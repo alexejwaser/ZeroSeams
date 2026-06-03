@@ -26,7 +26,7 @@ function segmentButtonStyle(active: boolean): React.CSSProperties {
     borderRadius: 999,
     cursor: 'pointer',
     fontSize: 12,
-    fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
+    fontFamily: 'var(--font)',
     fontWeight: active ? 'bold' : 'normal',
     transition: 'background 0.15s, color 0.15s',
     whiteSpace: 'nowrap' as const,
@@ -49,7 +49,7 @@ const numberInputStyle: React.CSSProperties = {
 const labelStyle: React.CSSProperties = {
   color: '#555555',
   fontSize: 11,
-  fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
+  fontFamily: 'var(--font)',
   fontWeight: 'bold',
   letterSpacing: '0.06em',
   textTransform: 'uppercase',
@@ -132,7 +132,7 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
           border: '1px solid #d4ccc2',
           borderRadius: 6,
           fontSize: 12,
-          fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
+          fontFamily: 'var(--font)',
           padding: '0 6px',
           cursor: 'pointer',
           outline: 'none',
@@ -218,7 +218,7 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
             flexShrink: 0,
           }}
         />
-        <span style={{ color: '#555555', fontSize: 12, fontFamily: 'monospace' }}>{backgroundColor}</span>
+        <span style={{ color: '#555555', fontSize: 12, fontFamily: 'var(--font)' }}>{backgroundColor}</span>
       </div>
     </div>
   )
