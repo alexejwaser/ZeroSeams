@@ -151,6 +151,34 @@ Canvas scaffold + Electron shell · Image frame/content model (InDesign crop/zoo
 
 Frame labels in `CarouselStage` are hidden when `previewMode` is true.
 
+## Visual Design System (issue #46)
+Design tokens live in `src/ui/theme.css` — the single source of truth for all colors and the font. Import it once at the top of `src/main.tsx`.
+
+**Palette:**
+- `--bg-base` `#fdf8f2` · `--bg-panel` `#f5ede2` · `--bg-canvas` `#ede7dc` · `--bg-surface` `#ffffff`
+- `--border` `#e8e0d5` · `--stroke` `#d4ccc2`
+- `--text-primary` `#111111` · `--text-secondary` `#555555` · `--text-muted` `#aaaaaa`
+- `--accent` `#f94608` (orange — active states, Konva handles, primary CTA)
+- `--font` `'Uncut Sans Variable', system-ui, sans-serif`
+
+**Font:** `UncutSans-Variable.ttf` lives in `public/fonts/`. `@font-face` in `theme.css` declares it; `body { font-family: var(--font) }` cascades everywhere. Never hardcode `'Uncut Sans Variable', system-ui, sans-serif` — use `var(--font)`.
+
+**Buttons:** pill shape everywhere (`borderRadius: 999`). Inputs/selects use `borderRadius: 6`. Cards/popovers use `borderRadius: 16`. The `.btn-raised` CSS class (in `theme.css`) gives Export-style shadow buttons their press-down hover animation — `box-shadow: 2px 4px 0 #000` at rest, `translateY(2px)` + smaller shadow on hover, fully pressed on `:active`.
+
+**`iconBtnStyle(active)`** (`src/ui/iconBtnStyle.ts`): active = orange `#f94608` fill, white icon; inactive = white fill, `#555555` icon, `#d4ccc2` border; always `borderRadius: 999`.
+
+**Sliders:** global `input[type="range"]` rule in `theme.css` applies warm thumb gradient and `background: #e8e0d5` track to ALL range inputs. Adjustments sliders add a per-slider Lightroom-style gradient via inline `background` style (overrides the default via specificity). Never add `.adj-slider` to new sliders — the global rule handles them.
+
+**Color swatches:** `input[type="color"]` gets `-webkit-appearance: none` + `::-webkit-color-swatch { border: none; border-radius: 3px }` via `theme.css`. Just set `width`/`height` inline; the CSS handles everything else.
+
+**Layout:**
+- `TitleBar` (full width, 52px) — logo, file ops, undo/redo pill
+- `ToolBar` (canvas column only, 50px) — drawing tools, frame settings, export
+- `LayerPanel` spans the full body height (starts directly below `TitleBar`, not below `ToolBar`)
+- See `src/main.tsx` for the flex nesting that achieves this
+
+**Konva handles:** all `borderStroke`/`anchorStroke` use `#f94608` (orange). Content-edit mode uses the same accent. Snap guides use `#f94608` for object snaps; `#ff3b5c` for frame snaps (intentionally distinct).
+
 ## Upcoming
 AI: background removal UI, SAM segmentation, LaMa inpainting · Font picker + Google Fonts · Templates/presets · Publish/share · Windows packaging + auto-update · Video: volume normalization meter, playback rate, info panel full video metadata (codec, bitrate), poster frame thumbnail preview in layer panel (issue #42 remaining) · Preview: TikTok/Facebook/Threads shell chrome (currently stubs), dark-mode shell variant, phone bezel option
 
