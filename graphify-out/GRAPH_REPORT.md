@@ -1,16 +1,16 @@
 # Graph Report - ZeroSeams  (2026-06-03)
 
 ## Corpus Check
-- 97 files · ~82,685 words
+- 97 files · ~82,827 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 912 nodes · 1558 edges · 63 communities (47 shown, 16 thin omitted)
+- 912 nodes · 1558 edges · 62 communities (47 shown, 15 thin omitted)
 - Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 62 edges (avg confidence: 0.83)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f645051d`
+- Built from commit: `8ef0709f`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -66,7 +66,6 @@
 - [[_COMMUNITY_Community 50|Community 50]]
 - [[_COMMUNITY_Community 51|Community 51]]
 - [[_COMMUNITY_Community 52|Community 52]]
-- [[_COMMUNITY_Community 53|Community 53]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `useCanvasStore` - 43 edges
@@ -92,7 +91,7 @@
 - `Zustand Store (src/store/index.ts)` --shares_data_with--> `History (past/future snapshots)`  [INFERRED]
   src/store/index.ts → CLAUDE.md
 
-## Communities (63 total, 16 thin omitted)
+## Communities (62 total, 15 thin omitted)
 
 ### Community 0 - "Canvas Node Components"
 Cohesion: 0.06
@@ -143,8 +142,8 @@ Cohesion: 0.11
 Nodes (17): compilerOptions, composite, jsx, lib, module, moduleResolution, noEmit, noImplicitReturns (+9 more)
 
 ### Community 12 - "AI Subsystem"
-Cohesion: 0.19
-Nodes (13): AIContext, AIContextValue, useAI(), AIProvider(), AIStoreState, useAIStore, useBackgroundRemoval(), UseBackgroundRemovalReturn (+5 more)
+Cohesion: 0.17
+Nodes (15): AIContext, AIContextValue, useAI(), AIProvider(), AIStoreState, useAIStore, useBackgroundRemoval(), UseBackgroundRemovalReturn (+7 more)
 
 ### Community 13 - "Playwright Test Scripts"
 Cohesion: 0.12
@@ -155,8 +154,8 @@ Cohesion: 0.13
 Nodes (22): captureVideoFrameSequence(), downloadFrames(), exportMixedFrames(), ExportResult, canvas/index exports, posixDirname(), posixRelative(), posixResolve() (+14 more)
 
 ### Community 15 - "Toolbar & Export UI"
-Cohesion: 0.10
-Nodes (21): Save Split-Button Pattern (Save / Save As / Save a Copy), Module-level activeTooltipCount (instant tooltip on hover when any tooltip is visible), App(), rootEl, FrameSettingsPopover(), FrameSettingsPopoverProps, labelStyle, numberInputStyle (+13 more)
+Cohesion: 0.14
+Nodes (15): Photo Adjustments Bypass Toggle (hold-to-compare \ key + persistent Power button), Save Split-Button Pattern (Save / Save As / Save a Copy), App(), rootEl, iconBtnStyle(), AdjustmentsSection(), ActiveTool, PLATFORM_RECOMMENDED (+7 more)
 
 ### Community 16 - "Canvas Type Definitions"
 Cohesion: 0.12
@@ -179,8 +178,8 @@ Cohesion: 0.09
 Nodes (10): FFmpeg, id, ids, trans, ERROR_IMPORT_FAILURE, ERROR_NOT_LOADED, ERROR_TERMINATED, ERROR_UNKNOWN_MESSAGE_TYPE (+2 more)
 
 ### Community 21 - "Layer Panel & Tooltip"
-Cohesion: 0.24
-Nodes (5): Photo Adjustments Bypass Toggle (hold-to-compare \ key + persistent Power button), iconBtnStyle(), LayerPanel(), AdjustmentsSection(), TooltipProps
+Cohesion: 0.15
+Nodes (10): Module-level activeTooltipCount (instant tooltip on hover when any tooltip is visible), FrameSettingsPopover(), FrameSettingsPopoverProps, labelStyle, numberInputStyle, PLATFORM_LABELS, PLATFORMS, segmentButtonStyle() (+2 more)
 
 ### Community 38 - "Community 38"
 Cohesion: 0.09
@@ -227,8 +226,8 @@ Cohesion: 0.25
 Nodes (8): addOnPostRun(), addOnPreRun(), callRuntimeCallbacks(), initRuntime(), postRun(), preRun(), run(), setTimeout()
 
 ### Community 49 - "Community 49"
-Cohesion: 0.40
-Nodes (4): SaveStatus, SaveStatusState, SaveStatus, SaveStatusState
+Cohesion: 0.27
+Nodes (5): LayerPanel(), SaveStatus, SaveStatusState, SaveStatus, SaveStatusState
 
 ### Community 50 - "Community 50"
 Cohesion: 0.40
@@ -241,14 +240,14 @@ Nodes (5): _environ_get(), _environ_sizes_get(), getEnvStrings(), getExecutableN
 ## Knowledge Gaps
 - **294 isolated node(s):** `composite`, `noEmit`, `module`, `moduleResolution`, `target` (+289 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **16 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **15 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Snap Guide System` connect `Canvas Node Components` to `Agent Domain Architecture`?**
   _High betweenness centrality (0.023) - this node is a cross-community bridge._
-- **Why does `useCanvasStore` connect `Canvas Node Components` to `UI Properties Panel`, `Text Span Utilities`, `AI Subsystem`, `Toolbar & Export UI`, `Layer Panel & Tooltip`?**
+- **Why does `useCanvasStore` connect `Canvas Node Components` to `UI Properties Panel`, `Text Span Utilities`, `AI Subsystem`, `Toolbar & Export UI`, `Community 49`, `Layer Panel & Tooltip`?**
   _High betweenness centrality (0.020) - this node is a cross-community bridge._
 - **Why does `CanvasObject` connect `Type System & Declarations` to `Canvas Node Components`, `Canvas Type Definitions`, `Video Export Pipeline`?**
   _High betweenness centrality (0.020) - this node is a cross-community bridge._
