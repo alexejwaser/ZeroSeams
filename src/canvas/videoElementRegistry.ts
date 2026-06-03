@@ -11,3 +11,6 @@ export function unregisterVideoElement(id: string): void {
 export function getVideoElement(id: string): HTMLVideoElement | undefined {
   return registry.get(id)
 }
+
+/** Direct access to the registry map — use getVideoElement() when possible. */
+export { registry as videoElementRegistry }

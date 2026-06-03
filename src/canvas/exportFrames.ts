@@ -1,5 +1,5 @@
 import type Konva from 'konva'
-import type { CanvasObject, VideoObject } from '../types/canvas'
+import type { CanvasObject, VideoObject, VideoExportSettings } from '../types/canvas'
 import { getVideoElement } from './videoElementRegistry'
 import { encodeVideoFrames, encodeVideoWithAudio } from './videoExport'
 
@@ -151,6 +151,7 @@ async function captureVideoFrameSequence(
   durationSeconds: number,
   videoElements: HTMLVideoElement[],
   onFrame?: (f: number) => void,
+  clipStart = 0,
 ): Promise<Blob[]> {
   const PIXEL_RATIO = 2
   const totalFrames = Math.ceil(durationSeconds * fps)
@@ -158,7 +159,7 @@ async function captureVideoFrameSequence(
 
   for (let f = 0; f < totalFrames; f++) {
     onFrame?.(f + 1)
-    const t = f / fps
+    const t = clipStart + f / fps
     await Promise.all(
       videoElements.map(
         (v) =>
@@ -201,6 +202,7 @@ export async function exportMixedFrames(
   endFrame?: number,
   onStatus?: (msg: string) => void,
   isCancelled?: () => boolean,
+  exportSettings?: VideoExportSettings,
 ): Promise<ExportResult[]> {
   const start = startFrame ?? 0
   const end = endFrame ?? frameCount - 1
@@ -276,19 +278,33 @@ export async function exportMixedFrames(
           .map((obj) => getVideoElement(obj.id))
           .filter((el): el is HTMLVideoElement => el !== undefined)
 
-        // Use the longest video duration visible in this frame.
-        // Fall back to the live video element's duration if naturalDuration was stored as 0/NaN.
-        let duration = Math.max(...videoObjectsInFrame.map((obj) => obj.naturalDuration))
-        if (!isFinite(duration) || duration <= 0) {
-          duration = Math.max(...videoEls.map((v) => v.duration).filter(isFinite))
+        // Use the longest trimmed clip duration visible in this frame, respecting trimStart/trimEnd.
+        const clipStarts = videoObjectsInFrame.map((obj) => obj.trimStart ?? 0)
+        const clipEnds = videoObjectsInFrame.map((obj) => {
+          const end = obj.trimEnd ?? obj.naturalDuration
+          return isFinite(end) && end > 0 ? end : null
+        })
+        let clipStart = clipStarts[0] ?? 0
+        let clipEnd = clipEnds[0] ?? null
+        for (let k = 1; k < videoObjectsInFrame.length; k++) {
+          const candidateDur = (clipEnds[k] ?? 0) - clipStarts[k]
+          const currentDur = (clipEnd ?? 0) - clipStart
+          if (candidateDur > currentDur) {
+            clipStart = clipStarts[k]
+            clipEnd = clipEnds[k]
+          }
         }
-        if (!isFinite(duration) || duration <= 0) duration = 5 // last resort: 5s snapshot
+        if (clipEnd === null || !isFinite(clipEnd) || clipEnd <= clipStart) {
+          const liveDur = Math.max(...videoEls.map((v) => v.duration).filter(isFinite))
+          clipEnd = isFinite(liveDur) && liveDur > 0 ? liveDur : clipStart + 5
+        }
+        const duration = clipEnd - clipStart
 
         // Pause all video elements during seek-based capture
         videoEls.forEach((v) => v.pause())
 
         const totalFramesToCapture = Math.ceil(duration * EXPORT_FPS)
-        console.log(`[exportFrames] frame ${i}: capturing ${totalFramesToCapture} video frames (${duration.toFixed(2)}s @ ${EXPORT_FPS}fps)`)
+        console.log(`[exportFrames] frame ${i}: capturing ${totalFramesToCapture} video frames (${duration.toFixed(2)}s @ ${EXPORT_FPS}fps, clip ${clipStart.toFixed(2)}–${clipEnd.toFixed(2)})`)
         onStatus?.(`Capturing frame ${i + 1} (0/${totalFramesToCapture})…`)
 
         const pngBlobs = await captureVideoFrameSequence(
@@ -300,6 +316,7 @@ export async function exportMixedFrames(
           duration,
           videoEls,
           (f) => onStatus?.(`Capturing frame ${i + 1} (${f}/${totalFramesToCapture})…`),
+          clipStart,
         )
         console.log(`[exportFrames] frame ${i}: captured ${pngBlobs.length} PNG blobs`)
 
@@ -310,9 +327,9 @@ export async function exportMixedFrames(
         const audioSource = videoObjectsInFrame.find((obj) => !obj.muted)
         let mp4Blob: Blob
         if (audioSource) {
-          mp4Blob = await encodeVideoWithAudio(pngBlobs, EXPORT_FPS, frameWidth, frameHeight, audioSource.filePath, onStatus)
+          mp4Blob = await encodeVideoWithAudio(pngBlobs, EXPORT_FPS, frameWidth, frameHeight, audioSource.filePath, onStatus, exportSettings)
         } else {
-          mp4Blob = await encodeVideoFrames(pngBlobs, EXPORT_FPS, frameWidth, frameHeight, onStatus)
+          mp4Blob = await encodeVideoFrames(pngBlobs, EXPORT_FPS, frameWidth, frameHeight, onStatus, exportSettings)
         }
         results.push({ frameIndex: i, type: 'mp4', blob: mp4Blob })
       }

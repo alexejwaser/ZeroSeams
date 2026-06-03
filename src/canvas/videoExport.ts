@@ -1,5 +1,6 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { fetchFile, toBlobURL } from '@ffmpeg/util'
+import type { VideoExportSettings } from '@/types/canvas'
 
 const log = (msg: string, ...args: unknown[]) => {
   const line = `[videoExport ${new Date().toISOString().slice(11, 23)}] ${msg} ${args.map(String).join(' ')}`.trimEnd()
@@ -46,6 +47,7 @@ export async function encodeVideoFrames(
   width: number,
   height: number,
   onStatus?: (msg: string) => void,
+  settings?: VideoExportSettings,
 ): Promise<Blob> {
   log(`encodeVideoFrames: ${pngBlobs.length} frames, ${fps} fps, ${width}×${height}`)
 
@@ -62,12 +64,19 @@ export async function encodeVideoFrames(
   }
   log('all frames written, starting encode…')
 
+  const outputFps =
+    settings?.frameRate === 'source' || settings?.frameRate === undefined
+      ? String(fps)
+      : String(settings.frameRate)
+
   onStatus?.('Encoding video…')
   await ffmpeg.exec([
     '-framerate', String(fps),
     '-i', 'frame%04d.png',
-    '-c:v', 'libx264',
+    '-c:v', settings?.videoCodec ?? 'libx264',
+    '-crf', String(settings?.crf ?? 23),
     '-pix_fmt', 'yuv420p',
+    '-r', outputFps,
     '-vf', `scale=${width}:${height}`,
     'output.mp4',
   ])
@@ -91,6 +100,7 @@ export async function encodeVideoWithAudio(
   height: number,
   audioFilePath: string,
   onStatus?: (msg: string) => void,
+  settings?: VideoExportSettings,
 ): Promise<Blob> {
   log(`encodeVideoWithAudio: ${pngBlobs.length} frames, audio: ${audioFilePath}`)
 
@@ -112,6 +122,11 @@ export async function encodeVideoWithAudio(
   log('audio written')
 
   const duration = pngBlobs.length / fps
+  const outputFps =
+    settings?.frameRate === 'source' || settings?.frameRate === undefined
+      ? String(fps)
+      : String(settings.frameRate)
+
   log(`encoding with audio, duration=${duration}s…`)
   onStatus?.('Encoding video + audio…')
   await ffmpeg.exec([
@@ -120,9 +135,12 @@ export async function encodeVideoWithAudio(
     '-i', 'audio_source.mp4',
     '-map', '0:v:0',   // video from PNG frames (input 0)
     '-map', '1:a:0',   // audio from source file (input 1)
-    '-c:v', 'libx264',
-    '-c:a', 'aac',
+    '-c:v', settings?.videoCodec ?? 'libx264',
+    '-crf', String(settings?.crf ?? 23),
+    '-c:a', settings?.audioCodec ?? 'aac',
+    '-b:a', `${settings?.audioBitrate ?? 128}k`,
     '-pix_fmt', 'yuv420p',
+    '-r', outputFps,
     '-vf', `scale=${width}:${height}`,
     '-t', String(duration),
     '-shortest',

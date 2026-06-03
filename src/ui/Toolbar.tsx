@@ -1,15 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
 import { getStageInstance } from '@/canvas/CarouselStage'
 import { exportMixedFrames } from '@/canvas/exportFrames'
 import { useSaveStatusStore, type SaveStatus } from './useSaveStatusStore'
 import type { CarouselProject } from '@/types/project'
-import type { ShapeKind } from '@/types/canvas'
+import type { ShapeKind, VideoExportSettings } from '@/types/canvas'
+import { DEFAULT_VIDEO_EXPORT_SETTINGS } from '@/types/canvas'
 import { relativizeVideoObjects, resolveVideoObjects } from '@/canvas/pathUtils'
 import {
   MousePointer2, Type, Square, Circle, Minus, PenTool,
   Undo2, Redo2, FolderOpen, Save, ImageDown,
-  ChevronDown, Plus, LayoutTemplate, Check, AlertTriangle, Film,
+  ChevronDown, ChevronUp, Plus, LayoutTemplate, Check, AlertTriangle, Film,
 } from 'lucide-react'
 import Tooltip from './Tooltip'
 import { iconBtnStyle } from './iconBtnStyle'
@@ -128,6 +129,8 @@ export function Toolbar(): React.ReactElement {
   const [loadingProject, setLoadingProject] = useState(false)
   const [saveMenuOpen, setSaveMenuOpen] = useState(false)
   const [showFrameSettings, setShowFrameSettings] = useState(false)
+  const [exportSettings, setExportSettings] = useState<VideoExportSettings>({ ...DEFAULT_VIDEO_EXPORT_SETTINGS })
+  const [showVideoSettings, setShowVideoSettings] = useState(false)
 
   const exportWrapperRef = useRef<HTMLDivElement>(null)
   const recentWrapperRef = useRef<HTMLDivElement>(null)
@@ -174,6 +177,19 @@ export function Toolbar(): React.ReactElement {
     return () => document.removeEventListener('mousedown', handler)
   }, [saveMenuOpen])
 
+  // Compute whether the selected export range contains any visible video objects
+  const currentObjects = objects
+  const hasVideoInRange = useMemo(() => {
+    const start = exportMode === 'single' ? exportSingle - 1 : exportMode === 'range' ? exportFrom - 1 : 0
+    const end = exportMode === 'single' ? exportSingle - 1 : exportMode === 'range' ? exportTo - 1 : frameCount - 1
+    return Object.values(currentObjects).some((obj) => {
+      if (obj.type !== 'video' || !obj.visible) return false
+      const frameLeft = start * frameWidth
+      const frameRight = (end + 1) * frameWidth
+      return obj.x < frameRight && obj.x + obj.width > frameLeft
+    })
+  }, [currentObjects, exportMode, exportSingle, exportFrom, exportTo, frameCount, frameWidth])
+
   async function handleExportAction(): Promise<void> {
     const stage = getStageInstance()
     if (!stage) return
@@ -197,11 +213,12 @@ export function Toolbar(): React.ReactElement {
     useExportStore.setState({ cancelRequested: false })
     void window.electronAPI.clearExportLog()
     try {
-      const currentObjects = useCanvasStore.getState().objects
+      const storeObjects = useCanvasStore.getState().objects
       const results = await exportMixedFrames(
-        stage, currentObjects, frameCount, frameWidth, frameHeight, start, end,
+        stage, storeObjects, frameCount, frameWidth, frameHeight, start, end,
         setExportStatus,
         () => useExportStore.getState().cancelRequested,
+        exportSettings,
       )
       for (const result of results) {
         const frameNum = result.frameIndex + 1
@@ -346,6 +363,21 @@ export function Toolbar(): React.ReactElement {
     height: 24,
     background: active ? '#0af' : 'transparent',
     color: active ? '#fff' : '#aaa',
+    border: 'none',
+    borderRadius: 3,
+    cursor: 'pointer',
+    fontSize: 12,
+    fontWeight: active ? 'bold' : 'normal',
+    transition: 'background 0.15s, color 0.15s',
+    whiteSpace: 'nowrap' as const,
+  })
+
+  // Shared style for video settings segment buttons
+  const videoSettingsBtnStyle = (active: boolean): React.CSSProperties => ({
+    padding: '0 8px',
+    height: 24,
+    background: active ? '#0af' : '#2a2a2a',
+    color: active ? '#fff' : '#ccc',
     border: 'none',
     borderRadius: 3,
     cursor: 'pointer',
@@ -964,6 +996,143 @@ export function Toolbar(): React.ReactElement {
                       padding: '0 4px',
                     }}
                   />
+                </div>
+              )}
+
+              {/* Video Settings — shown only when the selected range contains a visible video */}
+              {hasVideoInRange && (
+                <div
+                  style={{
+                    borderTop: '1px solid #2e2e2e',
+                    paddingTop: 8,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 8,
+                  }}
+                >
+                  {/* Section header / toggle */}
+                  <button
+                    onClick={() => setShowVideoSettings((v) => !v)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      cursor: 'pointer',
+                      width: '100%',
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: '#aaa',
+                        fontSize: 11,
+                        fontWeight: 'bold',
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Video Settings
+                    </span>
+                    {showVideoSettings
+                      ? <ChevronUp size={13} color="#aaa" strokeWidth={1.5}/>
+                      : <ChevronDown size={13} color="#aaa" strokeWidth={1.5}/>}
+                  </button>
+
+                  {showVideoSettings && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+
+                      {/* Codec row */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ color: '#aaa', fontSize: 11, fontWeight: 'bold', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                          Codec
+                        </span>
+                        <div style={{ display: 'flex', gap: 4 }}>
+                          <button
+                            onClick={() => setExportSettings((s) => ({ ...s, videoCodec: 'libx264' }))}
+                            style={videoSettingsBtnStyle(exportSettings.videoCodec === 'libx264')}
+                          >
+                            H.264
+                          </button>
+                          <button
+                            onClick={() => setExportSettings((s) => ({ ...s, videoCodec: 'libx265' }))}
+                            style={videoSettingsBtnStyle(exportSettings.videoCodec === 'libx265')}
+                          >
+                            H.265
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Quality (CRF) row */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                        <span style={{ color: '#aaa', fontSize: 11, fontWeight: 'bold', letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                          Quality
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1 }}>
+                          <input
+                            type="range"
+                            min={0}
+                            max={51}
+                            step={1}
+                            value={exportSettings.crf}
+                            onChange={(e) => setExportSettings((s) => ({ ...s, crf: Number(e.target.value) }))}
+                            style={{ flex: 1, accentColor: '#0af', cursor: 'pointer' }}
+                          />
+                          <span style={{ color: '#ccc', fontSize: 12, minWidth: 20, textAlign: 'right' }}>
+                            {exportSettings.crf}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Audio row */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                        <span style={{ color: '#aaa', fontSize: 11, fontWeight: 'bold', letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                          Audio
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <input
+                            type="number"
+                            min={32}
+                            max={320}
+                            value={exportSettings.audioBitrate}
+                            onChange={(e) => setExportSettings((s) => ({ ...s, audioBitrate: Number(e.target.value) }))}
+                            style={{
+                              width: 52,
+                              height: 24,
+                              background: '#2a2a2a',
+                              color: '#ccc',
+                              border: '1px solid #444',
+                              borderRadius: 3,
+                              fontSize: 12,
+                              textAlign: 'center',
+                              padding: '0 4px',
+                            }}
+                          />
+                          <span style={{ color: '#aaa', fontSize: 11 }}>kbps</span>
+                        </div>
+                      </div>
+
+                      {/* Frame rate row */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ color: '#aaa', fontSize: 11, fontWeight: 'bold', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                          FPS
+                        </span>
+                        <div style={{ display: 'flex', gap: 4 }}>
+                          {(['source', 24, 30, 60] as const).map((fps) => (
+                            <button
+                              key={String(fps)}
+                              onClick={() => setExportSettings((s) => ({ ...s, frameRate: fps }))}
+                              style={videoSettingsBtnStyle(exportSettings.frameRate === fps)}
+                            >
+                              {fps === 'source' ? 'Source' : String(fps)}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+                  )}
                 </div>
               )}
 

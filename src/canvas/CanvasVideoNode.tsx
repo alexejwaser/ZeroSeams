@@ -21,6 +21,8 @@ interface CanvasVideoNodeInnerProps extends CanvasVideoNodeProps {
 
 function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoNodeInnerProps): React.ReactElement | null {
   const isSelected = useCanvasStore((s) => s.selectedId === id)
+  const isPlaying = useCanvasStore((s) => s.videoPlayingIds.has(id))
+  const toggleVideoPlay = useCanvasStore((s) => s.toggleVideoPlay)
   const commitUpdate = useCanvasStore((s) => s.commitUpdate)
   const updateObject = useCanvasStore((s) => s.updateObject)
   const selectedIds = useCanvasStore((s) => s.selectedIds)
@@ -68,13 +70,14 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     videoElRef.current = vid
 
     function onLoaded(): void {
+      // Seek to trimStart before registering — ensures first painted frame is within the clip.
+      const seekTarget = obj.trimStart ?? 0
+      if (seekTarget > 0) {
+        vid.currentTime = seekTarget
+      }
       setVideoEl(vid)
       registerVideoElement(id, vid)
-      // canplay guarantees readyState ≥ HAVE_FUTURE_DATA so ctx.drawImage has a frame.
-      // Muted videos are allowed by Chromium autoplay policy; log if rejected anyway.
-      vid.play().catch((e: unknown) => {
-        console.warn('[CanvasVideoNode] play() rejected:', e)
-      })
+      // Do not auto-play — playback is gated on videoPlayingIds in a separate effect.
     }
     // canplay fires when the browser has decoded at least one frame and can start playing.
     // loadedmetadata only guarantees readyState=1 (no pixel data) — drawImage paints nothing.
@@ -98,11 +101,22 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, obj.filePath])
 
-  // RAF loop — keeps Konva repainting while video is playing.
+  // RAF loop — keeps Konva repainting and enforces trim boundaries.
   useEffect(() => {
     if (!videoEl) return
 
     function tick(): void {
+      const end = obj.trimEnd ?? obj.naturalDuration
+      const start = obj.trimStart ?? 0
+      if (videoEl!.currentTime >= end) {
+        videoEl!.currentTime = start
+        if (!(obj.loop ?? true)) {
+          videoEl!.pause()
+          // Sync store so the play button reflects paused state
+          const store = useCanvasStore.getState()
+          if (store.videoPlayingIds.has(id)) store.toggleVideoPlay(id)
+        }
+      }
       const layer = groupRef.current?.getLayer()
       if (layer) layer.batchDraw()
       rafRef.current = requestAnimationFrame(tick)
@@ -115,7 +129,34 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
         rafRef.current = null
       }
     }
+    // obj.trimStart/End/loop/naturalDuration intentionally omitted — tick reads
+    // obj via closure from the outer component render, which re-runs this effect
+    // whenever videoEl changes. Trim re-seek is handled by a separate effect.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoEl])
+
+  // Play/pause gating — drive the video element from the store flag.
+  useEffect(() => {
+    if (!videoEl) return
+    if (isPlaying) {
+      videoEl.play().catch((e: unknown) => {
+        console.warn('[CanvasVideoNode] play() rejected:', e)
+      })
+    } else {
+      videoEl.pause()
+    }
+  }, [isPlaying, videoEl])
+
+  // Re-seek when trim points change — clamp current time into the new range.
+  useEffect(() => {
+    if (!videoEl) return
+    const start = obj.trimStart ?? 0
+    const end = obj.trimEnd ?? obj.naturalDuration
+    if (videoEl.currentTime < start || videoEl.currentTime > end) {
+      videoEl.currentTime = start
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [obj.trimStart, obj.trimEnd])
 
   const groupClip = useMemo(
     () => ({ x: 0, y: 0, width: obj.frameWidth, height: obj.frameHeight }),

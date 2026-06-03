@@ -17,8 +17,9 @@ import {
 import { FontPicker } from './FontPicker'
 import Tooltip from './Tooltip'
 import { iconBtnStyle } from './iconBtnStyle'
-import { PenTool, Square, Circle, Trash2, Pencil, Eye, EyeOff, AlignLeft, AlignCenter, AlignRight, Power, Plus, X, ChevronDown, ChevronRight, Volume2, VolumeX } from 'lucide-react'
+import { PenTool, Square, Circle, Trash2, Pencil, Eye, EyeOff, AlignLeft, AlignCenter, AlignRight, Power, Plus, X, ChevronDown, ChevronRight, Volume2, VolumeX, Play, Pause, Repeat } from 'lucide-react'
 import './adjustments.css'
+import { videoElementRegistry } from '@/canvas/videoElementRegistry'
 
 // ---------------------------------------------------------------------------
 // rotateAroundCenter — pure utility
@@ -1256,6 +1257,16 @@ function formatDuration(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
+const trimLabelStyle: React.CSSProperties = {
+  color: '#aaa',
+  fontSize: 11,
+  width: 32,
+  flexShrink: 0,
+  textTransform: 'uppercase',
+  fontWeight: 'bold',
+  letterSpacing: '0.06em',
+}
+
 function VideoSection({
   videoObj,
   selectedId,
@@ -1263,6 +1274,17 @@ function VideoSection({
   onUpdate,
   onCommit,
 }: VideoSectionProps): React.ReactElement {
+  const isPlaying = useCanvasStore((s) => s.videoPlayingIds.has(videoObj.id))
+  const toggleVideoPlay = useCanvasStore((s) => s.toggleVideoPlay)
+
+  const [currentTime, setCurrentTime] = useState(0)
+  useEffect(() => {
+    const vid = videoElementRegistry.get(videoObj.id)
+    if (!vid) return
+    const intervalId = setInterval(() => setCurrentTime(vid.currentTime), 100)
+    return () => clearInterval(intervalId)
+  }, [videoObj.id, isPlaying])
+
   return (
     <div style={{ padding: '12px 12px 0' }}>
       {/* Read-only info */}
@@ -1290,6 +1312,110 @@ function VideoSection({
             {videoObj.muted ? <VolumeX size={14} /> : <Volume2 size={14} />}
           </button>
         </Tooltip>
+      </div>
+
+      {/* Playback controls */}
+      <div style={sectionLabelStyle}>Playback</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+        <Tooltip label={isPlaying ? 'Pause' : 'Play'}>
+          <button
+            style={iconBtnStyle(isPlaying)}
+            onClick={() => toggleVideoPlay(videoObj.id)}
+          >
+            {isPlaying ? <Pause size={14} /> : <Play size={14} />}
+          </button>
+        </Tooltip>
+        <Tooltip label={(videoObj.loop ?? true) ? 'Loop on' : 'Loop off'}>
+          <button
+            style={iconBtnStyle(videoObj.loop ?? true)}
+            onClick={() => onCommit(selectedId, { loop: !(videoObj.loop ?? true) })}
+          >
+            <Repeat size={14} />
+          </button>
+        </Tooltip>
+        <span style={{ color: '#aaa', fontSize: 11, marginLeft: 4 }}>
+          {formatDuration(currentTime)} / {formatDuration(videoObj.naturalDuration)}
+        </span>
+      </div>
+
+      {/* Scrub bar */}
+      <div style={{ marginBottom: 10 }}>
+        <input
+          type="range"
+          min={videoObj.trimStart ?? 0}
+          max={videoObj.trimEnd ?? videoObj.naturalDuration}
+          step={0.01}
+          value={currentTime}
+          style={{ width: '100%' }}
+          onMouseDown={onStartDrag}
+          onChange={(e) => {
+            const t = Number(e.target.value)
+            const vid = videoElementRegistry.get(videoObj.id)
+            if (vid) vid.currentTime = t
+            setCurrentTime(t)
+          }}
+          onMouseUp={() => {
+            onCommit(selectedId, {})
+          }}
+        />
+      </div>
+
+      {/* Trim section */}
+      <div style={sectionLabelStyle}>Trim</div>
+      {/* In point */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+        <span style={trimLabelStyle}>In</span>
+        <input
+          type="number"
+          min={0}
+          max={videoObj.naturalDuration}
+          step={0.01}
+          value={(videoObj.trimStart ?? 0).toFixed(2)}
+          onMouseDown={onStartDrag}
+          onChange={(e) => onUpdate(selectedId, { trimStart: Number(e.target.value) })}
+          onBlur={(e) => onCommit(selectedId, { trimStart: Number(e.target.value) })}
+          style={numInputStyle(60)}
+        />
+        <Tooltip label="Set In to current time">
+          <button
+            style={{ ...iconBtnStyle(false), fontSize: 11, padding: '2px 6px', width: 'auto' }}
+            onClick={() => onCommit(selectedId, { trimStart: currentTime })}
+          >
+            Set In
+          </button>
+        </Tooltip>
+      </div>
+      {/* Out point */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+        <span style={trimLabelStyle}>Out</span>
+        <input
+          type="number"
+          min={0}
+          max={videoObj.naturalDuration}
+          step={0.01}
+          value={(videoObj.trimEnd ?? videoObj.naturalDuration).toFixed(2)}
+          onMouseDown={onStartDrag}
+          onChange={(e) => onUpdate(selectedId, { trimEnd: Number(e.target.value) })}
+          onBlur={(e) => onCommit(selectedId, { trimEnd: Number(e.target.value) })}
+          style={numInputStyle(60)}
+        />
+        <Tooltip label="Set Out to current time">
+          <button
+            style={{ ...iconBtnStyle(false), fontSize: 11, padding: '2px 6px', width: 'auto' }}
+            onClick={() => onCommit(selectedId, { trimEnd: currentTime })}
+          >
+            Set Out
+          </button>
+        </Tooltip>
+      </div>
+      {/* Reset trim */}
+      <div style={{ marginBottom: 10 }}>
+        <button
+          style={{ ...iconBtnStyle(false), fontSize: 11, padding: '2px 8px', width: 'auto' }}
+          onClick={() => onCommit(selectedId, { trimStart: 0, trimEnd: videoObj.naturalDuration })}
+        >
+          Reset Trim
+        </button>
       </div>
 
       {/* Rotation slider + numeric input */}
