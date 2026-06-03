@@ -1139,13 +1139,28 @@ export function CarouselStage(): React.ReactElement {
           setContextMenu({ x: e.evt.clientX, y: e.evt.clientY, targetId: null })
         }}
       >
-        {/* Layer 1: background + guides */}
+        {/* Layer 0: background fills — never hidden during export */}
+        <Layer name="background" listening={false}>
+          {Array.from({ length: frameCount }, (_, i) => {
+            const fill = frames[i]?.backgroundColor ?? backgroundColor
+            return (
+              <KonvaRect
+                key={`bg-${i}`}
+                x={i * frameWidth}
+                y={0}
+                width={frameWidth}
+                height={frameHeight}
+                fill={fill}
+              />
+            )
+          })}
+        </Layer>
+
+        {/* Layer 1: guides/snap decorations — hidden during export */}
         <Layer name="guides" listening={false}>
           <FrameGuides
             frameCount={frameCount}
-            frames={frames}
             frameHeight={frameHeight}
-            backgroundColor={backgroundColor}
           />
         </Layer>
 
