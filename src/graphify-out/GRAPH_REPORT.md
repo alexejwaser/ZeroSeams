@@ -1,16 +1,16 @@
 # Graph Report - src  (2026-06-03)
 
 ## Corpus Check
-- 67 files · ~62,182 words
+- 67 files · ~62,328 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 364 nodes · 736 edges · 20 communities (15 shown, 5 thin omitted)
+- 364 nodes · 742 edges · 20 communities (15 shown, 5 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 16 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2abf34e0`
+- Built from commit: `15b11ec5`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -35,7 +35,7 @@
 ## God Nodes (most connected - your core abstractions)
 1. `useCanvasStore` - 43 edges
 2. `buildFilterPipeline()` - 17 edges
-3. `useViewportStore` - 14 edges
+3. `useViewportStore` - 16 edges
 4. `SnapGuide` - 14 edges
 5. `useSnapGuides()` - 14 edges
 6. `CarouselStage()` - 10 edges
@@ -47,14 +47,14 @@
 ## Surprising Connections (you probably didn't know these)
 - `FrameSettingsPopover()` --calls--> `useCanvasStore`  [INFERRED]
   ui/FrameSettingsPopover.tsx → canvas/useCanvasStore.ts
+- `TextSection()` --calls--> `getSelectionStyle()`  [INFERRED]
+  ui/PropertiesPanel.tsx → canvas/textSpans.ts
 - `EffectsSection()` --calls--> `getAllEffectDefinitions()`  [INFERRED]
   ui/PropertiesPanel.tsx → canvas/effects/registry.ts
 - `VideoSection()` --calls--> `useCanvasStore`  [INFERRED]
   ui/PropertiesPanel.tsx → canvas/useCanvasStore.ts
 - `PropertiesPanel()` --calls--> `useCanvasStore`  [INFERRED]
   ui/PropertiesPanel.tsx → canvas/useCanvasStore.ts
-- `PropertiesPanel()` --calls--> `useThumbnailStore`  [INFERRED]
-  ui/PropertiesPanel.tsx → canvas/useThumbnailStore.ts
 
 ## Communities (20 total, 5 thin omitted)
 
@@ -64,7 +64,7 @@ Nodes (59): CanvasImageNode, CanvasImageNodeInner(), CanvasImageNodeInnerProps, 
 
 ### Community 1 - "Community 1"
 Cohesion: 0.06
-Nodes (30): getSelectionStyle(), resolveSpanStyle(), useThumbnailStore, FontPicker(), MAC_SYSTEM_FONTS, iconBtnStyle(), LayerPanel(), AdjustmentsSection() (+22 more)
+Nodes (28): useThumbnailStore, FontPicker(), MAC_SYSTEM_FONTS, iconBtnStyle(), LayerPanel(), AdjustmentsSection(), AdjustmentsSectionProps, alignButtonStyle() (+20 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.13
@@ -87,8 +87,8 @@ Cohesion: 0.22
 Nodes (12): buildEffectFilters(), boxBlurH(), boxBlurV(), buildFilter(), hexToRgb(), EffectControlDescriptor, EffectDefinition, EffectParams (+4 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.18
-Nodes (15): applyStyleToAll(), applyStyleToRange(), fontStyleToCSS(), mergeAdjacentSpans(), ResolvedSpanStyle, SelectionStyle, spanText(), splitSpansAt() (+7 more)
+Cohesion: 0.16
+Nodes (17): applyStyleToAll(), applyStyleToRange(), fontStyleToCSS(), getSelectionStyle(), mergeAdjacentSpans(), ResolvedSpanStyle, resolveSpanStyle(), SelectionStyle (+9 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.12
@@ -121,6 +121,6 @@ _Questions this graph is uniquely positioned to answer:_
 - **What connects `rootEl`, `FrameSettingsPopoverProps`, `PLATFORM_LABELS` to the rest of the system?**
   _106 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.06259183073758448 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06435498089920658 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.05919661733615222 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0627177700348432 - nodes in this community are weakly interconnected._

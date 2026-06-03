@@ -1,6 +1,8 @@
 import { useEffect } from 'react'
 import type React from 'react'
 import { useCanvasStore } from './useCanvasStore'
+import { useViewportStore } from './useViewportStore'
+import { CANVAS_SCALE } from './constants'
 
 interface ElectronFile extends File {
   readonly path: string
@@ -25,67 +27,76 @@ export function useVideoDrop(containerRef: React.RefObject<HTMLDivElement>): voi
       e.preventDefault()
       e.stopPropagation()
 
+      // Capture drop coordinates synchronously before any async work
+      const rect = containerRef.current!.getBoundingClientRect()
+      const { panX, panY, zoom } = useViewportStore.getState()
+      const canvasX = (e.clientX - rect.left - panX) / (CANVAS_SCALE * zoom)
+      const canvasY = (e.clientY - rect.top - panY) / (CANVAS_SCALE * zoom)
+
       const ACCEPTED_TYPES = ['video/mp4', 'video/quicktime', 'video/webm', 'video/x-m4v']
       const ACCEPTED_EXTS = ['.mp4', '.mov', '.webm', '.m4v']
-      const file = Array.from(e.dataTransfer?.files ?? []).find((f) =>
-        ACCEPTED_TYPES.includes(f.type) ||
-        ACCEPTED_EXTS.some((ext) => f.name.toLowerCase().endsWith(ext)),
-      ) as ElectronFile | undefined
-      if (!file) return
+      const videoFiles = Array.from(e.dataTransfer?.files ?? []).filter(
+        (f) =>
+          ACCEPTED_TYPES.includes(f.type) ||
+          ACCEPTED_EXTS.some((ext) => f.name.toLowerCase().endsWith(ext)),
+      ) as ElectronFile[]
+      if (videoFiles.length === 0) return
 
-      const rawName = file.name.replace(/\.[^.]+$/, '')
-      const absolutePath = file.path
+      videoFiles.forEach((file, index) => {
+        const rawName = file.name.replace(/\.[^.]+$/, '')
+        const absolutePath = file.path
 
-      const vid = document.createElement('video')
-      vid.preload = 'metadata'
-      vid.onloadedmetadata = () => {
-        const w = vid.videoWidth
-        const h = vid.videoHeight
-        const dur = vid.duration
-        URL.revokeObjectURL(vid.src)
+        const vid = document.createElement('video')
+        vid.preload = 'metadata'
+        vid.onloadedmetadata = () => {
+          const w = vid.videoWidth
+          const h = vid.videoHeight
+          const dur = vid.duration
+          URL.revokeObjectURL(vid.src)
 
-        const MAX_SIZE = 600
-        const scale = Math.min(1, MAX_SIZE / Math.max(w, h))
-        const frameW = Math.round(w * scale)
-        const frameH = Math.round(h * scale)
+          const MAX_SIZE = 600
+          const scale = Math.min(1, MAX_SIZE / Math.max(w, h))
+          const frameW = Math.round(w * scale)
+          const frameH = Math.round(h * scale)
 
-        const frameX = frameWidth / 2 - frameW / 2
-        const frameY = frameHeight / 2 - frameH / 2
+          const frameX = canvasX - frameW / 2 + index * 30
+          const frameY = canvasY - frameH / 2 + index * 30
 
-        addObject({
-          id: crypto.randomUUID(),
-          type: 'video',
-          scope: 'global',
-          name: rawName,
-          filePath: absolutePath,
-          relativeFilePath: undefined,
-          muted: false,
-          naturalWidth: w,
-          naturalHeight: h,
-          naturalDuration: dur,
-          frameX,
-          frameY,
-          frameWidth: frameW,
-          frameHeight: frameH,
-          contentOffsetX: 0,
-          contentOffsetY: 0,
-          contentWidth: frameW,
-          contentHeight: frameH,
-          contentEditMode: false,
-          x: frameX,
-          y: frameY,
-          width: frameW,
-          height: frameH,
-          rotation: 0,
-          scaleX: 1,
-          scaleY: 1,
-          opacity: 1,
-          visible: true,
-          locked: false,
-          zIndex: objectOrder.length,
-        })
-      }
-      vid.src = URL.createObjectURL(file)
+          addObject({
+            id: crypto.randomUUID(),
+            type: 'video',
+            scope: 'global',
+            name: rawName,
+            filePath: absolutePath,
+            relativeFilePath: undefined,
+            muted: false,
+            naturalWidth: w,
+            naturalHeight: h,
+            naturalDuration: dur,
+            frameX,
+            frameY,
+            frameWidth: frameW,
+            frameHeight: frameH,
+            contentOffsetX: 0,
+            contentOffsetY: 0,
+            contentWidth: frameW,
+            contentHeight: frameH,
+            contentEditMode: false,
+            x: frameX,
+            y: frameY,
+            width: frameW,
+            height: frameH,
+            rotation: 0,
+            scaleX: 1,
+            scaleY: 1,
+            opacity: 1,
+            visible: true,
+            locked: false,
+            zIndex: objectOrder.length,
+          })
+        }
+        vid.src = URL.createObjectURL(file)
+      })
     }
 
     container.addEventListener('dragover', handleDragOver)

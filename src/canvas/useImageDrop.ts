@@ -1,6 +1,8 @@
 import { useEffect } from 'react'
 import type React from 'react'
 import { useCanvasStore } from './useCanvasStore'
+import { useViewportStore } from './useViewportStore'
+import { CANVAS_SCALE } from './constants'
 
 export function useImageDrop(containerRef: React.RefObject<HTMLDivElement>): void {
   const addObject = useCanvasStore((s) => s.addObject)
@@ -21,123 +23,133 @@ export function useImageDrop(containerRef: React.RefObject<HTMLDivElement>): voi
       e.preventDefault()
       e.stopPropagation()
 
+      // Capture drop coordinates synchronously before any async work
+      const rect = containerRef.current!.getBoundingClientRect()
+      const { panX, panY, zoom } = useViewportStore.getState()
+      const canvasX = (e.clientX - rect.left - panX) / (CANVAS_SCALE * zoom)
+      const canvasY = (e.clientY - rect.top - panY) / (CANVAS_SCALE * zoom)
+
       const files = Array.from(e.dataTransfer?.files ?? [])
 
-      const videoFile = files.find((f) => f.type.startsWith('video/'))
-      if (videoFile) {
-        const filePath = (videoFile as File & { path: string }).path
-        if (!filePath) return
-        const rawName = videoFile.name.replace(/\.[^.]+$/, '')
+      const videoFiles = files.filter((f) => f.type.startsWith('video/'))
+      if (videoFiles.length > 0) {
+        videoFiles.forEach((videoFile, index) => {
+          const filePath = (videoFile as File & { path: string }).path
+          if (!filePath) return
+          const rawName = videoFile.name.replace(/\.[^.]+$/, '')
 
-        const vid = document.createElement('video')
-        vid.preload = 'metadata'
-        const onMeta = () => {
-          // durationchange fires when duration becomes finite; loadedmetadata can still be NaN
-          if (!isFinite(vid.duration) || vid.duration <= 0) return
-          vid.removeEventListener('durationchange', onMeta)
-          const MAX_SIZE = 600
-          const scale = Math.min(1, MAX_SIZE / Math.max(vid.videoWidth, vid.videoHeight))
-          const w = Math.round(vid.videoWidth * scale)
-          const h = Math.round(vid.videoHeight * scale)
-          const frameX = frameWidth / 2 - w / 2
-          const frameY = frameHeight / 2 - h / 2
-          vid.src = ''
+          const vid = document.createElement('video')
+          vid.preload = 'metadata'
+          const onMeta = () => {
+            // durationchange fires when duration becomes finite; loadedmetadata can still be NaN
+            if (!isFinite(vid.duration) || vid.duration <= 0) return
+            vid.removeEventListener('durationchange', onMeta)
+            const MAX_SIZE = 600
+            const scale = Math.min(1, MAX_SIZE / Math.max(vid.videoWidth, vid.videoHeight))
+            const w = Math.round(vid.videoWidth * scale)
+            const h = Math.round(vid.videoHeight * scale)
+            const frameX = canvasX - w / 2 + index * 30
+            const frameY = canvasY - h / 2 + index * 30
+            vid.src = ''
 
-          addObject({
-            id: crypto.randomUUID(),
-            type: 'video',
-            scope: 'global',
-            name: rawName,
-            filePath,
-            muted: false,
-            naturalWidth: vid.videoWidth,
-            naturalHeight: vid.videoHeight,
-            naturalDuration: vid.duration,
-            frameX,
-            frameY,
-            frameWidth: w,
-            frameHeight: h,
-            contentOffsetX: 0,
-            contentOffsetY: 0,
-            contentWidth: w,
-            contentHeight: h,
-            contentEditMode: false,
-            x: frameX,
-            y: frameY,
-            width: w,
-            height: h,
-            rotation: 0,
-            scaleX: 1,
-            scaleY: 1,
-            opacity: 1,
-            visible: true,
-            locked: false,
-            zIndex: objectOrder.length,
-          })
-        }
-        vid.addEventListener('durationchange', onMeta)
-        vid.onerror = () => vid.removeEventListener('durationchange', onMeta)
-        vid.src = `zeroseams-media://localhost${filePath}`
+            addObject({
+              id: crypto.randomUUID(),
+              type: 'video',
+              scope: 'global',
+              name: rawName,
+              filePath,
+              muted: false,
+              naturalWidth: vid.videoWidth,
+              naturalHeight: vid.videoHeight,
+              naturalDuration: vid.duration,
+              frameX,
+              frameY,
+              frameWidth: w,
+              frameHeight: h,
+              contentOffsetX: 0,
+              contentOffsetY: 0,
+              contentWidth: w,
+              contentHeight: h,
+              contentEditMode: false,
+              x: frameX,
+              y: frameY,
+              width: w,
+              height: h,
+              rotation: 0,
+              scaleX: 1,
+              scaleY: 1,
+              opacity: 1,
+              visible: true,
+              locked: false,
+              zIndex: objectOrder.length,
+            })
+          }
+          vid.addEventListener('durationchange', onMeta)
+          vid.onerror = () => vid.removeEventListener('durationchange', onMeta)
+          vid.src = `zeroseams-media://localhost${filePath}`
+        })
         return
       }
 
-      const imageFile = files.find((f) => f.type.startsWith('image/'))
-      if (!imageFile) return
+      const imageFiles = files.filter((f) => f.type.startsWith('image/'))
+      if (imageFiles.length === 0) return
 
-      const rawName = imageFile.name.replace(/\.[^.]+$/, '')
+      imageFiles.forEach((imageFile, index) => {
+        const rawName = imageFile.name.replace(/\.[^.]+$/, '')
 
-      const reader = new FileReader()
-      reader.onload = (readerEvent) => {
-        const dataUrl = readerEvent.target?.result
-        if (typeof dataUrl !== 'string') return
+        const reader = new FileReader()
+        reader.onload = (readerEvent) => {
+          const dataUrl = readerEvent.target?.result
+          if (typeof dataUrl !== 'string') return
 
-        // Load image to get natural dimensions before creating the object
-        const img = new Image()
-        img.onload = () => {
-          const MAX_SIZE = 600
-          const scale = Math.min(1, MAX_SIZE / Math.max(img.naturalWidth, img.naturalHeight))
-          const w = Math.round(img.naturalWidth * scale)
-          const h = Math.round(img.naturalHeight * scale)
+          // Load image to get natural dimensions before creating the object
+          const img = new Image()
+          img.onload = () => {
+            const MAX_SIZE = 600
+            const scale = Math.min(1, MAX_SIZE / Math.max(img.naturalWidth, img.naturalHeight))
+            const w = Math.round(img.naturalWidth * scale)
+            const h = Math.round(img.naturalHeight * scale)
 
-          const frameX = frameWidth / 2 - w / 2
-          const frameY = frameHeight / 2 - h / 2
+            const frameX = canvasX - w / 2 + index * 30
+            const frameY = canvasY - h / 2 + index * 30
 
-          addObject({
-            id: crypto.randomUUID(),
-            type: 'image',
-            scope: 'global',
-            name: rawName,
-            src: dataUrl,
-            backgroundRemoved: false,
-            frameX,
-            frameY,
-            frameWidth: w,
-            frameHeight: h,
-            contentOffsetX: 0,
-            contentOffsetY: 0,
-            contentWidth: w,
-            contentHeight: h,
-            naturalWidth: img.naturalWidth,
-            naturalHeight: img.naturalHeight,
-            contentEditMode: false,
-            maskEditMode: false,
-            // keep in sync with frame for compatibility
-            x: frameX,
-            y: frameY,
-            width: w,
-            height: h,
-            rotation: 0,
-            scaleX: 1,
-            scaleY: 1,
-            opacity: 1,
-            visible: true,
-            locked: false,
-            zIndex: objectOrder.length,
-          })
+            addObject({
+              id: crypto.randomUUID(),
+              type: 'image',
+              scope: 'global',
+              name: rawName,
+              src: dataUrl,
+              backgroundRemoved: false,
+              frameX,
+              frameY,
+              frameWidth: w,
+              frameHeight: h,
+              contentOffsetX: 0,
+              contentOffsetY: 0,
+              contentWidth: w,
+              contentHeight: h,
+              naturalWidth: img.naturalWidth,
+              naturalHeight: img.naturalHeight,
+              contentEditMode: false,
+              maskEditMode: false,
+              // keep in sync with frame for compatibility
+              x: frameX,
+              y: frameY,
+              width: w,
+              height: h,
+              rotation: 0,
+              scaleX: 1,
+              scaleY: 1,
+              opacity: 1,
+              visible: true,
+              locked: false,
+              zIndex: objectOrder.length,
+            })
+          }
+          img.src = dataUrl
         }
-        img.src = dataUrl
-      }
-      reader.readAsDataURL(imageFile)
+        reader.readAsDataURL(imageFile)
+      })
     }
 
     container.addEventListener('dragover', handleDragOver)

@@ -1456,7 +1456,7 @@
       "label": "useImageDrop()",
       "file_type": "code",
       "source_file": "canvas/useImageDrop.ts",
-      "source_location": "L5",
+      "source_location": "L7",
       "id": "canvas_useimagedrop_useimagedrop",
       "community": 0,
       "norm_label": "useimagedrop()"
@@ -1521,7 +1521,7 @@
       "source_file": "canvas/textSpans.ts",
       "source_location": "L27",
       "id": "canvas_textspans_resolvespanstyle",
-      "community": 1,
+      "community": 7,
       "norm_label": "resolvespanstyle()"
     },
     {
@@ -1539,7 +1539,7 @@
       "source_file": "canvas/textSpans.ts",
       "source_location": "L51",
       "id": "canvas_textspans_getselectionstyle",
-      "community": 1,
+      "community": 7,
       "norm_label": "getselectionstyle()"
     },
     {
@@ -1960,7 +1960,7 @@
       "label": "ElectronFile",
       "file_type": "code",
       "source_file": "canvas/useVideoDrop.ts",
-      "source_location": "L5",
+      "source_location": "L7",
       "id": "canvas_usevideodrop_electronfile",
       "community": 0,
       "norm_label": "electronfile"
@@ -1969,7 +1969,7 @@
       "label": "useVideoDrop()",
       "file_type": "code",
       "source_file": "canvas/useVideoDrop.ts",
-      "source_location": "L9",
+      "source_location": "L11",
       "id": "canvas_usevideodrop_usevideodrop",
       "community": 0,
       "norm_label": "usevideodrop()"
@@ -6866,6 +6866,39 @@
       "target": "canvas_usecanvasstore_usecanvasstore"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/useImageDrop.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "canvas_useimagedrop_ts",
+      "target": "canvas_useviewportstore_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/useImageDrop.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "canvas_useimagedrop_ts",
+      "target": "canvas_useviewportstore_useviewportstore",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/useImageDrop.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "canvas_useimagedrop_ts",
+      "target": "canvas_constants_ts",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "canvas/useImageDrop.ts",
@@ -7708,6 +7741,17 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "canvas/useVideoDrop.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "canvas_usevideodrop_ts",
+      "target": "canvas_useviewportstore_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "canvas/CanvasTextNode.tsx",
       "source_location": "L7",
       "weight": 1.0,
@@ -7747,6 +7791,17 @@
       "confidence_score": 1.0,
       "source": "canvas_canvasimagenode_tsx",
       "target": "canvas_useviewportstore_useviewportstore"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/useVideoDrop.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "canvas_usevideodrop_ts",
+      "target": "canvas_useviewportstore_useviewportstore",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -8635,6 +8690,17 @@
       "confidence_score": 1.0,
       "source": "canvas_constants_ts",
       "target": "canvas_constants_axislock"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/useVideoDrop.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "canvas_usevideodrop_ts",
+      "target": "canvas_constants_ts",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -11082,5 +11148,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "2abf34e00d46fa97b109d60a2aac415683173bc7"
+  "built_at_commit": "15b11ec558957e3c8ca0b2a2e2d3572a4dfd1c98"
 }
