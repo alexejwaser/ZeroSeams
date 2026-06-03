@@ -69,6 +69,10 @@ interface CanvasState {
   adjustmentsBypass: boolean
   setAdjustmentsBypass: (v: boolean) => void
   toggleAdjustmentsBypass: () => void
+  previewMode: boolean
+  previewFrame: number        // 0-based index of frame shown in preview
+  togglePreviewMode: () => void
+  setPreviewFrame: (n: number) => void
   past: HistorySnapshot[]
   future: HistorySnapshot[]
   // Volatile UI state — NOT in HistorySnapshot
@@ -211,6 +215,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
     resizeMode: 'auto',
     snapEnabled: true,
     adjustmentsBypass: false,
+    previewMode: false,
+    previewFrame: 0,
     past: [],
     future: [],
     contextMenu: null,
@@ -382,6 +388,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
     toggleSnap: () => set((s) => ({ snapEnabled: !s.snapEnabled })),
     setAdjustmentsBypass: (v) => set({ adjustmentsBypass: v }),
     toggleAdjustmentsBypass: () => set((s) => ({ adjustmentsBypass: !s.adjustmentsBypass })),
+    togglePreviewMode: () => set((s) => ({ previewMode: !s.previewMode, previewFrame: 0 })),
+    setPreviewFrame: (n) => set({ previewFrame: n }),
 
     reorderObjects: (fromId, toId, side) =>
       set((state) => {

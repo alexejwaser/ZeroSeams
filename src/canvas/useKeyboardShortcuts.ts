@@ -298,6 +298,13 @@ export function useKeyboardShortcuts(): void {
           sendBackward(selectedId)
           return
         }
+
+        if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'P' || e.key === 'p')) {
+          e.preventDefault()
+          const { platform, togglePreviewMode } = useCanvasStore.getState()
+          if (platform !== 'custom') togglePreviewMode()
+          return
+        }
       }
     }
 

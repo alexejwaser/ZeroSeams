@@ -10,7 +10,7 @@ import { relativizeVideoObjects, resolveVideoObjects } from '@/canvas/pathUtils'
 import {
   MousePointer2, Type, Square, Circle, Minus, PenTool,
   Undo2, Redo2, FolderOpen, Save, ImageDown,
-  ChevronDown, ChevronUp, Plus, LayoutTemplate, Check, AlertTriangle, Film,
+  ChevronDown, ChevronUp, Plus, LayoutTemplate, Check, AlertTriangle, Film, Eye,
 } from 'lucide-react'
 import Tooltip from './Tooltip'
 import type { Platform } from '@/types/project'
@@ -250,6 +250,8 @@ export function Toolbar(): React.ReactElement {
   const setResizeMode = useCanvasStore((s) => s.setResizeMode)
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
   const toggleSnap = useCanvasStore((s) => s.toggleSnap)
+  const previewMode = useCanvasStore((s) => s.previewMode)
+  const togglePreviewMode = useCanvasStore((s) => s.togglePreviewMode)
   const loadProject = useCanvasStore((s) => s.loadProject)
   const activeShapeKind = useCanvasStore((s) => s.activeShapeKind)
   const setActiveShapeKind = useCanvasStore((s) => s.setActiveShapeKind)
@@ -1015,6 +1017,18 @@ export function Toolbar(): React.ReactElement {
         </Tooltip>
 
         {divider}
+
+        {/* Preview button */}
+        <Tooltip label="Preview" shortcut="⌘⇧P" description="Preview carousel in platform mockup">
+          <button
+            onClick={togglePreviewMode}
+            disabled={platform === 'custom'}
+            aria-pressed={previewMode}
+            style={iconBtnStyle(previewMode, platform === 'custom')}
+          >
+            <Eye size={15} />
+          </button>
+        </Tooltip>
 
         {/* Group 6 — Export */}
         <div ref={exportWrapperRef} style={{ position: 'relative' }}>

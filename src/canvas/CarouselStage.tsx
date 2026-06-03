@@ -62,6 +62,7 @@ export function CarouselStage(): React.ReactElement {
   const maskModeActive = useCanvasStore((s) => s.maskModeActive)
   const enterMaskDrawMode = useCanvasStore((s) => s.enterMaskDrawMode)
   const setFrameBackground = useCanvasStore((s) => s.setFrameBackground)
+  const previewMode = useCanvasStore((s) => s.previewMode)
 
   // Viewport store
   const zoom = useViewportStore((s) => s.zoom)
@@ -571,7 +572,7 @@ export function CarouselStage(): React.ReactElement {
       onMouseLeave={handleContainerMouseUp}
     >
       {/* Frame labels + colour swatches — follow the canvas viewport */}
-      {Array.from({ length: frameCount }).map((_, i) => {
+      {!previewMode && Array.from({ length: frameCount }).map((_, i) => {
         const frameColor = frames[i]?.backgroundColor ?? null
         const displayColor = frameColor ?? backgroundColor
         const labelX = panX + i * frameWidth * (CANVAS_SCALE * zoom)

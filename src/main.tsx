@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { CarouselStage } from '@/canvas'
 import { Toolbar, LayerPanel, PropertiesPanel, ContextMenu } from '@/ui'
 import { useExportStore } from '@/ui/useExportStore'
+import { PreviewShell } from '@/ui/preview/PreviewShell'
 import { AIProvider } from '@/ai'
 
 function App(): React.ReactElement {
@@ -42,6 +43,7 @@ function App(): React.ReactElement {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-start',
+            alignItems: 'stretch',
             padding: 24,
             background: '#111',
             boxSizing: 'border-box',
@@ -49,6 +51,7 @@ function App(): React.ReactElement {
           }}
         >
           <CarouselStage />
+          <PreviewShell />
 
           {exporting && (
             <div
