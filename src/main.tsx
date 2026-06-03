@@ -2,7 +2,7 @@ import './ui/theme.css'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { CarouselStage } from '@/canvas'
-import { Toolbar, LayerPanel, PropertiesPanel, ContextMenu } from '@/ui'
+import { TitleBar, ToolBar, LayerPanel, PropertiesPanel, ContextMenu } from '@/ui'
 import { useExportStore } from '@/ui/useExportStore'
 import { PreviewShell } from '@/ui/preview/PreviewShell'
 import { AIProvider } from '@/ai'
@@ -23,10 +23,10 @@ function App(): React.ReactElement {
         overflow: 'hidden',
       }}
     >
-      {/* Top toolbar */}
-      <Toolbar />
+      {/* Title bar — full width */}
+      <TitleBar />
 
-      {/* Middle row: sidebar + canvas + properties */}
+      {/* Middle row: layer panel + right column */}
       <div
         style={{
           display: 'flex',
@@ -36,60 +36,82 @@ function App(): React.ReactElement {
       >
         <LayerPanel />
 
-        {/* Canvas area */}
+        {/* Right column: toolbar + canvas + properties */}
         <div
           style={{
-            flex: 1,
-            overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'flex-start',
-            alignItems: 'stretch',
-            padding: 24,
-            background: 'var(--bg-canvas)',
-            boxSizing: 'border-box',
-            position: 'relative',
+            flex: 1,
+            overflow: 'hidden',
           }}
         >
-          <CarouselStage />
-          <PreviewShell />
+          {/* Tool bar — spans only the right column */}
+          <ToolBar />
 
-          {exporting && (
+          {/* Canvas + properties row */}
+          <div
+            style={{
+              display: 'flex',
+              flex: 1,
+              overflow: 'hidden',
+            }}
+          >
+            {/* Canvas area */}
             <div
               style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'rgba(0,0,0,0.6)',
+                flex: 1,
+                overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 16,
-                zIndex: 500,
+                justifyContent: 'flex-start',
+                alignItems: 'stretch',
+                padding: 24,
+                background: 'var(--bg-canvas)',
+                boxSizing: 'border-box',
+                position: 'relative',
               }}
             >
-              <div style={{ color: 'var(--text-primary)', fontSize: 15, fontWeight: 600 }}>
-                {exportStatus || 'Exporting…'}
-              </div>
-              <button
-                onClick={requestCancel}
-                style={{
-                  padding: '6px 18px',
-                  background: 'var(--bg-surface)',
-                  color: 'var(--text-primary)',
-                  border: '1px solid var(--stroke)',
-                  borderRadius: 999,
-                  cursor: 'pointer',
-                  fontSize: 13,
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          )}
-        </div>
+              <CarouselStage />
+              <PreviewShell />
 
-        <PropertiesPanel />
+              {exporting && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'rgba(0,0,0,0.6)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 16,
+                    zIndex: 500,
+                  }}
+                >
+                  <div style={{ color: 'var(--text-primary)', fontSize: 15, fontWeight: 600 }}>
+                    {exportStatus || 'Exporting…'}
+                  </div>
+                  <button
+                    onClick={requestCancel}
+                    style={{
+                      padding: '6px 18px',
+                      background: 'var(--bg-surface)',
+                      color: 'var(--text-primary)',
+                      border: '1px solid var(--stroke)',
+                      borderRadius: 999,
+                      cursor: 'pointer',
+                      fontSize: 13,
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <PropertiesPanel />
+          </div>
+        </div>
       </div>
 
       {/* Portal-based context menu — renders to document.body */}

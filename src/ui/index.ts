@@ -1,4 +1,4 @@
-export { Toolbar } from './Toolbar'
+export { TitleBar, ToolBar } from './Toolbar'
 export { LayerPanel } from './LayerPanel'
 export { PropertiesPanel } from './PropertiesPanel'
 export { ContextMenu } from './ContextMenu'

@@ -250,21 +250,24 @@ function ColorInput({ value, onChange }: ColorInputProps): React.ReactElement {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <div style={{ width: 32, height: 24, borderRadius: 6, overflow: 'hidden', flexShrink: 0, border: '1px solid #d4ccc2' }}>
       <input
         type="color"
         value={value}
         onChange={handleSwatchChange}
         style={{
-          width: 32,
-          height: 24,
+          width: '110%',
+          height: '110%',
           border: 'none',
-          borderRadius: 4,
+          borderRadius: 0,
           cursor: 'pointer',
           padding: 0,
           background: 'none',
-          flexShrink: 0,
+          marginLeft: '-5%',
+          marginTop: '-5%',
         }}
       />
+      </div>
       <input
         type="text"
         value={hexText}
@@ -334,20 +337,21 @@ function MixedColorInput({ value, onChange }: MixedColorInputProps): React.React
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-      <div style={{ position: 'relative', flexShrink: 0 }}>
+      <div style={{ position: 'relative', flexShrink: 0, width: 32, height: 24, borderRadius: 6, overflow: 'hidden', border: '1px solid #d4ccc2', opacity: isMixed ? 0.4 : 1 }}>
         <input
           type="color"
           value={displayValue}
           onChange={handleSwatchChange}
           style={{
-            width: 32,
-            height: 24,
+            width: '110%',
+            height: '110%',
             border: 'none',
-            borderRadius: 4,
+            borderRadius: 0,
             cursor: 'pointer',
             padding: 0,
             background: 'none',
-            opacity: isMixed ? 0.4 : 1,
+            marginLeft: '-5%',
+            marginTop: '-5%',
           }}
         />
         {isMixed && (
@@ -1079,13 +1083,15 @@ function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): R
                     return (
                       <div key={ctrl.key} style={{ display: 'flex', alignItems: 'center', marginBottom: 5, gap: 6 }}>
                         <label style={{ color: '#555555', fontSize: 11, width: 68, flexShrink: 0 }}>{ctrl.label}</label>
-                        <input
-                          type="color"
-                          value={val as string}
-                          onChange={e => updateParam(effect.id, ctrl.key, e.target.value, false)}
-                          onBlur={e => updateParam(effect.id, ctrl.key, e.target.value, true)}
-                          style={{ width: 36, height: 22, border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
-                        />
+                        <div style={{ width: 36, height: 22, borderRadius: 6, overflow: 'hidden', border: '1px solid #d4ccc2' }}>
+                          <input
+                            type="color"
+                            value={val as string}
+                            onChange={e => updateParam(effect.id, ctrl.key, e.target.value, false)}
+                            onBlur={e => updateParam(effect.id, ctrl.key, e.target.value, true)}
+                            style={{ width: '110%', height: '110%', border: 'none', background: 'none', cursor: 'pointer', padding: 0, marginLeft: '-5%', marginTop: '-5%' }}
+                          />
+                        </div>
                       </div>
                     )
                   }
