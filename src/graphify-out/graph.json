@@ -367,7 +367,7 @@
       "label": "PropertiesPanel()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L1774",
+      "source_location": "L1775",
       "id": "ui_propertiespanel_propertiespanel",
       "community": 5,
       "norm_label": "propertiespanel()"
@@ -1393,7 +1393,7 @@
       "label": "CanvasVideoNodeOuter()",
       "file_type": "code",
       "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L983",
+      "source_location": "L978",
       "id": "canvas_canvasvideonode_canvasvideonodeouter",
       "community": 0,
       "norm_label": "canvasvideonodeouter()"
@@ -1402,7 +1402,7 @@
       "label": "CanvasVideoNode",
       "file_type": "code",
       "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L989",
+      "source_location": "L984",
       "id": "canvas_canvasvideonode_canvasvideonode",
       "community": 0,
       "norm_label": "canvasvideonode"
@@ -6549,9 +6549,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_adjustments_pipeline_ts",
-      "confidence_score": 1.0
+      "target": "canvas_adjustments_pipeline_ts"
     },
     {
       "relation": "imports",
@@ -6560,9 +6560,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "adjustments_pipeline_buildfilterpipeline",
-      "confidence_score": 1.0
+      "target": "adjustments_pipeline_buildfilterpipeline"
     },
     {
       "relation": "imports_from",
@@ -6571,9 +6571,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_effects_buildeffectfilters_ts",
-      "confidence_score": 1.0
+      "target": "canvas_effects_buildeffectfilters_ts"
     },
     {
       "relation": "imports",
@@ -6582,9 +6582,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "effects_buildeffectfilters_buildeffectfilters",
-      "confidence_score": 1.0
+      "target": "effects_buildeffectfilters_buildeffectfilters"
     },
     {
       "relation": "contains",
@@ -11082,5 +11082,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "296ee92a1a61af27f8971693d3f4fecac6f4bbdb"
+  "built_at_commit": "2abf34e00d46fa97b109d60a2aac415683173bc7"
 }
