@@ -77,8 +77,8 @@ export function LayerPanel(): React.ReactElement {
         width: 240,
         flexShrink: 0,
         height: '100%',
-        background: '#2a2a2a',
-        borderRight: '1px solid #333',
+        background: 'var(--bg-panel)',
+        borderRight: '1px solid var(--border)',
         display: 'flex',
         flexDirection: 'column',
         boxSizing: 'border-box',
@@ -89,12 +89,13 @@ export function LayerPanel(): React.ReactElement {
       <div
         style={{
           padding: '12px 12px 8px',
-          color: '#fff',
+          color: 'var(--text-primary)',
           fontSize: 13,
-          fontWeight: 'bold',
+          fontWeight: 700,
+          fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
-          borderBottom: '1px solid #333',
+          borderBottom: '1px solid var(--border)',
           flexShrink: 0,
         }}
       >
@@ -106,13 +107,14 @@ export function LayerPanel(): React.ReactElement {
         style={{
           flex: 1,
           overflowY: 'auto',
+          padding: '4px 6px',
         }}
       >
         {reversedOrder.length === 0 && (
           <div
             style={{
-              padding: '16px 12px',
-              color: '#555',
+              padding: '16px 6px',
+              color: 'var(--text-muted)',
               fontSize: 12,
             }}
           >
@@ -164,14 +166,17 @@ export function LayerPanel(): React.ReactElement {
                 display: 'flex',
                 alignItems: 'center',
                 padding: '0 8px',
-                background: isSelected ? 'rgba(0,170,255,0.15)' : 'transparent',
+                background: isSelected ? '#ffffff' : 'transparent',
+                border: isSelected ? '1px solid #e8e0d5' : '1px solid transparent',
+                borderRadius: 12,
                 cursor: 'pointer',
                 userSelect: 'none',
                 gap: 6,
-                borderLeft: isAnchor ? '3px solid #f5a623' : isSelected ? '2px solid #0af' : '2px solid transparent',
-                borderTop: isDropBefore ? '2px solid #0af' : '2px solid transparent',
-                borderBottom: isDropAfter ? '2px solid #0af' : '2px solid transparent',
+                outline: isAnchor ? '2px solid #f5a623' : 'none',
+                borderTop: isDropBefore ? '2px solid #f94608' : undefined,
+                borderBottom: isDropAfter ? '2px solid #f94608' : undefined,
                 boxSizing: 'border-box',
+                marginBottom: 2,
               }}
             >
               {/* Thumbnail(s) — dual if image has a mask */}
@@ -182,16 +187,16 @@ export function LayerPanel(): React.ReactElement {
                     onClick={(e) => { e.stopPropagation(); setSelected(id) }}
                     style={{
                       width: 24, height: 24, borderRadius: 3, overflow: 'hidden',
-                      background: '#111', border: '1px solid #3a3a3a', cursor: 'pointer', flexShrink: 0,
+                      background: '#f5ede2', border: '1px solid #e8e0d5', cursor: 'pointer', flexShrink: 0,
                     }}
                   >
                     {thumbnails[id] != null ? (
                       <img src={thumbnails[id]} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="" draggable={false} />
                     ) : (
-                      <div style={{ width: '100%', height: '100%', background: '#222' }} />
+                      <div style={{ width: '100%', height: '100%', background: '#e8e0d5' }} />
                     )}
                   </div>
-                  <span style={{ color: '#555', fontSize: 10, flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                  <span style={{ color: '#aaaaaa', fontSize: 10, flexShrink: 0, display: 'flex', alignItems: 'center' }}>
                     <Link2 size={11} strokeWidth={1.5}/>
                   </span>
                   {/* Mask thumbnail */}
@@ -200,27 +205,27 @@ export function LayerPanel(): React.ReactElement {
                     title="Click to edit mask"
                     style={{
                       width: 24, height: 24, borderRadius: 3, overflow: 'hidden',
-                      background: '#000', border: '1px solid #3a3a3a', cursor: 'pointer', flexShrink: 0,
+                      background: '#f5ede2', border: '1px solid #e8e0d5', cursor: 'pointer', flexShrink: 0,
                     }}
                   >
                     {thumbnails[`${id}__mask`] != null ? (
                       <img src={thumbnails[`${id}__mask`]} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="mask" draggable={false} />
                     ) : (
-                      <div style={{ width: '100%', height: '100%', background: '#111' }} />
+                      <div style={{ width: '100%', height: '100%', background: '#e8e0d5' }} />
                     )}
                   </div>
                 </div>
               ) : (
                 <div
                   style={{
-                    width: 36, height: 36, flexShrink: 0, borderRadius: 3,
-                    overflow: 'hidden', background: '#111', border: '1px solid #3a3a3a',
+                    width: 26, height: 26, flexShrink: 0, borderRadius: 4,
+                    overflow: 'hidden', background: '#f5ede2', border: '1px solid #e8e0d5',
                   }}
                 >
                   {thumbnails[id] != null ? (
                     <img src={thumbnails[id]} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="" draggable={false} />
                   ) : (
-                    <div style={{ width: '100%', height: '100%', background: '#222' }} />
+                    <div style={{ width: '100%', height: '100%', background: '#e8e0d5' }} />
                   )}
                 </div>
               )}
@@ -229,8 +234,9 @@ export function LayerPanel(): React.ReactElement {
               <span
                 style={{
                   flex: 1,
-                  color: obj.visible ? '#ddd' : '#555',
+                  color: obj.visible ? 'var(--text-primary)' : 'var(--text-muted)',
                   fontSize: 13,
+                  fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
@@ -257,12 +263,12 @@ export function LayerPanel(): React.ReactElement {
                       padding: '0 2px',
                       fontSize: 12,
                       lineHeight: '1',
-                      color: isAnchor ? '#f5a623' : '#666',
+                      color: isAnchor ? '#f5a623' : '#aaaaaa',
                       display: 'flex',
                       alignItems: 'center',
                     }}
                   >
-                    <Star size={13} strokeWidth={1.5} fill={isAnchor ? 'gold' : 'none'} color={isAnchor ? 'gold' : '#666'}/>
+                    <Star size={13} strokeWidth={1.5} fill={isAnchor ? 'gold' : 'none'} color={isAnchor ? 'gold' : '#aaaaaa'}/>
                   </button>
                 </Tooltip>
               )}
@@ -279,7 +285,8 @@ export function LayerPanel(): React.ReactElement {
                       height: 22,
                       flexShrink: 0,
                       background: 'none',
-                      opacity: (obj as VideoObject).muted ? 1 : 0.4,
+                      border: 'none',
+                      color: (obj as VideoObject).muted ? '#f94608' : '#aaaaaa',
                     }}
                   >
                     {(obj as VideoObject).muted
@@ -302,8 +309,7 @@ export function LayerPanel(): React.ReactElement {
                     padding: '0 2px',
                     fontSize: 13,
                     lineHeight: '1',
-                    color: '#fff',
-                    opacity: obj.locked ? 1 : 0.3,
+                    color: obj.locked ? '#f94608' : '#aaaaaa',
                     display: 'flex',
                     alignItems: 'center',
                   }}
@@ -325,8 +331,7 @@ export function LayerPanel(): React.ReactElement {
                     padding: '0 2px',
                     fontSize: 14,
                     lineHeight: '1',
-                    color: '#fff',
-                    opacity: obj.visible ? 0.7 : 0.4,
+                    color: obj.visible ? '#f94608' : '#aaaaaa',
                     display: 'flex',
                     alignItems: 'center',
                   }}

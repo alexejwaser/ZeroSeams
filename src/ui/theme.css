@@ -1,0 +1,37 @@
+@font-face {
+  font-family: 'Uncut Sans Variable';
+  src: url('/fonts/UncutSans-Variable.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg-base: #fdf8f2;
+  --bg-panel: #f5ede2;
+  --bg-canvas: #ede7dc;
+  --bg-surface: #ffffff;
+  --border: #e8e0d5;
+  --stroke: #d4ccc2;
+  --text-primary: #111111;
+  --text-secondary: #555555;
+  --text-muted: #aaaaaa;
+  --accent: #f94608;
+  --font: 'Uncut Sans Variable', system-ui, sans-serif;
+}
+
+/* Raised / shadow buttons — press-down animation */
+.btn-raised {
+  box-shadow: 2px 4px 0 #000000;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  /* Extra bottom padding so the shadow doesn't clip */
+  margin-bottom: 4px;
+}
+.btn-raised:hover {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #000000;
+}
+.btn-raised:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}

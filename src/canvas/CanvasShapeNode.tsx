@@ -349,7 +349,7 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
       {isInMultiSelect && (obj.kind === 'line' || obj.kind === 'arrow') && (
         <KonvaLine
           points={[obj.x, obj.y, obj.x2 ?? obj.x + obj.width, obj.y2 ?? obj.y + obj.height]}
-          stroke={isAnchor ? '#f5a623' : '#0096ff'} strokeWidth={isAnchor ? 2 : 1} strokeScaleEnabled={false}
+          stroke={isAnchor ? '#f5a623' : '#f94608'} strokeWidth={isAnchor ? 2 : 1} strokeScaleEnabled={false}
           perfectDrawEnabled={false} listening={false}
         />
       )}
@@ -361,7 +361,7 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
           height={obj.height}
           rotation={obj.rotation}
           fill="transparent"
-          stroke={isAnchor ? '#f5a623' : '#0096ff'}
+          stroke={isAnchor ? '#f5a623' : '#f94608'}
           strokeWidth={isAnchor ? 2 : 1}
           strokeScaleEnabled={false}
           perfectDrawEnabled={false}
@@ -476,7 +476,7 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
             {isSelected && (
               <KonvaLine
                 points={[x1, y1, x2, y2]}
-                stroke="#0096ff"
+                stroke="#f94608"
                 strokeWidth={1}
                 strokeScaleEnabled={false}
                 dash={[6, 3]}
@@ -488,14 +488,14 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
               <>
                 <KonvaCircle
                   x={x1} y={y1} radius={6}
-                  fill="#fff" stroke="#0096ff" strokeWidth={2}
+                  fill="#fff" stroke="#f94608" strokeWidth={2}
                   draggable
                   onDragMove={(e) => handleEndpointDragMove('a', e)}
                   onDragEnd={(e) => handleEndpointDragEnd('a', e)}
                 />
                 <KonvaCircle
                   x={x2} y={y2} radius={6}
-                  fill="#fff" stroke="#0096ff" strokeWidth={2}
+                  fill="#fff" stroke="#f94608" strokeWidth={2}
                   draggable
                   onDragMove={(e) => handleEndpointDragMove('b', e)}
                   onDragEnd={(e) => handleEndpointDragEnd('b', e)}

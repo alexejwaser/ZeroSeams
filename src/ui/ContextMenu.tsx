@@ -11,10 +11,11 @@ interface MenuItemProps {
   label: string
   kbd?: string
   disabled?: boolean
+  destructive?: boolean
   onClick: () => void
 }
 
-function MenuItem({ label, kbd, disabled = false, onClick }: MenuItemProps): React.ReactElement {
+function MenuItem({ label, kbd, disabled = false, destructive = false, onClick }: MenuItemProps): React.ReactElement {
   const [hovered, setHovered] = useState(false)
 
   function handleClick(): void {
@@ -32,11 +33,14 @@ function MenuItem({ label, kbd, disabled = false, onClick }: MenuItemProps): Rea
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '6px 14px',
+        padding: '6px 12px',
+        margin: '0 4px',
+        borderRadius: 8,
         fontSize: 13,
-        color: disabled ? '#555' : '#e0e0e0',
+        fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
+        color: disabled ? '#aaaaaa' : destructive ? '#f94608' : '#333333',
         cursor: disabled ? 'default' : 'pointer',
-        background: hovered && !disabled ? '#2a2a2a' : 'transparent',
+        background: hovered && !disabled ? '#f5ede2' : 'transparent',
         userSelect: 'none',
       }}
     >
@@ -45,7 +49,7 @@ function MenuItem({ label, kbd, disabled = false, onClick }: MenuItemProps): Rea
         <span
           style={{
             fontSize: 11,
-            color: '#666',
+            color: '#aaaaaa',
             marginLeft: 24,
           }}
         >
@@ -61,7 +65,7 @@ function Divider(): React.ReactElement {
     <div
       style={{
         height: 1,
-        background: '#333',
+        background: '#e8e0d5',
         margin: '4px 0',
       }}
     />
@@ -152,10 +156,10 @@ export function ContextMenu(): React.ReactElement | null {
         position: 'fixed',
         left,
         top,
-        background: '#1e1e1e',
-        border: '1px solid #3a3a3a',
-        borderRadius: 8,
-        boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+        background: '#ffffff',
+        border: '1px solid #e8e0d5',
+        borderRadius: 16,
+        boxShadow: '0 8px 28px rgba(0,0,0,0.13)',
         padding: '4px 0',
         minWidth: 200,
         zIndex: 9999,
@@ -213,11 +217,12 @@ export function ContextMenu(): React.ReactElement | null {
               <MenuItem
                 label="Delete"
                 kbd="⌫"
+                destructive={true}
                 onClick={() => { removeObject(targetId); dismiss() }}
               />
               {isImage && (
                 <>
-                  <hr style={{ borderColor: '#3a3a3a', margin: '4px 0', border: 'none', borderTop: '1px solid #3a3a3a' }} />
+                  <Divider />
                   <MenuItem
                     label={bgOpRunning ? 'Removing Background…' : 'Remove Background'}
                     disabled={bgOpRunning || locked}

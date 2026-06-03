@@ -626,7 +626,7 @@ export function CarouselStage(): React.ReactElement {
                 onClick={e => { e.stopPropagation(); setFrameBackground(i, null) }}
                 title="Reset to canvas background"
                 style={{
-                  background: 'none', border: 'none', color: '#888',
+                  background: 'none', border: 'none', color: 'var(--text-muted)',
                   cursor: 'pointer', padding: 0, fontSize: 13, lineHeight: 1,
                   display: 'flex', alignItems: 'center',
                 }}
@@ -635,7 +635,7 @@ export function CarouselStage(): React.ReactElement {
               </button>
             )}
             {/* Frame label */}
-            <span style={{ fontSize: 11, color: '#888', whiteSpace: 'nowrap', userSelect: 'none' }}>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--font)', whiteSpace: 'nowrap', userSelect: 'none' }}>
               Frame {i + 1}
             </span>
           </div>
@@ -1231,10 +1231,10 @@ export function CarouselStage(): React.ReactElement {
             draggable
             rotationSnaps={snapEnabled ? [0, 45, 90, 135, 180, 225, 270, 315] : []}
             rotationSnapTolerance={8}
-            borderStroke="#0096ff"
+            borderStroke="#f94608"
             borderStrokeWidth={1.5}
             anchorFill="#fff"
-            anchorStroke="#0096ff"
+            anchorStroke="#f94608"
             anchorSize={8}
             onTransformEnd={handleGroupTransformEnd}
             onDragStart={() => {
@@ -1298,7 +1298,7 @@ export function CarouselStage(): React.ReactElement {
               width={marquee.width}
               height={marquee.height}
               fill="rgba(0,150,255,0.08)"
-              stroke="#0096ff"
+              stroke="#f94608"
               strokeWidth={1}
               strokeScaleEnabled={false}
               dash={[6, 4]}
@@ -1348,7 +1348,7 @@ export function CarouselStage(): React.ReactElement {
               const x = Math.min(start.x, maskCursorPos.x); const y = Math.min(start.y, maskCursorPos.y)
               const w = Math.abs(maskCursorPos.x - start.x); const h = Math.abs(maskCursorPos.y - start.y)
               return <KonvaRect x={x} y={y} width={w} height={h}
-                stroke="#0af" strokeWidth={1} strokeScaleEnabled={false}
+                stroke="#f94608" strokeWidth={1} strokeScaleEnabled={false}
                 dash={[4, 3]} fill="rgba(0,170,255,0.08)" listening={false} />
             }
 
@@ -1356,7 +1356,7 @@ export function CarouselStage(): React.ReactElement {
               const x = Math.min(start.x, maskCursorPos.x); const y = Math.min(start.y, maskCursorPos.y)
               const w = Math.abs(maskCursorPos.x - start.x); const h = Math.abs(maskCursorPos.y - start.y)
               return <KonvaEllipse x={x + w / 2} y={y + h / 2} radiusX={w / 2} radiusY={h / 2}
-                stroke="#0af" strokeWidth={1} strokeScaleEnabled={false}
+                stroke="#f94608" strokeWidth={1} strokeScaleEnabled={false}
                 dash={[4, 3]} fill="rgba(0,170,255,0.08)" listening={false} />
             }
 
@@ -1378,20 +1378,20 @@ export function CarouselStage(): React.ReactElement {
                 Math.hypot(maskCursorPos.x - maskPenAnchors[0].x, maskCursorPos.y - maskPenAnchors[0].y) < 12
               return (
                 <>
-                  {placedData && <KonvaPath data={placedData} fill="transparent" stroke="#0af"
+                  {placedData && <KonvaPath data={placedData} fill="transparent" stroke="#f94608"
                     strokeWidth={1} strokeScaleEnabled={false} listening={false} perfectDrawEnabled={false} />}
-                  {previewData && <KonvaPath data={previewData} fill="transparent" stroke="#0af"
+                  {previewData && <KonvaPath data={previewData} fill="transparent" stroke="#f94608"
                     strokeWidth={1} strokeScaleEnabled={false} dash={[4, 3]} listening={false} perfectDrawEnabled={false} />}
                   {isDragging && <>
                     <KonvaLine points={[ghostX - drag!.dx, ghostY - drag!.dy, ghostX + drag!.dx, ghostY + drag!.dy]}
-                      stroke="#0096ff" strokeWidth={1} strokeScaleEnabled={false} dash={[3, 2]} listening={false} />
-                    <KonvaCircle x={ghostX - drag!.dx} y={ghostY - drag!.dy} radius={6} fill="#fff" stroke="#0096ff" strokeWidth={1.5} listening={false} />
-                    <KonvaCircle x={ghostX + drag!.dx} y={ghostY + drag!.dy} radius={6} fill="#fff" stroke="#0096ff" strokeWidth={1.5} listening={false} />
+                      stroke="#f94608" strokeWidth={1} strokeScaleEnabled={false} dash={[3, 2]} listening={false} />
+                    <KonvaCircle x={ghostX - drag!.dx} y={ghostY - drag!.dy} radius={6} fill="#fff" stroke="#f94608" strokeWidth={1.5} listening={false} />
+                    <KonvaCircle x={ghostX + drag!.dx} y={ghostY + drag!.dy} radius={6} fill="#fff" stroke="#f94608" strokeWidth={1.5} listening={false} />
                   </>}
                   {maskPenAnchors.map((a, i) => (
                     <KonvaCircle key={i} x={a.x} y={a.y}
                       radius={7}
-                      fill={i === 0 && isNearFirst ? '#ff4488' : '#0af'}
+                      fill={i === 0 && isNearFirst ? '#ff4488' : '#f94608'}
                       stroke="#fff" strokeWidth={1.5} listening={false} />
                   ))}
                 </>
@@ -1447,16 +1447,16 @@ export function CarouselStage(): React.ReactElement {
                         ghostX - drag!.dx, ghostY - drag!.dy,
                         ghostX + drag!.dx, ghostY + drag!.dy,
                       ]}
-                      stroke="#0096ff" strokeWidth={1} strokeScaleEnabled={false}
+                      stroke="#f94608" strokeWidth={1} strokeScaleEnabled={false}
                       dash={[3, 2]} listening={false} perfectDrawEnabled={false}
                     />
                     <KonvaCircle
                       x={ghostX - drag!.dx} y={ghostY - drag!.dy}
-                      radius={3} fill="#fff" stroke="#0096ff" strokeWidth={1.5} listening={false}
+                      radius={3} fill="#fff" stroke="#f94608" strokeWidth={1.5} listening={false}
                     />
                     <KonvaCircle
                       x={ghostX + drag!.dx} y={ghostY + drag!.dy}
-                      radius={3} fill="#fff" stroke="#0096ff" strokeWidth={1.5} listening={false}
+                      radius={3} fill="#fff" stroke="#f94608" strokeWidth={1.5} listening={false}
                     />
                   </>
                 )}

@@ -61,7 +61,7 @@ function SaveStatusPill({ status }: { status: SaveStatus }): React.ReactElement 
   if (status === 'idle') return null
 
   const config: Record<Exclude<SaveStatus, 'idle'>, { icon: React.ReactElement; text: string; color: string }> = {
-    saving: { icon: <span/>, text: 'Saving…', color: '#aaa' },
+    saving: { icon: <span/>, text: 'Saving…', color: '#aaaaaa' },
     saved: { icon: <Check size={12} strokeWidth={1.5}/>, text: ' Saved', color: '#4c4' },
     error: { icon: <AlertTriangle size={12} strokeWidth={1.5}/>, text: ' Save failed', color: '#f55' },
   }
@@ -86,7 +86,7 @@ function SaveStatusPill({ status }: { status: SaveStatus }): React.ReactElement 
 }
 
 const divider = (
-  <div style={{ width: 1, height: 20, background: '#3a3a3a', margin: '0 6px' }} />
+  <div style={{ width: 1, height: 20, background: '#d4ccc2', margin: '0 6px' }} />
 )
 
 async function blobToBase64(blob: Blob): Promise<string> {
@@ -122,27 +122,27 @@ function VideoExportSettingsPanel({
 
   const tabBtnStyle = (active: boolean): React.CSSProperties => ({
     flex: 1, height: 24,
-    background: active ? '#2a2a2a' : 'none',
-    color: active ? '#fff' : '#777',
+    background: active ? '#f94608' : 'none',
+    color: active ? '#fff' : '#555555',
     border: 'none', borderRadius: 3, cursor: 'pointer',
     fontSize: 11, fontWeight: active ? 'bold' : 'normal',
   })
 
   const rowLabelStyle: React.CSSProperties = {
-    color: '#aaa', fontSize: 11, fontWeight: 'bold',
+    color: '#555555', fontSize: 11, fontWeight: 'bold',
     letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap',
   }
 
   const numFieldStyle: React.CSSProperties = {
-    width: 52, height: 24, background: '#2a2a2a', color: '#ccc',
-    border: '1px solid #444', borderRadius: 3, fontSize: 12,
+    width: 52, height: 24, background: '#ffffff', color: '#333333',
+    border: '1px solid #d4ccc2', borderRadius: 6, fontSize: 12,
     textAlign: 'center', padding: '0 4px',
   }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       {/* Tab strip */}
-      <div style={{ display: 'flex', gap: 2, background: '#1a1a1a', borderRadius: 4, padding: 2 }}>
+      <div style={{ display: 'flex', gap: 2, background: '#f5ede2', borderRadius: 6, padding: 2 }}>
         <button style={tabBtnStyle(tab === 'simple')} onClick={() => onTabChange('simple')}>Simple</button>
         <button style={tabBtnStyle(tab === 'advanced')} onClick={() => onTabChange('advanced')}>Advanced</button>
       </div>
@@ -160,19 +160,19 @@ function VideoExportSettingsPanel({
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   padding: '6px 10px',
-                  background: isActive ? '#0d2a38' : '#1e1e1e',
-                  border: `1px solid ${isActive ? '#0af' : '#333'}`,
-                  borderRadius: 5, cursor: 'pointer', textAlign: 'left',
+                  background: isActive ? '#fff4f0' : '#ffffff',
+                  border: `1px solid ${isActive ? '#f94608' : '#d4ccc2'}`,
+                  borderRadius: 6, cursor: 'pointer', textAlign: 'left',
                 }}
               >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <span style={{ color: isActive ? '#0af' : '#ddd', fontSize: 12, fontWeight: 'bold' }}>{p.label}</span>
-                  <span style={{ color: '#666', fontSize: 10 }}>{p.hint}</span>
+                  <span style={{ color: isActive ? '#f94608' : '#333333', fontSize: 12, fontWeight: 'bold' }}>{p.label}</span>
+                  <span style={{ color: '#aaaaaa', fontSize: 10 }}>{p.hint}</span>
                 </div>
                 {isRecommended && (
                   <span style={{
-                    fontSize: 9, color: isActive ? '#0af' : '#888',
-                    border: `1px solid ${isActive ? '#0af' : '#555'}`,
+                    fontSize: 9, color: isActive ? '#f94608' : '#555555',
+                    border: `1px solid ${isActive ? '#f94608' : '#d4ccc2'}`,
                     borderRadius: 3, padding: '1px 4px', whiteSpace: 'nowrap',
                   }}>
                     {platformLabel}
@@ -200,9 +200,9 @@ function VideoExportSettingsPanel({
                 type="range" min={0} max={51} step={1}
                 value={51 - settings.crf}
                 onChange={(e) => onSettingsChange((s) => ({ ...s, crf: 51 - Number(e.target.value) }))}
-                style={{ flex: 1, accentColor: '#0af', cursor: 'pointer' }}
+                style={{ flex: 1, accentColor: '#f94608', cursor: 'pointer' }}
               />
-              <span style={{ color: '#ccc', fontSize: 11, minWidth: 36, textAlign: 'right' }}>CRF {settings.crf}</span>
+              <span style={{ color: '#555555', fontSize: 11, minWidth: 36, textAlign: 'right' }}>CRF {settings.crf}</span>
             </div>
           </div>
           {/* Audio */}
@@ -213,7 +213,7 @@ function VideoExportSettingsPanel({
                 onChange={(e) => onSettingsChange((s) => ({ ...s, audioBitrate: Number(e.target.value) }))}
                 style={numFieldStyle}
               />
-              <span style={{ color: '#aaa', fontSize: 11 }}>kbps</span>
+              <span style={{ color: '#aaaaaa', fontSize: 11 }}>kbps</span>
             </div>
           </div>
           {/* Frame rate */}
@@ -515,10 +515,10 @@ export function Toolbar(): React.ReactElement {
   const segmentButtonStyle = (active: boolean): React.CSSProperties => ({
     padding: '3px 10px',
     height: 24,
-    background: active ? '#0af' : 'transparent',
-    color: active ? '#fff' : '#aaa',
+    background: active ? '#f94608' : 'transparent',
+    color: active ? '#fff' : '#555555',
     border: 'none',
-    borderRadius: 3,
+    borderRadius: 999,
     cursor: 'pointer',
     fontSize: 12,
     fontWeight: active ? 'bold' : 'normal',
@@ -530,10 +530,10 @@ export function Toolbar(): React.ReactElement {
   const videoSettingsBtnStyle = (active: boolean): React.CSSProperties => ({
     padding: '0 8px',
     height: 24,
-    background: active ? '#0af' : '#2a2a2a',
-    color: active ? '#fff' : '#ccc',
-    border: 'none',
-    borderRadius: 3,
+    background: active ? '#f94608' : '#ffffff',
+    color: active ? '#fff' : '#555555',
+    border: `1px solid ${active ? '#f94608' : '#d4ccc2'}`,
+    borderRadius: 999,
     cursor: 'pointer',
     fontSize: 12,
     fontWeight: active ? 'bold' : 'normal',
@@ -542,27 +542,31 @@ export function Toolbar(): React.ReactElement {
   })
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        width: '100%',
-        height: 40,
-        background: '#2a2a2a',
-        borderBottom: '1px solid #333',
-        flexShrink: 0,
-        boxSizing: 'border-box',
-      }}
-    >
-      {/* Left: title */}
+    <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0, width: '100%' }}>
+      {/* ── Title Bar ── */}
       <div
         style={{
-          paddingLeft: 16,
-          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          height: 52,
+          padding: '0 20px',
+          gap: 8,
+          background: 'var(--bg-base)',
+          borderBottom: '1px solid var(--border)',
+          boxSizing: 'border-box',
+          fontFamily: 'var(--font)',
+        }}
+      >
+      {/* App title */}
+      <div
+        style={{
+          paddingLeft: 0,
+          color: '#111111',
           fontSize: 16,
           fontWeight: 'bold',
           whiteSpace: 'nowrap',
           flex: '0 0 auto',
+          fontFamily: 'var(--font)',
         }}
       >
         {`Zero Seams${projectName !== 'Untitled Project' ? ` — ${projectName}` : ''}`}
@@ -577,16 +581,16 @@ export function Toolbar(): React.ReactElement {
             style={{
               width: 30,
               height: 30,
-              background: '#333',
-              color: loadingProject ? '#555' : '#fff',
-              border: 'none',
-              borderRadius: '4px 0 0 4px',
+              background: '#ffffff',
+              color: loadingProject ? '#aaaaaa' : '#555555',
+              border: '1px solid #d4ccc2',
+              borderRight: 'none',
+              borderRadius: '999px 0 0 999px',
               cursor: loadingProject ? 'default' : 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               opacity: loadingProject ? 0.5 : 1,
-              borderRight: '1px solid #555',
             }}
           >
             <FolderOpen size={15} />
@@ -598,10 +602,10 @@ export function Toolbar(): React.ReactElement {
             style={{
               padding: '4px 6px',
               height: 30,
-              background: recentOpen ? '#555' : '#333',
-              color: '#aaa',
-              border: 'none',
-              borderRadius: '0 4px 4px 0',
+              background: recentOpen ? '#f5ede2' : '#ffffff',
+              color: '#555555',
+              border: '1px solid #d4ccc2',
+              borderRadius: '0 999px 999px 0',
               cursor: 'pointer',
               fontSize: 11,
               display: 'flex',
@@ -620,16 +624,16 @@ export function Toolbar(): React.ReactElement {
               left: 0,
               zIndex: 1001,
               marginTop: 6,
-              background: '#1e1e1e',
-              border: '1px solid #3a3a3a',
-              borderRadius: 8,
-              boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+              background: '#ffffff',
+              border: '1px solid #e8e0d5',
+              borderRadius: 12,
+              boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
               padding: '4px 0',
               minWidth: 260,
             }}
           >
             {recentFiles.length === 0 ? (
-              <div style={{ padding: '8px 14px', color: '#555', fontSize: 12 }}>No recent projects</div>
+              <div style={{ padding: '8px 14px', color: '#aaaaaa', fontSize: 12 }}>No recent projects</div>
             ) : (
               recentFiles.map((file) => (
                 <div
@@ -639,13 +643,13 @@ export function Toolbar(): React.ReactElement {
                   style={{
                     padding: '7px 14px',
                     cursor: 'pointer',
-                    borderBottom: '1px solid #2a2a2a',
+                    borderBottom: '1px solid #e8e0d5',
                   }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#2a2a2a' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#f5ede2' }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = 'transparent' }}
                 >
-                  <div style={{ color: '#e0e0e0', fontSize: 13, fontWeight: 'bold' }}>{file.name}</div>
-                  <div style={{ color: '#666', fontSize: 11 }}>
+                  <div style={{ color: '#111111', fontSize: 13, fontWeight: 'bold' }}>{file.name}</div>
+                  <div style={{ color: '#aaaaaa', fontSize: 11 }}>
                     {new Date(file.modifiedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                   </div>
                 </div>
@@ -678,16 +682,17 @@ export function Toolbar(): React.ReactElement {
             style={{
               padding: '4px 10px',
               height: 30,
-              background: '#333',
-              color: '#fff',
-              border: 'none',
-              borderRight: '1px solid #555',
-              borderRadius: '4px 0 0 4px',
+              background: '#ffffff',
+              color: '#333333',
+              border: '1px solid #d4ccc2',
+              borderRight: 'none',
+              borderRadius: '999px 0 0 999px',
               cursor: 'pointer',
               fontSize: 13,
               whiteSpace: 'nowrap',
               display: 'flex',
               alignItems: 'center',
+              fontFamily: 'var(--font)',
             }}
           >
             <Save size={14} style={{ marginRight: 5 }} />
@@ -700,10 +705,10 @@ export function Toolbar(): React.ReactElement {
             style={{
               padding: '4px 6px',
               height: 30,
-              background: saveMenuOpen ? '#555' : '#333',
-              color: '#aaa',
-              border: 'none',
-              borderRadius: '0 4px 4px 0',
+              background: saveMenuOpen ? '#f5ede2' : '#ffffff',
+              color: '#555555',
+              border: '1px solid #d4ccc2',
+              borderRadius: '0 999px 999px 0',
               cursor: 'pointer',
               fontSize: 11,
               display: 'flex',
@@ -719,10 +724,10 @@ export function Toolbar(): React.ReactElement {
             top: '100%',
             left: 0,
             marginTop: 6,
-            background: '#1e1e1e',
-            border: '1px solid #3a3a3a',
-            borderRadius: 8,
-            boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+            background: '#ffffff',
+            border: '1px solid #e8e0d5',
+            borderRadius: 12,
+            boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
             zIndex: 1000,
             minWidth: 160,
             padding: '4px 0',
@@ -741,10 +746,11 @@ export function Toolbar(): React.ReactElement {
               }}
               style={{
                 display: 'block', width: '100%', textAlign: 'left',
-                background: 'none', border: 'none', color: '#e0e0e0',
+                background: 'none', border: 'none', color: '#333333',
                 fontSize: 13, padding: '7px 14px', cursor: 'pointer',
+                fontFamily: 'var(--font)',
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = '#2a2a2a')}
+              onMouseEnter={e => (e.currentTarget.style.background = '#f5ede2')}
               onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
               Save As…
@@ -758,10 +764,11 @@ export function Toolbar(): React.ReactElement {
               }}
               style={{
                 display: 'block', width: '100%', textAlign: 'left',
-                background: 'none', border: 'none', color: '#e0e0e0',
+                background: 'none', border: 'none', color: '#333333',
                 fontSize: 13, padding: '7px 14px', cursor: 'pointer',
+                fontFamily: 'var(--font)',
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = '#2a2a2a')}
+              onMouseEnter={e => (e.currentTarget.style.background = '#f5ede2')}
               onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
               Save a Copy…
@@ -772,31 +779,38 @@ export function Toolbar(): React.ReactElement {
 
       <SaveStatusPill status={saveStatus} />
 
-      {/* Center: tool groups */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: 6,
-        }}
-      >
-        {/* Group 1 — History */}
+      <div style={{ flex: 1 }} />
+
+      {/* Undo/Redo pill */}
+      <div style={{ display: 'flex', alignItems: 'center', background: '#ffffff', border: '1px solid #d4ccc2', borderRadius: 999, padding: 3, gap: 2 }}>
         <Tooltip label="Undo" shortcut="⌘Z">
-          <button onClick={undo} disabled={undoDisabled} style={iconBtnStyle(false, undoDisabled)}>
+          <button onClick={undo} disabled={undoDisabled} style={{ ...iconBtnStyle(false, undoDisabled), border: 'none' }}>
             <Undo2 size={15} />
           </button>
         </Tooltip>
         <Tooltip label="Redo" shortcut="⌘⇧Z">
-          <button onClick={redo} disabled={redoDisabled} style={iconBtnStyle(false, redoDisabled)}>
+          <button onClick={redo} disabled={redoDisabled} style={{ ...iconBtnStyle(false, redoDisabled), border: 'none' }}>
             <Redo2 size={15} />
           </button>
         </Tooltip>
+      </div>
+      </div>
 
-        {divider}
-
-        {/* Group 2 — Selection */}
+      {/* ── Tool Bar ── */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          height: 50,
+          padding: '0 20px',
+          gap: 6,
+          background: 'var(--bg-base)',
+          borderBottom: '1px solid var(--border)',
+          boxSizing: 'border-box',
+          fontFamily: 'var(--font)',
+        }}
+      >
+        {/* Group 1 — Selection */}
         <Tooltip label="Select" shortcut="V">
           <button
             onClick={() => handleToolClick('select')}
@@ -813,10 +827,10 @@ export function Toolbar(): React.ReactElement {
             style={{
               width: 30,
               height: 30,
-              background: snapEnabled ? '#0af' : '#333',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 4,
+              background: snapEnabled ? '#f94608' : '#ffffff',
+              color: snapEnabled ? '#ffffff' : '#555555',
+              border: snapEnabled ? 'none' : '1px solid #d4ccc2',
+              borderRadius: 999,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -828,7 +842,7 @@ export function Toolbar(): React.ReactElement {
           </button>
         </Tooltip>
 
-        <div style={{ display: 'flex', alignItems: 'center', background: '#222', border: '1px solid #444', borderRadius: 4, padding: 2, gap: 2 }}>
+        <div style={{ display: 'flex', alignItems: 'center', background: '#ffffff', border: '1px solid #d4ccc2', borderRadius: 999, padding: 2, gap: 2 }}>
           <Tooltip label="Crop mode" description="Frame clips content">
             <button
               onClick={() => setResizeMode('advanced')}
@@ -911,10 +925,10 @@ export function Toolbar(): React.ReactElement {
               display: 'flex',
               alignItems: 'center',
               gap: 2,
-              background: '#222',
-              borderRadius: 4,
+              background: '#ffffff',
+              borderRadius: 999,
               padding: '2px',
-              border: '1px solid #444',
+              border: '1px solid #d4ccc2',
               marginLeft: 4,
             }}
           >
@@ -938,7 +952,7 @@ export function Toolbar(): React.ReactElement {
           </div>
         )}
 
-        {divider}
+        <div style={{ flex: 1 }} />
 
         {/* Group 4 — Frame Settings */}
         <div style={{ position: 'relative' }}>
@@ -955,7 +969,7 @@ export function Toolbar(): React.ReactElement {
             title="Frame Settings"
           >
             <LayoutTemplate size={15} strokeWidth={1.5}/>
-            <span style={{ fontSize: 12 }}>Frame Settings</span>
+            <span style={{ fontSize: 12, fontFamily: 'var(--font)' }}>Frame Settings</span>
           </button>
           {showFrameSettings && <FrameSettingsPopover onClose={() => setShowFrameSettings(false)}/>}
         </div>
@@ -963,58 +977,63 @@ export function Toolbar(): React.ReactElement {
         {divider}
 
         {/* Group 5 — Frame count */}
-        <span style={{ color: '#aaa', fontSize: 13 }}>Frames:</span>
-        <Tooltip label="Remove frame">
-          <button
-            onClick={handleMinus}
-            disabled={frameCount <= 1}
+        <span style={{ color: '#555555', fontSize: 13, fontFamily: 'var(--font)' }}>Frames:</span>
+        <div style={{ display: 'flex', alignItems: 'center', background: '#ffffff', border: '1px solid #d4ccc2', borderRadius: 999, padding: '2px 6px', gap: 4 }}>
+          <Tooltip label="Remove frame">
+            <button
+              onClick={handleMinus}
+              disabled={frameCount <= 1}
+              style={{
+                width: 20,
+                height: 20,
+                background: 'none',
+                color: frameCount <= 1 ? '#aaaaaa' : '#555555',
+                border: 'none',
+                borderRadius: 999,
+                cursor: frameCount <= 1 ? 'default' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 0,
+              }}
+            >
+              <Minus size={13} strokeWidth={1.5}/>
+            </button>
+          </Tooltip>
+          <span
             style={{
-              width: 24,
-              height: 24,
-              background: '#333',
-              color: frameCount <= 1 ? '#555' : '#fff',
-              border: 'none',
-              borderRadius: 4,
-              cursor: frameCount <= 1 ? 'default' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              color: '#111111',
+              fontSize: 14,
+              fontWeight: 'bold',
+              minWidth: 16,
+              textAlign: 'center',
+              fontFamily: 'var(--font)',
             }}
           >
-            <Minus size={13} strokeWidth={1.5}/>
-          </button>
-        </Tooltip>
-        <span
-          style={{
-            color: '#fff',
-            fontSize: 14,
-            fontWeight: 'bold',
-            minWidth: 16,
-            textAlign: 'center',
-          }}
-        >
-          {frameCount}
-        </span>
-        <Tooltip label="Add frame">
-          <button
-            onClick={handlePlus}
-            disabled={frameCount >= 10}
-            style={{
-              width: 24,
-              height: 24,
-              background: '#333',
-              color: frameCount >= 10 ? '#555' : '#fff',
-              border: 'none',
-              borderRadius: 4,
-              cursor: frameCount >= 10 ? 'default' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Plus size={13} strokeWidth={1.5}/>
-          </button>
-        </Tooltip>
+            {frameCount}
+          </span>
+          <Tooltip label="Add frame">
+            <button
+              onClick={handlePlus}
+              disabled={frameCount >= 10}
+              style={{
+                width: 20,
+                height: 20,
+                background: 'none',
+                color: frameCount >= 10 ? '#aaaaaa' : '#555555',
+                border: 'none',
+                borderRadius: 999,
+                cursor: frameCount >= 10 ? 'default' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 0,
+              }}
+            >
+              <Plus size={13} strokeWidth={1.5}/>
+            </button>
+          </Tooltip>
+        </div>
 
         {divider}
 
@@ -1034,21 +1053,22 @@ export function Toolbar(): React.ReactElement {
         <div ref={exportWrapperRef} style={{ position: 'relative' }}>
           <Tooltip label="Export">
             <button
+              className="btn-raised"
               onClick={() => { setExportOpen((v) => !v) }}
               style={{
-                padding: '4px 10px',
-                height: 30,
-                background: exportOpen ? '#0af' : '#333',
+                padding: '5px 14px',
+                background: '#f94608',
                 color: '#fff',
-                border: 'none',
-                borderRadius: 4,
+                border: '1px solid #000000',
+                borderRadius: 999,
                 cursor: 'pointer',
                 fontSize: 13,
-                transition: 'background 0.15s',
+                fontWeight: 'bold',
                 whiteSpace: 'nowrap',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 5,
+                fontFamily: 'var(--font)',
               }}
             >
               <ImageDown size={14} />
@@ -1064,15 +1084,16 @@ export function Toolbar(): React.ReactElement {
                 right: 0,
                 zIndex: 1000,
                 marginTop: 6,
-                background: '#1e1e1e',
-                border: '1px solid #3a3a3a',
-                borderRadius: 8,
-                boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+                background: '#ffffff',
+                border: '1px solid #e8e0d5',
+                borderRadius: 16,
+                boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
                 padding: '12px',
                 minWidth: 220,
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 10,
+                fontFamily: 'var(--font)',
               }}
             >
               {/* Mode segmented control */}
@@ -1081,10 +1102,10 @@ export function Toolbar(): React.ReactElement {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 2,
-                  background: '#222',
-                  borderRadius: 4,
+                  background: '#f5ede2',
+                  borderRadius: 999,
                   padding: '2px',
-                  border: '1px solid #444',
+                  border: '1px solid #e8e0d5',
                 }}
               >
                 {(['all', 'single', 'range'] as const).map((mode) => (
@@ -1100,7 +1121,7 @@ export function Toolbar(): React.ReactElement {
 
               {exportMode === 'single' && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <label style={{ color: '#aaa', fontSize: 12 }}>Frame</label>
+                  <label style={{ color: '#555555', fontSize: 12 }}>Frame</label>
                   <input
                     type="number"
                     min={1}
@@ -1110,10 +1131,10 @@ export function Toolbar(): React.ReactElement {
                     style={{
                       width: 48,
                       height: 24,
-                      background: '#333',
-                      color: '#fff',
-                      border: '1px solid #444',
-                      borderRadius: 3,
+                      background: '#ffffff',
+                      color: '#333333',
+                      border: '1px solid #d4ccc2',
+                      borderRadius: 6,
                       fontSize: 12,
                       textAlign: 'center',
                       padding: '0 4px',
@@ -1124,7 +1145,7 @@ export function Toolbar(): React.ReactElement {
 
               {exportMode === 'range' && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <label style={{ color: '#aaa', fontSize: 12 }}>From</label>
+                  <label style={{ color: '#555555', fontSize: 12 }}>From</label>
                   <input
                     type="number"
                     min={1}
@@ -1134,16 +1155,16 @@ export function Toolbar(): React.ReactElement {
                     style={{
                       width: 48,
                       height: 24,
-                      background: '#333',
-                      color: '#fff',
-                      border: '1px solid #444',
-                      borderRadius: 3,
+                      background: '#ffffff',
+                      color: '#333333',
+                      border: '1px solid #d4ccc2',
+                      borderRadius: 6,
                       fontSize: 12,
                       textAlign: 'center',
                       padding: '0 4px',
                     }}
                   />
-                  <label style={{ color: '#aaa', fontSize: 12 }}>To</label>
+                  <label style={{ color: '#555555', fontSize: 12 }}>To</label>
                   <input
                     type="number"
                     min={1}
@@ -1153,10 +1174,10 @@ export function Toolbar(): React.ReactElement {
                     style={{
                       width: 48,
                       height: 24,
-                      background: '#333',
-                      color: '#fff',
-                      border: '1px solid #444',
-                      borderRadius: 3,
+                      background: '#ffffff',
+                      color: '#333333',
+                      border: '1px solid #d4ccc2',
+                      borderRadius: 6,
                       fontSize: 12,
                       textAlign: 'center',
                       padding: '0 4px',
@@ -1169,7 +1190,7 @@ export function Toolbar(): React.ReactElement {
               {hasVideoInRange && (
                 <div
                   style={{
-                    borderTop: '1px solid #2e2e2e',
+                    borderTop: '1px solid #e8e0d5',
                     paddingTop: 8,
                     display: 'flex',
                     flexDirection: 'column',
@@ -1192,7 +1213,7 @@ export function Toolbar(): React.ReactElement {
                   >
                     <span
                       style={{
-                        color: '#aaa',
+                        color: '#555555',
                         fontSize: 11,
                         fontWeight: 'bold',
                         letterSpacing: '0.06em',
@@ -1202,8 +1223,8 @@ export function Toolbar(): React.ReactElement {
                       Video Settings
                     </span>
                     {showVideoSettings
-                      ? <ChevronUp size={13} color="#aaa" strokeWidth={1.5}/>
-                      : <ChevronDown size={13} color="#aaa" strokeWidth={1.5}/>}
+                      ? <ChevronUp size={13} color="#aaaaaa" strokeWidth={1.5}/>
+                      : <ChevronDown size={13} color="#aaaaaa" strokeWidth={1.5}/>}
                   </button>
 
                   {showVideoSettings && (
@@ -1229,17 +1250,19 @@ export function Toolbar(): React.ReactElement {
               )}
 
               <button
+                className={exporting ? '' : 'btn-raised'}
                 onClick={() => { void handleExportAction() }}
                 disabled={exporting}
                 style={{
                   height: 32,
-                  background: exporting ? '#555' : '#0af',
+                  background: exporting ? '#aaaaaa' : '#f94608',
                   color: '#fff',
-                  border: 'none',
-                  borderRadius: 4,
+                  border: exporting ? 'none' : '1px solid #000000',
+                  borderRadius: 999,
                   cursor: exporting ? 'default' : 'pointer',
                   fontSize: 13,
                   fontWeight: 'bold',
+                  fontFamily: 'var(--font)',
                 }}
               >
                 {exporting ? (exportStatus || 'Exporting…') : 'Export Frames'}
@@ -1248,6 +1271,7 @@ export function Toolbar(): React.ReactElement {
           )}
         </div>
       </div>
+    </div>
     </div>
   )
 }

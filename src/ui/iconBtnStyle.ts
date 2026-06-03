@@ -1,17 +1,13 @@
 import type React from 'react'
 
-/**
- * Shared icon-button style helper used by Toolbar and PropertiesPanel.
- * Produces a 30×30 dark pill button; active state highlights in #0af.
- */
 export function iconBtnStyle(active = false, disabled = false): React.CSSProperties {
   return {
     width: 30,
     height: 30,
-    background: active ? '#0af' : '#333',
-    color: '#fff',
-    border: 'none',
-    borderRadius: 4,
+    background: active ? '#f94608' : '#ffffff',
+    color: active ? '#ffffff' : '#555555',
+    border: active ? 'none' : '1px solid #d4ccc2',
+    borderRadius: 999,
     cursor: disabled ? 'default' : 'pointer',
     display: 'flex',
     alignItems: 'center',

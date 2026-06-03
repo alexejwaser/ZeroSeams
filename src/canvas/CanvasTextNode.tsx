@@ -345,7 +345,7 @@ function CanvasTextNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasTextNod
     div.style.lineHeight = String(obj.lineHeight)
     div.style.textAlign = obj.align
     div.style.background = 'transparent'
-    div.style.border = '1px dashed #0af'
+    div.style.border = '1px dashed #f94608'
     div.style.outline = 'none'
     div.style.padding = '0'
     div.style.margin = '0'
@@ -538,7 +538,7 @@ function CanvasTextNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasTextNod
           height={obj.height}
           rotation={obj.rotation}
           fill="transparent"
-          stroke={isAnchor ? '#f5a623' : '#0096ff'}
+          stroke={isAnchor ? '#f5a623' : '#f94608'}
           strokeWidth={isAnchor ? 2 : 1}
           strokeScaleEnabled={false}
           perfectDrawEnabled={false}

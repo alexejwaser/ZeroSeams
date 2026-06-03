@@ -218,17 +218,17 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
     if (isSelected && !obj.maskEditMode && !isDrawTarget) {
       if (obj.contentEditMode) {
         tr.nodes([img])
-        tr.borderStroke('#ff7043')
+        tr.borderStroke('#f94608')
         tr.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'bottom-right', 'bottom-center', 'bottom-left', 'middle-left'])
         tr.rotateEnabled(true)
       } else if (obj.locked) {
         tr.nodes([frameRect])
-        tr.borderStroke('#0096ff')
+        tr.borderStroke('#f94608')
         tr.enabledAnchors([])
         tr.rotateEnabled(false)
       } else {
         tr.nodes([frameRect])
-        tr.borderStroke('#0096ff')
+        tr.borderStroke('#f94608')
         tr.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'bottom-right', 'bottom-center', 'bottom-left', 'middle-left'])
         tr.rotateEnabled(true)
       }
@@ -607,7 +607,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
                 x={bboxX} y={bboxY}
                 width={bboxW} height={bboxH}
                 fill="transparent"
-                stroke="#0096ff" strokeWidth={1}
+                stroke="#f94608" strokeWidth={1}
                 strokeScaleEnabled={false}
                 dash={[4, 3]}
                 draggable
@@ -679,10 +679,10 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
                 <React.Fragment key={i}>
                   {hasHandleIn && (
                     <>
-                      <Line points={[ax, ay, hix, hiy]} stroke="#0096ff" strokeWidth={1} listening={false} />
+                      <Line points={[ax, ay, hix, hiy]} stroke="#f94608" strokeWidth={1} listening={false} />
                       <Circle
                         x={hix} y={hiy} radius={6}
-                        fill="#fff" stroke="#0096ff" strokeWidth={1}
+                        fill="#fff" stroke="#f94608" strokeWidth={1}
                         draggable
                         onDragMove={(e) => {
                           const n = e.target as Konva.Circle
@@ -703,10 +703,10 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
                   )}
                   {hasHandleOut && (
                     <>
-                      <Line points={[ax, ay, hox, hoy]} stroke="#0096ff" strokeWidth={1} listening={false} />
+                      <Line points={[ax, ay, hox, hoy]} stroke="#f94608" strokeWidth={1} listening={false} />
                       <Circle
                         x={hox} y={hoy} radius={6}
-                        fill="#fff" stroke="#0096ff" strokeWidth={1}
+                        fill="#fff" stroke="#f94608" strokeWidth={1}
                         draggable
                         onDragMove={(e) => {
                           const n = e.target as Konva.Circle
@@ -727,7 +727,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
                   )}
                   <Circle
                     x={ax} y={ay} radius={7}
-                    fill="#0096ff" stroke="#fff" strokeWidth={1.5}
+                    fill="#f94608" stroke="#fff" strokeWidth={1.5}
                     draggable
                     onDragMove={(e) => {
                       const n = e.target as Konva.Circle
@@ -787,7 +787,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
         height={obj.frameHeight}
         rotation={obj.rotation}
         fill="transparent"
-        stroke={isAnchor && isInMultiSelect ? '#f5a623' : '#0096ff'}
+        stroke={isAnchor && isInMultiSelect ? '#f5a623' : '#f94608'}
         strokeWidth={isAnchor && isInMultiSelect ? 2 : 1}
         strokeEnabled={obj.contentEditMode || isInMultiSelect}
         strokeScaleEnabled={false}

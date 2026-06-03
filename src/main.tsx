@@ -1,3 +1,4 @@
+import './ui/theme.css'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { CarouselStage } from '@/canvas'
@@ -17,8 +18,8 @@ function App(): React.ReactElement {
         display: 'flex',
         flexDirection: 'column',
         height: '100vh',
-        background: '#1a1a1a',
-        fontFamily: 'system-ui, sans-serif',
+        background: 'var(--bg-base)',
+        fontFamily: 'var(--font)',
         overflow: 'hidden',
       }}
     >
@@ -45,7 +46,7 @@ function App(): React.ReactElement {
             justifyContent: 'flex-start',
             alignItems: 'stretch',
             padding: 24,
-            background: '#111',
+            background: 'var(--bg-canvas)',
             boxSizing: 'border-box',
             position: 'relative',
           }}
@@ -67,17 +68,17 @@ function App(): React.ReactElement {
                 zIndex: 500,
               }}
             >
-              <div style={{ color: '#fff', fontSize: 15, fontWeight: 600 }}>
+              <div style={{ color: 'var(--text-primary)', fontSize: 15, fontWeight: 600 }}>
                 {exportStatus || 'Exporting…'}
               </div>
               <button
                 onClick={requestCancel}
                 style={{
                   padding: '6px 18px',
-                  background: '#333',
-                  color: '#fff',
-                  border: '1px solid #555',
-                  borderRadius: 6,
+                  background: 'var(--bg-surface)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--stroke)',
+                  borderRadius: 999,
                   cursor: 'pointer',
                   fontSize: 13,
                 }}

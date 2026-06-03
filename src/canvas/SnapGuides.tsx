@@ -12,7 +12,7 @@ export function SnapGuides({ guides, totalWidth, totalHeight }: SnapGuidesProps)
   return (
     <>
       {guides.map((guide, index) => {
-        const color = guide.kind === 'frame' ? '#ff3b5c' : '#0096ff'
+        const color = guide.kind === 'frame' ? '#ff3b5c' : '#f94608'
         if (guide.orientation === 'h') {
           return (
             <Line

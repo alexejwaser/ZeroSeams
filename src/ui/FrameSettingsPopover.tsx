@@ -20,12 +20,13 @@ function segmentButtonStyle(active: boolean): React.CSSProperties {
   return {
     padding: '3px 10px',
     height: 24,
-    background: active ? '#0af' : 'transparent',
-    color: active ? '#fff' : '#aaa',
-    border: 'none',
-    borderRadius: 3,
+    background: active ? '#f94608' : '#ffffff',
+    color: active ? '#ffffff' : '#555555',
+    border: active ? 'none' : '1px solid #d4ccc2',
+    borderRadius: 999,
     cursor: 'pointer',
     fontSize: 12,
+    fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
     fontWeight: active ? 'bold' : 'normal',
     transition: 'background 0.15s, color 0.15s',
     whiteSpace: 'nowrap' as const,
@@ -35,10 +36,10 @@ function segmentButtonStyle(active: boolean): React.CSSProperties {
 const numberInputStyle: React.CSSProperties = {
   width: 56,
   height: 24,
-  background: '#333',
-  color: '#fff',
-  border: '1px solid #444',
-  borderRadius: 3,
+  background: '#ffffff',
+  color: '#111111',
+  border: '1px solid #d4ccc2',
+  borderRadius: 6,
   fontSize: 12,
   textAlign: 'center',
   padding: '0 4px',
@@ -46,8 +47,9 @@ const numberInputStyle: React.CSSProperties = {
 }
 
 const labelStyle: React.CSSProperties = {
-  color: '#aaa',
+  color: '#555555',
   fontSize: 11,
+  fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
   fontWeight: 'bold',
   letterSpacing: '0.06em',
   textTransform: 'uppercase',
@@ -110,11 +112,11 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
         left: 0,
         zIndex: 1000,
         marginTop: 6,
-        background: '#1c1c1e',
-        border: '1px solid #3a3a3a',
-        borderRadius: 8,
+        background: '#ffffff',
+        border: '1px solid #e8e0d5',
+        borderRadius: 16,
         padding: 16,
-        boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+        boxShadow: '0 8px 28px rgba(0,0,0,0.13)',
         minWidth: 240,
       }}
     >
@@ -125,11 +127,12 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
         style={{
           width: '100%',
           height: 28,
-          background: '#222',
-          color: '#aaa',
-          border: '1px solid #444',
-          borderRadius: 4,
+          background: '#ffffff',
+          color: '#111111',
+          border: '1px solid #d4ccc2',
+          borderRadius: 6,
           fontSize: 12,
+          fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
           padding: '0 6px',
           cursor: 'pointer',
           outline: 'none',
@@ -148,10 +151,10 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
           display: 'flex',
           alignItems: 'center',
           gap: 2,
-          background: '#222',
-          borderRadius: 4,
+          background: '#ffffff',
+          borderRadius: 999,
           padding: '2px',
-          border: '1px solid #444',
+          border: '1px solid #d4ccc2',
         }}
       >
         {presets.map((preset) => (
@@ -180,7 +183,7 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
               style={numberInputStyle}
               title="Width"
             />
-            <span style={{ color: '#666', fontSize: 12 }}>×</span>
+            <span style={{ color: '#aaaaaa', fontSize: 12 }}>×</span>
             <input
               type="number"
               min={100}
@@ -196,7 +199,9 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
         </>
       )}
 
-      <div style={labelStyle}>Background</div>
+      <div style={{ height: 1, background: '#e8e0d5', margin: '12px 0 0' }} />
+
+      <div style={{ ...labelStyle, marginTop: 12 }}>Background</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <input
           type="color"
@@ -205,15 +210,15 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
           style={{
             width: 32,
             height: 24,
-            border: 'none',
-            borderRadius: 4,
+            border: '1px solid #d4ccc2',
+            borderRadius: 6,
             cursor: 'pointer',
             padding: 0,
             background: 'none',
             flexShrink: 0,
           }}
         />
-        <span style={{ color: '#aaa', fontSize: 12, fontFamily: 'monospace' }}>{backgroundColor}</span>
+        <span style={{ color: '#555555', fontSize: 12, fontFamily: 'monospace' }}>{backgroundColor}</span>
       </div>
     </div>
   )

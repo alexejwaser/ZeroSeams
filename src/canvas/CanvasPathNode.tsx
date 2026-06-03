@@ -413,7 +413,7 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
           <KonvaPath
             data={pathData}
             fill="transparent"
-            stroke={isAnchor ? '#f5a623' : '#0096ff'}
+            stroke={isAnchor ? '#f5a623' : '#f94608'}
             strokeWidth={isAnchor ? 2 : 1}
             strokeScaleEnabled={false}
             perfectDrawEnabled={false}
@@ -503,21 +503,21 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
             {hasIn && (
               <KonvaLine
                 points={[anchor.x + anchor.handleIn.dx, anchor.y + anchor.handleIn.dy, anchor.x, anchor.y]}
-                stroke="#0096ff" strokeWidth={1} strokeScaleEnabled={false}
+                stroke="#f94608" strokeWidth={1} strokeScaleEnabled={false}
                 dash={[3, 2]} listening={false} perfectDrawEnabled={false}
               />
             )}
             {hasOut && (
               <KonvaLine
                 points={[anchor.x, anchor.y, anchor.x + anchor.handleOut.dx, anchor.y + anchor.handleOut.dy]}
-                stroke="#0096ff" strokeWidth={1} strokeScaleEnabled={false}
+                stroke="#f94608" strokeWidth={1} strokeScaleEnabled={false}
                 dash={[3, 2]} listening={false} perfectDrawEnabled={false}
               />
             )}
             {hasIn && (
               <KonvaCircle
                 x={anchor.x + anchor.handleIn.dx} y={anchor.y + anchor.handleIn.dy}
-                radius={6} fill="#fff" stroke="#0096ff" strokeWidth={1.5}
+                radius={6} fill="#fff" stroke="#f94608" strokeWidth={1.5}
                 draggable
                 onDragMove={(e) => handleHandleDragMove(idx, 'in', e)}
                 onDragEnd={(e) => handleHandleDragEnd(idx, 'in', e)}
@@ -526,7 +526,7 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
             {hasOut && (
               <KonvaCircle
                 x={anchor.x + anchor.handleOut.dx} y={anchor.y + anchor.handleOut.dy}
-                radius={6} fill="#fff" stroke="#0096ff" strokeWidth={1.5}
+                radius={6} fill="#fff" stroke="#f94608" strokeWidth={1.5}
                 draggable
                 onDragMove={(e) => handleHandleDragMove(idx, 'out', e)}
                 onDragEnd={(e) => handleHandleDragEnd(idx, 'out', e)}
@@ -536,7 +536,7 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
               x={anchor.x} y={anchor.y}
               radius={7}
               fill={hasIn || hasOut ? '#4488ff' : '#fff'}
-              stroke="#0096ff" strokeWidth={2}
+              stroke="#f94608" strokeWidth={2}
               draggable
               onDragMove={(e) => handleAnchorDragMove(idx, e)}
               onDragEnd={(e) => handleAnchorDragEnd(idx, e)}

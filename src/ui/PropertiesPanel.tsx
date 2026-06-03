@@ -54,10 +54,10 @@ function rotateAroundCenter(
 const numInputStyle = (width: number): React.CSSProperties => ({
   width,
   fontSize: 11,
-  background: '#222',
-  color: '#ccc',
-  border: '1px solid #444',
-  borderRadius: 3,
+  background: '#ffffff',
+  color: '#111111',
+  border: '1px solid #d4ccc2',
+  borderRadius: 6,
   padding: '0 4px',
   textAlign: 'right',
 })
@@ -101,7 +101,7 @@ function NumberField({
     >
       <label
         style={{
-          color: '#aaa',
+          color: '#555555',
           fontSize: 12,
           width: 64,
           flexShrink: 0,
@@ -118,10 +118,10 @@ function NumberField({
         onChange={handleChange}
         style={{
           flex: 1,
-          background: '#1a1a1a',
-          border: '1px solid #444',
-          borderRadius: 4,
-          color: '#fff',
+          background: '#ffffff',
+          border: '1px solid #d4ccc2',
+          borderRadius: 6,
+          color: '#111111',
           fontSize: 13,
           padding: '3px 6px',
           boxSizing: 'border-box',
@@ -173,7 +173,7 @@ function MixedNumberField({
     >
       <label
         style={{
-          color: '#aaa',
+          color: '#555555',
           fontSize: 12,
           width: 64,
           flexShrink: 0,
@@ -191,10 +191,10 @@ function MixedNumberField({
         onChange={handleChange}
         style={{
           flex: 1,
-          background: '#1a1a1a',
-          border: '1px solid #444',
-          borderRadius: 4,
-          color: isMixed ? '#666' : '#fff',
+          background: '#ffffff',
+          border: '1px solid #d4ccc2',
+          borderRadius: 6,
+          color: isMixed ? '#aaaaaa' : '#111111',
           fontSize: 13,
           padding: '3px 6px',
           boxSizing: 'border-box',
@@ -273,10 +273,10 @@ function ColorInput({ value, onChange }: ColorInputProps): React.ReactElement {
         onKeyDown={handleTextKeyDown}
         style={{
           flex: 1,
-          background: '#1a1a1a',
-          border: '1px solid #444',
-          borderRadius: 4,
-          color: '#fff',
+          background: '#ffffff',
+          border: '1px solid #d4ccc2',
+          borderRadius: 6,
+          color: '#111111',
           fontSize: 12,
           padding: '3px 6px',
           boxSizing: 'border-box',
@@ -376,10 +376,10 @@ function MixedColorInput({ value, onChange }: MixedColorInputProps): React.React
         onKeyDown={handleTextKeyDown}
         style={{
           flex: 1,
-          background: '#1a1a1a',
-          border: '1px solid #444',
-          borderRadius: 4,
-          color: isMixed ? '#666' : '#fff',
+          background: '#ffffff',
+          border: '1px solid #d4ccc2',
+          borderRadius: 6,
+          color: isMixed ? '#aaaaaa' : '#111111',
           fontSize: 12,
           padding: '3px 6px',
           boxSizing: 'border-box',
@@ -396,11 +396,12 @@ function MixedColorInput({ value, onChange }: MixedColorInputProps): React.React
 // ---------------------------------------------------------------------------
 
 const sectionLabelStyle: React.CSSProperties = {
-  color: '#aaa',
-  fontSize: 11,
-  fontWeight: 'bold',
-  letterSpacing: '0.08em',
+  color: '#555555',
+  fontSize: 9,
+  fontWeight: 700,
+  letterSpacing: '1.5px',
   textTransform: 'uppercase',
+  fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
   marginTop: 12,
   marginBottom: 6,
 }
@@ -408,10 +409,10 @@ const sectionLabelStyle: React.CSSProperties = {
 const alignButtonStyle = (active?: boolean): React.CSSProperties => ({
   flex: 1,
   height: 28,
-  background: active ? '#0af' : '#333',
-  color: '#fff',
-  border: 'none',
-  borderRadius: 4,
+  background: active ? '#f94608' : '#ffffff',
+  color: active ? '#ffffff' : '#555555',
+  border: active ? 'none' : '1px solid #d4ccc2',
+  borderRadius: 999,
   cursor: 'pointer',
   fontSize: 12,
   padding: '0 4px',
@@ -420,10 +421,10 @@ const alignButtonStyle = (active?: boolean): React.CSSProperties => ({
 const distributeButtonStyle = (disabled: boolean): React.CSSProperties => ({
   flex: 1,
   height: 28,
-  background: '#333',
-  color: disabled ? '#555' : '#fff',
-  border: 'none',
-  borderRadius: 4,
+  background: '#ffffff',
+  color: disabled ? '#aaaaaa' : '#555555',
+  border: '1px solid #d4ccc2',
+  borderRadius: 999,
   cursor: disabled ? 'default' : 'pointer',
   fontSize: 12,
   opacity: disabled ? 0.45 : 1,
@@ -528,16 +529,16 @@ function AlignDistributeSection({
 
       {/* Reference object for alignment */}
       <div style={{ marginBottom: 12 }}>
-        <div style={{ color: '#666', fontSize: 11, marginBottom: 4 }}>Reference</div>
+        <div style={{ color: '#aaaaaa', fontSize: 11, marginBottom: 4 }}>Reference</div>
         <select
           value={anchorId ?? ''}
           onChange={(e) => onSetAnchor(e.target.value || null)}
           style={{
             width: '100%',
-            background: '#1e1e1e',
-            border: '1px solid #444',
-            borderRadius: 4,
-            color: anchorId ? '#f5a623' : '#999',
+            background: '#ffffff',
+            border: '1px solid #d4ccc2',
+            borderRadius: 6,
+            color: anchorId ? '#f5a623' : '#555555',
             fontSize: 12,
             padding: '4px 6px',
           }}
@@ -553,11 +554,11 @@ function AlignDistributeSection({
 
       <div
         style={{
-          color: '#555',
+          color: '#aaaaaa',
           fontSize: 11,
           marginBottom: 12,
           paddingBottom: 12,
-          borderBottom: '1px solid #333',
+          borderBottom: '1px solid #e8e0d5',
         }}
       >
         {selectedCount} objects selected
@@ -572,7 +573,7 @@ function AlignDistributeSection({
 
 function CanvasSection(): React.ReactElement {
   return (
-    <div style={{ padding: '12px 12px 0', color: '#555', fontSize: 12 }}>
+    <div style={{ padding: '12px 12px 0', color: '#555555', fontSize: 12 }}>
       Select an object to see its properties, or open Frame Settings to configure the canvas.
     </div>
   )
@@ -684,7 +685,7 @@ function TextSection({
     <div style={{ padding: '12px 12px 0' }}>
       {/* Rotation slider + numeric input */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
+        <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
         <input
           type="range" min={-360} max={360} step={1}
           value={Math.round(textObj.rotation ?? 0)}
@@ -715,7 +716,7 @@ function TextSection({
 
       {/* Opacity slider + numeric input */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
+        <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
         <input
           type="range" min={0} max={100} step={1}
           value={Math.round((textObj.opacity ?? 1) * 100)}
@@ -739,13 +740,13 @@ function TextSection({
       {isInEditMode ? (
         <div
           style={{
-            background: 'rgba(0,170,255,0.12)',
-            border: '1px solid #0af',
-            borderRadius: 4,
+            background: 'rgba(249,70,8,0.08)',
+            border: '1px solid #f94608',
+            borderRadius: 8,
             padding: '5px 8px',
             marginTop: 10,
             marginBottom: 4,
-            color: '#0af',
+            color: '#f94608',
             fontSize: 11,
           }}
         >
@@ -756,7 +757,7 @@ function TextSection({
       ) : (
         <div
           style={{
-            color: '#555',
+            color: '#555555',
             fontSize: 12,
             marginTop: 10,
             marginBottom: 4,
@@ -770,7 +771,7 @@ function TextSection({
       {/* Font family */}
       <div style={{ ...sectionLabelStyle }}>Font</div>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: 8 }}>
-        <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Family</label>
+        <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Family</label>
         <FontPicker
           value={currentFontFamily}
           onChange={(family) => applySpanField({ fontFamily: family })}
@@ -798,10 +799,10 @@ function TextSection({
                 style={{
                   padding: '3px 10px',
                   height: 28,
-                  background: active ? '#0af' : '#333',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 4,
+                  background: active ? '#f94608' : '#ffffff',
+                  color: active ? '#ffffff' : '#555555',
+                  border: active ? 'none' : '1px solid #d4ccc2',
+                  borderRadius: 999,
                   cursor: 'pointer',
                   fontSize: 13,
                   fontWeight: bit === 'bold' ? 'bold' : 'normal',
@@ -825,10 +826,10 @@ function TextSection({
                 padding: '3px 10px',
                 height: 28,
                 flex: 1,
-                background: textObj.align === a ? '#0af' : '#333',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 4,
+                background: textObj.align === a ? '#f94608' : '#ffffff',
+                color: textObj.align === a ? '#ffffff' : '#555555',
+                border: textObj.align === a ? 'none' : '1px solid #d4ccc2',
+                borderRadius: 999,
                 cursor: 'pointer',
                 fontSize: 12,
                 display: 'flex',
@@ -849,7 +850,7 @@ function TextSection({
       {/* Fill color */}
       <div style={{ ...sectionLabelStyle }}>Color</div>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: 8 }}>
-        <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Fill</label>
+        <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Fill</label>
         <div style={{ flex: 1 }}>
           <MixedColorInput
             value={currentFill}
@@ -946,7 +947,7 @@ function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): R
   }
 
   return (
-    <div style={{ borderTop: '1px solid #333', paddingTop: 10, marginTop: 4 }}>
+    <div style={{ borderTop: '1px solid #e8e0d5', paddingTop: 10, marginTop: 4 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
         <div style={{ ...sectionLabelStyle, marginBottom: 0 }}>Effects</div>
         <div style={{ position: 'relative' }} ref={pickerRef}>
@@ -960,8 +961,8 @@ function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): R
           {pickerOpen && (
             <div style={{
               position: 'absolute', right: 0, top: 26, zIndex: 100,
-              background: '#2a2a2a', border: '1px solid #444', borderRadius: 4,
-              minWidth: 140, boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+              background: '#ffffff', border: '1px solid #d4ccc2', borderRadius: 8,
+              minWidth: 140, boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
             }}>
               {allDefs.map(def => (
                 <button
@@ -970,9 +971,9 @@ function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): R
                   style={{
                     display: 'block', width: '100%', textAlign: 'left',
                     padding: '6px 10px', background: 'none', border: 'none',
-                    color: '#ddd', fontSize: 12, cursor: 'pointer',
+                    color: '#111111', fontSize: 12, cursor: 'pointer',
                   }}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#3a3a3a')}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#f5ede2')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'none')}
                 >
                   {def.label}
@@ -984,7 +985,7 @@ function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): R
       </div>
 
       {activeEffects.length === 0 && (
-        <div style={{ color: '#555', fontSize: 11, paddingBottom: 6 }}>No effects — click + to add</div>
+        <div style={{ color: '#aaaaaa', fontSize: 11, paddingBottom: 6 }}>No effects — click + to add</div>
       )}
 
       {activeEffects.map(effect => {
@@ -992,17 +993,17 @@ function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): R
         if (!def) return null
         const isCollapsed = collapsed[effect.id] ?? false
         return (
-          <div key={effect.id} style={{ marginBottom: 6, background: '#1e1e1e', borderRadius: 4, overflow: 'hidden' }}>
+          <div key={effect.id} style={{ marginBottom: 6, background: '#ffffff', border: '1px solid #e8e0d5', borderRadius: 8, overflow: 'hidden' }}>
             {/* Effect header row */}
             <div style={{ display: 'flex', alignItems: 'center', padding: '4px 6px', gap: 4 }}>
               <button
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', padding: 0, display: 'flex', alignItems: 'center' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#555555', padding: 0, display: 'flex', alignItems: 'center' }}
                 onClick={() => setCollapsed(c => ({ ...c, [effect.id]: !isCollapsed }))}
               >
                 {isCollapsed ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
               </button>
               <span
-                style={{ flex: 1, color: '#ddd', fontSize: 12, cursor: 'pointer' }}
+                style={{ flex: 1, color: '#111111', fontSize: 12, cursor: 'pointer' }}
                 onClick={() => setCollapsed(c => ({ ...c, [effect.id]: !isCollapsed }))}
               >
                 {def.label}
@@ -1015,7 +1016,7 @@ function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): R
                 {effect.enabled ? <Eye size={11} /> : <EyeOff size={11} />}
               </button>
               <button
-                style={{ ...iconBtnStyle(false), width: 20, height: 20, color: '#888' }}
+                style={{ ...iconBtnStyle(false), width: 20, height: 20, color: '#555555' }}
                 onClick={() => removeEffect(effect.id)}
                 title="Remove effect"
               >
@@ -1034,7 +1035,7 @@ function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): R
                     return (
                       <div key={ctrl.key} style={{ display: 'flex', alignItems: 'center', marginBottom: 5, gap: 6 }}>
                         <label
-                          style={{ color: '#aaa', fontSize: 11, width: 68, flexShrink: 0, cursor: 'pointer' }}
+                          style={{ color: '#555555', fontSize: 11, width: 68, flexShrink: 0, cursor: 'pointer' }}
                           onDoubleClick={() => resetParam(effect.id, ctrl.key)}
                         >
                           {ctrl.label}
@@ -1065,7 +1066,7 @@ function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): R
                   if (ctrl.type === 'toggle') {
                     return (
                       <div key={ctrl.key} style={{ display: 'flex', alignItems: 'center', marginBottom: 5, gap: 6 }}>
-                        <label style={{ color: '#aaa', fontSize: 11, width: 68, flexShrink: 0 }}>{ctrl.label}</label>
+                        <label style={{ color: '#555555', fontSize: 11, width: 68, flexShrink: 0 }}>{ctrl.label}</label>
                         <input
                           type="checkbox"
                           checked={val as boolean}
@@ -1077,7 +1078,7 @@ function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): R
                   if (ctrl.type === 'color') {
                     return (
                       <div key={ctrl.key} style={{ display: 'flex', alignItems: 'center', marginBottom: 5, gap: 6 }}>
-                        <label style={{ color: '#aaa', fontSize: 11, width: 68, flexShrink: 0 }}>{ctrl.label}</label>
+                        <label style={{ color: '#555555', fontSize: 11, width: 68, flexShrink: 0 }}>{ctrl.label}</label>
                         <input
                           type="color"
                           value={val as string}
@@ -1114,10 +1115,10 @@ interface AdjustmentsSectionProps {
 }
 
 const subGroupLabelStyle: React.CSSProperties = {
-  color: '#666',
-  fontSize: 10,
-  fontWeight: 'bold',
-  letterSpacing: '0.06em',
+  color: '#aaaaaa',
+  fontSize: 9,
+  fontWeight: 700,
+  letterSpacing: '1px',
   textTransform: 'uppercase' as const,
   marginTop: 10,
   marginBottom: 4,
@@ -1153,7 +1154,7 @@ function AdjustmentsSection({ imgObj, selectedId: _selectedId, bypass, onToggleB
     return (
       <div key={key} style={{ display: 'flex', alignItems: 'center', marginBottom: 6, gap: 8 }}>
         <label
-          style={{ color: '#aaa', fontSize: 12, width: 80, flexShrink: 0, cursor: 'pointer' }}
+          style={{ color: '#555555', fontSize: 12, width: 80, flexShrink: 0, cursor: 'pointer' }}
           onDoubleClick={() => onCommit({ ...adj, [key]: 0 })}
         >
           {label}
@@ -1187,7 +1188,7 @@ function AdjustmentsSection({ imgObj, selectedId: _selectedId, bypass, onToggleB
   }
 
   return (
-    <div style={{ borderTop: '1px solid #333', paddingTop: 10, marginTop: 4 }}>
+    <div style={{ borderTop: '1px solid #e8e0d5', paddingTop: 10, marginTop: 4 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
         <div style={{ ...sectionLabelStyle, marginBottom: 0 }}>Adjustments</div>
         <button
@@ -1225,10 +1226,10 @@ function AdjustmentsSection({ imgObj, selectedId: _selectedId, bypass, onToggleB
           marginTop: 8,
           width: '100%',
           fontSize: 11,
-          background: '#333',
-          color: '#aaa',
-          border: '1px solid #444',
-          borderRadius: 3,
+          background: '#ffffff',
+          color: '#555555',
+          border: '1px solid #d4ccc2',
+          borderRadius: 999,
           padding: '3px 0',
           cursor: 'pointer',
         }}
@@ -1259,13 +1260,13 @@ function formatDuration(seconds: number): string {
 }
 
 const trimLabelStyle: React.CSSProperties = {
-  color: '#aaa',
+  color: '#555555',
   fontSize: 11,
   width: 32,
   flexShrink: 0,
   textTransform: 'uppercase',
-  fontWeight: 'bold',
-  letterSpacing: '0.06em',
+  fontWeight: 700,
+  letterSpacing: '1px',
 }
 
 function VideoSection({
@@ -1310,17 +1311,17 @@ function VideoSection({
       {/* Read-only info */}
       <div style={sectionLabelStyle}>Info</div>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6, gap: 8 }}>
-        <span style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Duration</span>
-        <span style={{ color: '#ddd', fontSize: 12 }}>{formatDuration(videoObj.naturalDuration)}</span>
+        <span style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Duration</span>
+        <span style={{ color: '#111111', fontSize: 12 }}>{formatDuration(videoObj.naturalDuration)}</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6, gap: 8 }}>
-        <span style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Dimensions</span>
-        <span style={{ color: '#ddd', fontSize: 12 }}>{videoObj.naturalWidth} × {videoObj.naturalHeight}</span>
+        <span style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Dimensions</span>
+        <span style={{ color: '#111111', fontSize: 12 }}>{videoObj.naturalWidth} × {videoObj.naturalHeight}</span>
       </div>
       {fileSize != null && (
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10, gap: 8 }}>
-          <span style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>File Size</span>
-          <span style={{ color: '#ddd', fontSize: 12 }}>{fileSize}</span>
+          <span style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>File Size</span>
+          <span style={{ color: '#111111', fontSize: 12 }}>{fileSize}</span>
         </div>
       )}
 
@@ -1376,7 +1377,7 @@ function VideoSection({
             <Repeat size={14} />
           </button>
         </Tooltip>
-        <span style={{ color: '#aaa', fontSize: 11, marginLeft: 4 }}>
+        <span style={{ color: '#555555', fontSize: 11, marginLeft: 4 }}>
           {formatDuration(currentTime)} / {formatDuration(videoObj.naturalDuration)}
         </span>
       </div>
@@ -1410,7 +1411,7 @@ function VideoSection({
       {/* Poster frame */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
         <span style={trimLabelStyle}>Poster</span>
-        <span style={{ color: '#ccc', fontSize: 11, flex: 1 }}>
+        <span style={{ color: '#111111', fontSize: 11, flex: 1 }}>
           {videoObj.posterFrame != null
             ? formatDuration(videoObj.posterFrame)
             : `Default (${formatDuration(videoObj.trimStart ?? 0)})`}
@@ -1509,7 +1510,7 @@ function VideoSection({
       {/* Rotation slider + numeric input */}
       <div style={sectionLabelStyle}>Transform</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
+        <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
         <input
           type="range" min={-360} max={360} step={1}
           value={Math.round(videoObj.rotation ?? 0)}
@@ -1540,7 +1541,7 @@ function VideoSection({
 
       {/* Opacity slider + numeric input */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
+        <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
         <input
           type="range" min={0} max={100} step={1}
           value={Math.round((videoObj.opacity ?? 1) * 100)}
@@ -1579,23 +1580,23 @@ function VideoSection({
       />
 
       {/* Mask section */}
-      <div style={{ borderTop: '1px solid #333', paddingTop: 10, marginTop: 4, marginBottom: 10 }}>
-        <div style={{ color: '#aaa', fontSize: 11, fontWeight: 'bold', letterSpacing: '0.08em',
-          textTransform: 'uppercase' as const, marginBottom: 8 }}>Mask</div>
+      <div style={{ borderTop: '1px solid #e8e0d5', paddingTop: 10, marginTop: 4, marginBottom: 10 }}>
+        <div style={{ color: '#555555', fontSize: 9, fontWeight: 700, letterSpacing: '1.5px',
+          textTransform: 'uppercase' as const, fontFamily: "'Uncut Sans Variable', system-ui, sans-serif", marginBottom: 8 }}>Mask</div>
 
         {videoObj.maskEditMode ? (
           /* Mask edit mode active banner */
           <div style={{
-            background: '#1e3a2f',
-            border: '1px solid #2d6a4f',
-            borderRadius: 4,
+            background: 'rgba(82,183,136,0.1)',
+            border: '1px solid #52b788',
+            borderRadius: 8,
             padding: '6px 10px',
             marginBottom: 8,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
-            <span style={{ color: '#52b788', fontSize: 11 }}>Editing mask path</span>
+            <span style={{ color: '#2d6a4f', fontSize: 11 }}>Editing mask path</span>
             <button
               onClick={() => {
                 onCommit(selectedId, { maskEditMode: false })
@@ -1604,7 +1605,7 @@ function VideoSection({
                 background: '#2d6a4f',
                 color: '#fff',
                 border: 'none',
-                borderRadius: 3,
+                borderRadius: 999,
                 padding: '2px 8px',
                 cursor: 'pointer',
                 fontSize: 11,
@@ -1618,7 +1619,7 @@ function VideoSection({
           maskDrawModeV?.id === selectedId ? (
             /* Draw in progress for this video */
             <div>
-              <div style={{ color: '#0af', fontSize: 11, marginBottom: 8 }}>
+              <div style={{ color: '#f94608', fontSize: 11, marginBottom: 8 }}>
                 Drawing {maskDrawModeV.tool} mask —{'  '}
                 {maskDrawModeV.tool === 'pen'
                   ? 'click to add points, close path to finish'
@@ -1629,10 +1630,10 @@ function VideoSection({
                 style={{
                   width: '100%',
                   height: 28,
-                  background: '#3a2020',
-                  color: '#f88',
-                  border: '1px solid #6a2020',
-                  borderRadius: 4,
+                  background: 'rgba(249,70,8,0.08)',
+                  color: '#f94608',
+                  border: '1px solid #f94608',
+                  borderRadius: 999,
                   cursor: 'pointer',
                   fontSize: 12,
                 }}
@@ -1643,7 +1644,7 @@ function VideoSection({
           ) : (
             /* Tool picker — icon-only buttons */
             <div>
-              <div style={{ color: '#777', fontSize: 11, marginBottom: 6 }}>Add mask:</div>
+              <div style={{ color: '#555555', fontSize: 11, marginBottom: 6 }}>Add mask:</div>
               <div style={{ display: 'flex', gap: 6 }}>
                 <Tooltip label="Pen mask">
                   <button
@@ -1681,8 +1682,8 @@ function VideoSection({
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
               {thumbnailsV[`${selectedId}__mask`] != null && (
                 <div style={{
-                  width: 36, height: 36, flexShrink: 0, borderRadius: 3,
-                  overflow: 'hidden', border: '1px solid #3a3a3a', background: '#000',
+                  width: 36, height: 36, flexShrink: 0, borderRadius: 6,
+                  overflow: 'hidden', border: '1px solid #d4ccc2', background: '#f5ede2',
                 }}>
                   <img
                     src={thumbnailsV[`${selectedId}__mask`]}
@@ -1729,7 +1730,7 @@ function VideoSection({
 
             {/* Feather */}
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: 8 }}>
-              <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Feather</label>
+              <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Feather</label>
               <input
                 type="range"
                 min={0}
@@ -1745,14 +1746,14 @@ function VideoSection({
                 }}
                 style={{ flex: 1 }}
               />
-              <span style={{ color: '#ccc', fontSize: 12, width: 24, textAlign: 'right' }}>
+              <span style={{ color: '#111111', fontSize: 12, width: 24, textAlign: 'right' }}>
                 {videoObj.mask.feather}
               </span>
             </div>
 
             {/* Invert */}
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: 8 }}>
-              <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Invert</label>
+              <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Invert</label>
               <input
                 type="checkbox"
                 checked={videoObj.mask.inverted}
@@ -1873,8 +1874,8 @@ export function PropertiesPanel(): React.ReactElement {
         width: 300,
         flexShrink: 0,
         height: '100%',
-        background: '#2a2a2a',
-        borderLeft: '1px solid #333',
+        background: 'var(--bg-panel)',
+        borderLeft: '1px solid var(--border)',
         display: 'flex',
         flexDirection: 'column',
         boxSizing: 'border-box',
@@ -1885,12 +1886,13 @@ export function PropertiesPanel(): React.ReactElement {
       <div
         style={{
           padding: '12px 12px 8px',
-          color: '#fff',
+          color: '#111111',
           fontSize: 13,
-          fontWeight: 'bold',
-          letterSpacing: '0.08em',
+          fontWeight: 700,
+          letterSpacing: '1.5px',
           textTransform: 'uppercase',
-          borderBottom: '1px solid #333',
+          fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
+          borderBottom: '1px solid #e8e0d5',
           flexShrink: 0,
         }}
       >
@@ -1930,7 +1932,7 @@ export function PropertiesPanel(): React.ReactElement {
           <div
             style={{
               padding: '20px 12px',
-              color: '#555',
+              color: '#555555',
               fontSize: 13,
             }}
           >
@@ -1978,7 +1980,7 @@ export function PropertiesPanel(): React.ReactElement {
             <div style={{ padding: '12px 12px 0' }}>
               {/* Rotation slider + numeric input */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
+                <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
                 <input
                   type="range" min={-360} max={360} step={1}
                   value={Math.round(shapeObj.rotation ?? 0)}
@@ -2014,7 +2016,7 @@ export function PropertiesPanel(): React.ReactElement {
               </div>
               {/* Opacity slider + numeric input */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
+                <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
                 <input
                   type="range" min={0} max={100} step={1}
                   value={Math.round((shapeObj.opacity ?? 1) * 100)}
@@ -2057,19 +2059,19 @@ export function PropertiesPanel(): React.ReactElement {
             <div style={{ padding: '12px 12px 0' }}>
               {pathObj.pathEditMode && (
                 <div style={{
-                  background: 'rgba(68,136,255,0.15)',
-                  border: '1px solid #4488ff',
-                  borderRadius: 4,
+                  background: 'rgba(249,70,8,0.08)',
+                  border: '1px solid #f94608',
+                  borderRadius: 8,
                   padding: '6px 8px',
                   marginBottom: 8,
-                  color: '#4488ff',
+                  color: '#f94608',
                   fontSize: 11,
                 }}>
                   Path edit mode — drag anchors and handles
                 </div>
               )}
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
+                <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
                 <input
                   type="range" min={0} max={100} step={1}
                   value={Math.round((pathObj.opacity ?? 1) * 100)}
@@ -2078,7 +2080,7 @@ export function PropertiesPanel(): React.ReactElement {
                   onMouseUp={e => commitUpdate(pathObj.id, { opacity: Number((e.target as HTMLInputElement).value) / 100 })}
                   style={{ flex: 1 }}
                 />
-                <span style={{ minWidth: 32, textAlign: 'right', fontSize: 11, color: '#aaa' }}>
+                <span style={{ minWidth: 32, textAlign: 'right', fontSize: 11, color: '#555555' }}>
                   {Math.round((pathObj.opacity ?? 1) * 100)}%
                 </span>
               </div>
@@ -2119,7 +2121,7 @@ export function PropertiesPanel(): React.ReactElement {
               <div style={{ padding: '12px 12px 0' }}>
                 {/* Rotation slider + numeric input */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                  <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
+                  <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
                   <input
                     type="range" min={-360} max={360} step={1}
                     value={Math.round(imgObj.rotation ?? 0)}
@@ -2149,7 +2151,7 @@ export function PropertiesPanel(): React.ReactElement {
                 </div>
                 {/* Opacity slider + numeric input */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                  <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
+                  <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
                   <input
                     type="range" min={0} max={100} step={1}
                     value={Math.round((imgObj.opacity ?? 1) * 100)}
@@ -2168,28 +2170,28 @@ export function PropertiesPanel(): React.ReactElement {
                     style={numInputStyle(44)}
                   />
                 </div>
-                <div style={{ color: '#555', fontSize: 11, marginTop: 8, marginBottom: 8 }}>
+                <div style={{ color: '#555555', fontSize: 11, marginTop: 8, marginBottom: 8 }}>
                   Double-click image to edit content
                 </div>
 
                 {/* Mask section */}
-                <div style={{ borderTop: '1px solid #333', paddingTop: 10, marginTop: 4, marginBottom: 10 }}>
-                  <div style={{ color: '#aaa', fontSize: 11, fontWeight: 'bold', letterSpacing: '0.08em',
-                    textTransform: 'uppercase' as const, marginBottom: 8 }}>Mask</div>
+                <div style={{ borderTop: '1px solid #e8e0d5', paddingTop: 10, marginTop: 4, marginBottom: 10 }}>
+                  <div style={{ color: '#555555', fontSize: 9, fontWeight: 700, letterSpacing: '1.5px',
+                    textTransform: 'uppercase' as const, fontFamily: "'Uncut Sans Variable', system-ui, sans-serif", marginBottom: 8 }}>Mask</div>
 
                   {imgObj.maskEditMode ? (
                     /* Mask edit mode active banner */
                     <div style={{
-                      background: '#1e3a2f',
-                      border: '1px solid #2d6a4f',
-                      borderRadius: 4,
+                      background: 'rgba(82,183,136,0.1)',
+                      border: '1px solid #52b788',
+                      borderRadius: 8,
                       padding: '6px 10px',
                       marginBottom: 8,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
                     }}>
-                      <span style={{ color: '#52b788', fontSize: 11 }}>Editing mask path</span>
+                      <span style={{ color: '#2d6a4f', fontSize: 11 }}>Editing mask path</span>
                       <button
                         onClick={() => {
                           if (selectedId) commitUpdate(selectedId, { maskEditMode: false })
@@ -2198,7 +2200,7 @@ export function PropertiesPanel(): React.ReactElement {
                           background: '#2d6a4f',
                           color: '#fff',
                           border: 'none',
-                          borderRadius: 3,
+                          borderRadius: 999,
                           padding: '2px 8px',
                           cursor: 'pointer',
                           fontSize: 11,
@@ -2212,7 +2214,7 @@ export function PropertiesPanel(): React.ReactElement {
                     maskDrawMode?.id === selectedId ? (
                       /* Draw in progress for this image */
                       <div>
-                        <div style={{ color: '#0af', fontSize: 11, marginBottom: 8 }}>
+                        <div style={{ color: '#f94608', fontSize: 11, marginBottom: 8 }}>
                           Drawing {maskDrawMode.tool} mask —{' '}
                           {maskDrawMode.tool === 'pen'
                             ? 'click to add points, close path to finish'
@@ -2223,10 +2225,10 @@ export function PropertiesPanel(): React.ReactElement {
                           style={{
                             width: '100%',
                             height: 28,
-                            background: '#3a2020',
-                            color: '#f88',
-                            border: '1px solid #6a2020',
-                            borderRadius: 4,
+                            background: 'rgba(249,70,8,0.08)',
+                            color: '#f94608',
+                            border: '1px solid #f94608',
+                            borderRadius: 999,
                             cursor: 'pointer',
                             fontSize: 12,
                           }}
@@ -2237,7 +2239,7 @@ export function PropertiesPanel(): React.ReactElement {
                     ) : (
                       /* Tool picker — icon-only buttons */
                       <div>
-                        <div style={{ color: '#777', fontSize: 11, marginBottom: 6 }}>Add mask:</div>
+                        <div style={{ color: '#555555', fontSize: 11, marginBottom: 6 }}>Add mask:</div>
                         <div style={{ display: 'flex', gap: 6 }}>
                           <Tooltip label="Pen mask">
                             <button
@@ -2275,8 +2277,8 @@ export function PropertiesPanel(): React.ReactElement {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                         {thumbnails[`${selectedId}__mask`] != null && (
                           <div style={{
-                            width: 36, height: 36, flexShrink: 0, borderRadius: 3,
-                            overflow: 'hidden', border: '1px solid #3a3a3a', background: '#000',
+                            width: 36, height: 36, flexShrink: 0, borderRadius: 6,
+                            overflow: 'hidden', border: '1px solid #d4ccc2', background: '#f5ede2',
                           }}>
                             <img
                               src={thumbnails[`${selectedId}__mask`]}
@@ -2323,7 +2325,7 @@ export function PropertiesPanel(): React.ReactElement {
 
                       {/* Feather */}
                       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: 8 }}>
-                        <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Feather</label>
+                        <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Feather</label>
                         <input
                           type="range"
                           min={0}
@@ -2341,14 +2343,14 @@ export function PropertiesPanel(): React.ReactElement {
                           }}
                           style={{ flex: 1 }}
                         />
-                        <span style={{ color: '#ccc', fontSize: 12, width: 24, textAlign: 'right' }}>
+                        <span style={{ color: '#111111', fontSize: 12, width: 24, textAlign: 'right' }}>
                           {imgObj.mask.feather}
                         </span>
                       </div>
 
                       {/* Invert */}
                       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: 8 }}>
-                        <label style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Invert</label>
+                        <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Invert</label>
                         <input
                           type="checkbox"
                           checked={imgObj.mask.inverted}
@@ -2396,8 +2398,8 @@ export function PropertiesPanel(): React.ReactElement {
                 Content Edit Mode
               </div>
 
-              <div style={{ color: '#aaa', fontSize: 11, fontWeight: 'bold', letterSpacing: '0.08em',
-                textTransform: 'uppercase' as const, marginBottom: 6 }}>Content</div>
+              <div style={{ color: '#555555', fontSize: 9, fontWeight: 700, letterSpacing: '1.5px',
+                textTransform: 'uppercase' as const, fontFamily: "'Uncut Sans Variable', system-ui, sans-serif", marginBottom: 6 }}>Content</div>
               <NumberField
                 label="Offset X"
                 value={imgObj.contentOffsetX}
@@ -2430,8 +2432,8 @@ export function PropertiesPanel(): React.ReactElement {
                   }}
                   style={{
                     width: '100%', height: 30,
-                    background: '#333', color: '#fff',
-                    border: '1px solid #555', borderRadius: 4,
+                    background: '#ffffff', color: '#555555',
+                    border: '1px solid #d4ccc2', borderRadius: 999,
                     cursor: 'pointer', fontSize: 12, marginBottom: 6,
                   }}
                 >
@@ -2470,10 +2472,10 @@ export function PropertiesPanel(): React.ReactElement {
                   style={{
                     width: '100%',
                     height: 30,
-                    background: '#333',
-                    color: '#fff',
-                    border: '1px solid #555',
-                    borderRadius: 4,
+                    background: '#ffffff',
+                    color: '#555555',
+                    border: '1px solid #d4ccc2',
+                    borderRadius: 999,
                     cursor: 'pointer',
                     fontSize: 12,
                     marginBottom: 6,
@@ -2502,10 +2504,10 @@ export function PropertiesPanel(): React.ReactElement {
                   style={{
                     width: '100%',
                     height: 30,
-                    background: '#333',
-                    color: '#fff',
-                    border: '1px solid #555',
-                    borderRadius: 4,
+                    background: '#ffffff',
+                    color: '#555555',
+                    border: '1px solid #d4ccc2',
+                    borderRadius: 999,
                     cursor: 'pointer',
                     fontSize: 12,
                     marginBottom: 6,
@@ -2515,7 +2517,7 @@ export function PropertiesPanel(): React.ReactElement {
                 </button>
               </Tooltip>
 
-              <div style={{ color: '#888', fontSize: 11, marginTop: 8, marginBottom: 8 }}>
+              <div style={{ color: '#aaaaaa', fontSize: 11, marginTop: 8, marginBottom: 8 }}>
                 Click outside to exit content mode
               </div>
             </div>
@@ -2530,31 +2532,32 @@ export function PropertiesPanel(): React.ReactElement {
           <div
             style={{
               padding: 12,
-              borderTop: '1px solid #333',
+              borderTop: '1px solid #e8e0d5',
               flexShrink: 0,
             }}
           >
             <div
               style={{
-                color: '#aaa',
-                fontSize: 11,
-                fontWeight: 'bold',
-                letterSpacing: '0.08em',
+                color: '#555555',
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: '1.5px',
                 textTransform: 'uppercase',
+                fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
                 marginBottom: 8,
               }}
             >
               AI Tools
             </div>
             {activeBgOp?.status === 'running' && (
-              <div style={{ background: '#1a1a1a', borderRadius: 6, padding: '8px 10px' }}>
-                <div style={{ color: '#aaa', fontSize: 12, marginBottom: 6 }}>
+              <div style={{ background: '#f5ede2', borderRadius: 8, padding: '8px 10px' }}>
+                <div style={{ color: '#555555', fontSize: 12, marginBottom: 6 }}>
                   Removing background… {activeBgOp.progress}%
                 </div>
-                <div style={{ background: '#333', borderRadius: 3, height: 6, overflow: 'hidden' }}>
+                <div style={{ background: '#e8e0d5', borderRadius: 3, height: 6, overflow: 'hidden' }}>
                   <div
                     style={{
-                      background: '#0af',
+                      background: '#f94608',
                       width: `${activeBgOp.progress}%`,
                       height: '100%',
                       transition: 'width 0.2s',
@@ -2576,10 +2579,10 @@ export function PropertiesPanel(): React.ReactElement {
                   style={{
                     width: '100%',
                     height: 32,
-                    background: '#0af',
-                    color: '#fff',
+                    background: '#f94608',
+                    color: '#ffffff',
                     border: 'none',
-                    borderRadius: 6,
+                    borderRadius: 999,
                     cursor: 'pointer',
                     fontSize: 13,
                     fontWeight: 'bold',
@@ -2597,28 +2600,29 @@ export function PropertiesPanel(): React.ReactElement {
           <div
             style={{
               padding: 12,
-              borderTop: '1px solid #333',
+              borderTop: '1px solid #e8e0d5',
               flexShrink: 0,
             }}
           >
             <div
               style={{
-                color: '#aaa',
-                fontSize: 11,
-                fontWeight: 'bold',
-                letterSpacing: '0.08em',
+                color: '#555555',
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: '1.5px',
                 textTransform: 'uppercase',
+                fontFamily: "'Uncut Sans Variable', system-ui, sans-serif",
                 marginBottom: 8,
               }}
             >
               External Editor
             </div>
-            <div style={{ color: '#666', fontSize: 11, marginBottom: 6 }}>
+            <div style={{ color: '#aaaaaa', fontSize: 11, marginBottom: 6 }}>
               {externalEditor ? `Default: ${externalEditor.name}` : 'No default editor set'}
             </div>
             {activeObjectId === selectedId ? (
               <>
-                <div style={{ color: '#52b788', fontSize: 12, marginBottom: 6 }}>
+                <div style={{ color: '#2d6a4f', fontSize: 12, marginBottom: 6 }}>
                   Watching for changes…
                 </div>
                 <Tooltip label="Stop watching">
@@ -2627,10 +2631,10 @@ export function PropertiesPanel(): React.ReactElement {
                     style={{
                       width: '100%',
                       height: 28,
-                      background: '#2a2a2a',
-                      color: '#aaa',
-                      border: '1px solid #444',
-                      borderRadius: 6,
+                      background: '#ffffff',
+                      color: '#555555',
+                      border: '1px solid #d4ccc2',
+                      borderRadius: 999,
                       cursor: 'pointer',
                       fontSize: 12,
                     }}
@@ -2647,10 +2651,10 @@ export function PropertiesPanel(): React.ReactElement {
                     style={{
                       flex: 1,
                       height: 32,
-                      background: '#2a2a2a',
-                      color: '#e0e0e0',
-                      border: '1px solid #444',
-                      borderRadius: 6,
+                      background: '#f94608',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: 999,
                       cursor: 'pointer',
                       fontSize: 13,
                     }}
@@ -2665,10 +2669,10 @@ export function PropertiesPanel(): React.ReactElement {
                       style={{
                         height: 32,
                         padding: '0 10px',
-                        background: '#2a2a2a',
-                        color: '#888',
-                        border: '1px solid #444',
-                        borderRadius: 6,
+                        background: '#ffffff',
+                        color: '#555555',
+                        border: '1px solid #d4ccc2',
+                        borderRadius: 999,
                         cursor: 'pointer',
                         fontSize: 11,
                       }}

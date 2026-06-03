@@ -1,4 +1,4 @@
-/* Adjustment sliders — Lightroom Classic styled tracks */
+/* Adjustment sliders — warm-palette styled tracks */
 .adj-slider {
   -webkit-appearance: none;
   appearance: none;
@@ -13,13 +13,13 @@
   width: 13px;
   height: 13px;
   border-radius: 50%;
-  background: linear-gradient(145deg, #e0e0e0, #b8b8b8);
-  border: 1px solid rgba(0, 0, 0, 0.22);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  background: linear-gradient(145deg, #f0ece6, #d8d0c6);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   margin-top: -5px;
 }
 
 .adj-slider:active::-webkit-slider-thumb {
-  background: linear-gradient(145deg, #f0f0f0, #cccccc);
+  background: linear-gradient(145deg, #ffffff, #e8e0d5);
 }
