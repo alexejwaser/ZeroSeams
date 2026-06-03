@@ -131,6 +131,8 @@ export function Toolbar(): React.ReactElement {
   const [showFrameSettings, setShowFrameSettings] = useState(false)
   const [exportSettings, setExportSettings] = useState<VideoExportSettings>({ ...DEFAULT_VIDEO_EXPORT_SETTINGS })
   const [showVideoSettings, setShowVideoSettings] = useState(false)
+  const [videoSettingsTab, setVideoSettingsTab] = useState<'simple' | 'advanced'>('simple')
+  const [selectedPreset, setSelectedPreset] = useState<'draft' | 'balanced' | 'high'>('balanced')
 
   const exportWrapperRef = useRef<HTMLDivElement>(null)
   const recentWrapperRef = useRef<HTMLDivElement>(null)
@@ -1040,99 +1042,167 @@ export function Toolbar(): React.ReactElement {
                       : <ChevronDown size={13} color="#aaa" strokeWidth={1.5}/>}
                   </button>
 
-                  {showVideoSettings && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {showVideoSettings && (() => {
+                    // Presets — crf uses FFmpeg convention (lower = better quality)
+                    const PRESETS = {
+                      draft:    { crf: 32, audioBitrate: 128, label: 'Draft',        hint: 'Smallest file' },
+                      balanced: { crf: 23, audioBitrate: 192, label: 'Balanced',     hint: 'Good quality' },
+                      high:     { crf: 18, audioBitrate: 256, label: 'High Quality', hint: 'Largest file' },
+                    } as const
+                    const PLATFORM_PRESET: Record<string, 'draft' | 'balanced' | 'high'> = {
+                      instagram: 'balanced',
+                      threads:   'balanced',
+                      facebook:  'balanced',
+                      tiktok:    'high',
+                    }
+                    const recommendedPreset = PLATFORM_PRESET[platform] ?? 'balanced'
+                    const platformLabel = platform.charAt(0).toUpperCase() + platform.slice(1)
 
-                      {/* Codec row */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span style={{ color: '#aaa', fontSize: 11, fontWeight: 'bold', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                          Codec
-                        </span>
-                        <div style={{ display: 'flex', gap: 4 }}>
-                          <button
-                            onClick={() => setExportSettings((s) => ({ ...s, videoCodec: 'libx264' }))}
-                            style={videoSettingsBtnStyle(exportSettings.videoCodec === 'libx264')}
-                          >
-                            H.264
-                          </button>
-                          <button
-                            onClick={() => setExportSettings((s) => ({ ...s, videoCodec: 'libx265' }))}
-                            style={videoSettingsBtnStyle(exportSettings.videoCodec === 'libx265')}
-                          >
-                            H.265
-                          </button>
+                    const tabBtnStyle = (active: boolean): React.CSSProperties => ({
+                      flex: 1,
+                      height: 24,
+                      background: active ? '#2a2a2a' : 'none',
+                      color: active ? '#fff' : '#777',
+                      border: 'none',
+                      borderRadius: 3,
+                      cursor: 'pointer',
+                      fontSize: 11,
+                      fontWeight: active ? 'bold' : 'normal',
+                    })
+
+                    const numFieldStyle: React.CSSProperties = {
+                      width: 52, height: 24, background: '#2a2a2a', color: '#ccc',
+                      border: '1px solid #444', borderRadius: 3, fontSize: 12,
+                      textAlign: 'center', padding: '0 4px',
+                    }
+
+                    const rowLabel = (text: string): React.CSSProperties => ({
+                      color: '#aaa', fontSize: 11, fontWeight: 'bold',
+                      letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap',
+                    })
+
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+
+                        {/* Simple / Advanced tab strip */}
+                        <div style={{ display: 'flex', gap: 2, background: '#1a1a1a', borderRadius: 4, padding: 2 }}>
+                          <button style={tabBtnStyle(videoSettingsTab === 'simple')} onClick={() => setVideoSettingsTab('simple')}>Simple</button>
+                          <button style={tabBtnStyle(videoSettingsTab === 'advanced')} onClick={() => setVideoSettingsTab('advanced')}>Advanced</button>
                         </div>
-                      </div>
 
-                      {/* Quality (CRF) row */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                        <span style={{ color: '#aaa', fontSize: 11, fontWeight: 'bold', letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-                          Quality
-                        </span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1 }}>
-                          <input
-                            type="range"
-                            min={0}
-                            max={51}
-                            step={1}
-                            value={exportSettings.crf}
-                            onChange={(e) => setExportSettings((s) => ({ ...s, crf: Number(e.target.value) }))}
-                            style={{ flex: 1, accentColor: '#0af', cursor: 'pointer' }}
-                          />
-                          <span style={{ color: '#ccc', fontSize: 12, minWidth: 20, textAlign: 'right' }}>
-                            {exportSettings.crf}
-                          </span>
-                        </div>
-                      </div>
+                        {videoSettingsTab === 'simple' ? (
+                          /* ── Simple tab: 3 preset tiles ── */
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                            {(['draft', 'balanced', 'high'] as const).map((key) => {
+                              const p = PRESETS[key]
+                              const isActive = selectedPreset === key
+                              const isRecommended = key === recommendedPreset
+                              return (
+                                <button
+                                  key={key}
+                                  onClick={() => {
+                                    setSelectedPreset(key)
+                                    setExportSettings((s) => ({
+                                      ...s,
+                                      crf: p.crf,
+                                      audioBitrate: p.audioBitrate,
+                                    }))
+                                  }}
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '6px 10px',
+                                    background: isActive ? '#0d2a38' : '#1e1e1e',
+                                    border: `1px solid ${isActive ? '#0af' : '#333'}`,
+                                    borderRadius: 5,
+                                    cursor: 'pointer',
+                                    textAlign: 'left',
+                                  }}
+                                >
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                    <span style={{ color: isActive ? '#0af' : '#ddd', fontSize: 12, fontWeight: 'bold' }}>
+                                      {p.label}
+                                    </span>
+                                    <span style={{ color: '#666', fontSize: 10 }}>{p.hint}</span>
+                                  </div>
+                                  {isRecommended && (
+                                    <span style={{
+                                      fontSize: 9, color: isActive ? '#0af' : '#888',
+                                      border: `1px solid ${isActive ? '#0af' : '#555'}`,
+                                      borderRadius: 3, padding: '1px 4px',
+                                      whiteSpace: 'nowrap',
+                                    }}>
+                                      {platformLabel}
+                                    </span>
+                                  )}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        ) : (
+                          /* ── Advanced tab ── */
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
 
-                      {/* Audio row */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                        <span style={{ color: '#aaa', fontSize: 11, fontWeight: 'bold', letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-                          Audio
-                        </span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <input
-                            type="number"
-                            min={32}
-                            max={320}
-                            value={exportSettings.audioBitrate}
-                            onChange={(e) => setExportSettings((s) => ({ ...s, audioBitrate: Number(e.target.value) }))}
-                            style={{
-                              width: 52,
-                              height: 24,
-                              background: '#2a2a2a',
-                              color: '#ccc',
-                              border: '1px solid #444',
-                              borderRadius: 3,
-                              fontSize: 12,
-                              textAlign: 'center',
-                              padding: '0 4px',
-                            }}
-                          />
-                          <span style={{ color: '#aaa', fontSize: 11 }}>kbps</span>
-                        </div>
-                      </div>
+                            {/* Codec */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <span style={rowLabel('Codec')}>Codec</span>
+                              <div style={{ display: 'flex', gap: 4 }}>
+                                <button onClick={() => setExportSettings((s) => ({ ...s, videoCodec: 'libx264' }))} style={videoSettingsBtnStyle(exportSettings.videoCodec === 'libx264')}>H.264</button>
+                                <button onClick={() => setExportSettings((s) => ({ ...s, videoCodec: 'libx265' }))} style={videoSettingsBtnStyle(exportSettings.videoCodec === 'libx265')}>H.265</button>
+                              </div>
+                            </div>
 
-                      {/* Frame rate row */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span style={{ color: '#aaa', fontSize: 11, fontWeight: 'bold', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                          FPS
-                        </span>
-                        <div style={{ display: 'flex', gap: 4 }}>
-                          {(['source', 24, 30, 60] as const).map((fps) => (
-                            <button
-                              key={String(fps)}
-                              onClick={() => setExportSettings((s) => ({ ...s, frameRate: fps }))}
-                              style={videoSettingsBtnStyle(exportSettings.frameRate === fps)}
-                            >
-                              {fps === 'source' ? 'Source' : String(fps)}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
+                            {/* Quality — slider right = better (maps to lower CRF) */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                              <span style={rowLabel('Quality')}>Quality</span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1 }}>
+                                <input
+                                  type="range" min={0} max={51} step={1}
+                                  value={51 - exportSettings.crf}
+                                  onChange={(e) => {
+                                    setSelectedPreset('balanced') // clear preset selection in simple tab
+                                    setExportSettings((s) => ({ ...s, crf: 51 - Number(e.target.value) }))
+                                  }}
+                                  style={{ flex: 1, accentColor: '#0af', cursor: 'pointer' }}
+                                />
+                                <span style={{ color: '#ccc', fontSize: 11, minWidth: 36, textAlign: 'right' }}>
+                                  CRF {exportSettings.crf}
+                                </span>
+                              </div>
+                            </div>
 
-                    </div>
-                  )}
+                            {/* Audio bitrate */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                              <span style={rowLabel('Audio')}>Audio</span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                <input
+                                  type="number" min={32} max={320}
+                                  value={exportSettings.audioBitrate}
+                                  onChange={(e) => setExportSettings((s) => ({ ...s, audioBitrate: Number(e.target.value) }))}
+                                  style={numFieldStyle}
+                                />
+                                <span style={{ color: '#aaa', fontSize: 11 }}>kbps</span>
+                              </div>
+                            </div>
+
+                            {/* Frame rate */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <span style={rowLabel('FPS')}>FPS</span>
+                              <div style={{ display: 'flex', gap: 4 }}>
+                                {(['source', 24, 30, 60] as const).map((fps) => (
+                                  <button key={String(fps)} onClick={() => setExportSettings((s) => ({ ...s, frameRate: fps }))} style={videoSettingsBtnStyle(exportSettings.frameRate === fps)}>
+                                    {fps === 'source' ? 'Source' : String(fps)}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })()}
                 </div>
               )}
 
