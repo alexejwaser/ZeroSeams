@@ -222,6 +222,41 @@ export interface VideoObject extends BaseCanvasObject {
 
   /** When true, transformer targets content inside the frame rather than the frame itself */
   contentEditMode: boolean
+
+  // --- Trim / clip ---
+  /** Playback start point in seconds (default 0) */
+  trimStart?: number
+  /** Playback end point in seconds (default naturalDuration) */
+  trimEnd?: number
+
+  // --- Playback ---
+  /** Whether playback loops when trimEnd is reached (default true) */
+  loop?: boolean
+
+  // --- Vector mask (mirrors ImageObject masking) ---
+  mask?: MaskData
+  /** When true, mask anchor overlay is shown and editable */
+  maskEditMode?: boolean
+}
+
+/** FFmpeg encoding settings used by the video export pipeline. */
+export interface VideoExportSettings {
+  videoCodec: 'libx264' | 'libx265'
+  /** CRF quality (0–51, lower = better; 23 is FFmpeg default for H.264) */
+  crf: number
+  audioCodec: 'aac' | 'libmp3lame'
+  /** Audio bitrate in kbps */
+  audioBitrate: number
+  /** Output frame rate; 'source' preserves the captured sequence FPS */
+  frameRate: 'source' | 24 | 30 | 60
+}
+
+export const DEFAULT_VIDEO_EXPORT_SETTINGS: VideoExportSettings = {
+  videoCodec: 'libx264',
+  crf: 23,
+  audioCodec: 'aac',
+  audioBitrate: 128,
+  frameRate: 'source',
 }
 
 export type CanvasObject = ImageObject | TextObject | ShapeObject | GroupObject | PathObject | VideoObject

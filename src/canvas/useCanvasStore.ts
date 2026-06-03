@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { CanvasObject, ImageObject, ShapeObject, PathObject, ShapeKind, TextObject, MaskData } from '@/types/canvas'
+import type { CanvasObject, ImageObject, ShapeObject, PathObject, ShapeKind, TextObject, MaskData, VideoObject } from '@/types/canvas'
 import type { Frame, FrameRatio, Platform, CarouselProject } from '@/types/project'
 
 export const PLATFORM_PRESETS: Record<Platform, Array<{ ratio: FrameRatio; label: string; width: number; height: number }>> = {
@@ -136,6 +136,10 @@ interface CanvasState {
   _dragStartObjects: Record<string, CanvasObject> | null
   /** Call onMouseDown before any updateObject drag calls. commitUpdate will use this snapshot for the history entry. */
   startDrag: () => void
+  /** Transient — set of VideoObject ids currently playing. Not in history. */
+  videoPlayingIds: Set<string>
+  /** Toggle play/pause for a video object. */
+  toggleVideoPlay: (id: string) => void
 }
 
 function normalizeObjectsForSnapshot(objects: Record<string, CanvasObject>): Record<string, CanvasObject> {
@@ -146,6 +150,13 @@ function normalizeObjectsForSnapshot(objects: Record<string, CanvasObject>): Rec
       const img = obj as ImageObject
       if (img.contentEditMode || img.maskEditMode) {
         result[id] = { ...img, contentEditMode: false, maskEditMode: false }
+        changed = true
+        continue
+      }
+    } else if (obj.type === 'video') {
+      const vid = obj as VideoObject
+      if (vid.contentEditMode || vid.maskEditMode) {
+        result[id] = { ...vid, contentEditMode: false, maskEditMode: false }
         changed = true
         continue
       }
@@ -210,6 +221,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
     maskDrawMode: null,
     maskModeActive: false,
     _dragStartObjects: null,
+    videoPlayingIds: new Set<string>(),
 
     addObject: (obj) => {
       let normalized = obj
@@ -693,7 +705,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
         const updated: Record<string, CanvasObject> = {}
         let changed = false
         for (const [id, obj] of Object.entries(state.objects)) {
-          if (obj.type === 'image' && (obj as ImageObject).maskEditMode) {
+          if ((obj.type === 'image' || obj.type === 'video') && (obj as ImageObject | VideoObject).maskEditMode) {
             updated[id] = { ...obj, maskEditMode: false } as CanvasObject
             changed = true
           } else {
@@ -708,7 +720,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
       set((state) => {
         const updated: Record<string, CanvasObject> = {}
         for (const [oid, obj] of Object.entries(state.objects)) {
-          if (obj.type === 'image') {
+          if (obj.type === 'image' || obj.type === 'video') {
             updated[oid] = {
               ...obj,
               contentEditMode: false,
@@ -725,7 +737,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
       set((state) => {
         const updated: Record<string, CanvasObject> = {}
         for (const [oid, obj] of Object.entries(state.objects)) {
-          if (obj.type === 'image') {
+          if (obj.type === 'image' || obj.type === 'video') {
             updated[oid] = { ...obj, contentEditMode: false, maskEditMode: false } as CanvasObject
           } else if (obj.type === 'path') {
             updated[oid] = { ...(obj as PathObject), pathEditMode: false } as CanvasObject
@@ -739,6 +751,17 @@ export const useCanvasStore = create<CanvasState>((set) => {
     clearMaskDrawMode: () => set({ maskDrawMode: null }),
 
     setMaskModeActive: (v) => set({ maskModeActive: v }),
+
+    toggleVideoPlay: (id) =>
+      set((state) => {
+        const next = new Set(state.videoPlayingIds)
+        if (next.has(id)) {
+          next.delete(id)
+        } else {
+          next.add(id)
+        }
+        return { videoPlayingIds: next }
+      }),
 
     moveObject: (id, dx, dy) =>
       set((state) => {
@@ -798,6 +821,12 @@ export const useCanvasStore = create<CanvasState>((set) => {
               ...img,
               maskEditMode: img.maskEditMode ?? false,
             } as ImageObject
+          } else if (obj.type === 'video') {
+            const vid = obj as VideoObject
+            migratedObjects[id] = {
+              ...vid,
+              maskEditMode: vid.maskEditMode ?? false,
+            } as VideoObject
           } else {
             migratedObjects[id] = obj
           }
