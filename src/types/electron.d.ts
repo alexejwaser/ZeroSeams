@@ -45,5 +45,6 @@ interface Window {
     openVideoFile(): Promise<{ canceled: boolean; filePath?: string }>
     appendExportLog(line: string): Promise<void>
     clearExportLog(): Promise<void>
+    getFileSize(filePath: string): Promise<{ size: number }>
   }
 }

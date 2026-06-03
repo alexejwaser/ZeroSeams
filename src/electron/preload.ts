@@ -55,4 +55,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('resolve-video-path', { relativeFilePath, projectFilePath }),
   makeRelativePath: (fromDir: string, toPath: string): Promise<{ relativePath: string }> =>
     ipcRenderer.invoke('make-relative-path', { fromDir, toPath }),
+  getFileSize: (filePath: string): Promise<{ size: number }> =>
+    ipcRenderer.invoke('get-file-size', { filePath }),
 })

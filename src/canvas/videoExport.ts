@@ -101,6 +101,7 @@ export async function encodeVideoWithAudio(
   audioFilePath: string,
   onStatus?: (msg: string) => void,
   settings?: VideoExportSettings,
+  volume?: number,
 ): Promise<Blob> {
   log(`encodeVideoWithAudio: ${pngBlobs.length} frames, audio: ${audioFilePath}`)
 
@@ -127,8 +128,11 @@ export async function encodeVideoWithAudio(
       ? String(fps)
       : String(settings.frameRate)
 
-  log(`encoding with audio, duration=${duration}s…`)
+  log(`encoding with audio, duration=${duration}s, volume=${volume ?? 1}…`)
   onStatus?.('Encoding video + audio…')
+  const audioFilters = (volume !== undefined && volume !== 1)
+    ? ['-af', `volume=${volume.toFixed(3)}`]
+    : []
   await ffmpeg.exec([
     '-framerate', String(fps),
     '-i', 'frame%04d.png',
@@ -139,6 +143,7 @@ export async function encodeVideoWithAudio(
     '-crf', String(settings?.crf ?? 23),
     '-c:a', settings?.audioCodec ?? 'aac',
     '-b:a', `${settings?.audioBitrate ?? 128}k`,
+    ...audioFilters,
     '-pix_fmt', 'yuv420p',
     '-r', outputFps,
     '-vf', `scale=${width}:${height}`,

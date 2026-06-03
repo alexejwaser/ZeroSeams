@@ -363,6 +363,15 @@ ipcMain.handle('clear-export-log', async () => {
   await writeFile(EXPORT_LOG, '--- new export ---\n')
 })
 
+ipcMain.handle('get-file-size', async (_event, { filePath }: { filePath: string }) => {
+  try {
+    const { size } = await stat(filePath)
+    return { size }
+  } catch {
+    return { size: 0 }
+  }
+})
+
 ipcMain.handle('stop-external-edit', async (_event, { objectId }: { objectId: string }) => {
   const watcher = watchers.get(objectId)
   if (watcher) {

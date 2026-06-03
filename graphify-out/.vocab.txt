@@ -19,6 +19,7 @@ app
 apply
 architecture
 around
+audio
 author
 auto
 autosave
@@ -28,7 +29,9 @@ barrel
 base
 bin
 blacks
+blob
 blur
+body
 boundaries
 bounding
 box
@@ -39,6 +42,7 @@ button
 bypass
 cache
 canvas
+capture
 carousel
 center
 change
@@ -69,6 +73,7 @@ conversion
 convert
 coord
 copy
+corp
 correct
 count
 create
@@ -90,6 +95,7 @@ device
 dialog
 dimensions
 dir
+dirname
 distribute
 div
 divider
@@ -99,14 +105,17 @@ download
 drag
 draw
 drop
+duration
 edit
 editor
 edits
 effect
 effects
 electron
+element
 ellipse
 emit
+encode
 engineer
 entry
 equal
@@ -128,6 +137,7 @@ filters
 fingerprint
 first
 fixture
+fmpeg
 font
 fonts
 for
@@ -149,6 +159,8 @@ guides
 halation
 handler
 harsh
+header
+headers
 hex
 highlights
 history
@@ -199,6 +211,7 @@ list
 local
 locals
 lock
+log
 logical
 logs
 lucide
@@ -211,8 +224,10 @@ map
 mask
 masking
 matches
+media
 menu
 merge
+mime
 mirrors
 mixed
 mjs
@@ -252,6 +267,7 @@ parameters
 params
 past
 path
+pathname
 paths
 pattern
 pen
@@ -268,6 +284,7 @@ plugin
 point
 points
 popover
+posix
 power
 preferences
 preload
@@ -295,6 +312,8 @@ redo
 references
 register
 registry
+relative
+relativize
 removal
 remove
 render
@@ -304,6 +323,7 @@ resize
 resolution
 resolve
 restore
+result
 return
 returns
 reviewer
@@ -327,6 +347,7 @@ sel
 select
 selection
 separation
+sequence
 set
 settings
 shadows
@@ -351,6 +372,7 @@ state
 status
 stop
 store
+stream
 strict
 style
 styles
@@ -391,10 +413,12 @@ upcoming
 use
 uses
 utilities
+utils
 value
 verify
 version
 vibrance
+video
 viewport
 vignette
 visible

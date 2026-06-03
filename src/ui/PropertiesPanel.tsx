@@ -1104,7 +1104,7 @@ function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): R
 // ---------------------------------------------------------------------------
 
 interface AdjustmentsSectionProps {
-  imgObj: ImageObject
+  imgObj: { adjustments?: PhotoAdjustments }
   selectedId: string
   bypass: boolean
   onToggleBypass: () => void
@@ -1282,8 +1282,11 @@ function VideoSection({
   const enterMaskDrawModeV = useCanvasStore((s) => s.enterMaskDrawMode)
   const clearMaskDrawModeV = useCanvasStore((s) => s.clearMaskDrawMode)
   const thumbnailsV = useThumbnailStore((s) => s.thumbnails)
+  const adjustmentsBypassV = useCanvasStore((s) => s.adjustmentsBypass)
+  const toggleAdjustmentsBypassV = useCanvasStore((s) => s.toggleAdjustmentsBypass)
 
   const [currentTime, setCurrentTime] = useState(0)
+  const [fileSize, setFileSize] = useState<string | null>(null)
   const isScrubbing = useRef(false)
   useEffect(() => {
     const vid = videoElementRegistry.get(videoObj.id)
@@ -1293,6 +1296,14 @@ function VideoSection({
     }, 100)
     return () => clearInterval(intervalId)
   }, [videoObj.id, isPlaying])
+  useEffect(() => {
+    if (typeof window.electronAPI.getFileSize !== 'function') return
+    window.electronAPI.getFileSize(videoObj.filePath).then(({ size }) => {
+      if (size === 0) { setFileSize(null); return }
+      if (size >= 1024 * 1024) setFileSize(`${(size / (1024 * 1024)).toFixed(1)} MB`)
+      else setFileSize(`${(size / 1024).toFixed(0)} KB`)
+    }).catch(() => setFileSize(null))
+  }, [videoObj.filePath])
 
   return (
     <div style={{ padding: '12px 12px 0' }}>
@@ -1302,17 +1313,20 @@ function VideoSection({
         <span style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Duration</span>
         <span style={{ color: '#ddd', fontSize: 12 }}>{formatDuration(videoObj.naturalDuration)}</span>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10, gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6, gap: 8 }}>
         <span style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>Dimensions</span>
         <span style={{ color: '#ddd', fontSize: 12 }}>{videoObj.naturalWidth} × {videoObj.naturalHeight}</span>
       </div>
+      {fileSize != null && (
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10, gap: 8 }}>
+          <span style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>File Size</span>
+          <span style={{ color: '#ddd', fontSize: 12 }}>{fileSize}</span>
+        </div>
+      )}
 
-      {/* Mute toggle */}
+      {/* Audio: mute toggle + volume slider */}
       <div style={sectionLabelStyle}>Audio</div>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10, gap: 8 }}>
-        <span style={{ color: '#aaa', fontSize: 12, width: 64, flexShrink: 0 }}>
-          {videoObj.muted ? 'Muted' : 'Unmuted'}
-        </span>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6, gap: 6 }}>
         <Tooltip label={videoObj.muted ? 'Unmute' : 'Mute'}>
           <button
             style={iconBtnStyle(!videoObj.muted)}
@@ -1321,6 +1335,26 @@ function VideoSection({
             {videoObj.muted ? <VolumeX size={14} /> : <Volume2 size={14} />}
           </button>
         </Tooltip>
+        <input
+          type="range" min={0} max={100} step={1}
+          value={Math.round((videoObj.volume ?? 1) * 100)}
+          disabled={videoObj.muted}
+          onMouseDown={onStartDrag}
+          onChange={e => onUpdate(selectedId, { volume: Number(e.target.value) / 100 })}
+          onMouseUp={e => onCommit(selectedId, { volume: Number((e.target as HTMLInputElement).value) / 100 })}
+          style={{ flex: 1, opacity: videoObj.muted ? 0.35 : 1, pointerEvents: videoObj.muted ? 'none' : 'auto' }}
+        />
+        <input
+          type="number" min={0} max={100} step={1}
+          value={Math.round((videoObj.volume ?? 1) * 100)}
+          disabled={videoObj.muted}
+          onChange={e => {
+            const v = Math.max(0, Math.min(100, Number(e.target.value)))
+            onCommit(selectedId, { volume: v / 100 })
+          }}
+          onDoubleClick={() => onCommit(selectedId, { volume: 1 })}
+          style={{ ...numInputStyle(44), opacity: videoObj.muted ? 0.35 : 1 }}
+        />
       </div>
 
       {/* Playback controls */}
@@ -1371,6 +1405,34 @@ function VideoSection({
             onCommit(selectedId, {})
           }}
         />
+      </div>
+
+      {/* Poster frame */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+        <span style={trimLabelStyle}>Poster</span>
+        <span style={{ color: '#ccc', fontSize: 11, flex: 1 }}>
+          {videoObj.posterFrame != null
+            ? formatDuration(videoObj.posterFrame)
+            : `Default (${formatDuration(videoObj.trimStart ?? 0)})`}
+        </span>
+        <Tooltip label="Set poster to current position">
+          <button
+            style={{ ...iconBtnStyle(false), fontSize: 11, padding: '2px 6px', width: 'auto' }}
+            onClick={() => onCommit(selectedId, { posterFrame: currentTime })}
+          >
+            Set
+          </button>
+        </Tooltip>
+        {videoObj.posterFrame != null && (
+          <Tooltip label="Reset poster to trim start">
+            <button
+              style={{ ...iconBtnStyle(false), fontSize: 11, padding: '2px 6px', width: 'auto' }}
+              onClick={() => onCommit(selectedId, { posterFrame: undefined })}
+            >
+              Reset
+            </button>
+          </Tooltip>
+        )}
       </div>
 
       {/* Trim section */}
@@ -1430,6 +1492,19 @@ function VideoSection({
           Reset Trim
         </button>
       </div>
+      {/* Start delay */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+        <span style={trimLabelStyle}>Delay</span>
+        <input
+          type="number" min={0} max={30} step={0.1}
+          value={(videoObj.startOffset ?? 0).toFixed(1)}
+          onMouseDown={onStartDrag}
+          onChange={e => onUpdate(selectedId, { startOffset: Math.max(0, Number(e.target.value)) })}
+          onBlur={e => onCommit(selectedId, { startOffset: Math.max(0, Number(e.target.value)) })}
+          style={numInputStyle(60)}
+        />
+        <span style={{ color: '#666', fontSize: 11 }}>s before play</span>
+      </div>
 
       {/* Rotation slider + numeric input */}
       <div style={sectionLabelStyle}>Transform</div>
@@ -1484,6 +1559,24 @@ function VideoSection({
           style={numInputStyle(44)}
         />
       </div>
+
+      {/* Adjustments */}
+      <AdjustmentsSection
+        imgObj={videoObj}
+        selectedId={selectedId}
+        bypass={adjustmentsBypassV}
+        onToggleBypass={toggleAdjustmentsBypassV}
+        onStartDrag={onStartDrag}
+        onUpdate={(adj) => onUpdate(selectedId, { adjustments: adj })}
+        onCommit={(adj) => onCommit(selectedId, { adjustments: adj })}
+      />
+
+      {/* Effects */}
+      <EffectsSection
+        effects={videoObj.effects}
+        onUpdate={(effects) => onUpdate(selectedId, { effects })}
+        onCommit={(effects) => onCommit(selectedId, { effects })}
+      />
 
       {/* Mask section */}
       <div style={{ borderTop: '1px solid #333', paddingTop: 10, marginTop: 4, marginBottom: 10 }}>

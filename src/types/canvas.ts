@@ -232,6 +232,15 @@ export interface VideoObject extends BaseCanvasObject {
   // --- Playback ---
   /** Whether playback loops when trimEnd is reached (default true) */
   loop?: boolean
+  /** Per-object audio volume for export (0–1, default 1). Canvas preview is always muted. */
+  volume?: number
+  /** Which frame to show when not playing (seconds). Defaults to trimStart when unset. */
+  posterFrame?: number
+  /** Seconds to hold the poster frame before playback begins (canvas preview only). */
+  startOffset?: number
+
+  // --- Photo adjustments (non-destructive, applied via Konva filter pipeline) ---
+  adjustments?: PhotoAdjustments
 
   // --- Vector mask (mirrors ImageObject masking) ---
   mask?: MaskData

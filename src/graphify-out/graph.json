@@ -367,7 +367,7 @@
       "label": "PropertiesPanel()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L1682",
+      "source_location": "L1774",
       "id": "ui_propertiespanel_propertiespanel",
       "community": 5,
       "norm_label": "propertiespanel()"
@@ -952,7 +952,7 @@
       "label": "VideoExportSettings",
       "file_type": "code",
       "source_file": "types/canvas.ts",
-      "source_location": "L243",
+      "source_location": "L252",
       "id": "types_canvas_videoexportsettings",
       "community": 19,
       "norm_label": "videoexportsettings"
@@ -961,7 +961,7 @@
       "label": "DEFAULT_VIDEO_EXPORT_SETTINGS",
       "file_type": "code",
       "source_file": "types/canvas.ts",
-      "source_location": "L254",
+      "source_location": "L263",
       "id": "types_canvas_default_video_export_settings",
       "community": 2,
       "norm_label": "default_video_export_settings"
@@ -970,7 +970,7 @@
       "label": "CanvasObject",
       "file_type": "code",
       "source_file": "types/canvas.ts",
-      "source_location": "L262",
+      "source_location": "L271",
       "id": "types_canvas_canvasobject",
       "community": 2,
       "norm_label": "canvasobject"
@@ -1366,7 +1366,7 @@
       "label": "CanvasVideoNodeProps",
       "file_type": "code",
       "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L13",
+      "source_location": "L16",
       "id": "canvas_canvasvideonode_canvasvideonodeprops",
       "community": 0,
       "norm_label": "canvasvideonodeprops"
@@ -1375,7 +1375,7 @@
       "label": "CanvasVideoNodeInnerProps",
       "file_type": "code",
       "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L19",
+      "source_location": "L22",
       "id": "canvas_canvasvideonode_canvasvideonodeinnerprops",
       "community": 0,
       "norm_label": "canvasvideonodeinnerprops"
@@ -1384,7 +1384,7 @@
       "label": "CanvasVideoNodeInner()",
       "file_type": "code",
       "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L23",
+      "source_location": "L26",
       "id": "canvas_canvasvideonode_canvasvideonodeinner",
       "community": 0,
       "norm_label": "canvasvideonodeinner()"
@@ -1393,7 +1393,7 @@
       "label": "CanvasVideoNodeOuter()",
       "file_type": "code",
       "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L901",
+      "source_location": "L983",
       "id": "canvas_canvasvideonode_canvasvideonodeouter",
       "community": 0,
       "norm_label": "canvasvideonodeouter()"
@@ -1402,7 +1402,7 @@
       "label": "CanvasVideoNode",
       "file_type": "code",
       "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L907",
+      "source_location": "L989",
       "id": "canvas_canvasvideonode_canvasvideonode",
       "community": 0,
       "norm_label": "canvasvideonode"
@@ -2304,7 +2304,7 @@
       "source_file": "canvas/videoElementRegistry.ts",
       "source_location": "L1",
       "id": "canvas_videoelementregistry_ts",
-      "community": 19,
+      "community": 0,
       "norm_label": "videoelementregistry.ts"
     },
     {
@@ -2313,7 +2313,7 @@
       "source_file": "canvas/videoElementRegistry.ts",
       "source_location": "L1",
       "id": "canvas_videoelementregistry_registry",
-      "community": 19,
+      "community": 0,
       "norm_label": "registry"
     },
     {
@@ -2322,7 +2322,7 @@
       "source_file": "canvas/videoElementRegistry.ts",
       "source_location": "L3",
       "id": "canvas_videoelementregistry_registervideoelement",
-      "community": 19,
+      "community": 0,
       "norm_label": "registervideoelement()"
     },
     {
@@ -2331,7 +2331,7 @@
       "source_file": "canvas/videoElementRegistry.ts",
       "source_location": "L7",
       "id": "canvas_videoelementregistry_unregistervideoelement",
-      "community": 19,
+      "community": 0,
       "norm_label": "unregistervideoelement()"
     },
     {
@@ -2340,7 +2340,7 @@
       "source_file": "canvas/videoElementRegistry.ts",
       "source_location": "L11",
       "id": "canvas_videoelementregistry_getvideoelement",
-      "community": 19,
+      "community": 0,
       "norm_label": "getvideoelement()"
     },
     {
@@ -3220,7 +3220,7 @@
       "label": "MEDIA_MIME",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L382",
+      "source_location": "L391",
       "id": "electron_index_media_mime",
       "community": 4,
       "norm_label": "media_mime"
@@ -3229,7 +3229,7 @@
       "label": "pathname",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L387",
+      "source_location": "L396",
       "id": "electron_index_pathname",
       "community": 4,
       "norm_label": "pathname"
@@ -3238,7 +3238,7 @@
       "label": "rangeHeader",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L398",
+      "source_location": "L407",
       "id": "electron_index_rangeheader",
       "community": 4,
       "norm_label": "rangeheader"
@@ -3247,7 +3247,7 @@
       "label": "nodeStream",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L403",
+      "source_location": "L412",
       "id": "electron_index_nodestream",
       "community": 4,
       "norm_label": "nodestream"
@@ -3256,7 +3256,7 @@
       "label": "body",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L404",
+      "source_location": "L413",
       "id": "electron_index_body",
       "community": 4,
       "norm_label": "body"
@@ -3265,7 +3265,7 @@
       "label": "corpHeaders",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L415",
+      "source_location": "L424",
       "id": "electron_index_corpheaders",
       "community": 4,
       "norm_label": "corpheaders"
@@ -4136,9 +4136,9 @@
       "source_file": "ui/Toolbar.tsx",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_toolbar_tsx",
-      "target": "ui_toolbar_video_presets",
-      "confidence_score": 1.0
+      "target": "ui_toolbar_video_presets"
     },
     {
       "relation": "contains",
@@ -4146,9 +4146,9 @@
       "source_file": "ui/Toolbar.tsx",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_toolbar_tsx",
-      "target": "ui_toolbar_platform_recommended",
-      "confidence_score": 1.0
+      "target": "ui_toolbar_platform_recommended"
     },
     {
       "relation": "contains",
@@ -4156,9 +4156,9 @@
       "source_file": "ui/Toolbar.tsx",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_toolbar_tsx",
-      "target": "ui_toolbar_presetkey",
-      "confidence_score": 1.0
+      "target": "ui_toolbar_presetkey"
     },
     {
       "relation": "imports_from",
@@ -4218,9 +4218,9 @@
       "source_file": "ui/Toolbar.tsx",
       "source_location": "L105",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_toolbar_tsx",
-      "target": "ui_toolbar_videoexportsettingspanelprops",
-      "confidence_score": 1.0
+      "target": "ui_toolbar_videoexportsettingspanelprops"
     },
     {
       "relation": "contains",
@@ -4228,9 +4228,9 @@
       "source_file": "ui/Toolbar.tsx",
       "source_location": "L116",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_toolbar_tsx",
-      "target": "ui_toolbar_videoexportsettingspanel",
-      "confidence_score": 1.0
+      "target": "ui_toolbar_videoexportsettingspanel"
     },
     {
       "relation": "contains",
@@ -6541,6 +6541,50 @@
       "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
       "target": "canvas_canvaspathnode_anchorstopathdata"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasVideoNode.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "canvas_canvasvideonode_tsx",
+      "target": "canvas_adjustments_pipeline_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasVideoNode.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "canvas_canvasvideonode_tsx",
+      "target": "adjustments_pipeline_buildfilterpipeline",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasVideoNode.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "canvas_canvasvideonode_tsx",
+      "target": "canvas_effects_buildeffectfilters_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasVideoNode.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "canvas_canvasvideonode_tsx",
+      "target": "effects_buildeffectfilters_buildeffectfilters",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -11038,5 +11082,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "b156af61b697b0d3b2d9f480420af55d1b2668d4"
+  "built_at_commit": "296ee92a1a61af27f8971693d3f4fecac6f4bbdb"
 }

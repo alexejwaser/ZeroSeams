@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, useMemo } from 'react'
 import { Group, Image as KonvaImage, Rect, Transformer, Shape, Circle, Line } from 'react-konva'
 import type Konva from 'konva'
 import type { VideoObject, AnchorPoint } from '@/types/canvas'
+import { DEFAULT_ADJUSTMENTS } from '@/types/canvas'
 import { useCanvasStore } from './useCanvasStore'
 import { useSnapGuides } from './useSnapGuides'
 import type { SnapGuide } from './useSnapGuides'
@@ -9,6 +10,8 @@ import { CANVAS_SCALE, axisLock } from './constants'
 import { useViewportStore } from './useViewportStore'
 import { registerVideoElement, unregisterVideoElement } from './videoElementRegistry'
 import { anchorsToPathData } from './CanvasPathNode'
+import { buildFilterPipeline } from './adjustments/pipeline'
+import { buildEffectFilters } from './effects/buildEffectFilters'
 
 interface CanvasVideoNodeProps {
   id: string
@@ -36,6 +39,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   const maskDrawMode = useCanvasStore((s) => s.maskDrawMode)
   const isDrawTarget = maskDrawMode?.id === id
   const maskModeActive = useCanvasStore((s) => s.maskModeActive)
+  const adjustmentsBypass = useCanvasStore((s) => s.adjustmentsBypass)
   const activeTool = useCanvasStore((s) => s.activeTool)
   const { zoom, panX, panY } = useViewportStore((s) => ({ zoom: s.zoom, panX: s.panX, panY: s.panY }))
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
@@ -63,6 +67,10 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   // Stores active mask cache bounds so the RAF tick can re-cache each frame.
   // null when no mask is active (caching disabled).
   const innerCacheBoundsRef = useRef<{ x: number; y: number; width: number; height: number } | null>(null)
+  // Countdown (seconds) before playback starts after a play command — drives start offset.
+  const startOffsetRemainingRef = useRef(0)
+  // Timestamp of the last RAF tick for delta-time calculation.
+  const lastTickTimeRef = useRef<number | null>(null)
 
   // The video element is created imperatively and passed as Konva image source.
   // videoEl state triggers a re-render so KonvaImage picks up the element after
@@ -84,7 +92,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
       // Always seek — even to 0. Chromium only decodes a displayable frame for
       // drawImage() once currentTime has been explicitly assigned (canplay alone
       // is not sufficient in some Electron builds).
-      vid.currentTime = obj.trimStart ?? 0
+      vid.currentTime = obj.posterFrame ?? obj.trimStart ?? 0
       setVideoEl(vid)
       registerVideoElement(id, vid)
       // Do not auto-play — playback is gated on videoPlayingIds in a separate effect.
@@ -111,26 +119,54 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, obj.filePath])
 
-  // RAF loop — keeps Konva repainting and enforces trim boundaries.
+  // RAF loop — keeps Konva repainting, enforces trim boundaries, and handles start offset.
   useEffect(() => {
     if (!videoEl) return
 
-    function tick(): void {
+    function tick(now: number): void {
+      // Start-offset countdown: hold poster frame until delay elapses, then play.
+      if (startOffsetRemainingRef.current > 0) {
+        const last = lastTickTimeRef.current ?? now
+        const delta = (now - last) / 1000
+        lastTickTimeRef.current = now
+        startOffsetRemainingRef.current = Math.max(0, startOffsetRemainingRef.current - delta)
+        if (startOffsetRemainingRef.current <= 0) {
+          videoEl.play().catch((e: unknown) => {
+            console.warn('[CanvasVideoNode] play() after offset rejected:', e)
+          })
+        }
+        const layer = groupRef.current?.getLayer()
+        if (layer) layer.batchDraw()
+        rafRef.current = requestAnimationFrame(tick)
+        return
+      }
+      lastTickTimeRef.current = now
+
       const end = obj.trimEnd ?? obj.naturalDuration
       const start = obj.trimStart ?? 0
       if (videoEl!.currentTime >= end) {
         videoEl!.currentTime = start
         if (!(obj.loop ?? true)) {
           videoEl!.pause()
+          // Seek to poster frame when stopped
+          videoEl!.currentTime = obj.posterFrame ?? start
           // Sync store so the play button reflects paused state
           const store = useCanvasStore.getState()
           if (store.videoPlayingIds.has(id)) store.toggleVideoPlay(id)
         }
       }
-      // When a mask is active the inner group is cached. Video frames change every
-      // tick, so we must re-cache to keep the visible content current.
+      // Re-cache strategy:
+      // - Mask active: always re-cache innerGroupRef each tick (keeps video live through mask).
+      //   If filters are also active, first re-cache videoImageRef so the inner group
+      //   captures a fresh filtered frame rather than a frozen snapshot.
+      // - Filters only (no mask): re-cache videoImageRef each tick so filters show current frame.
       const bounds = innerCacheBoundsRef.current
-      if (bounds) innerGroupRef.current?.cache(bounds)
+      if (bounds) {
+        if (allFiltersRef.current.length > 0) videoImageRef.current?.cache()
+        innerGroupRef.current?.cache(bounds)
+      } else if (allFiltersRef.current.length > 0) {
+        videoImageRef.current?.cache()
+      }
       const layer = groupRef.current?.getLayer()
       if (layer) layer.batchDraw()
       rafRef.current = requestAnimationFrame(tick)
@@ -153,12 +189,25 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   useEffect(() => {
     if (!videoEl) return
     if (isPlaying) {
-      videoEl.play().catch((e: unknown) => {
-        console.warn('[CanvasVideoNode] play() rejected:', e)
-      })
+      const delay = obj.startOffset ?? 0
+      if (delay > 0) {
+        // Hold at poster frame during the delay; RAF loop will call play() once elapsed.
+        videoEl.currentTime = obj.posterFrame ?? obj.trimStart ?? 0
+        startOffsetRemainingRef.current = delay
+        lastTickTimeRef.current = null
+      } else {
+        startOffsetRemainingRef.current = 0
+        videoEl.play().catch((e: unknown) => {
+          console.warn('[CanvasVideoNode] play() rejected:', e)
+        })
+      }
     } else {
+      startOffsetRemainingRef.current = 0
       videoEl.pause()
+      // Return to poster frame when stopped
+      videoEl.currentTime = obj.posterFrame ?? obj.trimStart ?? 0
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, videoEl])
 
   // Re-seek when trim points change — clamp current time into the new range.
@@ -176,6 +225,23 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     () => ({ x: 0, y: 0, width: obj.frameWidth, height: obj.frameHeight }),
     [obj.frameWidth, obj.frameHeight],
   )
+
+  const filterPipeline = useMemo(
+    () => adjustmentsBypass ? [] : buildFilterPipeline(obj.adjustments ?? DEFAULT_ADJUSTMENTS),
+    [obj.adjustments, adjustmentsBypass],
+  )
+  const effectFilters = useMemo(
+    () => buildEffectFilters(obj.effects),
+    [obj.effects],
+  )
+  const allFilters = useMemo(
+    () => [...filterPipeline, ...effectFilters],
+    [filterPipeline, effectFilters],
+  )
+  // Stable ref so the RAF tick can read the current filter list without being
+  // in its dependency array (the tick is only re-registered when videoEl changes).
+  const allFiltersRef = useRef(allFilters)
+  useEffect(() => { allFiltersRef.current = allFilters }, [allFilters])
 
   // Build the mask shape's sceneFunc whenever mask data or content dimensions change.
   // The function draws the mask into the inner group's cached canvas using destination-in
@@ -238,6 +304,16 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
       inner.getLayer()?.batchDraw()
     }
   }, [obj.mask, obj.contentOffsetX, obj.contentOffsetY, obj.contentWidth, obj.contentHeight, videoEl])
+
+  // When all filters are removed, clear the videoImageRef cache so the node
+  // reverts to direct live rendering. The RAF tick handles caching when filters
+  // are active — we never cache via a one-time effect (would freeze the frame).
+  useEffect(() => {
+    if (allFilters.length === 0) {
+      videoImageRef.current?.clearCache()
+      videoImageRef.current?.getLayer()?.batchDraw()
+    }
+  }, [allFilters])
 
   // Wire mask-edit Transformer to its target Rect when entering edit mode for rect/ellipse masks.
   useEffect(() => {
@@ -569,6 +645,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
             y={obj.contentOffsetY}
             width={obj.contentWidth}
             height={obj.contentHeight}
+            filters={allFilters.length > 0 ? allFilters : undefined}
             draggable={obj.contentEditMode && !obj.locked}
             onClick={() => { if (obj.contentEditMode) useCanvasStore.getState().setSelected(id) }}
             onTap={() => { if (obj.contentEditMode) useCanvasStore.getState().setSelected(id) }}

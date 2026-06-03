@@ -327,7 +327,7 @@ export async function exportMixedFrames(
         const audioSource = videoObjectsInFrame.find((obj) => !obj.muted)
         let mp4Blob: Blob
         if (audioSource) {
-          mp4Blob = await encodeVideoWithAudio(pngBlobs, EXPORT_FPS, frameWidth, frameHeight, audioSource.filePath, onStatus, exportSettings)
+          mp4Blob = await encodeVideoWithAudio(pngBlobs, EXPORT_FPS, frameWidth, frameHeight, audioSource.filePath, onStatus, exportSettings, audioSource.volume)
         } else {
           mp4Blob = await encodeVideoFrames(pngBlobs, EXPORT_FPS, frameWidth, frameHeight, onStatus, exportSettings)
         }
