@@ -1252,6 +1252,7 @@ interface VideoSectionProps {
 }
 
 function formatDuration(seconds: number): string {
+  if (!isFinite(seconds) || isNaN(seconds)) return '0:00'
   const m = Math.floor(seconds / 60)
   const s = Math.floor(seconds % 60)
   return `${m}:${s.toString().padStart(2, '0')}`
@@ -1283,10 +1284,13 @@ function VideoSection({
   const thumbnailsV = useThumbnailStore((s) => s.thumbnails)
 
   const [currentTime, setCurrentTime] = useState(0)
+  const isScrubbing = useRef(false)
   useEffect(() => {
     const vid = videoElementRegistry.get(videoObj.id)
     if (!vid) return
-    const intervalId = setInterval(() => setCurrentTime(vid.currentTime), 100)
+    const intervalId = setInterval(() => {
+      if (!isScrubbing.current) setCurrentTime(vid.currentTime)
+    }, 100)
     return () => clearInterval(intervalId)
   }, [videoObj.id, isPlaying])
 
@@ -1352,7 +1356,10 @@ function VideoSection({
           step={0.01}
           value={currentTime}
           style={{ width: '100%' }}
-          onMouseDown={onStartDrag}
+          onMouseDown={() => {
+            isScrubbing.current = true
+            onStartDrag()
+          }}
           onChange={(e) => {
             const t = Number(e.target.value)
             const vid = videoElementRegistry.get(videoObj.id)
@@ -1360,6 +1367,7 @@ function VideoSection({
             setCurrentTime(t)
           }}
           onMouseUp={() => {
+            isScrubbing.current = false
             onCommit(selectedId, {})
           }}
         />

@@ -60,6 +60,9 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   const contentDragStartRef = useRef<{ x: number; y: number } | null>(null)
   const pendingDuplicateRef = useRef(false)
   const rafRef = useRef<number | null>(null)
+  // Stores active mask cache bounds so the RAF tick can re-cache each frame.
+  // null when no mask is active (caching disabled).
+  const innerCacheBoundsRef = useRef<{ x: number; y: number; width: number; height: number } | null>(null)
 
   // The video element is created imperatively and passed as Konva image source.
   // videoEl state triggers a re-render so KonvaImage picks up the element after
@@ -78,11 +81,10 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     videoElRef.current = vid
 
     function onLoaded(): void {
-      // Seek to trimStart before registering — ensures first painted frame is within the clip.
-      const seekTarget = obj.trimStart ?? 0
-      if (seekTarget > 0) {
-        vid.currentTime = seekTarget
-      }
+      // Always seek — even to 0. Chromium only decodes a displayable frame for
+      // drawImage() once currentTime has been explicitly assigned (canplay alone
+      // is not sufficient in some Electron builds).
+      vid.currentTime = obj.trimStart ?? 0
       setVideoEl(vid)
       registerVideoElement(id, vid)
       // Do not auto-play — playback is gated on videoPlayingIds in a separate effect.
@@ -125,6 +127,10 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
           if (store.videoPlayingIds.has(id)) store.toggleVideoPlay(id)
         }
       }
+      // When a mask is active the inner group is cached. Video frames change every
+      // tick, so we must re-cache to keep the visible content current.
+      const bounds = innerCacheBoundsRef.current
+      if (bounds) innerGroupRef.current?.cache(bounds)
       const layer = groupRef.current?.getLayer()
       if (layer) layer.batchDraw()
       rafRef.current = requestAnimationFrame(tick)
@@ -210,20 +216,24 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   }, [obj.mask, obj.contentOffsetX, obj.contentOffsetY, obj.contentWidth, obj.contentHeight])
 
   // Manage the inner group's cache for mask compositing.
+  // innerCacheBoundsRef is kept in sync so the RAF tick can re-cache each frame.
   useEffect(() => {
     const inner = innerGroupRef.current
     if (!inner) return
     if (obj.mask && obj.mask.visible && obj.mask.anchors.length >= 3) {
       const feather = obj.mask.feather
       const buf = Math.max(feather, 0) + 2
-      inner.cache({
+      const bounds = {
         x: obj.contentOffsetX - buf,
         y: obj.contentOffsetY - buf,
         width: obj.contentWidth + buf * 2,
         height: obj.contentHeight + buf * 2,
-      })
+      }
+      innerCacheBoundsRef.current = bounds
+      inner.cache(bounds)
       inner.getLayer()?.batchDraw()
     } else {
+      innerCacheBoundsRef.current = null
       inner.clearCache()
       inner.getLayer()?.batchDraw()
     }

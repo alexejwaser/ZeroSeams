@@ -31,7 +31,10 @@ export function useImageDrop(containerRef: React.RefObject<HTMLDivElement>): voi
 
         const vid = document.createElement('video')
         vid.preload = 'metadata'
-        vid.onloadedmetadata = () => {
+        const onMeta = () => {
+          // durationchange fires when duration becomes finite; loadedmetadata can still be NaN
+          if (!isFinite(vid.duration) || vid.duration <= 0) return
+          vid.removeEventListener('durationchange', onMeta)
           const MAX_SIZE = 600
           const scale = Math.min(1, MAX_SIZE / Math.max(vid.videoWidth, vid.videoHeight))
           const w = Math.round(vid.videoWidth * scale)
@@ -72,6 +75,8 @@ export function useImageDrop(containerRef: React.RefObject<HTMLDivElement>): voi
             zIndex: objectOrder.length,
           })
         }
+        vid.addEventListener('durationchange', onMeta)
+        vid.onerror = () => vid.removeEventListener('durationchange', onMeta)
         vid.src = `zeroseams-media://localhost${filePath}`
         return
       }
