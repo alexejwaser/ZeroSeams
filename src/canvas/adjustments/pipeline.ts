@@ -16,6 +16,79 @@ function buildLUT(key: string, fn: (i: number) => number): Uint8ClampedArray {
 }
 
 // ---------------------------------------------------------------------------
+// 3D cube LUT cache — keyed "type:value", Float32Array of N³×3 values
+// ---------------------------------------------------------------------------
+
+const lut3dCache = new Map<string, Float32Array>()
+const LUT3D_N = 33          // 33 grid points → step = 256/(33-1) ≈ 8
+const LUT3D_STEP = 256 / (LUT3D_N - 1)
+
+function build3DLUT(
+  key: string,
+  fn: (r: number, g: number, b: number) => [number, number, number]
+): Float32Array {
+  if (lut3dCache.has(key)) return lut3dCache.get(key)!
+  const lut = new Float32Array(LUT3D_N * LUT3D_N * LUT3D_N * 3)
+  for (let ri = 0; ri < LUT3D_N; ri++) {
+    for (let gi = 0; gi < LUT3D_N; gi++) {
+      for (let bi = 0; bi < LUT3D_N; bi++) {
+        const [ro, go, bo] = fn(
+          Math.min(255, ri * LUT3D_STEP),
+          Math.min(255, gi * LUT3D_STEP),
+          Math.min(255, bi * LUT3D_STEP)
+        )
+        const idx = (ri * LUT3D_N * LUT3D_N + gi * LUT3D_N + bi) * 3
+        lut[idx]     = ro
+        lut[idx + 1] = go
+        lut[idx + 2] = bo
+      }
+    }
+  }
+  lut3dCache.set(key, lut)
+  return lut
+}
+
+function sample3DLUT(lut: Float32Array, r: number, g: number, b: number): [number, number, number] {
+  const rf = r / LUT3D_STEP
+  const gf = g / LUT3D_STEP
+  const bf = b / LUT3D_STEP
+  const r0 = Math.min(LUT3D_N - 2, rf | 0), r1 = r0 + 1
+  const g0 = Math.min(LUT3D_N - 2, gf | 0), g1 = g0 + 1
+  const b0 = Math.min(LUT3D_N - 2, bf | 0), b1 = b0 + 1
+  const fr = rf - r0, fg = gf - g0, fb = bf - b0
+  const N = LUT3D_N, N2 = N * N
+  function lerp3(ci: number): number {
+    const c000 = lut[(r0*N2 + g0*N + b0)*3 + ci]
+    const c001 = lut[(r0*N2 + g0*N + b1)*3 + ci]
+    const c010 = lut[(r0*N2 + g1*N + b0)*3 + ci]
+    const c011 = lut[(r0*N2 + g1*N + b1)*3 + ci]
+    const c100 = lut[(r1*N2 + g0*N + b0)*3 + ci]
+    const c101 = lut[(r1*N2 + g0*N + b1)*3 + ci]
+    const c110 = lut[(r1*N2 + g1*N + b0)*3 + ci]
+    const c111 = lut[(r1*N2 + g1*N + b1)*3 + ci]
+    return (c000*(1-fr)*(1-fg)*(1-fb) + c001*(1-fr)*(1-fg)*fb +
+            c010*(1-fr)*fg*(1-fb)     + c011*(1-fr)*fg*fb +
+            c100*fr*(1-fg)*(1-fb)     + c101*fr*(1-fg)*fb +
+            c110*fr*fg*(1-fb)         + c111*fr*fg*fb)
+  }
+  return [Math.round(lerp3(0)), Math.round(lerp3(1)), Math.round(lerp3(2))]
+}
+
+// ---------------------------------------------------------------------------
+// 1D float LUT cache — maps luminance level (0–255) to a per-pixel scale factor
+// ---------------------------------------------------------------------------
+
+const floatLutCache = new Map<string, Float32Array>()
+
+function buildFloatLUT(key: string, fn: (lIdx: number) => number): Float32Array {
+  if (floatLutCache.has(key)) return floatLutCache.get(key)!
+  const lut = new Float32Array(256)
+  for (let i = 0; i < 256; i++) lut[i] = fn(i)
+  floatLutCache.set(key, lut)
+  return lut
+}
+
+// ---------------------------------------------------------------------------
 // HSL helpers
 // ---------------------------------------------------------------------------
 
@@ -147,36 +220,35 @@ function makeBlacksFilter(blacks: number): (imageData: ImageData) => void {
 }
 
 function makeHighlightsFilter(highlights: number): (imageData: ImageData) => void {
-  // 0.5 scale factor: at +100 a pure-white pixel gets 1.5× scale — matches
-  // Lightroom's gentle highlights recovery/boost feel.
+  // Scale factor precomputed per luminance level — avoids per-pixel float division.
+  const scaleLUT = buildFloatLUT(`highlights_scale:${highlights}`, (lIdx) => {
+    const L = lIdx / 255
+    return 1 + (highlights / 100) * L * 0.5
+  })
   return (imageData: ImageData): void => {
     const d = imageData.data
     for (let j = 0; j < d.length; j += 4) {
-      const r = d[j]
-      const g = d[j + 1]
-      const b = d[j + 2]
-      const L = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-      const scale = 1 + (highlights / 100) * L * 0.5
-      d[j]     = Math.max(0, Math.min(255, Math.round(r * scale)))
-      d[j + 1] = Math.max(0, Math.min(255, Math.round(g * scale)))
-      d[j + 2] = Math.max(0, Math.min(255, Math.round(b * scale)))
+      const scale = scaleLUT[(77 * d[j] + 150 * d[j + 1] + 29 * d[j + 2]) >> 8]
+      d[j]     = Math.max(0, Math.min(255, Math.round(d[j]     * scale)))
+      d[j + 1] = Math.max(0, Math.min(255, Math.round(d[j + 1] * scale)))
+      d[j + 2] = Math.max(0, Math.min(255, Math.round(d[j + 2] * scale)))
     }
   }
 }
 
 function makeShadowsFilter(shadows: number): (imageData: ImageData) => void {
-  // 0.5 scale factor mirrors highlights — at +100 a pure-black pixel gets 1.5×.
+  // Scale factor precomputed per luminance level — avoids per-pixel float division.
+  const scaleLUT = buildFloatLUT(`shadows_scale:${shadows}`, (lIdx) => {
+    const L = lIdx / 255
+    return 1 + (shadows / 100) * (1 - L) * 0.5
+  })
   return (imageData: ImageData): void => {
     const d = imageData.data
     for (let j = 0; j < d.length; j += 4) {
-      const r = d[j]
-      const g = d[j + 1]
-      const b = d[j + 2]
-      const L = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-      const scale = 1 + (shadows / 100) * (1 - L) * 0.5
-      d[j]     = Math.max(0, Math.min(255, Math.round(r * scale)))
-      d[j + 1] = Math.max(0, Math.min(255, Math.round(g * scale)))
-      d[j + 2] = Math.max(0, Math.min(255, Math.round(b * scale)))
+      const scale = scaleLUT[(77 * d[j] + 150 * d[j + 1] + 29 * d[j + 2]) >> 8]
+      d[j]     = Math.max(0, Math.min(255, Math.round(d[j]     * scale)))
+      d[j + 1] = Math.max(0, Math.min(255, Math.round(d[j + 1] * scale)))
+      d[j + 2] = Math.max(0, Math.min(255, Math.round(d[j + 2] * scale)))
     }
   }
 }
@@ -208,70 +280,68 @@ function makeTintFilter(tint: number): (imageData: ImageData) => void {
 }
 
 function makeSaturationFilter(saturation: number): (imageData: ImageData) => void {
+  const lut = build3DLUT(`sat3d:${saturation}`, (r, g, b) => {
+    const [h, s, l] = rgbToHsl(r, g, b)
+    const sNew = Math.max(0, Math.min(1, s * (1 + saturation / 100)))
+    return hslToRgb(h, sNew, l)
+  })
   return (imageData: ImageData): void => {
     const d = imageData.data
     for (let j = 0; j < d.length; j += 4) {
-      const [h, s, l] = rgbToHsl(d[j], d[j + 1], d[j + 2])
-      const sNew = Math.max(0, Math.min(1, s * (1 + saturation / 100)))
-      const [r, g, b] = hslToRgb(h, sNew, l)
-      d[j]     = r
-      d[j + 1] = g
-      d[j + 2] = b
+      const [ro, go, bo] = sample3DLUT(lut, d[j], d[j + 1], d[j + 2])
+      d[j] = ro; d[j + 1] = go; d[j + 2] = bo
     }
   }
 }
 
 function makeVibranceFilter(vibrance: number): (imageData: ImageData) => void {
+  const lut = build3DLUT(`vib3d:${vibrance}`, (r, g, b) => {
+    const [h, s, l] = rgbToHsl(r, g, b)
+    const sNew = Math.max(0, Math.min(1, s + (vibrance / 100) * (1 - s) * (1 - s)))
+    return hslToRgb(h, sNew, l)
+  })
   return (imageData: ImageData): void => {
     const d = imageData.data
     for (let j = 0; j < d.length; j += 4) {
-      const [h, s, l] = rgbToHsl(d[j], d[j + 1], d[j + 2])
-      const sNew = Math.max(0, Math.min(1, s + (vibrance / 100) * (1 - s) * (1 - s)))
-      const [r, g, b] = hslToRgb(h, sNew, l)
-      d[j]     = r
-      d[j + 1] = g
-      d[j + 2] = b
+      const [ro, go, bo] = sample3DLUT(lut, d[j], d[j + 1], d[j + 2])
+      d[j] = ro; d[j + 1] = go; d[j + 2] = bo
     }
   }
 }
 
 function makeClarityFilter(clarity: number): (imageData: ImageData) => void {
+  // 0.2 × 255 ≈ 51, 0.8 × 255 ≈ 204 — midtone range
+  const scaleLUT = buildFloatLUT(`clarity_scale:${clarity}`, (lIdx) =>
+    lIdx >= 51 && lIdx <= 204 ? 1 + clarity * 0.003 : 1
+  )
   return (imageData: ImageData): void => {
     const d = imageData.data
     for (let j = 0; j < d.length; j += 4) {
-      const r = d[j]
-      const g = d[j + 1]
-      const b = d[j + 2]
-      const L = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-      const scale = L > 0.2 && L < 0.8 ? 1 + clarity * 0.003 : 1
-      d[j]     = Math.max(0, Math.min(255, Math.round(r * scale)))
-      d[j + 1] = Math.max(0, Math.min(255, Math.round(g * scale)))
-      d[j + 2] = Math.max(0, Math.min(255, Math.round(b * scale)))
+      const scale = scaleLUT[(77 * d[j] + 150 * d[j + 1] + 29 * d[j + 2]) >> 8]
+      d[j]     = Math.max(0, Math.min(255, Math.round(d[j]     * scale)))
+      d[j + 1] = Math.max(0, Math.min(255, Math.round(d[j + 1] * scale)))
+      d[j + 2] = Math.max(0, Math.min(255, Math.round(d[j + 2] * scale)))
     }
   }
 }
 
 function makeDehazeFilter(dehaze: number): (imageData: ImageData) => void {
-  // Precompute a contrast LUT at 50% weight of dehaze for the S-curve component
   const contrastWeight = dehaze * 0.5
-  const contrastLUT = buildLUT(`dehaze_contrast:${dehaze}`, (i) =>
-    Math.round(((i / 255 - 0.5) * (1 + contrastWeight / 100) + 0.5) * 255),
-  )
   const satWeight = dehaze * 0.5
+  // Bake contrast S-curve + HSL saturation boost into a single 3D LUT.
+  const combined3DLUT = build3DLUT(`dehaze3d:${dehaze}`, (r, g, b) => {
+    const cr = Math.max(0, Math.min(255, Math.round(((r / 255 - 0.5) * (1 + contrastWeight / 100) + 0.5) * 255)))
+    const cg = Math.max(0, Math.min(255, Math.round(((g / 255 - 0.5) * (1 + contrastWeight / 100) + 0.5) * 255)))
+    const cb = Math.max(0, Math.min(255, Math.round(((b / 255 - 0.5) * (1 + contrastWeight / 100) + 0.5) * 255)))
+    const [h, s, l] = rgbToHsl(cr, cg, cb)
+    const sNew = Math.max(0, Math.min(1, s * (1 + satWeight / 100)))
+    return hslToRgb(h, sNew, l)
+  })
   return (imageData: ImageData): void => {
     const d = imageData.data
     for (let j = 0; j < d.length; j += 4) {
-      // Apply contrast S-curve (50% weight)
-      let r = contrastLUT[d[j]]
-      let g = contrastLUT[d[j + 1]]
-      let b = contrastLUT[d[j + 2]]
-      // Apply saturation boost (50% weight) via HSL
-      const [h, s, l] = rgbToHsl(r, g, b)
-      const sNew = Math.max(0, Math.min(1, s * (1 + satWeight / 100)));
-      [r, g, b] = hslToRgb(h, sNew, l)
-      d[j]     = r
-      d[j + 1] = g
-      d[j + 2] = b
+      const [ro, go, bo] = sample3DLUT(combined3DLUT, d[j], d[j + 1], d[j + 2])
+      d[j] = ro; d[j + 1] = go; d[j + 2] = bo
     }
   }
 }
