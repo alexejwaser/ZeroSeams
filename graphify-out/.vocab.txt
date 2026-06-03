@@ -28,6 +28,7 @@ barrel
 base
 bin
 blacks
+blur
 boundaries
 bounding
 box
@@ -63,6 +64,7 @@ constants
 content
 context
 contrast
+control
 conversion
 convert
 coord
@@ -76,10 +78,12 @@ data
 dbl
 debug
 default
+definition
 dehaze
 delete
 dependencies
 description
+descriptor
 destructive
 dev
 device
@@ -98,6 +102,8 @@ drop
 edit
 editor
 edits
+effect
+effects
 electron
 ellipse
 emit
@@ -116,7 +122,9 @@ failures
 field
 file
 files
+film
 filter
+filters
 fingerprint
 first
 fixture
@@ -134,11 +142,14 @@ generate
 generator
 get
 gradient
+grain
 group
 guide
 guides
+halation
 handler
 harsh
+hex
 highlights
 history
 hold
@@ -238,6 +249,7 @@ package
 panel
 param
 parameters
+params
 past
 path
 paths
@@ -281,6 +293,8 @@ recent
 rect
 redo
 references
+register
+registry
 removal
 remove
 render
@@ -289,7 +303,6 @@ reset
 resize
 resolution
 resolve
-resolved
 restore
 return
 returns
@@ -383,6 +396,7 @@ verify
 version
 vibrance
 viewport
+vignette
 visible
 vite
 vitejs

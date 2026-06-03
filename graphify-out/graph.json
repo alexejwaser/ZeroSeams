@@ -8,7 +8,7 @@
       "file_type": "code",
       "source_file": "tsconfig.node.json",
       "source_location": "L1",
-      "community": 17,
+      "community": 18,
       "norm_label": "tsconfig.node.json",
       "id": "tsconfig_node_json"
     },
@@ -17,7 +17,7 @@
       "file_type": "code",
       "source_file": "tsconfig.node.json",
       "source_location": "L2",
-      "community": 17,
+      "community": 18,
       "norm_label": "compileroptions",
       "id": "zeroseams_tsconfig_node_compileroptions"
     },
@@ -26,7 +26,7 @@
       "file_type": "code",
       "source_file": "tsconfig.node.json",
       "source_location": "L3",
-      "community": 17,
+      "community": 18,
       "norm_label": "composite",
       "id": "zeroseams_tsconfig_node_compileroptions_composite"
     },
@@ -35,7 +35,7 @@
       "file_type": "code",
       "source_file": "tsconfig.node.json",
       "source_location": "L4",
-      "community": 17,
+      "community": 18,
       "norm_label": "noemit",
       "id": "zeroseams_tsconfig_node_compileroptions_noemit"
     },
@@ -44,7 +44,7 @@
       "file_type": "code",
       "source_file": "tsconfig.node.json",
       "source_location": "L5",
-      "community": 17,
+      "community": 18,
       "norm_label": "module",
       "id": "zeroseams_tsconfig_node_compileroptions_module"
     },
@@ -53,7 +53,7 @@
       "file_type": "code",
       "source_file": "tsconfig.node.json",
       "source_location": "L6",
-      "community": 17,
+      "community": 18,
       "norm_label": "moduleresolution",
       "id": "zeroseams_tsconfig_node_compileroptions_moduleresolution"
     },
@@ -62,7 +62,7 @@
       "file_type": "code",
       "source_file": "tsconfig.node.json",
       "source_location": "L7",
-      "community": 17,
+      "community": 18,
       "norm_label": "target",
       "id": "zeroseams_tsconfig_node_compileroptions_target"
     },
@@ -71,7 +71,7 @@
       "file_type": "code",
       "source_file": "tsconfig.node.json",
       "source_location": "L8",
-      "community": 17,
+      "community": 18,
       "norm_label": "strict",
       "id": "zeroseams_tsconfig_node_compileroptions_strict"
     },
@@ -80,7 +80,7 @@
       "file_type": "code",
       "source_file": "tsconfig.node.json",
       "source_location": "L9",
-      "community": 17,
+      "community": 18,
       "norm_label": "nounusedlocals",
       "id": "zeroseams_tsconfig_node_compileroptions_nounusedlocals"
     },
@@ -89,7 +89,7 @@
       "file_type": "code",
       "source_file": "tsconfig.node.json",
       "source_location": "L10",
-      "community": 17,
+      "community": 18,
       "norm_label": "nounusedparameters",
       "id": "zeroseams_tsconfig_node_compileroptions_nounusedparameters"
     },
@@ -98,7 +98,7 @@
       "file_type": "code",
       "source_file": "tsconfig.node.json",
       "source_location": "L11",
-      "community": 17,
+      "community": 18,
       "norm_label": "noimplicitreturns",
       "id": "zeroseams_tsconfig_node_compileroptions_noimplicitreturns"
     },
@@ -107,7 +107,7 @@
       "file_type": "code",
       "source_file": "tsconfig.node.json",
       "source_location": "L12",
-      "community": 17,
+      "community": 18,
       "norm_label": "skiplibcheck",
       "id": "zeroseams_tsconfig_node_compileroptions_skiplibcheck"
     },
@@ -116,7 +116,7 @@
       "file_type": "code",
       "source_file": "tsconfig.node.json",
       "source_location": "L14",
-      "community": 17,
+      "community": 18,
       "norm_label": "include",
       "id": "zeroseams_tsconfig_node_include"
     },
@@ -125,7 +125,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L1",
-      "community": 10,
+      "community": 11,
       "norm_label": "tsconfig.web.json",
       "id": "tsconfig_web_json"
     },
@@ -134,7 +134,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L2",
-      "community": 10,
+      "community": 11,
       "norm_label": "compileroptions",
       "id": "zeroseams_tsconfig_web_compileroptions"
     },
@@ -143,7 +143,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L3",
-      "community": 10,
+      "community": 11,
       "norm_label": "composite",
       "id": "zeroseams_tsconfig_web_compileroptions_composite"
     },
@@ -152,7 +152,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L4",
-      "community": 10,
+      "community": 11,
       "norm_label": "noemit",
       "id": "zeroseams_tsconfig_web_compileroptions_noemit"
     },
@@ -161,7 +161,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L5",
-      "community": 10,
+      "community": 11,
       "norm_label": "module",
       "id": "zeroseams_tsconfig_web_compileroptions_module"
     },
@@ -170,7 +170,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L6",
-      "community": 10,
+      "community": 11,
       "norm_label": "moduleresolution",
       "id": "zeroseams_tsconfig_web_compileroptions_moduleresolution"
     },
@@ -179,7 +179,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L7",
-      "community": 10,
+      "community": 11,
       "norm_label": "target",
       "id": "zeroseams_tsconfig_web_compileroptions_target"
     },
@@ -188,7 +188,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L8",
-      "community": 10,
+      "community": 11,
       "norm_label": "lib",
       "id": "zeroseams_tsconfig_web_compileroptions_lib"
     },
@@ -197,7 +197,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L9",
-      "community": 10,
+      "community": 11,
       "norm_label": "jsx",
       "id": "zeroseams_tsconfig_web_compileroptions_jsx"
     },
@@ -206,7 +206,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L10",
-      "community": 10,
+      "community": 11,
       "norm_label": "strict",
       "id": "zeroseams_tsconfig_web_compileroptions_strict"
     },
@@ -215,7 +215,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L11",
-      "community": 10,
+      "community": 11,
       "norm_label": "nounusedlocals",
       "id": "zeroseams_tsconfig_web_compileroptions_nounusedlocals"
     },
@@ -224,7 +224,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L12",
-      "community": 10,
+      "community": 11,
       "norm_label": "nounusedparameters",
       "id": "zeroseams_tsconfig_web_compileroptions_nounusedparameters"
     },
@@ -233,7 +233,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L13",
-      "community": 10,
+      "community": 11,
       "norm_label": "noimplicitreturns",
       "id": "zeroseams_tsconfig_web_compileroptions_noimplicitreturns"
     },
@@ -242,7 +242,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L14",
-      "community": 10,
+      "community": 11,
       "norm_label": "paths",
       "id": "zeroseams_tsconfig_web_compileroptions_paths"
     },
@@ -251,7 +251,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L15",
-      "community": 10,
+      "community": 11,
       "norm_label": "@/*",
       "id": "zeroseams_tsconfig_web_paths"
     },
@@ -260,7 +260,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L17",
-      "community": 10,
+      "community": 11,
       "norm_label": "skiplibcheck",
       "id": "zeroseams_tsconfig_web_compileroptions_skiplibcheck"
     },
@@ -269,7 +269,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L19",
-      "community": 10,
+      "community": 11,
       "norm_label": "include",
       "id": "zeroseams_tsconfig_web_include"
     },
@@ -278,7 +278,7 @@
       "file_type": "code",
       "source_file": "tsconfig.web.json",
       "source_location": "L20",
-      "community": 10,
+      "community": 11,
       "norm_label": "exclude",
       "id": "zeroseams_tsconfig_web_exclude"
     },
@@ -287,7 +287,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L1",
-      "community": 8,
+      "community": 7,
       "norm_label": "package.json",
       "id": "package_json"
     },
@@ -296,7 +296,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L2",
-      "community": 8,
+      "community": 7,
       "norm_label": "name",
       "id": "zeroseams_package_name"
     },
@@ -305,7 +305,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L3",
-      "community": 8,
+      "community": 7,
       "norm_label": "version",
       "id": "zeroseams_package_version"
     },
@@ -314,7 +314,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L4",
-      "community": 8,
+      "community": 7,
       "norm_label": "description",
       "id": "zeroseams_package_description"
     },
@@ -323,7 +323,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L5",
-      "community": 8,
+      "community": 7,
       "norm_label": "main",
       "id": "zeroseams_package_main"
     },
@@ -332,7 +332,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L6",
-      "community": 8,
+      "community": 7,
       "norm_label": "author",
       "id": "zeroseams_package_author"
     },
@@ -341,7 +341,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L7",
-      "community": 8,
+      "community": 7,
       "norm_label": "license",
       "id": "zeroseams_package_license"
     },
@@ -350,7 +350,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L8",
-      "community": 8,
+      "community": 7,
       "norm_label": "scripts",
       "id": "zeroseams_package_scripts"
     },
@@ -359,7 +359,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L9",
-      "community": 8,
+      "community": 7,
       "norm_label": "dev",
       "id": "zeroseams_package_scripts_dev"
     },
@@ -368,7 +368,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L10",
-      "community": 8,
+      "community": 7,
       "norm_label": "build",
       "id": "zeroseams_package_scripts_build"
     },
@@ -377,7 +377,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L11",
-      "community": 8,
+      "community": 7,
       "norm_label": "preview",
       "id": "zeroseams_package_scripts_preview"
     },
@@ -386,7 +386,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L12",
-      "community": 8,
+      "community": 7,
       "norm_label": "typecheck",
       "id": "zeroseams_package_scripts_typecheck"
     },
@@ -395,7 +395,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L13",
-      "community": 8,
+      "community": 7,
       "norm_label": "lint",
       "id": "zeroseams_package_scripts_lint"
     },
@@ -404,7 +404,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L15",
-      "community": 8,
+      "community": 7,
       "norm_label": "dependencies",
       "id": "zeroseams_package_dependencies"
     },
@@ -413,7 +413,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L16",
-      "community": 8,
+      "community": 7,
       "norm_label": "@imgly/background-removal",
       "id": "zeroseams_package_dependencies_imgly_background_removal"
     },
@@ -422,7 +422,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L17",
-      "community": 8,
+      "community": 7,
       "norm_label": "chokidar",
       "id": "zeroseams_package_dependencies_chokidar"
     },
@@ -431,7 +431,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L18",
-      "community": 8,
+      "community": 7,
       "norm_label": "konva",
       "id": "zeroseams_package_dependencies_konva"
     },
@@ -440,7 +440,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L19",
-      "community": 8,
+      "community": 7,
       "norm_label": "lucide-react",
       "id": "zeroseams_package_dependencies_lucide_react"
     },
@@ -449,7 +449,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L20",
-      "community": 8,
+      "community": 7,
       "norm_label": "onnxruntime-web",
       "id": "zeroseams_package_dependencies_onnxruntime_web"
     },
@@ -458,7 +458,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L21",
-      "community": 8,
+      "community": 7,
       "norm_label": "react",
       "id": "zeroseams_package_dependencies_react"
     },
@@ -467,7 +467,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L22",
-      "community": 8,
+      "community": 7,
       "norm_label": "react-dom",
       "id": "zeroseams_package_dependencies_react_dom"
     },
@@ -476,7 +476,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L23",
-      "community": 8,
+      "community": 7,
       "norm_label": "react-konva",
       "id": "zeroseams_package_dependencies_react_konva"
     },
@@ -485,7 +485,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L24",
-      "community": 8,
+      "community": 7,
       "norm_label": "use-image",
       "id": "zeroseams_package_dependencies_use_image"
     },
@@ -494,7 +494,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L25",
-      "community": 8,
+      "community": 7,
       "norm_label": "zustand",
       "id": "zeroseams_package_dependencies_zustand"
     },
@@ -566,7 +566,7 @@
       "file_type": "code",
       "source_file": "tsconfig.json",
       "source_location": "L1",
-      "community": 24,
+      "community": 25,
       "norm_label": "tsconfig.json",
       "id": "tsconfig_json"
     },
@@ -575,7 +575,7 @@
       "file_type": "code",
       "source_file": "tsconfig.json",
       "source_location": "L2",
-      "community": 24,
+      "community": 25,
       "norm_label": "files",
       "id": "zeroseams_tsconfig_files"
     },
@@ -584,7 +584,7 @@
       "file_type": "code",
       "source_file": "tsconfig.json",
       "source_location": "L3",
-      "community": 24,
+      "community": 25,
       "norm_label": "references",
       "id": "zeroseams_tsconfig_references"
     },
@@ -1196,7 +1196,7 @@
       "file_type": "code",
       "source_file": "scripts/test-axis-lock.mjs",
       "source_location": "L1",
-      "community": 16,
+      "community": 17,
       "norm_label": "test-axis-lock.mjs",
       "id": "scripts_test_axis_lock_mjs"
     },
@@ -1205,7 +1205,7 @@
       "file_type": "code",
       "source_file": "scripts/test-axis-lock.mjs",
       "source_location": "L14",
-      "community": 16,
+      "community": 17,
       "norm_label": "root",
       "id": "scripts_test_axis_lock_root"
     },
@@ -1214,7 +1214,7 @@
       "file_type": "code",
       "source_file": "scripts/test-axis-lock.mjs",
       "source_location": "L20",
-      "community": 16,
+      "community": 17,
       "norm_label": "failures",
       "id": "scripts_test_axis_lock_failures"
     },
@@ -1223,7 +1223,7 @@
       "file_type": "code",
       "source_file": "scripts/test-axis-lock.mjs",
       "source_location": "L22",
-      "community": 16,
+      "community": 17,
       "norm_label": "ok()",
       "id": "scripts_test_axis_lock_ok"
     },
@@ -1232,7 +1232,7 @@
       "file_type": "code",
       "source_file": "scripts/test-axis-lock.mjs",
       "source_location": "L26",
-      "community": 16,
+      "community": 17,
       "norm_label": "near()",
       "id": "scripts_test_axis_lock_near"
     },
@@ -1241,7 +1241,7 @@
       "file_type": "code",
       "source_file": "scripts/test-axis-lock.mjs",
       "source_location": "L39",
-      "community": 16,
+      "community": 17,
       "norm_label": "wait()",
       "id": "scripts_test_axis_lock_wait"
     },
@@ -1250,7 +1250,7 @@
       "file_type": "code",
       "source_file": "scripts/test-axis-lock.mjs",
       "source_location": "L40",
-      "community": 16,
+      "community": 17,
       "norm_label": "ss()",
       "id": "scripts_test_axis_lock_ss"
     },
@@ -1259,7 +1259,7 @@
       "file_type": "code",
       "source_file": "scripts/test-axis-lock.mjs",
       "source_location": "L55",
-      "community": 16,
+      "community": 17,
       "norm_label": "getobjects()",
       "id": "scripts_test_axis_lock_getobjects"
     },
@@ -1268,7 +1268,7 @@
       "file_type": "code",
       "source_file": "scripts/test-axis-lock.mjs",
       "source_location": "L57",
-      "community": 16,
+      "community": 17,
       "norm_label": "getstageinfo()",
       "id": "scripts_test_axis_lock_getstageinfo"
     },
@@ -1277,7 +1277,7 @@
       "file_type": "code",
       "source_file": "scripts/test-axis-lock.mjs",
       "source_location": "L65",
-      "community": 16,
+      "community": 17,
       "norm_label": "k2p()",
       "id": "scripts_test_axis_lock_k2p"
     },
@@ -1286,7 +1286,7 @@
       "file_type": "code",
       "source_file": "scripts/test-axis-lock.mjs",
       "source_location": "L70",
-      "community": 16,
+      "community": 17,
       "norm_label": "resetcanvas()",
       "id": "scripts_test_axis_lock_resetcanvas"
     },
@@ -1295,7 +1295,7 @@
       "file_type": "code",
       "source_file": "scripts/test-axis-lock.mjs",
       "source_location": "L78",
-      "community": 16,
+      "community": 17,
       "norm_label": "addrect()",
       "id": "scripts_test_axis_lock_addrect"
     },
@@ -1304,7 +1304,7 @@
       "file_type": "code",
       "source_file": "scripts/test-axis-lock.mjs",
       "source_location": "L91",
-      "community": 16,
+      "community": 17,
       "norm_label": "clickat()",
       "id": "scripts_test_axis_lock_clickat"
     },
@@ -1313,7 +1313,7 @@
       "file_type": "code",
       "source_file": "scripts/test-axis-lock.mjs",
       "source_location": "L103",
-      "community": 16,
+      "community": 17,
       "norm_label": "drag()",
       "id": "scripts_test_axis_lock_drag"
     },
@@ -1322,7 +1322,7 @@
       "file_type": "code",
       "source_file": "scripts/test-save-path.mjs",
       "source_location": "L1",
-      "community": 12,
+      "community": 13,
       "norm_label": "test-save-path.mjs",
       "id": "scripts_test_save_path_mjs"
     },
@@ -1331,7 +1331,7 @@
       "file_type": "code",
       "source_file": "scripts/test-save-path.mjs",
       "source_location": "L20",
-      "community": 12,
+      "community": 13,
       "norm_label": "root",
       "id": "scripts_test_save_path_root"
     },
@@ -1340,7 +1340,7 @@
       "file_type": "code",
       "source_file": "scripts/test-save-path.mjs",
       "source_location": "L21",
-      "community": 12,
+      "community": 13,
       "norm_label": "electron_bin",
       "id": "scripts_test_save_path_electron_bin"
     },
@@ -1349,7 +1349,7 @@
       "file_type": "code",
       "source_file": "scripts/test-save-path.mjs",
       "source_location": "L27",
-      "community": 12,
+      "community": 13,
       "norm_label": "failures",
       "id": "scripts_test_save_path_failures"
     },
@@ -1358,7 +1358,7 @@
       "file_type": "code",
       "source_file": "scripts/test-save-path.mjs",
       "source_location": "L29",
-      "community": 12,
+      "community": 13,
       "norm_label": "ok()",
       "id": "scripts_test_save_path_ok"
     },
@@ -1367,7 +1367,7 @@
       "file_type": "code",
       "source_file": "scripts/test-save-path.mjs",
       "source_location": "L33",
-      "community": 12,
+      "community": 13,
       "norm_label": "skip()",
       "id": "scripts_test_save_path_skip"
     },
@@ -1376,7 +1376,7 @@
       "file_type": "code",
       "source_file": "scripts/test-save-path.mjs",
       "source_location": "L42",
-      "community": 12,
+      "community": 13,
       "norm_label": "consolelogs",
       "id": "scripts_test_save_path_consolelogs"
     },
@@ -1385,7 +1385,7 @@
       "file_type": "code",
       "source_file": "scripts/test-save-path.mjs",
       "source_location": "L45",
-      "community": 12,
+      "community": 13,
       "norm_label": "ss()",
       "id": "scripts_test_save_path_ss"
     },
@@ -1394,7 +1394,7 @@
       "file_type": "code",
       "source_file": "scripts/test-save-path.mjs",
       "source_location": "L46",
-      "community": 12,
+      "community": 13,
       "norm_label": "wait()",
       "id": "scripts_test_save_path_wait"
     },
@@ -1403,7 +1403,7 @@
       "file_type": "code",
       "source_file": "scripts/test-save-path.mjs",
       "source_location": "L52",
-      "community": 12,
+      "community": 13,
       "norm_label": "getsavestore()",
       "id": "scripts_test_save_path_getsavestore"
     },
@@ -1412,7 +1412,7 @@
       "file_type": "code",
       "source_file": "scripts/test-save-path.mjs",
       "source_location": "L57",
-      "community": 12,
+      "community": 13,
       "norm_label": "setcurrentfilepath()",
       "id": "scripts_test_save_path_setcurrentfilepath"
     },
@@ -1421,7 +1421,7 @@
       "file_type": "code",
       "source_file": "scripts/test-save-path.mjs",
       "source_location": "L61",
-      "community": 12,
+      "community": 13,
       "norm_label": "triggercanvaschange()",
       "id": "scripts_test_save_path_triggercanvaschange"
     },
@@ -1430,7 +1430,7 @@
       "file_type": "code",
       "source_file": "scripts/test-save-path.mjs",
       "source_location": "L88",
-      "community": 12,
+      "community": 13,
       "norm_label": "mocksavedialog()",
       "id": "scripts_test_save_path_mocksavedialog"
     },
@@ -1439,7 +1439,7 @@
       "file_type": "code",
       "source_file": "scripts/test-save-path.mjs",
       "source_location": "L94",
-      "community": 12,
+      "community": 13,
       "norm_label": "restoredialog()",
       "id": "scripts_test_save_path_restoredialog"
     },
@@ -1448,7 +1448,7 @@
       "file_type": "code",
       "source_file": "scripts/test-save-path.mjs",
       "source_location": "L113",
-      "community": 12,
+      "community": 13,
       "norm_label": "testfile",
       "id": "scripts_test_save_path_testfile"
     },
@@ -1457,7 +1457,7 @@
       "file_type": "code",
       "source_file": "scripts/test-save-path.mjs",
       "source_location": "L127",
-      "community": 12,
+      "community": 13,
       "norm_label": "content",
       "id": "scripts_test_save_path_content"
     },
@@ -1466,7 +1466,7 @@
       "file_type": "code",
       "source_file": "scripts/test-save-path.mjs",
       "source_location": "L202",
-      "community": 12,
+      "community": 13,
       "norm_label": "existingpath",
       "id": "scripts_test_save_path_existingpath"
     },
@@ -1529,7 +1529,7 @@
       "file_type": "code",
       "source_file": "src/main.tsx",
       "source_location": "L1",
-      "community": 18,
+      "community": 19,
       "norm_label": "main.tsx",
       "id": "src_main_tsx"
     },
@@ -1538,7 +1538,7 @@
       "file_type": "code",
       "source_file": "src/main.tsx",
       "source_location": "L7",
-      "community": 18,
+      "community": 19,
       "norm_label": "app()",
       "id": "src_main_app"
     },
@@ -1547,7 +1547,7 @@
       "file_type": "code",
       "source_file": "src/main.tsx",
       "source_location": "L62",
-      "community": 18,
+      "community": 19,
       "norm_label": "rootel",
       "id": "src_main_rootel"
     },
@@ -1556,7 +1556,7 @@
       "file_type": "code",
       "source_file": "src/ui/FrameSettingsPopover.tsx",
       "source_location": "L1",
-      "community": 19,
+      "community": 20,
       "norm_label": "framesettingspopover.tsx",
       "id": "src_ui_framesettingspopover_tsx"
     },
@@ -1565,7 +1565,7 @@
       "file_type": "code",
       "source_file": "src/ui/FrameSettingsPopover.tsx",
       "source_location": "L5",
-      "community": 19,
+      "community": 20,
       "norm_label": "framesettingspopoverprops",
       "id": "ui_framesettingspopover_framesettingspopoverprops"
     },
@@ -1574,7 +1574,7 @@
       "file_type": "code",
       "source_file": "src/ui/FrameSettingsPopover.tsx",
       "source_location": "L9",
-      "community": 19,
+      "community": 20,
       "norm_label": "platform_labels",
       "id": "ui_framesettingspopover_platform_labels"
     },
@@ -1583,7 +1583,7 @@
       "file_type": "code",
       "source_file": "src/ui/FrameSettingsPopover.tsx",
       "source_location": "L17",
-      "community": 19,
+      "community": 20,
       "norm_label": "platforms",
       "id": "ui_framesettingspopover_platforms"
     },
@@ -1592,7 +1592,7 @@
       "file_type": "code",
       "source_file": "src/ui/FrameSettingsPopover.tsx",
       "source_location": "L19",
-      "community": 19,
+      "community": 20,
       "norm_label": "segmentbuttonstyle()",
       "id": "ui_framesettingspopover_segmentbuttonstyle"
     },
@@ -1601,7 +1601,7 @@
       "file_type": "code",
       "source_file": "src/ui/FrameSettingsPopover.tsx",
       "source_location": "L35",
-      "community": 19,
+      "community": 20,
       "norm_label": "numberinputstyle",
       "id": "ui_framesettingspopover_numberinputstyle"
     },
@@ -1610,7 +1610,7 @@
       "file_type": "code",
       "source_file": "src/ui/FrameSettingsPopover.tsx",
       "source_location": "L48",
-      "community": 19,
+      "community": 20,
       "norm_label": "labelstyle",
       "id": "ui_framesettingspopover_labelstyle"
     },
@@ -1619,7 +1619,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L1",
-      "community": 5,
+      "community": 6,
       "norm_label": "propertiespanel.tsx",
       "id": "src_ui_propertiespanel_tsx"
     },
@@ -1628,7 +1628,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L32",
-      "community": 5,
+      "community": 6,
       "norm_label": "rotatearoundcenter()",
       "id": "ui_propertiespanel_rotatearoundcenter"
     },
@@ -1637,7 +1637,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L52",
-      "community": 5,
+      "community": 6,
       "norm_label": "numinputstyle()",
       "id": "ui_propertiespanel_numinputstyle"
     },
@@ -1646,7 +1646,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L67",
-      "community": 5,
+      "community": 6,
       "norm_label": "numberfieldprops",
       "id": "ui_propertiespanel_numberfieldprops"
     },
@@ -1655,7 +1655,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L76",
-      "community": 5,
+      "community": 6,
       "norm_label": "numberfield()",
       "id": "ui_propertiespanel_numberfield"
     },
@@ -1664,7 +1664,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L137",
-      "community": 5,
+      "community": 6,
       "norm_label": "mixednumberfieldprops",
       "id": "ui_propertiespanel_mixednumberfieldprops"
     },
@@ -1673,7 +1673,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L146",
-      "community": 5,
+      "community": 6,
       "norm_label": "mixednumberfield()",
       "id": "ui_propertiespanel_mixednumberfield"
     },
@@ -1682,7 +1682,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L215",
-      "community": 5,
+      "community": 6,
       "norm_label": "colorinput()",
       "id": "ui_propertiespanel_colorinput"
     },
@@ -1691,7 +1691,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L298",
-      "community": 5,
+      "community": 6,
       "norm_label": "mixedcolorinput()",
       "id": "ui_propertiespanel_mixedcolorinput"
     },
@@ -1700,7 +1700,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L396",
-      "community": 5,
+      "community": 6,
       "norm_label": "sectionlabelstyle",
       "id": "ui_propertiespanel_sectionlabelstyle"
     },
@@ -1709,7 +1709,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L406",
-      "community": 5,
+      "community": 6,
       "norm_label": "alignbuttonstyle()",
       "id": "ui_propertiespanel_alignbuttonstyle"
     },
@@ -1718,7 +1718,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L418",
-      "community": 5,
+      "community": 6,
       "norm_label": "distributebuttonstyle()",
       "id": "ui_propertiespanel_distributebuttonstyle"
     },
@@ -1727,7 +1727,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L444",
-      "community": 5,
+      "community": 6,
       "norm_label": "aligndistributesection()",
       "id": "ui_propertiespanel_aligndistributesection"
     },
@@ -1736,7 +1736,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L571",
-      "community": 5,
+      "community": 6,
       "norm_label": "canvassection()",
       "id": "ui_propertiespanel_canvassection"
     },
@@ -1745,7 +1745,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L583",
-      "community": 5,
+      "community": 6,
       "norm_label": "textsectionprops",
       "id": "ui_propertiespanel_textsectionprops"
     },
@@ -1754,7 +1754,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L591",
-      "community": 5,
+      "community": 6,
       "norm_label": "textsection()",
       "id": "ui_propertiespanel_textsection"
     },
@@ -1763,7 +1763,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L879",
-      "community": 5,
+      "community": 6,
       "norm_label": "adjustmentssectionprops",
       "id": "ui_propertiespanel_adjustmentssectionprops"
     },
@@ -1772,7 +1772,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L888",
-      "community": 5,
+      "community": 6,
       "norm_label": "subgrouplabelstyle",
       "id": "ui_propertiespanel_subgrouplabelstyle"
     },
@@ -1781,7 +1781,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L898",
-      "community": 5,
+      "community": 6,
       "norm_label": "track_gradient",
       "id": "ui_propertiespanel_track_gradient"
     },
@@ -1790,7 +1790,7 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L913",
-      "community": 5,
+      "community": 15,
       "norm_label": "adjustmentssection()",
       "id": "ui_propertiespanel_adjustmentssection"
     },
@@ -1799,7 +1799,7 @@
       "file_type": "code",
       "source_file": "src/ui/FontPicker.tsx",
       "source_location": "L1",
-      "community": 5,
+      "community": 6,
       "norm_label": "fontpicker.tsx",
       "id": "src_ui_fontpicker_tsx"
     },
@@ -1808,7 +1808,7 @@
       "file_type": "code",
       "source_file": "src/ui/FontPicker.tsx",
       "source_location": "L3",
-      "community": 5,
+      "community": 6,
       "norm_label": "mac_system_fonts",
       "id": "ui_fontpicker_mac_system_fonts"
     },
@@ -1862,7 +1862,7 @@
       "file_type": "code",
       "source_file": "src/ui/LayerPanel.tsx",
       "source_location": "L1",
-      "community": 20,
+      "community": 21,
       "norm_label": "layerpanel.tsx",
       "id": "src_ui_layerpanel_tsx"
     },
@@ -1871,7 +1871,7 @@
       "file_type": "code",
       "source_file": "src/ui/LayerPanel.tsx",
       "source_location": "L8",
-      "community": 20,
+      "community": 21,
       "norm_label": "typelabel()",
       "id": "ui_layerpanel_typelabel"
     },
@@ -1880,7 +1880,7 @@
       "file_type": "code",
       "source_file": "src/ui/Tooltip.tsx",
       "source_location": "L1",
-      "community": 20,
+      "community": 21,
       "norm_label": "tooltip.tsx",
       "id": "src_ui_tooltip_tsx"
     },
@@ -1889,7 +1889,7 @@
       "file_type": "code",
       "source_file": "src/ui/Tooltip.tsx",
       "source_location": "L4",
-      "community": 20,
+      "community": 21,
       "norm_label": "tooltipprops",
       "id": "ui_tooltip_tooltipprops"
     },
@@ -1898,7 +1898,7 @@
       "file_type": "code",
       "source_file": "src/ui/Tooltip.tsx",
       "source_location": "L16",
-      "community": 20,
+      "community": 21,
       "norm_label": "tooltip()",
       "id": "ui_tooltip_tooltip"
     },
@@ -1907,7 +1907,7 @@
       "file_type": "code",
       "source_file": "src/ui/Tooltip.tsx",
       "source_location": "L40",
-      "community": 20,
+      "community": 21,
       "norm_label": "tooltipinner()",
       "id": "ui_tooltip_tooltipinner"
     },
@@ -1916,7 +1916,7 @@
       "file_type": "code",
       "source_file": "src/ui/ContextMenu.tsx",
       "source_location": "L1",
-      "community": 13,
+      "community": 12,
       "norm_label": "contextmenu.tsx",
       "id": "src_ui_contextmenu_tsx"
     },
@@ -1925,7 +1925,7 @@
       "file_type": "code",
       "source_file": "src/ui/ContextMenu.tsx",
       "source_location": "L10",
-      "community": 13,
+      "community": 12,
       "norm_label": "menuitemprops",
       "id": "ui_contextmenu_menuitemprops"
     },
@@ -1934,7 +1934,7 @@
       "file_type": "code",
       "source_file": "src/ui/ContextMenu.tsx",
       "source_location": "L17",
-      "community": 13,
+      "community": 12,
       "norm_label": "menuitem()",
       "id": "ui_contextmenu_menuitem"
     },
@@ -1943,7 +1943,7 @@
       "file_type": "code",
       "source_file": "src/ui/ContextMenu.tsx",
       "source_location": "L59",
-      "community": 13,
+      "community": 12,
       "norm_label": "divider()",
       "id": "ui_contextmenu_divider"
     },
@@ -2006,7 +2006,7 @@
       "file_type": "code",
       "source_file": "src/types/project.ts",
       "source_location": "L1",
-      "community": 2,
+      "community": 3,
       "norm_label": "project.ts",
       "id": "src_types_project_ts"
     },
@@ -2015,7 +2015,7 @@
       "file_type": "code",
       "source_file": "src/types/project.ts",
       "source_location": "L5",
-      "community": 2,
+      "community": 3,
       "norm_label": "platform",
       "id": "types_project_platform"
     },
@@ -2024,7 +2024,7 @@
       "file_type": "code",
       "source_file": "src/types/project.ts",
       "source_location": "L7",
-      "community": 2,
+      "community": 3,
       "norm_label": "frameratio",
       "id": "types_project_frameratio"
     },
@@ -2033,7 +2033,7 @@
       "file_type": "code",
       "source_file": "src/types/project.ts",
       "source_location": "L10",
-      "community": 2,
+      "community": 3,
       "norm_label": "framedimensions",
       "id": "types_project_framedimensions"
     },
@@ -2042,7 +2042,7 @@
       "file_type": "code",
       "source_file": "src/types/project.ts",
       "source_location": "L16",
-      "community": 2,
+      "community": 3,
       "norm_label": "frame",
       "id": "types_project_frame"
     },
@@ -2051,7 +2051,7 @@
       "file_type": "code",
       "source_file": "src/types/project.ts",
       "source_location": "L25",
-      "community": 2,
+      "community": 3,
       "norm_label": "carouselproject",
       "id": "types_project_carouselproject"
     },
@@ -2060,7 +2060,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L1",
-      "community": 2,
+      "community": 3,
       "norm_label": "canvas.ts",
       "id": "src_types_canvas_ts"
     },
@@ -2069,7 +2069,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L6",
-      "community": 2,
+      "community": 3,
       "norm_label": "canvasobjectscope",
       "id": "types_canvas_canvasobjectscope"
     },
@@ -2078,7 +2078,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L10",
-      "community": 2,
+      "community": 3,
       "norm_label": "basecanvasobject",
       "id": "types_canvas_basecanvasobject"
     },
@@ -2087,7 +2087,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L38",
-      "community": 2,
+      "community": 3,
       "norm_label": "imageobject",
       "id": "types_canvas_imageobject"
     },
@@ -2096,7 +2096,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L81",
-      "community": 2,
+      "community": 3,
       "norm_label": "maskdata",
       "id": "types_canvas_maskdata"
     },
@@ -2105,7 +2105,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L95",
-      "community": 7,
+      "community": 3,
       "norm_label": "photoadjustments",
       "id": "types_canvas_photoadjustments"
     },
@@ -2114,7 +2114,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L113",
-      "community": 7,
+      "community": 3,
       "norm_label": "default_adjustments",
       "id": "types_canvas_default_adjustments"
     },
@@ -2123,7 +2123,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L120",
-      "community": 2,
+      "community": 3,
       "norm_label": "fontstyle",
       "id": "types_canvas_fontstyle"
     },
@@ -2132,7 +2132,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L123",
-      "community": 2,
+      "community": 3,
       "norm_label": "textspanstyle",
       "id": "types_canvas_textspanstyle"
     },
@@ -2141,7 +2141,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L132",
-      "community": 2,
+      "community": 3,
       "norm_label": "textspan",
       "id": "types_canvas_textspan"
     },
@@ -2150,7 +2150,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L137",
-      "community": 2,
+      "community": 3,
       "norm_label": "textobject",
       "id": "types_canvas_textobject"
     },
@@ -2159,7 +2159,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L153",
-      "community": 2,
+      "community": 3,
       "norm_label": "shapekind",
       "id": "types_canvas_shapekind"
     },
@@ -2168,7 +2168,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L155",
-      "community": 2,
+      "community": 3,
       "norm_label": "shapeobject",
       "id": "types_canvas_shapeobject"
     },
@@ -2177,7 +2177,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L166",
-      "community": 2,
+      "community": 3,
       "norm_label": "anchorpoint",
       "id": "types_canvas_anchorpoint"
     },
@@ -2186,7 +2186,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L173",
-      "community": 2,
+      "community": 3,
       "norm_label": "pathobject",
       "id": "types_canvas_pathobject"
     },
@@ -2195,7 +2195,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L183",
-      "community": 2,
+      "community": 3,
       "norm_label": "groupobject",
       "id": "types_canvas_groupobject"
     },
@@ -2204,7 +2204,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L188",
-      "community": 2,
+      "community": 3,
       "norm_label": "canvasobject",
       "id": "types_canvas_canvasobject"
     },
@@ -2213,7 +2213,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.d.ts",
       "source_location": "L1",
-      "community": 14,
+      "community": 16,
       "norm_label": "canvas.d.ts",
       "id": "src_types_canvas_d_ts"
     },
@@ -2222,7 +2222,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.d.ts",
       "source_location": "L2",
-      "community": 14,
+      "community": 16,
       "norm_label": "canvasobjectscope",
       "id": "types_canvas_d_canvasobjectscope"
     },
@@ -2231,7 +2231,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.d.ts",
       "source_location": "L3",
-      "community": 14,
+      "community": 16,
       "norm_label": "basecanvasobject",
       "id": "types_canvas_d_basecanvasobject"
     },
@@ -2240,7 +2240,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.d.ts",
       "source_location": "L23",
-      "community": 14,
+      "community": 16,
       "norm_label": "imageobject",
       "id": "types_canvas_d_imageobject"
     },
@@ -2249,7 +2249,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.d.ts",
       "source_location": "L50",
-      "community": 14,
+      "community": 16,
       "norm_label": "maskdata",
       "id": "types_canvas_d_maskdata"
     },
@@ -2258,7 +2258,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.d.ts",
       "source_location": "L60",
-      "community": 14,
+      "community": 16,
       "norm_label": "photoadjustments",
       "id": "types_canvas_d_photoadjustments"
     },
@@ -2267,7 +2267,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.d.ts",
       "source_location": "L75",
-      "community": 14,
+      "community": 16,
       "norm_label": "fontstyle",
       "id": "types_canvas_d_fontstyle"
     },
@@ -2276,7 +2276,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.d.ts",
       "source_location": "L77",
-      "community": 14,
+      "community": 16,
       "norm_label": "textspanstyle",
       "id": "types_canvas_d_textspanstyle"
     },
@@ -2285,7 +2285,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.d.ts",
       "source_location": "L85",
-      "community": 14,
+      "community": 16,
       "norm_label": "textspan",
       "id": "types_canvas_d_textspan"
     },
@@ -2294,7 +2294,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.d.ts",
       "source_location": "L89",
-      "community": 14,
+      "community": 16,
       "norm_label": "textobject",
       "id": "types_canvas_d_textobject"
     },
@@ -2303,7 +2303,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.d.ts",
       "source_location": "L100",
-      "community": 14,
+      "community": 16,
       "norm_label": "shapekind",
       "id": "types_canvas_d_shapekind"
     },
@@ -2312,7 +2312,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.d.ts",
       "source_location": "L101",
-      "community": 14,
+      "community": 16,
       "norm_label": "shapeobject",
       "id": "types_canvas_d_shapeobject"
     },
@@ -2321,7 +2321,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.d.ts",
       "source_location": "L111",
-      "community": 14,
+      "community": 16,
       "norm_label": "anchorpoint",
       "id": "types_canvas_d_anchorpoint"
     },
@@ -2330,7 +2330,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.d.ts",
       "source_location": "L123",
-      "community": 14,
+      "community": 16,
       "norm_label": "pathobject",
       "id": "types_canvas_d_pathobject"
     },
@@ -2339,7 +2339,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.d.ts",
       "source_location": "L132",
-      "community": 14,
+      "community": 16,
       "norm_label": "groupobject",
       "id": "types_canvas_d_groupobject"
     },
@@ -2348,7 +2348,7 @@
       "file_type": "code",
       "source_file": "src/types/canvas.d.ts",
       "source_location": "L136",
-      "community": 14,
+      "community": 16,
       "norm_label": "canvasobject",
       "id": "types_canvas_d_canvasobject"
     },
@@ -2357,7 +2357,7 @@
       "file_type": "code",
       "source_file": "src/types/project.d.ts",
       "source_location": "L1",
-      "community": 2,
+      "community": 3,
       "norm_label": "project.d.ts",
       "id": "src_types_project_d_ts"
     },
@@ -2366,7 +2366,7 @@
       "file_type": "code",
       "source_file": "src/types/project.d.ts",
       "source_location": "L2",
-      "community": 2,
+      "community": 3,
       "norm_label": "platform",
       "id": "types_project_d_platform"
     },
@@ -2375,7 +2375,7 @@
       "file_type": "code",
       "source_file": "src/types/project.d.ts",
       "source_location": "L3",
-      "community": 2,
+      "community": 3,
       "norm_label": "frameratio",
       "id": "types_project_d_frameratio"
     },
@@ -2384,7 +2384,7 @@
       "file_type": "code",
       "source_file": "src/types/project.d.ts",
       "source_location": "L5",
-      "community": 2,
+      "community": 3,
       "norm_label": "framedimensions",
       "id": "types_project_d_framedimensions"
     },
@@ -2393,7 +2393,7 @@
       "file_type": "code",
       "source_file": "src/types/project.d.ts",
       "source_location": "L10",
-      "community": 2,
+      "community": 3,
       "norm_label": "frame",
       "id": "types_project_d_frame"
     },
@@ -2402,7 +2402,7 @@
       "file_type": "code",
       "source_file": "src/types/project.d.ts",
       "source_location": "L18",
-      "community": 2,
+      "community": 3,
       "norm_label": "carouselproject",
       "id": "types_project_d_carouselproject"
     },
@@ -2411,7 +2411,7 @@
       "file_type": "code",
       "source_file": "src/types/electron.d.ts",
       "source_location": "L1",
-      "community": 23,
+      "community": 24,
       "norm_label": "electron.d.ts",
       "id": "src_types_electron_d_ts"
     },
@@ -2420,7 +2420,7 @@
       "file_type": "code",
       "source_file": "src/types/electron.d.ts",
       "source_location": "L1",
-      "community": 23,
+      "community": 24,
       "norm_label": "externaleditor",
       "id": "types_electron_d_externaleditor"
     },
@@ -2429,7 +2429,7 @@
       "file_type": "code",
       "source_file": "src/types/electron.d.ts",
       "source_location": "L6",
-      "community": 23,
+      "community": 24,
       "norm_label": "window",
       "id": "types_electron_d_window"
     },
@@ -2438,7 +2438,7 @@
       "file_type": "code",
       "source_file": "src/types/ai.ts",
       "source_location": "L1",
-      "community": 2,
+      "community": 3,
       "norm_label": "ai.ts",
       "id": "src_types_ai_ts"
     },
@@ -2447,7 +2447,7 @@
       "file_type": "code",
       "source_file": "src/types/ai.ts",
       "source_location": "L9",
-      "community": 2,
+      "community": 3,
       "norm_label": "aioperationstatus",
       "id": "types_ai_aioperationstatus"
     },
@@ -2456,7 +2456,7 @@
       "file_type": "code",
       "source_file": "src/types/ai.ts",
       "source_location": "L16",
-      "community": 2,
+      "community": 3,
       "norm_label": "aioperationbase",
       "id": "types_ai_aioperationbase"
     },
@@ -2465,7 +2465,7 @@
       "file_type": "code",
       "source_file": "src/types/ai.ts",
       "source_location": "L34",
-      "community": 2,
+      "community": 3,
       "norm_label": "backgroundremovaloperation",
       "id": "types_ai_backgroundremovaloperation"
     },
@@ -2474,7 +2474,7 @@
       "file_type": "code",
       "source_file": "src/types/ai.ts",
       "source_location": "L40",
-      "community": 2,
+      "community": 3,
       "norm_label": "segmentationoperation",
       "id": "types_ai_segmentationoperation"
     },
@@ -2483,7 +2483,7 @@
       "file_type": "code",
       "source_file": "src/types/ai.ts",
       "source_location": "L48",
-      "community": 2,
+      "community": 3,
       "norm_label": "inpaintingoperation",
       "id": "types_ai_inpaintingoperation"
     },
@@ -2492,7 +2492,7 @@
       "file_type": "code",
       "source_file": "src/types/ai.ts",
       "source_location": "L56",
-      "community": 2,
+      "community": 3,
       "norm_label": "aioperation",
       "id": "types_ai_aioperation"
     },
@@ -2501,7 +2501,7 @@
       "file_type": "code",
       "source_file": "src/types/index.ts",
       "source_location": "L1",
-      "community": 2,
+      "community": 3,
       "norm_label": "index.ts",
       "id": "src_types_index_ts"
     },
@@ -2510,7 +2510,7 @@
       "file_type": "code",
       "source_file": "src/types/index.d.ts",
       "source_location": "L1",
-      "community": 2,
+      "community": 3,
       "norm_label": "index.d.ts",
       "id": "src_types_index_d_ts"
     },
@@ -2546,7 +2546,7 @@
       "file_type": "code",
       "source_file": "src/canvas/useAutosave.ts",
       "source_location": "L1",
-      "community": 15,
+      "community": 0,
       "norm_label": "useautosave.ts",
       "id": "src_canvas_useautosave_ts"
     },
@@ -2807,7 +2807,7 @@
       "file_type": "code",
       "source_file": "src/canvas/useExternalEdit.ts",
       "source_location": "L1",
-      "community": 0,
+      "community": 14,
       "norm_label": "useexternaledit.ts",
       "id": "src_canvas_useexternaledit_ts"
     },
@@ -2816,7 +2816,7 @@
       "file_type": "code",
       "source_file": "src/canvas/exportFrames.ts",
       "source_location": "L1",
-      "community": 0,
+      "community": 14,
       "norm_label": "exportframes.ts",
       "id": "src_canvas_exportframes_ts"
     },
@@ -2825,7 +2825,7 @@
       "file_type": "code",
       "source_file": "src/canvas/exportFrames.ts",
       "source_location": "L105",
-      "community": 0,
+      "community": 14,
       "norm_label": "downloadframes()",
       "id": "canvas_exportframes_downloadframes"
     },
@@ -3068,7 +3068,7 @@
       "file_type": "code",
       "source_file": "src/canvas/useCanvasStore.d.ts",
       "source_location": "L1",
-      "community": 21,
+      "community": 23,
       "norm_label": "usecanvasstore.d.ts",
       "id": "src_canvas_usecanvasstore_d_ts"
     },
@@ -3077,7 +3077,7 @@
       "file_type": "code",
       "source_file": "src/canvas/useCanvasStore.d.ts",
       "source_location": "L9",
-      "community": 21,
+      "community": 23,
       "norm_label": "historysnapshot",
       "id": "canvas_usecanvasstore_d_historysnapshot"
     },
@@ -3086,7 +3086,7 @@
       "file_type": "code",
       "source_file": "src/canvas/useCanvasStore.d.ts",
       "source_location": "L10",
-      "community": 21,
+      "community": 23,
       "norm_label": "canvasstate",
       "id": "canvas_usecanvasstore_d_canvasstate"
     },
@@ -3140,7 +3140,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L1",
-      "community": 7,
+      "community": 8,
       "norm_label": "pipeline.ts",
       "id": "src_canvas_adjustments_pipeline_ts"
     },
@@ -3149,7 +3149,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L8",
-      "community": 7,
+      "community": 8,
       "norm_label": "lutcache",
       "id": "adjustments_pipeline_lutcache"
     },
@@ -3158,7 +3158,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L10",
-      "community": 7,
+      "community": 8,
       "norm_label": "buildlut()",
       "id": "adjustments_pipeline_buildlut"
     },
@@ -3167,7 +3167,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L22",
-      "community": 7,
+      "community": 8,
       "norm_label": "rgbtohsl()",
       "id": "adjustments_pipeline_rgbtohsl"
     },
@@ -3176,7 +3176,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L39",
-      "community": 7,
+      "community": 8,
       "norm_label": "hsltorgb()",
       "id": "adjustments_pipeline_hsltorgb"
     },
@@ -3185,7 +3185,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L65",
-      "community": 7,
+      "community": 8,
       "norm_label": "isalldefault()",
       "id": "adjustments_pipeline_isalldefault"
     },
@@ -3194,7 +3194,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L75",
-      "community": 7,
+      "community": 8,
       "norm_label": "makeexposurefilter()",
       "id": "adjustments_pipeline_makeexposurefilter"
     },
@@ -3203,7 +3203,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L95",
-      "community": 7,
+      "community": 8,
       "norm_label": "makecontrastfilter()",
       "id": "adjustments_pipeline_makecontrastfilter"
     },
@@ -3212,7 +3212,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L111",
-      "community": 7,
+      "community": 8,
       "norm_label": "makewhitesfilter()",
       "id": "adjustments_pipeline_makewhitesfilter"
     },
@@ -3221,7 +3221,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L130",
-      "community": 7,
+      "community": 8,
       "norm_label": "makeblacksfilter()",
       "id": "adjustments_pipeline_makeblacksfilter"
     },
@@ -3230,7 +3230,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L149",
-      "community": 7,
+      "community": 8,
       "norm_label": "makehighlightsfilter()",
       "id": "adjustments_pipeline_makehighlightsfilter"
     },
@@ -3239,7 +3239,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L167",
-      "community": 7,
+      "community": 8,
       "norm_label": "makeshadowsfilter()",
       "id": "adjustments_pipeline_makeshadowsfilter"
     },
@@ -3248,7 +3248,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L184",
-      "community": 7,
+      "community": 8,
       "norm_label": "maketemperaturefilter()",
       "id": "adjustments_pipeline_maketemperaturefilter"
     },
@@ -3257,7 +3257,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L196",
-      "community": 7,
+      "community": 8,
       "norm_label": "maketintfilter()",
       "id": "adjustments_pipeline_maketintfilter"
     },
@@ -3266,7 +3266,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L210",
-      "community": 7,
+      "community": 8,
       "norm_label": "makesaturationfilter()",
       "id": "adjustments_pipeline_makesaturationfilter"
     },
@@ -3275,7 +3275,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L224",
-      "community": 7,
+      "community": 8,
       "norm_label": "makevibrancefilter()",
       "id": "adjustments_pipeline_makevibrancefilter"
     },
@@ -3284,7 +3284,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L238",
-      "community": 7,
+      "community": 8,
       "norm_label": "makeclarityfilter()",
       "id": "adjustments_pipeline_makeclarityfilter"
     },
@@ -3293,7 +3293,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L254",
-      "community": 7,
+      "community": 8,
       "norm_label": "makedehazefilter()",
       "id": "adjustments_pipeline_makedehazefilter"
     },
@@ -3302,7 +3302,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L283",
-      "community": 7,
+      "community": 8,
       "norm_label": "buildfilterpipeline()",
       "id": "adjustments_pipeline_buildfilterpipeline"
     },
@@ -3311,7 +3311,7 @@
       "file_type": "code",
       "source_file": "src/ai/useBackgroundRemoval.ts",
       "source_location": "L1",
-      "community": 13,
+      "community": 12,
       "norm_label": "usebackgroundremoval.ts",
       "id": "src_ai_usebackgroundremoval_ts"
     },
@@ -3320,7 +3320,7 @@
       "file_type": "code",
       "source_file": "src/ai/useBackgroundRemoval.ts",
       "source_location": "L7",
-      "community": 13,
+      "community": 12,
       "norm_label": "usebackgroundremovalreturn",
       "id": "ai_usebackgroundremoval_usebackgroundremovalreturn"
     },
@@ -3329,7 +3329,7 @@
       "file_type": "code",
       "source_file": "src/ai/useAIStore.ts",
       "source_location": "L1",
-      "community": 13,
+      "community": 12,
       "norm_label": "useaistore.ts",
       "id": "src_ai_useaistore_ts"
     },
@@ -3338,7 +3338,7 @@
       "file_type": "code",
       "source_file": "src/ai/useAIStore.ts",
       "source_location": "L4",
-      "community": 13,
+      "community": 12,
       "norm_label": "aistorestate",
       "id": "ai_useaistore_aistorestate"
     },
@@ -3347,7 +3347,7 @@
       "file_type": "code",
       "source_file": "src/ai/useAIStore.ts",
       "source_location": "L10",
-      "community": 13,
+      "community": 12,
       "norm_label": "useaistore",
       "id": "ai_useaistore_useaistore"
     },
@@ -3356,7 +3356,7 @@
       "file_type": "code",
       "source_file": "src/ai/AIContext.tsx",
       "source_location": "L1",
-      "community": 13,
+      "community": 12,
       "norm_label": "aicontext.tsx",
       "id": "src_ai_aicontext_tsx"
     },
@@ -3365,7 +3365,7 @@
       "file_type": "code",
       "source_file": "src/ai/AIContext.tsx",
       "source_location": "L4",
-      "community": 13,
+      "community": 12,
       "norm_label": "aicontextvalue",
       "id": "ai_aicontext_aicontextvalue"
     },
@@ -3374,7 +3374,7 @@
       "file_type": "code",
       "source_file": "src/ai/AIContext.tsx",
       "source_location": "L9",
-      "community": 13,
+      "community": 12,
       "norm_label": "aicontext",
       "id": "ai_aicontext_aicontext"
     },
@@ -3383,7 +3383,7 @@
       "file_type": "code",
       "source_file": "src/ai/AIContext.tsx",
       "source_location": "L11",
-      "community": 13,
+      "community": 12,
       "norm_label": "useai()",
       "id": "ai_aicontext_useai"
     },
@@ -3392,7 +3392,7 @@
       "file_type": "code",
       "source_file": "src/ai/index.ts",
       "source_location": "L1",
-      "community": 13,
+      "community": 12,
       "norm_label": "index.ts",
       "id": "src_ai_index_ts"
     },
@@ -3401,7 +3401,7 @@
       "file_type": "code",
       "source_file": "src/ai/AIProvider.tsx",
       "source_location": "L1",
-      "community": 13,
+      "community": 12,
       "norm_label": "aiprovider.tsx",
       "id": "src_ai_aiprovider_tsx"
     },
@@ -3410,7 +3410,7 @@
       "file_type": "code",
       "source_file": "src/electron/preload.ts",
       "source_location": "L1",
-      "community": 30,
+      "community": 31,
       "norm_label": "preload.ts",
       "id": "src_electron_preload_ts"
     },
@@ -3419,7 +3419,7 @@
       "file_type": "code",
       "source_file": "src/electron/preload.ts",
       "source_location": "L41",
-      "community": 30,
+      "community": 31,
       "norm_label": "handler()",
       "id": "electron_preload_handler"
     },
@@ -3428,7 +3428,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L1",
-      "community": 3,
+      "community": 2,
       "norm_label": "index.ts",
       "id": "src_electron_index_ts"
     },
@@ -3437,7 +3437,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L8",
-      "community": 3,
+      "community": 2,
       "norm_label": "getzeroseamsdir()",
       "id": "electron_index_getzeroseamsdir"
     },
@@ -3446,7 +3446,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L12",
-      "community": 3,
+      "community": 2,
       "norm_label": "getpreferencespath()",
       "id": "electron_index_getpreferencespath"
     },
@@ -3455,7 +3455,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L16",
-      "community": 3,
+      "community": 2,
       "norm_label": "getrecentfilespath()",
       "id": "electron_index_getrecentfilespath"
     },
@@ -3464,7 +3464,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L20",
-      "community": 3,
+      "community": 2,
       "norm_label": "addrecentfile()",
       "id": "electron_index_addrecentfile"
     },
@@ -3473,7 +3473,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L30",
-      "community": 3,
+      "community": 2,
       "norm_label": "preferences",
       "id": "electron_index_preferences"
     },
@@ -3482,7 +3482,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L34",
-      "community": 3,
+      "community": 2,
       "norm_label": "externaleditor",
       "id": "electron_index_externaleditor"
     },
@@ -3491,7 +3491,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L39",
-      "community": 3,
+      "community": 2,
       "norm_label": "readpreferences()",
       "id": "electron_index_readpreferences"
     },
@@ -3500,7 +3500,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L48",
-      "community": 3,
+      "community": 2,
       "norm_label": "writepreferences()",
       "id": "electron_index_writepreferences"
     },
@@ -3509,7 +3509,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L52",
-      "community": 3,
+      "community": 2,
       "norm_label": "watchers",
       "id": "electron_index_watchers"
     },
@@ -3518,7 +3518,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L53",
-      "community": 3,
+      "community": 2,
       "norm_label": "tempfiles",
       "id": "electron_index_tempfiles"
     },
@@ -3527,7 +3527,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L57",
-      "community": 3,
+      "community": 2,
       "norm_label": "createwindow()",
       "id": "electron_index_createwindow"
     },
@@ -3536,7 +3536,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L100",
-      "community": 3,
+      "community": 2,
       "norm_label": "dir",
       "id": "electron_index_dir"
     },
@@ -3545,7 +3545,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L103",
-      "community": 3,
+      "community": 2,
       "norm_label": "filepath",
       "id": "electron_index_filepath"
     },
@@ -3554,7 +3554,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L185",
-      "community": 3,
+      "community": 2,
       "norm_label": "paths",
       "id": "electron_index_paths"
     },
@@ -3563,7 +3563,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L191",
-      "community": 3,
+      "community": 2,
       "norm_label": "files",
       "id": "electron_index_files"
     },
@@ -3572,7 +3572,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L227",
-      "community": 3,
+      "community": 2,
       "norm_label": "name",
       "id": "electron_index_name"
     },
@@ -3581,7 +3581,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L228",
-      "community": 3,
+      "community": 2,
       "norm_label": "editor",
       "id": "electron_index_editor"
     },
@@ -3590,7 +3590,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L245",
-      "community": 3,
+      "community": 2,
       "norm_label": "existing",
       "id": "electron_index_existing"
     },
@@ -3599,7 +3599,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L254",
-      "community": 3,
+      "community": 2,
       "norm_label": "editdir",
       "id": "electron_index_editdir"
     },
@@ -3608,7 +3608,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L277",
-      "community": 3,
+      "community": 2,
       "norm_label": "watcher",
       "id": "electron_index_watcher"
     },
@@ -3617,7 +3617,7 @@
       "file_type": "code",
       "source_file": "src/electron/index.ts",
       "source_location": "L284",
-      "community": 3,
+      "community": 2,
       "norm_label": "newbase64",
       "id": "electron_index_newbase64"
     },
@@ -3626,7 +3626,7 @@
       "file_type": "code",
       "source_file": "src/store/index.ts",
       "source_location": "L1",
-      "community": 31,
+      "community": 32,
       "norm_label": "index.ts",
       "id": "src_store_index_ts"
     },
@@ -3691,7 +3691,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 32,
+      "community": 33,
       "norm_label": "claude settings local",
       "id": "claude_settings_local"
     },
@@ -3704,7 +3704,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 19,
       "norm_label": "debug-selection playwright script",
       "id": "scripts_debug_selection"
     },
@@ -3717,7 +3717,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 19,
       "norm_label": "test-multiselect-transform playwright script",
       "id": "scripts_test_multiselect_transform"
     },
@@ -3730,7 +3730,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 19,
       "norm_label": "test-axis-lock playwright script",
       "id": "scripts_test_axis_lock"
     },
@@ -3743,7 +3743,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 19,
       "norm_label": "test-save-path playwright script",
       "id": "scripts_test_save_path"
     },
@@ -3756,7 +3756,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 19,
       "norm_label": "verify-mask-draw playwright script",
       "id": "scripts_verify_mask_draw"
     },
@@ -3795,7 +3795,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 20,
+      "community": 21,
       "norm_label": "module-level activetooltipcount (instant tooltip on hover when any tooltip is visible)",
       "id": "concept_tooltip_active_count"
     },
@@ -3808,7 +3808,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 19,
       "norm_label": "playwright electron integration testing pattern",
       "id": "concept_playwright_electron_testing"
     },
@@ -3821,7 +3821,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 19,
       "norm_label": "window store exposure for e2e tests (__canvasstore__, __viewportstore__, __savestatusstore__)",
       "id": "concept_store_exposure_for_tests"
     },
@@ -3834,7 +3834,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 15,
       "norm_label": "photo adjustments bypass toggle (hold-to-compare \\ key + persistent power button)",
       "id": "concept_adjust_bypass"
     },
@@ -3847,7 +3847,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 6,
       "norm_label": "rotatearoundcenter: konva rect/text rotate around top-left not center; ellipse exempt",
       "id": "concept_rotate_around_center_rationale"
     },
@@ -3860,7 +3860,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 15,
+      "community": 0,
       "norm_label": "electronapi",
       "id": "types_electron_d_electronapi"
     },
@@ -3873,7 +3873,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 3,
       "norm_label": "types/index (barrel)",
       "id": "types_index_typesindex"
     },
@@ -3886,7 +3886,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 33,
+      "community": 34,
       "norm_label": "textspans utilities",
       "id": "canvas_textspans_textspans"
     },
@@ -3899,7 +3899,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 12,
       "norm_label": "frame/content two-layer model",
       "id": "concept_frame_content_model"
     },
@@ -3912,7 +3912,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "non-destructive photo adjustments pipeline",
       "id": "concept_nondestructive_adjustments"
     },
@@ -3925,7 +3925,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 0,
+      "community": 5,
       "norm_label": "snap guide system",
       "id": "concept_snap_system"
     },
@@ -3938,7 +3938,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 15,
+      "community": 0,
       "norm_label": "autosave pipeline",
       "id": "concept_autosave_pipeline"
     },
@@ -3951,7 +3951,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 12,
       "norm_label": "syncgroupontransform",
       "id": "canvas_canvasimagenode_syncgroupontransform"
     },
@@ -4016,7 +4016,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 34,
+      "community": 35,
       "norm_label": "ai/index exports",
       "id": "ai_index_exports"
     },
@@ -4029,7 +4029,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 0,
+      "community": 14,
       "norm_label": "electronapi (contextbridge)",
       "id": "electron_preload_electronapi"
     },
@@ -4081,7 +4081,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 2,
       "norm_label": "main process (electron)",
       "id": "electron_index_mainprocess"
     },
@@ -4094,7 +4094,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 2,
       "norm_label": "ipc: save-file",
       "id": "electron_index_savefile"
     },
@@ -4107,7 +4107,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 2,
       "norm_label": "ipc: autosave-project",
       "id": "electron_index_autosaveproject"
     },
@@ -4120,7 +4120,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 2,
       "norm_label": "ipc: open-project",
       "id": "electron_index_openproject"
     },
@@ -4133,7 +4133,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 2,
       "norm_label": "ipc: save-project",
       "id": "electron_index_saveproject"
     },
@@ -4146,7 +4146,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 2,
       "norm_label": "ipc: get-system-fonts",
       "id": "electron_index_getsystemfonts"
     },
@@ -4159,7 +4159,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 2,
       "norm_label": "ipc: list-recent-projects",
       "id": "electron_index_listrecentprojects"
     },
@@ -4172,7 +4172,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 2,
       "norm_label": "ipc: get-external-editor",
       "id": "electron_index_getexternaleditor"
     },
@@ -4185,7 +4185,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 2,
       "norm_label": "ipc: edit-in-external-app",
       "id": "electron_index_editinexternalapp"
     },
@@ -4198,7 +4198,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 2,
       "norm_label": "ipc: stop-external-edit",
       "id": "electron_index_stopexternaledit"
     },
@@ -4211,7 +4211,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 2,
       "norm_label": "recentfiles.json",
       "id": "electron_index_recentfilesjson"
     },
@@ -4224,7 +4224,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 2,
       "norm_label": "ipc push: external-image-changed",
       "id": "electron_index_externalimagechanged"
     },
@@ -4237,7 +4237,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "zustand store (src/store/index.ts)",
       "id": "store_index_zustandstore"
     },
@@ -4250,7 +4250,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 29,
+      "community": 30,
       "norm_label": "index.html entry point",
       "id": "index_html_entrypoint"
     },
@@ -4263,7 +4263,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 29,
+      "community": 30,
       "norm_label": "react root div#root",
       "id": "index_html_rootdiv"
     },
@@ -4276,7 +4276,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 36,
       "norm_label": "zero seams project readme",
       "id": "readme_zeroseams"
     },
@@ -4289,7 +4289,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "seamless canvas concept",
       "id": "readme_seamlesscanvas"
     },
@@ -4302,7 +4302,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 29,
       "norm_label": "on-device ai (no data leaves machine)",
       "id": "readme_ondeviceai"
     },
@@ -4315,7 +4315,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 36,
+      "community": 37,
       "norm_label": ".carousel / .zeroseams project file format",
       "id": "readme_carouselfile"
     },
@@ -4328,7 +4328,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "claude.md ai dev guide",
       "id": "claudemd_devguide"
     },
@@ -4341,7 +4341,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "file ownership by agent domain",
       "id": "claudemd_fileownership"
     },
@@ -4354,7 +4354,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "image frame/content two-layer model",
       "id": "claudemd_imageframecontentmodel"
     },
@@ -4367,7 +4367,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "rationale: two-layer model (never collapse frame vs content)",
       "id": "claudemd_imageframecontentmodel_rationale"
     },
@@ -4380,7 +4380,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "multi-select architecture",
       "id": "claudemd_multiselect"
     },
@@ -4393,7 +4393,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 0,
+      "community": 5,
       "norm_label": "rationale: snap absolute\u2192logical coord conversion",
       "id": "claudemd_snapcoordspace"
     },
@@ -4406,7 +4406,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "photo adjustments pipeline",
       "id": "claudemd_photoadjustments"
     },
@@ -4419,7 +4419,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "rationale: gamma-correct exposure (matches lightroom, no harsh clipping)",
       "id": "claudemd_photoadjustments_rationale"
     },
@@ -4432,7 +4432,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "lut cache (module-level map)",
       "id": "claudemd_lutcache"
     },
@@ -4445,7 +4445,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "rationale: lut cache keyed by param:value, rebuilt only on change",
       "id": "claudemd_lutcache_rationale"
     },
@@ -4458,7 +4458,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "adjustments bypass toggle",
       "id": "claudemd_adjustmentsbypass"
     },
@@ -4471,7 +4471,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "masking system (pen/rect/ellipse)",
       "id": "claudemd_masking"
     },
@@ -4484,7 +4484,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "history (past/future snapshots)",
       "id": "claudemd_history"
     },
@@ -4497,7 +4497,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "thumbnail store (usethumbnailstore)",
       "id": "claudemd_thumbnails"
     },
@@ -4510,7 +4510,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 25,
+      "community": 26,
       "norm_label": "frame labels (html div, not konva text)",
       "id": "claudemd_framelabels"
     },
@@ -4523,7 +4523,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 25,
+      "community": 26,
       "norm_label": "rationale: frame labels as html div (not konva text)",
       "id": "claudemd_framelabels_rationale"
     },
@@ -4536,7 +4536,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 2,
       "norm_label": "currentfilepath in usesavestatusstore",
       "id": "claudemd_savecurrentfilepath"
     },
@@ -4549,7 +4549,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 26,
+      "community": 27,
       "norm_label": "keepratio mirrors resizemode",
       "id": "claudemd_keyratio"
     },
@@ -4562,7 +4562,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 26,
+      "community": 27,
       "norm_label": "rationale: keepratio auto=proportional default (shift=free); advanced=free default (shift=proportional)",
       "id": "claudemd_keyratio_rationale"
     },
@@ -4575,7 +4575,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "pen pathobject with anchorpoints",
       "id": "claudemd_penpath"
     },
@@ -4588,7 +4588,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 27,
+      "community": 28,
       "norm_label": "shape/ellipse bounding-box origin in store",
       "id": "claudemd_shapeellipse"
     },
@@ -4601,7 +4601,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 27,
+      "community": 28,
       "norm_label": "rationale: store uses top-left (x,y) for all shapes; convert to center at render for konva ellipse",
       "id": "claudemd_shapeellipse_rationale"
     },
@@ -4614,7 +4614,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 28,
+      "community": 29,
       "norm_label": "upcoming: ai background removal, sam, lama",
       "id": "claudemd_upcomingai"
     },
@@ -4627,7 +4627,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "agent: ui-engineer",
       "id": "agents_uiengineer"
     },
@@ -4640,7 +4640,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "agent: ai-engineer",
       "id": "agents_aiengineer"
     },
@@ -4653,7 +4653,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "agent: canvas-engineer",
       "id": "agents_canvasengineer"
     },
@@ -4666,7 +4666,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "agent: qa-reviewer",
       "id": "agents_qareviewer"
     },
@@ -4679,7 +4679,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "src/ui/ (ui-engineer domain)",
       "id": "agents_uiengineer_srcui"
     },
@@ -4692,7 +4692,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "src/ai/ (ai-engineer domain)",
       "id": "agents_aiengineer_srcai"
     },
@@ -4705,7 +4705,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "src/canvas/ (canvas-engineer domain)",
       "id": "agents_canvasengineer_srccanvas"
     },
@@ -4718,7 +4718,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "agent domain isolation (no cross-domain edits)",
       "id": "agents_agentisolation"
     },
@@ -4731,7 +4731,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "rationale: agents must not cross domain boundaries (ui/canvas/ai separation)",
       "id": "agents_agentisolation_rationale"
     },
@@ -4776,7 +4776,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L283",
-      "community": 7,
+      "community": 8,
       "norm_label": "pipelinecache",
       "id": "adjustments_pipeline_pipelinecache"
     },
@@ -4785,7 +4785,7 @@
       "file_type": "code",
       "source_file": "src/canvas/adjustments/pipeline.ts",
       "source_location": "L285",
-      "community": 7,
+      "community": 8,
       "norm_label": "adjfingerprint()",
       "id": "adjustments_pipeline_adjfingerprint"
     },
@@ -4794,198 +4794,513 @@
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L880",
-      "id": "ui_propertiespanel_effectssectionprops",
-      "community": 5,
-      "norm_label": "effectssectionprops"
+      "community": 6,
+      "norm_label": "effectssectionprops",
+      "id": "ui_propertiespanel_effectssectionprops"
     },
     {
       "label": "EffectsSection()",
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L886",
-      "id": "ui_propertiespanel_effectssection",
-      "community": 5,
-      "norm_label": "effectssection()"
-    },
-    {
-      "label": "CanvasObjectType",
-      "file_type": "code",
-      "source_file": "src/types/canvas.ts",
-      "source_location": "L4",
-      "id": "types_canvas_canvasobjecttype",
-      "community": 2,
-      "norm_label": "canvasobjecttype"
+      "community": 6,
+      "norm_label": "effectssection()",
+      "id": "ui_propertiespanel_effectssection"
     },
     {
       "label": "LayerEffect",
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L123",
-      "id": "types_canvas_layereffect",
-      "community": 2,
-      "norm_label": "layereffect"
+      "community": 3,
+      "norm_label": "layereffect",
+      "id": "types_canvas_layereffect"
     },
     {
       "label": "vignette.ts",
       "file_type": "code",
       "source_file": "src/canvas/effects/vignette.ts",
       "source_location": "L1",
-      "id": "src_canvas_effects_vignette_ts",
-      "community": 11,
-      "norm_label": "vignette.ts"
+      "community": 10,
+      "norm_label": "vignette.ts",
+      "id": "src_canvas_effects_vignette_ts"
     },
     {
       "label": "buildFilter()",
       "file_type": "code",
       "source_file": "src/canvas/effects/vignette.ts",
       "source_location": "L14",
-      "id": "effects_vignette_buildfilter",
-      "community": 11,
-      "norm_label": "buildfilter()"
+      "community": 10,
+      "norm_label": "buildfilter()",
+      "id": "effects_vignette_buildfilter"
     },
     {
       "label": "filmGrain.ts",
       "file_type": "code",
       "source_file": "src/canvas/effects/filmGrain.ts",
       "source_location": "L1",
-      "id": "src_canvas_effects_filmgrain_ts",
-      "community": 11,
-      "norm_label": "filmgrain.ts"
+      "community": 10,
+      "norm_label": "filmgrain.ts",
+      "id": "src_canvas_effects_filmgrain_ts"
     },
     {
       "label": "buildFilter()",
       "file_type": "code",
       "source_file": "src/canvas/effects/filmGrain.ts",
       "source_location": "L14",
-      "id": "effects_filmgrain_buildfilter",
-      "community": 11,
-      "norm_label": "buildfilter()"
+      "community": 10,
+      "norm_label": "buildfilter()",
+      "id": "effects_filmgrain_buildfilter"
     },
     {
       "label": "halation.ts",
       "file_type": "code",
       "source_file": "src/canvas/effects/halation.ts",
       "source_location": "L1",
-      "id": "src_canvas_effects_halation_ts",
-      "community": 11,
-      "norm_label": "halation.ts"
+      "community": 10,
+      "norm_label": "halation.ts",
+      "id": "src_canvas_effects_halation_ts"
     },
     {
       "label": "hexToRgb()",
       "file_type": "code",
       "source_file": "src/canvas/effects/halation.ts",
       "source_location": "L4",
-      "id": "effects_halation_hextorgb",
-      "community": 11,
-      "norm_label": "hextorgb()"
+      "community": 10,
+      "norm_label": "hextorgb()",
+      "id": "effects_halation_hextorgb"
     },
     {
       "label": "boxBlurH()",
       "file_type": "code",
       "source_file": "src/canvas/effects/halation.ts",
       "source_location": "L10",
-      "id": "effects_halation_boxblurh",
-      "community": 11,
-      "norm_label": "boxblurh()"
+      "community": 10,
+      "norm_label": "boxblurh()",
+      "id": "effects_halation_boxblurh"
     },
     {
       "label": "boxBlurV()",
       "file_type": "code",
       "source_file": "src/canvas/effects/halation.ts",
       "source_location": "L26",
-      "id": "effects_halation_boxblurv",
-      "community": 11,
-      "norm_label": "boxblurv()"
+      "community": 10,
+      "norm_label": "boxblurv()",
+      "id": "effects_halation_boxblurv"
     },
     {
       "label": "buildFilter()",
       "file_type": "code",
       "source_file": "src/canvas/effects/halation.ts",
       "source_location": "L58",
-      "id": "effects_halation_buildfilter",
-      "community": 11,
-      "norm_label": "buildfilter()"
+      "community": 10,
+      "norm_label": "buildfilter()",
+      "id": "effects_halation_buildfilter"
     },
     {
       "label": "registry.ts",
       "file_type": "code",
       "source_file": "src/canvas/effects/registry.ts",
       "source_location": "L1",
-      "id": "src_canvas_effects_registry_ts",
-      "community": 11,
-      "norm_label": "registry.ts"
+      "community": 10,
+      "norm_label": "registry.ts",
+      "id": "src_canvas_effects_registry_ts"
     },
     {
       "label": "EffectParams",
       "file_type": "code",
       "source_file": "src/canvas/effects/registry.ts",
       "source_location": "L1",
-      "id": "effects_registry_effectparams",
-      "community": 11,
-      "norm_label": "effectparams"
+      "community": 10,
+      "norm_label": "effectparams",
+      "id": "effects_registry_effectparams"
     },
     {
       "label": "EffectControlDescriptor",
       "file_type": "code",
       "source_file": "src/canvas/effects/registry.ts",
       "source_location": "L3",
-      "id": "effects_registry_effectcontroldescriptor",
-      "community": 11,
-      "norm_label": "effectcontroldescriptor"
+      "community": 10,
+      "norm_label": "effectcontroldescriptor",
+      "id": "effects_registry_effectcontroldescriptor"
     },
     {
       "label": "EffectDefinition",
       "file_type": "code",
       "source_file": "src/canvas/effects/registry.ts",
       "source_location": "L12",
-      "id": "effects_registry_effectdefinition",
-      "community": 11,
-      "norm_label": "effectdefinition"
+      "community": 10,
+      "norm_label": "effectdefinition",
+      "id": "effects_registry_effectdefinition"
     },
     {
       "label": "registry",
       "file_type": "code",
       "source_file": "src/canvas/effects/registry.ts",
       "source_location": "L20",
-      "id": "effects_registry_registry",
-      "community": 11,
-      "norm_label": "registry"
+      "community": 10,
+      "norm_label": "registry",
+      "id": "effects_registry_registry"
     },
     {
       "label": "registerEffect()",
       "file_type": "code",
       "source_file": "src/canvas/effects/registry.ts",
       "source_location": "L22",
-      "id": "effects_registry_registereffect",
-      "community": 11,
-      "norm_label": "registereffect()"
+      "community": 10,
+      "norm_label": "registereffect()",
+      "id": "effects_registry_registereffect"
     },
     {
       "label": "getEffectDefinition()",
       "file_type": "code",
       "source_file": "src/canvas/effects/registry.ts",
       "source_location": "L26",
-      "id": "effects_registry_geteffectdefinition",
-      "community": 11,
-      "norm_label": "geteffectdefinition()"
+      "community": 10,
+      "norm_label": "geteffectdefinition()",
+      "id": "effects_registry_geteffectdefinition"
     },
     {
       "label": "index.ts",
       "file_type": "code",
       "source_file": "src/canvas/effects/index.ts",
       "source_location": "L1",
-      "id": "src_canvas_effects_index_ts",
-      "community": 11,
-      "norm_label": "index.ts"
+      "community": 10,
+      "norm_label": "index.ts",
+      "id": "src_canvas_effects_index_ts"
     },
     {
       "label": "buildEffectFilters.ts",
       "file_type": "code",
       "source_file": "src/canvas/effects/buildEffectFilters.ts",
       "source_location": "L1",
-      "id": "src_canvas_effects_buildeffectfilters_ts",
+      "community": 10,
+      "norm_label": "buildeffectfilters.ts",
+      "id": "src_canvas_effects_buildeffectfilters_ts"
+    },
+    {
+      "label": "VideoSectionProps",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1245",
+      "id": "ui_propertiespanel_videosectionprops",
+      "community": 6,
+      "norm_label": "videosectionprops"
+    },
+    {
+      "label": "formatDuration()",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1253",
+      "id": "ui_propertiespanel_formatduration",
+      "community": 6,
+      "norm_label": "formatduration()"
+    },
+    {
+      "label": "VideoSection()",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1259",
+      "id": "ui_propertiespanel_videosection",
+      "community": 6,
+      "norm_label": "videosection()"
+    },
+    {
+      "label": "useExportStore.ts",
+      "file_type": "code",
+      "source_file": "src/ui/useExportStore.ts",
+      "source_location": "L1",
+      "id": "src_ui_useexportstore_ts",
+      "community": 15,
+      "norm_label": "useexportstore.ts"
+    },
+    {
+      "label": "ExportState",
+      "file_type": "code",
+      "source_file": "src/ui/useExportStore.ts",
+      "source_location": "L3",
+      "id": "ui_useexportstore_exportstate",
+      "community": 15,
+      "norm_label": "exportstate"
+    },
+    {
+      "label": "blobToBase64()",
+      "file_type": "code",
+      "source_file": "src/ui/Toolbar.tsx",
+      "source_location": "L74",
+      "id": "ui_toolbar_blobtobase64",
+      "community": 15,
+      "norm_label": "blobtobase64()"
+    },
+    {
+      "label": "VideoObject",
+      "file_type": "code",
+      "source_file": "src/types/canvas.ts",
+      "source_location": "L198",
+      "id": "types_canvas_videoobject",
+      "community": 14,
+      "norm_label": "videoobject"
+    },
+    {
+      "label": "CanvasVideoNode.tsx",
+      "file_type": "code",
+      "source_file": "src/canvas/CanvasVideoNode.tsx",
+      "source_location": "L1",
+      "id": "src_canvas_canvasvideonode_tsx",
       "community": 0,
-      "norm_label": "buildeffectfilters.ts"
+      "norm_label": "canvasvideonode.tsx"
+    },
+    {
+      "label": "CanvasVideoNodeProps",
+      "file_type": "code",
+      "source_file": "src/canvas/CanvasVideoNode.tsx",
+      "source_location": "L12",
+      "id": "canvas_canvasvideonode_canvasvideonodeprops",
+      "community": 0,
+      "norm_label": "canvasvideonodeprops"
+    },
+    {
+      "label": "CanvasVideoNodeOuter()",
+      "file_type": "code",
+      "source_file": "src/canvas/CanvasVideoNode.tsx",
+      "source_location": "L555",
+      "id": "canvas_canvasvideonode_canvasvideonodeouter",
+      "community": 0,
+      "norm_label": "canvasvideonodeouter()"
+    },
+    {
+      "label": "videoExport.ts",
+      "file_type": "code",
+      "source_file": "src/canvas/videoExport.ts",
+      "source_location": "L1",
+      "id": "src_canvas_videoexport_ts",
+      "community": 14,
+      "norm_label": "videoexport.ts"
+    },
+    {
+      "label": "log()",
+      "file_type": "code",
+      "source_file": "src/canvas/videoExport.ts",
+      "source_location": "L4",
+      "id": "canvas_videoexport_log",
+      "community": 14,
+      "norm_label": "log()"
+    },
+    {
+      "label": "getFFmpeg()",
+      "file_type": "code",
+      "source_file": "src/canvas/videoExport.ts",
+      "source_location": "L12",
+      "id": "canvas_videoexport_getffmpeg",
+      "community": 14,
+      "norm_label": "getffmpeg()"
+    },
+    {
+      "label": "encodeVideoFrames()",
+      "file_type": "code",
+      "source_file": "src/canvas/videoExport.ts",
+      "source_location": "L43",
+      "id": "canvas_videoexport_encodevideoframes",
+      "community": 14,
+      "norm_label": "encodevideoframes()"
+    },
+    {
+      "label": "encodeVideoWithAudio()",
+      "file_type": "code",
+      "source_file": "src/canvas/videoExport.ts",
+      "source_location": "L87",
+      "id": "canvas_videoexport_encodevideowithaudio",
+      "community": 14,
+      "norm_label": "encodevideowithaudio()"
+    },
+    {
+      "label": "ExportResult",
+      "file_type": "code",
+      "source_file": "src/canvas/exportFrames.ts",
+      "source_location": "L139",
+      "id": "canvas_exportframes_exportresult",
+      "community": 14,
+      "norm_label": "exportresult"
+    },
+    {
+      "label": "captureVideoFrameSequence()",
+      "file_type": "code",
+      "source_file": "src/canvas/exportFrames.ts",
+      "source_location": "L145",
+      "id": "canvas_exportframes_capturevideoframesequence",
+      "community": 14,
+      "norm_label": "capturevideoframesequence()"
+    },
+    {
+      "label": "exportMixedFrames()",
+      "file_type": "code",
+      "source_file": "src/canvas/exportFrames.ts",
+      "source_location": "L194",
+      "id": "canvas_exportframes_exportmixedframes",
+      "community": 14,
+      "norm_label": "exportmixedframes()"
+    },
+    {
+      "label": "useVideoDrop.ts",
+      "file_type": "code",
+      "source_file": "src/canvas/useVideoDrop.ts",
+      "source_location": "L1",
+      "id": "src_canvas_usevideodrop_ts",
+      "community": 0,
+      "norm_label": "usevideodrop.ts"
+    },
+    {
+      "label": "ElectronFile",
+      "file_type": "code",
+      "source_file": "src/canvas/useVideoDrop.ts",
+      "source_location": "L5",
+      "id": "canvas_usevideodrop_electronfile",
+      "community": 0,
+      "norm_label": "electronfile"
+    },
+    {
+      "label": "videoElementRegistry.ts",
+      "file_type": "code",
+      "source_file": "src/canvas/videoElementRegistry.ts",
+      "source_location": "L1",
+      "id": "src_canvas_videoelementregistry_ts",
+      "community": 14,
+      "norm_label": "videoelementregistry.ts"
+    },
+    {
+      "label": "registry",
+      "file_type": "code",
+      "source_file": "src/canvas/videoElementRegistry.ts",
+      "source_location": "L1",
+      "id": "canvas_videoelementregistry_registry",
+      "community": 14,
+      "norm_label": "registry"
+    },
+    {
+      "label": "registerVideoElement()",
+      "file_type": "code",
+      "source_file": "src/canvas/videoElementRegistry.ts",
+      "source_location": "L3",
+      "id": "canvas_videoelementregistry_registervideoelement",
+      "community": 14,
+      "norm_label": "registervideoelement()"
+    },
+    {
+      "label": "getVideoElement()",
+      "file_type": "code",
+      "source_file": "src/canvas/videoElementRegistry.ts",
+      "source_location": "L11",
+      "id": "canvas_videoelementregistry_getvideoelement",
+      "community": 14,
+      "norm_label": "getvideoelement()"
+    },
+    {
+      "label": "pathUtils.ts",
+      "file_type": "code",
+      "source_file": "src/canvas/pathUtils.ts",
+      "source_location": "L1",
+      "id": "src_canvas_pathutils_ts",
+      "community": 0,
+      "norm_label": "pathutils.ts"
+    },
+    {
+      "label": "posixDirname()",
+      "file_type": "code",
+      "source_file": "src/canvas/pathUtils.ts",
+      "source_location": "L3",
+      "id": "canvas_pathutils_posixdirname",
+      "community": 0,
+      "norm_label": "posixdirname()"
+    },
+    {
+      "label": "posixRelative()",
+      "file_type": "code",
+      "source_file": "src/canvas/pathUtils.ts",
+      "source_location": "L8",
+      "id": "canvas_pathutils_posixrelative",
+      "community": 0,
+      "norm_label": "posixrelative()"
+    },
+    {
+      "label": "posixResolve()",
+      "file_type": "code",
+      "source_file": "src/canvas/pathUtils.ts",
+      "source_location": "L16",
+      "id": "canvas_pathutils_posixresolve",
+      "community": 0,
+      "norm_label": "posixresolve()"
+    },
+    {
+      "label": "relativizeVideoObjects()",
+      "file_type": "code",
+      "source_file": "src/canvas/pathUtils.ts",
+      "source_location": "L26",
+      "id": "canvas_pathutils_relativizevideoobjects",
+      "community": 0,
+      "norm_label": "relativizevideoobjects()"
+    },
+    {
+      "label": "resolveVideoObjects()",
+      "file_type": "code",
+      "source_file": "src/canvas/pathUtils.ts",
+      "source_location": "L44",
+      "id": "canvas_pathutils_resolvevideoobjects",
+      "community": 0,
+      "norm_label": "resolvevideoobjects()"
+    },
+    {
+      "label": "MEDIA_MIME",
+      "file_type": "code",
+      "source_file": "src/electron/index.ts",
+      "source_location": "L382",
+      "id": "electron_index_media_mime",
+      "community": 2,
+      "norm_label": "media_mime"
+    },
+    {
+      "label": "pathname",
+      "file_type": "code",
+      "source_file": "src/electron/index.ts",
+      "source_location": "L387",
+      "id": "electron_index_pathname",
+      "community": 2,
+      "norm_label": "pathname"
+    },
+    {
+      "label": "rangeHeader",
+      "file_type": "code",
+      "source_file": "src/electron/index.ts",
+      "source_location": "L398",
+      "id": "electron_index_rangeheader",
+      "community": 2,
+      "norm_label": "rangeheader"
+    },
+    {
+      "label": "nodeStream",
+      "file_type": "code",
+      "source_file": "src/electron/index.ts",
+      "source_location": "L403",
+      "id": "electron_index_nodestream",
+      "community": 2,
+      "norm_label": "nodestream"
+    },
+    {
+      "label": "body",
+      "file_type": "code",
+      "source_file": "src/electron/index.ts",
+      "source_location": "L404",
+      "id": "electron_index_body",
+      "community": 2,
+      "norm_label": "body"
+    },
+    {
+      "label": "corpHeaders",
+      "file_type": "code",
+      "source_file": "src/electron/index.ts",
+      "source_location": "L415",
+      "id": "electron_index_corpheaders",
+      "community": 2,
+      "norm_label": "corpheaders"
     }
   ],
   "links": [
@@ -6876,7 +7191,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/main.tsx",
-      "source_location": "L7",
+      "source_location": "L8",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_main_tsx",
@@ -6886,7 +7201,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/main.tsx",
-      "source_location": "L62",
+      "source_location": "L102",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_main_tsx",
@@ -6931,6 +7246,17 @@
       "weight": 1.0,
       "source": "src_main_app",
       "target": "concept_store_exposure_for_tests"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/main.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_main_app",
+      "target": "src_ui_useexportstore_ts"
     },
     {
       "relation": "contains",
@@ -7233,7 +7559,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L592",
+      "source_location": "L594",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_ui_propertiespanel_tsx",
@@ -7243,7 +7569,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L1099",
+      "source_location": "L1105",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_ui_propertiespanel_tsx",
@@ -7253,7 +7579,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L1108",
+      "source_location": "L1115",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_ui_propertiespanel_tsx",
@@ -7263,7 +7589,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L1118",
+      "source_location": "L1125",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_ui_propertiespanel_tsx",
@@ -7273,7 +7599,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L1133",
+      "source_location": "L1140",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_ui_propertiespanel_tsx",
@@ -7296,7 +7622,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L1018",
+      "source_location": "L1357",
       "weight": 1.0,
       "source": "src_ui_propertiespanel_tsx",
       "target": "src_canvas_usecanvasstore_ts"
@@ -7359,20 +7685,50 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L880",
+      "source_location": "L886",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_effectssectionprops"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L892",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_effectssection"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1245",
       "weight": 1.0,
       "source": "src_ui_propertiespanel_tsx",
-      "target": "ui_propertiespanel_effectssectionprops",
+      "target": "ui_propertiespanel_videosectionprops",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L886",
+      "source_location": "L1253",
       "weight": 1.0,
       "source": "src_ui_propertiespanel_tsx",
-      "target": "ui_propertiespanel_effectssection",
+      "target": "ui_propertiespanel_formatduration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1259",
+      "weight": 1.0,
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_videosection",
       "confidence_score": 1.0
     },
     {
@@ -7400,11 +7756,22 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L707",
+      "source_location": "L711",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "ui_propertiespanel_textsection",
       "target": "ui_propertiespanel_numinputstyle"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1323",
+      "weight": 1.0,
+      "source": "ui_propertiespanel_videosection",
+      "target": "ui_propertiespanel_numinputstyle",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -7528,7 +7895,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/Toolbar.tsx",
-      "source_location": "L17",
+      "source_location": "L19",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_ui_toolbar_tsx",
@@ -7538,7 +7905,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/Toolbar.tsx",
-      "source_location": "L40",
+      "source_location": "L42",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_ui_toolbar_tsx",
@@ -7548,7 +7915,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/Toolbar.tsx",
-      "source_location": "L72",
+      "source_location": "L86",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_ui_toolbar_tsx",
@@ -7564,6 +7931,27 @@
       "confidence_score": 1.0,
       "source": "src_ui_index_ts",
       "target": "src_ui_toolbar_tsx"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/Toolbar.tsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "src_ui_toolbar_tsx",
+      "target": "src_ui_useexportstore_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/Toolbar.tsx",
+      "source_location": "L74",
+      "weight": 1.0,
+      "source": "src_ui_toolbar_tsx",
+      "target": "ui_toolbar_blobtobase64",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -7592,7 +7980,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "src/ui/Toolbar.tsx",
-      "source_location": "L73",
+      "source_location": "L87",
       "weight": 1.0,
       "source": "ui_toolbar_toolbar",
       "target": "src_canvas_usecanvasstore_ts"
@@ -7640,6 +8028,17 @@
       "target": "concept_save_split_button"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/ui/Toolbar.tsx",
+      "source_location": "L123",
+      "weight": 1.0,
+      "source": "ui_toolbar_toolbar",
+      "target": "src_ui_useexportstore_ts"
+    },
+    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -7654,7 +8053,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/LayerPanel.tsx",
-      "source_location": "L8",
+      "source_location": "L9",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_ui_layerpanel_tsx",
@@ -7677,7 +8076,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "src/ui/LayerPanel.tsx",
-      "source_location": "L19",
+      "source_location": "L21",
       "weight": 1.0,
       "source": "src_ui_layerpanel_tsx",
       "target": "src_canvas_usecanvasstore_ts"
@@ -8244,7 +8643,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/types/canvas.ts",
-      "source_location": "L198",
+      "source_location": "L227",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_types_canvas_ts",
@@ -8459,20 +8858,31 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/types/canvas.ts",
-      "source_location": "L4",
+      "source_location": "L123",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_types_canvas_ts",
-      "target": "types_canvas_canvasobjecttype",
-      "confidence_score": 1.0
+      "target": "types_canvas_layereffect"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/types/canvas.ts",
-      "source_location": "L123",
+      "source_location": "L198",
       "weight": 1.0,
       "source": "src_types_canvas_ts",
-      "target": "types_canvas_layereffect",
+      "target": "types_canvas_videoobject",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/exportFrames.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_canvas_exportframes_ts",
+      "target": "src_types_canvas_ts",
       "confidence_score": 1.0
     },
     {
@@ -9210,6 +9620,17 @@
       "target": "types_canvas_canvasobject"
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/exportFrames.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_canvas_exportframes_ts",
+      "target": "types_canvas_canvasobject",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/types/canvas.d.ts",
@@ -9818,9 +10239,9 @@
       "source_file": "src/canvas/CanvasShapeNode.tsx",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_canvasshapenode_tsx",
-      "target": "src_canvas_effects_buildeffectfilters_ts",
-      "confidence_score": 1.0
+      "target": "src_canvas_effects_buildeffectfilters_ts"
     },
     {
       "relation": "references",
@@ -9899,11 +10320,11 @@
       "target": "src_canvas_usecanvasstore_ts"
     },
     {
-      "relation": "imports",
-      "context": "import",
+      "relation": "calls",
+      "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/CarouselStage.tsx",
-      "source_location": "L18",
+      "source_location": "L170",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_canvas_carouselstage_tsx",
@@ -9928,6 +10349,28 @@
       "weight": 0.95,
       "source": "src_canvas_useautosave_ts",
       "target": "concept_autosave_pipeline"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useAutosave.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_canvas_useautosave_ts",
+      "target": "src_canvas_pathutils_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useAutosave.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_canvas_useautosave_ts",
+      "target": "canvas_pathutils_relativizevideoobjects",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -9962,11 +10405,11 @@
       "target": "src_canvas_usecanvasstore_ts"
     },
     {
-      "relation": "imports",
-      "context": "import",
+      "relation": "calls",
+      "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/CarouselStage.tsx",
-      "source_location": "L17",
+      "source_location": "L168",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_canvas_carouselstage_tsx",
@@ -10247,11 +10690,11 @@
       "target": "canvas_constants_axislock"
     },
     {
-      "relation": "imports",
-      "context": "import",
+      "relation": "calls",
+      "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/CarouselStage.tsx",
-      "source_location": "L7",
+      "source_location": "L37",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_canvas_carouselstage_tsx",
@@ -10368,11 +10811,11 @@
       "target": "canvas_usesnapguides_snapguide"
     },
     {
-      "relation": "imports",
-      "context": "import",
+      "relation": "calls",
+      "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/CarouselStage.tsx",
-      "source_location": "L19",
+      "source_location": "L171",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_canvas_carouselstage_tsx",
@@ -10394,7 +10837,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/CarouselStage.tsx",
-      "source_location": "L20",
+      "source_location": "L22",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_canvas_carouselstage_tsx",
@@ -10405,7 +10848,7 @@
       "context": "export",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/CarouselStage.tsx",
-      "source_location": "L22",
+      "source_location": "L24",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_canvas_carouselstage_tsx",
@@ -10415,7 +10858,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/CarouselStage.tsx",
-      "source_location": "L28",
+      "source_location": "L30",
       "weight": 1.0,
       "confidence_score": 0.85,
       "source": "src_canvas_carouselstage_tsx",
@@ -10431,6 +10874,28 @@
       "confidence_score": 1.0,
       "source": "src_canvas_index_ts",
       "target": "src_canvas_carouselstage_tsx"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L169",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "src_canvas_usevideodrop_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "src_canvas_canvasvideonode_tsx",
+      "confidence_score": 1.0
     },
     {
       "relation": "re_exports",
@@ -10751,6 +11216,17 @@
       "target": "canvas_usesnapguides_snapguide"
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CanvasVideoNode.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_canvas_canvasvideonode_tsx",
+      "target": "canvas_usesnapguides_snapguide",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -10797,7 +11273,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/exportFrames.ts",
-      "source_location": "L114",
+      "source_location": "L117",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_canvas_exportframes_ts",
@@ -10833,6 +11309,102 @@
       "weight": 1.0,
       "source": "canvas_index_exports",
       "target": "src_canvas_exportframes_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/exportFrames.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_canvas_exportframes_ts",
+      "target": "types_canvas_videoobject",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/exportFrames.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_canvas_exportframes_ts",
+      "target": "src_canvas_videoelementregistry_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/exportFrames.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_canvas_exportframes_ts",
+      "target": "canvas_videoelementregistry_getvideoelement",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/exportFrames.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_canvas_exportframes_ts",
+      "target": "src_canvas_videoexport_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/exportFrames.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_canvas_exportframes_ts",
+      "target": "canvas_videoexport_encodevideoframes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/exportFrames.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_canvas_exportframes_ts",
+      "target": "canvas_videoexport_encodevideowithaudio",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/exportFrames.ts",
+      "source_location": "L139",
+      "weight": 1.0,
+      "source": "src_canvas_exportframes_ts",
+      "target": "canvas_exportframes_exportresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/exportFrames.ts",
+      "source_location": "L145",
+      "weight": 1.0,
+      "source": "src_canvas_exportframes_ts",
+      "target": "canvas_exportframes_capturevideoframesequence",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/exportFrames.ts",
+      "source_location": "L194",
+      "weight": 1.0,
+      "source": "src_canvas_exportframes_ts",
+      "target": "canvas_exportframes_exportmixedframes",
+      "confidence_score": 1.0
     },
     {
       "relation": "re_exports",
@@ -11010,9 +11582,9 @@
       "source_file": "src/canvas/CanvasImageNode.tsx",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_canvasimagenode_tsx",
-      "target": "src_canvas_effects_buildeffectfilters_ts",
-      "confidence_score": 1.0
+      "target": "src_canvas_effects_buildeffectfilters_ts"
     },
     {
       "relation": "contains",
@@ -11080,10 +11652,21 @@
       "target": "canvas_constants_axislock"
     },
     {
-      "relation": "references",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CanvasVideoNode.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "src_canvas_canvasvideonode_tsx",
+      "target": "canvas_constants_axislock",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/useCanvasStore.ts",
-      "source_location": "line 558",
+      "source_location": "L5",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_canvas_usecanvasstore_ts",
@@ -11133,7 +11716,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/useCanvasStore.ts",
-      "source_location": "L137",
+      "source_location": "L141",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_canvas_usecanvasstore_ts",
@@ -11162,22 +11745,22 @@
       "target": "src_canvas_usecanvasstore_ts"
     },
     {
-      "relation": "references",
+      "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/FrameGuides.tsx",
-      "source_location": "line 3",
+      "source_location": "L11",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_canvas_frameguides_tsx",
       "target": "src_canvas_usecanvasstore_ts"
     },
     {
-      "relation": "references",
+      "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/useKeyboardShortcuts.ts",
-      "source_location": "line 3",
+      "source_location": "L32",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_canvas_usekeyboardshortcuts_ts",
@@ -11267,6 +11850,39 @@
       "target": "concept_history_undoredo"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CanvasVideoNode.tsx",
+      "source_location": "L23",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_canvas_canvasvideonode_tsx",
+      "target": "src_canvas_usecanvasstore_ts"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useVideoDrop.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_canvas_usevideodrop_ts",
+      "target": "src_canvas_usecanvasstore_ts"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/canvas/CanvasVideoNode.tsx",
+      "source_location": "L556",
+      "weight": 1.0,
+      "source": "canvas_canvasvideonode_canvasvideonodeouter",
+      "target": "src_canvas_usecanvasstore_ts"
+    },
+    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -11334,9 +11950,9 @@
       "source_file": "src/canvas/CanvasTextNode.tsx",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_canvastextnode_tsx",
-      "target": "src_canvas_effects_buildeffectfilters_ts",
-      "confidence_score": 1.0
+      "target": "src_canvas_effects_buildeffectfilters_ts"
     },
     {
       "relation": "contains",
@@ -11484,11 +12100,11 @@
       "target": "src_canvas_canvaspathnode_tsx"
     },
     {
-      "relation": "calls",
+      "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/useKeyboardShortcuts.ts",
-      "source_location": "line 8",
+      "source_location": "L7",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_canvas_usekeyboardshortcuts_ts",
@@ -11498,7 +12114,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/useKeyboardShortcuts.ts",
-      "source_location": "L9",
+      "source_location": "L10",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_canvas_usekeyboardshortcuts_ts",
@@ -11535,6 +12151,28 @@
       "target": "concept_photo_adjustments"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "src_canvas_usekeyboardshortcuts_ts",
+      "target": "src_canvas_pathutils_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "src_canvas_usekeyboardshortcuts_ts",
+      "target": "canvas_pathutils_relativizevideoobjects",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -11543,6 +12181,17 @@
       "weight": 1.0,
       "source": "canvas_usekeyboardshortcuts_buildprojectsnapshot",
       "target": "electron_preload_electronapi"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "canvas_usekeyboardshortcuts_buildprojectsnapshot",
+      "target": "canvas_pathutils_relativizevideoobjects",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -11623,9 +12272,9 @@
       "source_file": "src/canvas/CanvasPathNode.tsx",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_canvaspathnode_tsx",
-      "target": "src_canvas_effects_buildeffectfilters_ts",
-      "confidence_score": 1.0
+      "target": "src_canvas_effects_buildeffectfilters_ts"
     },
     {
       "relation": "contains",
@@ -12283,7 +12932,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L8",
+      "source_location": "L9",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12293,7 +12942,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L12",
+      "source_location": "L13",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12303,7 +12952,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12313,7 +12962,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12323,7 +12972,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L30",
+      "source_location": "L31",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12333,7 +12982,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L34",
+      "source_location": "L35",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12343,7 +12992,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L39",
+      "source_location": "L40",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12353,7 +13002,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L48",
+      "source_location": "L49",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12363,7 +13012,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L52",
+      "source_location": "L53",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12373,7 +13022,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L53",
+      "source_location": "L54",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12383,7 +13032,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L57",
+      "source_location": "L74",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12393,7 +13042,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L100",
+      "source_location": "L117",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12403,7 +13052,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L103",
+      "source_location": "L120",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12413,7 +13062,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L185",
+      "source_location": "L212",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12423,7 +13072,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L191",
+      "source_location": "L218",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12433,7 +13082,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L227",
+      "source_location": "L254",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12443,7 +13092,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L228",
+      "source_location": "L255",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12453,7 +13102,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L245",
+      "source_location": "L272",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12463,7 +13112,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L254",
+      "source_location": "L281",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12473,7 +13122,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L298",
+      "source_location": "L367",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
@@ -12483,18 +13132,78 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L284",
+      "source_location": "L311",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
       "target": "electron_index_newbase64"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/electron/index.ts",
+      "source_location": "L382",
+      "weight": 1.0,
+      "source": "src_electron_index_ts",
+      "target": "electron_index_media_mime",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/electron/index.ts",
+      "source_location": "L387",
+      "weight": 1.0,
+      "source": "src_electron_index_ts",
+      "target": "electron_index_pathname",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/electron/index.ts",
+      "source_location": "L398",
+      "weight": 1.0,
+      "source": "src_electron_index_ts",
+      "target": "electron_index_rangeheader",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/electron/index.ts",
+      "source_location": "L403",
+      "weight": 1.0,
+      "source": "src_electron_index_ts",
+      "target": "electron_index_nodestream",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/electron/index.ts",
+      "source_location": "L404",
+      "weight": 1.0,
+      "source": "src_electron_index_ts",
+      "target": "electron_index_body",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/electron/index.ts",
+      "source_location": "L415",
+      "weight": 1.0,
+      "source": "src_electron_index_ts",
+      "target": "electron_index_corpheaders",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L41",
+      "source_location": "L42",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "electron_index_readpreferences",
@@ -12505,7 +13214,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L49",
+      "source_location": "L50",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "electron_index_writepreferences",
@@ -12516,7 +13225,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L23",
+      "source_location": "L24",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "electron_index_addrecentfile",
@@ -12831,6 +13540,17 @@
       "weight": 1.0,
       "source": "claudemd_snapcoordspace",
       "target": "concept_snap_system"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CanvasVideoNode.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "src_canvas_canvasvideonode_tsx",
+      "target": "canvas_constants_canvas_scale",
+      "confidence_score": 1.0
     },
     {
       "relation": "implements",
@@ -13330,9 +14050,9 @@
       "source_file": "src/canvas/effects/vignette.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_vignette_ts",
-      "target": "src_canvas_effects_registry_ts",
-      "confidence_score": 1.0
+      "target": "src_canvas_effects_registry_ts"
     },
     {
       "relation": "imports",
@@ -13341,9 +14061,9 @@
       "source_file": "src/canvas/effects/vignette.ts",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_vignette_ts",
-      "target": "effects_registry_registereffect",
-      "confidence_score": 1.0
+      "target": "effects_registry_registereffect"
     },
     {
       "relation": "imports",
@@ -13352,9 +14072,9 @@
       "source_file": "src/canvas/effects/vignette.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_vignette_ts",
-      "target": "effects_registry_effectparams",
-      "confidence_score": 1.0
+      "target": "effects_registry_effectparams"
     },
     {
       "relation": "contains",
@@ -13362,9 +14082,9 @@
       "source_file": "src/canvas/effects/vignette.ts",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_vignette_ts",
-      "target": "effects_vignette_buildfilter",
-      "confidence_score": 1.0
+      "target": "effects_vignette_buildfilter"
     },
     {
       "relation": "imports_from",
@@ -13373,9 +14093,9 @@
       "source_file": "src/canvas/effects/index.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_index_ts",
-      "target": "src_canvas_effects_vignette_ts",
-      "confidence_score": 1.0
+      "target": "src_canvas_effects_vignette_ts"
     },
     {
       "relation": "imports_from",
@@ -13384,9 +14104,9 @@
       "source_file": "src/canvas/effects/filmGrain.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_filmgrain_ts",
-      "target": "src_canvas_effects_registry_ts",
-      "confidence_score": 1.0
+      "target": "src_canvas_effects_registry_ts"
     },
     {
       "relation": "imports",
@@ -13395,9 +14115,9 @@
       "source_file": "src/canvas/effects/filmGrain.ts",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_filmgrain_ts",
-      "target": "effects_registry_registereffect",
-      "confidence_score": 1.0
+      "target": "effects_registry_registereffect"
     },
     {
       "relation": "imports",
@@ -13406,9 +14126,9 @@
       "source_file": "src/canvas/effects/filmGrain.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_filmgrain_ts",
-      "target": "effects_registry_effectparams",
-      "confidence_score": 1.0
+      "target": "effects_registry_effectparams"
     },
     {
       "relation": "contains",
@@ -13416,9 +14136,9 @@
       "source_file": "src/canvas/effects/filmGrain.ts",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_filmgrain_ts",
-      "target": "effects_filmgrain_buildfilter",
-      "confidence_score": 1.0
+      "target": "effects_filmgrain_buildfilter"
     },
     {
       "relation": "imports_from",
@@ -13427,9 +14147,9 @@
       "source_file": "src/canvas/effects/index.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_index_ts",
-      "target": "src_canvas_effects_filmgrain_ts",
-      "confidence_score": 1.0
+      "target": "src_canvas_effects_filmgrain_ts"
     },
     {
       "relation": "imports_from",
@@ -13438,9 +14158,9 @@
       "source_file": "src/canvas/effects/halation.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_halation_ts",
-      "target": "src_canvas_effects_registry_ts",
-      "confidence_score": 1.0
+      "target": "src_canvas_effects_registry_ts"
     },
     {
       "relation": "imports",
@@ -13449,9 +14169,9 @@
       "source_file": "src/canvas/effects/halation.ts",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_halation_ts",
-      "target": "effects_registry_registereffect",
-      "confidence_score": 1.0
+      "target": "effects_registry_registereffect"
     },
     {
       "relation": "imports",
@@ -13460,9 +14180,9 @@
       "source_file": "src/canvas/effects/halation.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_halation_ts",
-      "target": "effects_registry_effectparams",
-      "confidence_score": 1.0
+      "target": "effects_registry_effectparams"
     },
     {
       "relation": "contains",
@@ -13470,9 +14190,9 @@
       "source_file": "src/canvas/effects/halation.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_halation_ts",
-      "target": "effects_halation_hextorgb",
-      "confidence_score": 1.0
+      "target": "effects_halation_hextorgb"
     },
     {
       "relation": "contains",
@@ -13480,9 +14200,9 @@
       "source_file": "src/canvas/effects/halation.ts",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_halation_ts",
-      "target": "effects_halation_boxblurh",
-      "confidence_score": 1.0
+      "target": "effects_halation_boxblurh"
     },
     {
       "relation": "contains",
@@ -13490,9 +14210,9 @@
       "source_file": "src/canvas/effects/halation.ts",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_halation_ts",
-      "target": "effects_halation_boxblurv",
-      "confidence_score": 1.0
+      "target": "effects_halation_boxblurv"
     },
     {
       "relation": "contains",
@@ -13500,9 +14220,9 @@
       "source_file": "src/canvas/effects/halation.ts",
       "source_location": "L58",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_halation_ts",
-      "target": "effects_halation_buildfilter",
-      "confidence_score": 1.0
+      "target": "effects_halation_buildfilter"
     },
     {
       "relation": "imports_from",
@@ -13511,9 +14231,9 @@
       "source_file": "src/canvas/effects/index.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_index_ts",
-      "target": "src_canvas_effects_halation_ts",
-      "confidence_score": 1.0
+      "target": "src_canvas_effects_halation_ts"
     },
     {
       "relation": "calls",
@@ -13522,9 +14242,9 @@
       "source_file": "src/canvas/effects/halation.ts",
       "source_location": "L59",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "effects_halation_buildfilter",
-      "target": "effects_halation_hextorgb",
-      "confidence_score": 1.0
+      "target": "effects_halation_hextorgb"
     },
     {
       "relation": "calls",
@@ -13533,9 +14253,9 @@
       "source_file": "src/canvas/effects/halation.ts",
       "source_location": "L82",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "effects_halation_buildfilter",
-      "target": "effects_halation_boxblurh",
-      "confidence_score": 1.0
+      "target": "effects_halation_boxblurh"
     },
     {
       "relation": "calls",
@@ -13544,9 +14264,9 @@
       "source_file": "src/canvas/effects/halation.ts",
       "source_location": "L83",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "effects_halation_buildfilter",
-      "target": "effects_halation_boxblurv",
-      "confidence_score": 1.0
+      "target": "effects_halation_boxblurv"
     },
     {
       "relation": "contains",
@@ -13554,9 +14274,9 @@
       "source_file": "src/canvas/effects/registry.ts",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_registry_ts",
-      "target": "effects_registry_effectparams",
-      "confidence_score": 1.0
+      "target": "effects_registry_effectparams"
     },
     {
       "relation": "contains",
@@ -13564,9 +14284,9 @@
       "source_file": "src/canvas/effects/registry.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_registry_ts",
-      "target": "effects_registry_effectcontroldescriptor",
-      "confidence_score": 1.0
+      "target": "effects_registry_effectcontroldescriptor"
     },
     {
       "relation": "contains",
@@ -13574,9 +14294,9 @@
       "source_file": "src/canvas/effects/registry.ts",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_registry_ts",
-      "target": "effects_registry_effectdefinition",
-      "confidence_score": 1.0
+      "target": "effects_registry_effectdefinition"
     },
     {
       "relation": "contains",
@@ -13584,9 +14304,9 @@
       "source_file": "src/canvas/effects/registry.ts",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_registry_ts",
-      "target": "effects_registry_registry",
-      "confidence_score": 1.0
+      "target": "effects_registry_registry"
     },
     {
       "relation": "contains",
@@ -13594,9 +14314,9 @@
       "source_file": "src/canvas/effects/registry.ts",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_registry_ts",
-      "target": "effects_registry_registereffect",
-      "confidence_score": 1.0
+      "target": "effects_registry_registereffect"
     },
     {
       "relation": "contains",
@@ -13604,9 +14324,9 @@
       "source_file": "src/canvas/effects/registry.ts",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_registry_ts",
-      "target": "effects_registry_geteffectdefinition",
-      "confidence_score": 1.0
+      "target": "effects_registry_geteffectdefinition"
     },
     {
       "relation": "re_exports",
@@ -13615,9 +14335,9 @@
       "source_file": "src/canvas/effects/index.ts",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_index_ts",
-      "target": "src_canvas_effects_registry_ts",
-      "confidence_score": 1.0
+      "target": "src_canvas_effects_registry_ts"
     },
     {
       "relation": "imports_from",
@@ -13626,9 +14346,9 @@
       "source_file": "src/canvas/effects/buildEffectFilters.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_buildeffectfilters_ts",
-      "target": "src_canvas_effects_registry_ts",
-      "confidence_score": 1.0
+      "target": "src_canvas_effects_registry_ts"
     },
     {
       "relation": "re_exports",
@@ -13637,9 +14357,9 @@
       "source_file": "src/canvas/effects/index.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_index_ts",
-      "target": "effects_registry_effectparams",
-      "confidence_score": 1.0
+      "target": "effects_registry_effectparams"
     },
     {
       "relation": "re_exports",
@@ -13648,9 +14368,9 @@
       "source_file": "src/canvas/effects/index.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_index_ts",
-      "target": "effects_registry_effectcontroldescriptor",
-      "confidence_score": 1.0
+      "target": "effects_registry_effectcontroldescriptor"
     },
     {
       "relation": "re_exports",
@@ -13659,9 +14379,9 @@
       "source_file": "src/canvas/effects/index.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_index_ts",
-      "target": "effects_registry_effectdefinition",
-      "confidence_score": 1.0
+      "target": "effects_registry_effectdefinition"
     },
     {
       "relation": "re_exports",
@@ -13670,9 +14390,9 @@
       "source_file": "src/canvas/effects/index.ts",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_index_ts",
-      "target": "effects_registry_registereffect",
-      "confidence_score": 1.0
+      "target": "effects_registry_registereffect"
     },
     {
       "relation": "re_exports",
@@ -13681,9 +14401,9 @@
       "source_file": "src/canvas/effects/index.ts",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_index_ts",
-      "target": "effects_registry_geteffectdefinition",
-      "confidence_score": 1.0
+      "target": "effects_registry_geteffectdefinition"
     },
     {
       "relation": "calls",
@@ -13703,11 +14423,336 @@
       "source_file": "src/canvas/effects/index.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_canvas_effects_index_ts",
-      "target": "src_canvas_effects_buildeffectfilters_ts",
+      "target": "src_canvas_effects_buildeffectfilters_ts"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1272",
+      "weight": 1.0,
+      "source": "ui_propertiespanel_videosection",
+      "target": "ui_propertiespanel_formatduration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/useExportStore.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_ui_useexportstore_ts",
+      "target": "ui_useexportstore_exportstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CanvasVideoNode.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "src_canvas_canvasvideonode_tsx",
+      "target": "src_canvas_videoelementregistry_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CanvasVideoNode.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "src_canvas_canvasvideonode_tsx",
+      "target": "canvas_videoelementregistry_registervideoelement",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CanvasVideoNode.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "src_canvas_canvasvideonode_tsx",
+      "target": "canvas_canvasvideonode_canvasvideonodeprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CanvasVideoNode.tsx",
+      "source_location": "L555",
+      "weight": 1.0,
+      "source": "src_canvas_canvasvideonode_tsx",
+      "target": "canvas_canvasvideonode_canvasvideonodeouter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/videoExport.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_canvas_videoexport_ts",
+      "target": "canvas_videoexport_log",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/videoExport.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "src_canvas_videoexport_ts",
+      "target": "canvas_videoexport_getffmpeg",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/videoExport.ts",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "src_canvas_videoexport_ts",
+      "target": "canvas_videoexport_encodevideoframes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/videoExport.ts",
+      "source_location": "L87",
+      "weight": 1.0,
+      "source": "src_canvas_videoexport_ts",
+      "target": "canvas_videoexport_encodevideowithaudio",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/videoExport.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "canvas_videoexport_getffmpeg",
+      "target": "canvas_videoexport_log",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/videoExport.ts",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "canvas_videoexport_encodevideoframes",
+      "target": "canvas_videoexport_log",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/videoExport.ts",
+      "source_location": "L95",
+      "weight": 1.0,
+      "source": "canvas_videoexport_encodevideowithaudio",
+      "target": "canvas_videoexport_log",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/videoExport.ts",
+      "source_location": "L53",
+      "weight": 1.0,
+      "source": "canvas_videoexport_encodevideoframes",
+      "target": "canvas_videoexport_getffmpeg",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/videoExport.ts",
+      "source_location": "L98",
+      "weight": 1.0,
+      "source": "canvas_videoexport_encodevideowithaudio",
+      "target": "canvas_videoexport_getffmpeg",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/canvas/exportFrames.ts",
+      "source_location": "L315",
+      "weight": 1.0,
+      "source": "canvas_exportframes_exportmixedframes",
+      "target": "canvas_videoexport_encodevideoframes"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/canvas/exportFrames.ts",
+      "source_location": "L313",
+      "weight": 1.0,
+      "source": "canvas_exportframes_exportmixedframes",
+      "target": "canvas_videoexport_encodevideowithaudio"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/exportFrames.ts",
+      "source_location": "L294",
+      "weight": 1.0,
+      "source": "canvas_exportframes_exportmixedframes",
+      "target": "canvas_exportframes_capturevideoframesequence",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useVideoDrop.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_canvas_usevideodrop_ts",
+      "target": "canvas_usevideodrop_electronfile",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/videoElementRegistry.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_canvas_videoelementregistry_ts",
+      "target": "canvas_videoelementregistry_registry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/videoElementRegistry.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_canvas_videoelementregistry_ts",
+      "target": "canvas_videoelementregistry_registervideoelement",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/videoElementRegistry.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "src_canvas_videoelementregistry_ts",
+      "target": "canvas_videoelementregistry_getvideoelement",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/pathUtils.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_canvas_pathutils_ts",
+      "target": "canvas_pathutils_posixdirname",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/pathUtils.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "src_canvas_pathutils_ts",
+      "target": "canvas_pathutils_posixrelative",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/pathUtils.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "src_canvas_pathutils_ts",
+      "target": "canvas_pathutils_posixresolve",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/pathUtils.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "src_canvas_pathutils_ts",
+      "target": "canvas_pathutils_relativizevideoobjects",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/pathUtils.ts",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "src_canvas_pathutils_ts",
+      "target": "canvas_pathutils_resolvevideoobjects",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/pathUtils.ts",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "canvas_pathutils_relativizevideoobjects",
+      "target": "canvas_pathutils_posixdirname",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/pathUtils.ts",
+      "source_location": "L48",
+      "weight": 1.0,
+      "source": "canvas_pathutils_resolvevideoobjects",
+      "target": "canvas_pathutils_posixdirname",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/pathUtils.ts",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "canvas_pathutils_relativizevideoobjects",
+      "target": "canvas_pathutils_posixrelative",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/pathUtils.ts",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "canvas_pathutils_resolvevideoobjects",
+      "target": "canvas_pathutils_posixresolve",
       "confidence_score": 1.0
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "00cfe0eef999a5c1ce6816c3baa0f530214cb3d7"
+  "built_at_commit": "70a83196f79d3ad168fcfc31ec77bf68e83141e5"
 }

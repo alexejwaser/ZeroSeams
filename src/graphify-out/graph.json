@@ -9,25 +9,25 @@
       "source_file": "main.tsx",
       "source_location": "L1",
       "id": "main_tsx",
-      "community": 11,
+      "community": 5,
       "norm_label": "main.tsx"
     },
     {
       "label": "App()",
       "file_type": "code",
       "source_file": "main.tsx",
-      "source_location": "L7",
+      "source_location": "L8",
       "id": "src_main_app",
-      "community": 11,
+      "community": 5,
       "norm_label": "app()"
     },
     {
       "label": "rootEl",
       "file_type": "code",
       "source_file": "main.tsx",
-      "source_location": "L62",
+      "source_location": "L102",
       "id": "src_main_rootel",
-      "community": 11,
+      "community": 5,
       "norm_label": "rootel"
     },
     {
@@ -115,7 +115,7 @@
       "label": "rotateAroundCenter()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L33",
+      "source_location": "L34",
       "id": "ui_propertiespanel_rotatearoundcenter",
       "community": 1,
       "norm_label": "rotatearoundcenter()"
@@ -124,7 +124,7 @@
       "label": "numInputStyle()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L53",
+      "source_location": "L54",
       "id": "ui_propertiespanel_numinputstyle",
       "community": 1,
       "norm_label": "numinputstyle()"
@@ -133,7 +133,7 @@
       "label": "NumberFieldProps",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L68",
+      "source_location": "L69",
       "id": "ui_propertiespanel_numberfieldprops",
       "community": 1,
       "norm_label": "numberfieldprops"
@@ -142,7 +142,7 @@
       "label": "NumberField()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L77",
+      "source_location": "L78",
       "id": "ui_propertiespanel_numberfield",
       "community": 1,
       "norm_label": "numberfield()"
@@ -151,7 +151,7 @@
       "label": "MixedNumberFieldProps",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L138",
+      "source_location": "L139",
       "id": "ui_propertiespanel_mixednumberfieldprops",
       "community": 1,
       "norm_label": "mixednumberfieldprops"
@@ -160,7 +160,7 @@
       "label": "MixedNumberField()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L147",
+      "source_location": "L148",
       "id": "ui_propertiespanel_mixednumberfield",
       "community": 1,
       "norm_label": "mixednumberfield()"
@@ -169,7 +169,7 @@
       "label": "ColorInputProps",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L211",
+      "source_location": "L212",
       "id": "ui_propertiespanel_colorinputprops",
       "community": 1,
       "norm_label": "colorinputprops"
@@ -178,7 +178,7 @@
       "label": "ColorInput()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L216",
+      "source_location": "L217",
       "id": "ui_propertiespanel_colorinput",
       "community": 1,
       "norm_label": "colorinput()"
@@ -187,7 +187,7 @@
       "label": "MixedColorInputProps",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L294",
+      "source_location": "L295",
       "id": "ui_propertiespanel_mixedcolorinputprops",
       "community": 1,
       "norm_label": "mixedcolorinputprops"
@@ -196,7 +196,7 @@
       "label": "MixedColorInput()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L299",
+      "source_location": "L300",
       "id": "ui_propertiespanel_mixedcolorinput",
       "community": 1,
       "norm_label": "mixedcolorinput()"
@@ -205,7 +205,7 @@
       "label": "sectionLabelStyle",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L397",
+      "source_location": "L398",
       "id": "ui_propertiespanel_sectionlabelstyle",
       "community": 1,
       "norm_label": "sectionlabelstyle"
@@ -214,7 +214,7 @@
       "label": "alignButtonStyle()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L407",
+      "source_location": "L408",
       "id": "ui_propertiespanel_alignbuttonstyle",
       "community": 1,
       "norm_label": "alignbuttonstyle()"
@@ -223,7 +223,7 @@
       "label": "distributeButtonStyle()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L419",
+      "source_location": "L420",
       "id": "ui_propertiespanel_distributebuttonstyle",
       "community": 1,
       "norm_label": "distributebuttonstyle()"
@@ -232,7 +232,7 @@
       "label": "AlignDistributeSectionProps",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L435",
+      "source_location": "L436",
       "id": "ui_propertiespanel_aligndistributesectionprops",
       "community": 1,
       "norm_label": "aligndistributesectionprops"
@@ -241,7 +241,7 @@
       "label": "AlignDistributeSection()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L445",
+      "source_location": "L446",
       "id": "ui_propertiespanel_aligndistributesection",
       "community": 1,
       "norm_label": "aligndistributesection()"
@@ -250,7 +250,7 @@
       "label": "CanvasSection()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L572",
+      "source_location": "L573",
       "id": "ui_propertiespanel_canvassection",
       "community": 1,
       "norm_label": "canvassection()"
@@ -259,7 +259,7 @@
       "label": "TextSectionProps",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L584",
+      "source_location": "L585",
       "id": "ui_propertiespanel_textsectionprops",
       "community": 1,
       "norm_label": "textsectionprops"
@@ -268,7 +268,7 @@
       "label": "TextSection()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L594",
+      "source_location": "L595",
       "id": "ui_propertiespanel_textsection",
       "community": 1,
       "norm_label": "textsection()"
@@ -277,7 +277,7 @@
       "label": "EffectsSectionProps",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L886",
+      "source_location": "L887",
       "id": "ui_propertiespanel_effectssectionprops",
       "community": 1,
       "norm_label": "effectssectionprops"
@@ -286,7 +286,7 @@
       "label": "EffectsSection()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L892",
+      "source_location": "L893",
       "id": "ui_propertiespanel_effectssection",
       "community": 1,
       "norm_label": "effectssection()"
@@ -295,7 +295,7 @@
       "label": "AdjustmentsSectionProps",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L1105",
+      "source_location": "L1106",
       "id": "ui_propertiespanel_adjustmentssectionprops",
       "community": 1,
       "norm_label": "adjustmentssectionprops"
@@ -304,7 +304,7 @@
       "label": "subGroupLabelStyle",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L1115",
+      "source_location": "L1116",
       "id": "ui_propertiespanel_subgrouplabelstyle",
       "community": 1,
       "norm_label": "subgrouplabelstyle"
@@ -313,7 +313,7 @@
       "label": "TRACK_GRADIENT",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L1125",
+      "source_location": "L1126",
       "id": "ui_propertiespanel_track_gradient",
       "community": 1,
       "norm_label": "track_gradient"
@@ -322,7 +322,7 @@
       "label": "AdjustmentsSection()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L1140",
+      "source_location": "L1141",
       "id": "ui_propertiespanel_adjustmentssection",
       "community": 1,
       "norm_label": "adjustmentssection()"
@@ -331,7 +331,7 @@
       "label": "VideoSectionProps",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L1245",
+      "source_location": "L1246",
       "id": "ui_propertiespanel_videosectionprops",
       "community": 1,
       "norm_label": "videosectionprops"
@@ -340,16 +340,25 @@
       "label": "formatDuration()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L1253",
+      "source_location": "L1254",
       "id": "ui_propertiespanel_formatduration",
       "community": 1,
       "norm_label": "formatduration()"
     },
     {
+      "label": "trimLabelStyle",
+      "file_type": "code",
+      "source_file": "ui/PropertiesPanel.tsx",
+      "source_location": "L1261",
+      "id": "ui_propertiespanel_trimlabelstyle",
+      "community": 1,
+      "norm_label": "trimlabelstyle"
+    },
+    {
       "label": "VideoSection()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L1259",
+      "source_location": "L1271",
       "id": "ui_propertiespanel_videosection",
       "community": 1,
       "norm_label": "videosection()"
@@ -358,7 +367,7 @@
       "label": "PropertiesPanel()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L1356",
+      "source_location": "L1682",
       "id": "ui_propertiespanel_propertiespanel",
       "community": 5,
       "norm_label": "propertiespanel()"
@@ -400,6 +409,33 @@
       "norm_label": "fontpicker.d.ts"
     },
     {
+      "label": "useExportStore.ts",
+      "file_type": "code",
+      "source_file": "ui/useExportStore.ts",
+      "source_location": "L1",
+      "id": "ui_useexportstore_ts",
+      "community": 5,
+      "norm_label": "useexportstore.ts"
+    },
+    {
+      "label": "ExportState",
+      "file_type": "code",
+      "source_file": "ui/useExportStore.ts",
+      "source_location": "L3",
+      "id": "ui_useexportstore_exportstate",
+      "community": 5,
+      "norm_label": "exportstate"
+    },
+    {
+      "label": "useExportStore",
+      "file_type": "code",
+      "source_file": "ui/useExportStore.ts",
+      "source_location": "L13",
+      "id": "ui_useexportstore_useexportstore",
+      "community": 5,
+      "norm_label": "useexportstore"
+    },
+    {
       "label": "Toolbar.tsx",
       "file_type": "code",
       "source_file": "ui/Toolbar.tsx",
@@ -409,10 +445,37 @@
       "norm_label": "toolbar.tsx"
     },
     {
+      "label": "VIDEO_PRESETS",
+      "file_type": "code",
+      "source_file": "ui/Toolbar.tsx",
+      "source_location": "L19",
+      "id": "ui_toolbar_video_presets",
+      "community": 5,
+      "norm_label": "video_presets"
+    },
+    {
+      "label": "PLATFORM_RECOMMENDED",
+      "file_type": "code",
+      "source_file": "ui/Toolbar.tsx",
+      "source_location": "L25",
+      "id": "ui_toolbar_platform_recommended",
+      "community": 5,
+      "norm_label": "platform_recommended"
+    },
+    {
+      "label": "PresetKey",
+      "file_type": "code",
+      "source_file": "ui/Toolbar.tsx",
+      "source_location": "L32",
+      "id": "ui_toolbar_presetkey",
+      "community": 5,
+      "norm_label": "presetkey"
+    },
+    {
       "label": "ActiveTool",
       "file_type": "code",
       "source_file": "ui/Toolbar.tsx",
-      "source_location": "L18",
+      "source_location": "L37",
       "id": "ui_toolbar_activetool",
       "community": 5,
       "norm_label": "activetool"
@@ -421,7 +484,7 @@
       "label": "SaveStatusPill()",
       "file_type": "code",
       "source_file": "ui/Toolbar.tsx",
-      "source_location": "L41",
+      "source_location": "L60",
       "id": "ui_toolbar_savestatuspill",
       "community": 5,
       "norm_label": "savestatuspill()"
@@ -430,16 +493,34 @@
       "label": "blobToBase64()",
       "file_type": "code",
       "source_file": "ui/Toolbar.tsx",
-      "source_location": "L73",
+      "source_location": "L92",
       "id": "ui_toolbar_blobtobase64",
       "community": 5,
       "norm_label": "blobtobase64()"
     },
     {
+      "label": "VideoExportSettingsPanelProps",
+      "file_type": "code",
+      "source_file": "ui/Toolbar.tsx",
+      "source_location": "L105",
+      "id": "ui_toolbar_videoexportsettingspanelprops",
+      "community": 5,
+      "norm_label": "videoexportsettingspanelprops"
+    },
+    {
+      "label": "VideoExportSettingsPanel()",
+      "file_type": "code",
+      "source_file": "ui/Toolbar.tsx",
+      "source_location": "L116",
+      "id": "ui_toolbar_videoexportsettingspanel",
+      "community": 5,
+      "norm_label": "videoexportsettingspanel()"
+    },
+    {
       "label": "Toolbar()",
       "file_type": "code",
       "source_file": "ui/Toolbar.tsx",
-      "source_location": "L85",
+      "source_location": "L236",
       "id": "ui_toolbar_toolbar",
       "community": 5,
       "norm_label": "toolbar()"
@@ -486,7 +567,7 @@
       "source_file": "ui/LayerPanel.tsx",
       "source_location": "L20",
       "id": "ui_layerpanel_layerpanel",
-      "community": 5,
+      "community": 1,
       "norm_label": "layerpanel()"
     },
     {
@@ -868,10 +949,28 @@
       "norm_label": "videoobject"
     },
     {
+      "label": "VideoExportSettings",
+      "file_type": "code",
+      "source_file": "types/canvas.ts",
+      "source_location": "L243",
+      "id": "types_canvas_videoexportsettings",
+      "community": 19,
+      "norm_label": "videoexportsettings"
+    },
+    {
+      "label": "DEFAULT_VIDEO_EXPORT_SETTINGS",
+      "file_type": "code",
+      "source_file": "types/canvas.ts",
+      "source_location": "L254",
+      "id": "types_canvas_default_video_export_settings",
+      "community": 2,
+      "norm_label": "default_video_export_settings"
+    },
+    {
       "label": "CanvasObject",
       "file_type": "code",
       "source_file": "types/canvas.ts",
-      "source_location": "L227",
+      "source_location": "L262",
       "id": "types_canvas_canvasobject",
       "community": 2,
       "norm_label": "canvasobject"
@@ -1267,7 +1366,7 @@
       "label": "CanvasVideoNodeProps",
       "file_type": "code",
       "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L12",
+      "source_location": "L13",
       "id": "canvas_canvasvideonode_canvasvideonodeprops",
       "community": 0,
       "norm_label": "canvasvideonodeprops"
@@ -1276,7 +1375,7 @@
       "label": "CanvasVideoNodeInnerProps",
       "file_type": "code",
       "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L18",
+      "source_location": "L19",
       "id": "canvas_canvasvideonode_canvasvideonodeinnerprops",
       "community": 0,
       "norm_label": "canvasvideonodeinnerprops"
@@ -1285,7 +1384,7 @@
       "label": "CanvasVideoNodeInner()",
       "file_type": "code",
       "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L22",
+      "source_location": "L23",
       "id": "canvas_canvasvideonode_canvasvideonodeinner",
       "community": 0,
       "norm_label": "canvasvideonodeinner()"
@@ -1294,7 +1393,7 @@
       "label": "CanvasVideoNodeOuter()",
       "file_type": "code",
       "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L542",
+      "source_location": "L901",
       "id": "canvas_canvasvideonode_canvasvideonodeouter",
       "community": 0,
       "norm_label": "canvasvideonodeouter()"
@@ -1303,7 +1402,7 @@
       "label": "CanvasVideoNode",
       "file_type": "code",
       "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L548",
+      "source_location": "L907",
       "id": "canvas_canvasvideonode_canvasvideonode",
       "community": 0,
       "norm_label": "canvasvideonode"
@@ -1422,7 +1521,7 @@
       "source_file": "canvas/textSpans.ts",
       "source_location": "L27",
       "id": "canvas_textspans_resolvespanstyle",
-      "community": 7,
+      "community": 1,
       "norm_label": "resolvespanstyle()"
     },
     {
@@ -1440,7 +1539,7 @@
       "source_file": "canvas/textSpans.ts",
       "source_location": "L51",
       "id": "canvas_textspans_getselectionstyle",
-      "community": 7,
+      "community": 1,
       "norm_label": "getselectionstyle()"
     },
     {
@@ -1579,10 +1678,19 @@
       "norm_label": "videoexport.ts"
     },
     {
+      "label": "log()",
+      "file_type": "code",
+      "source_file": "canvas/videoExport.ts",
+      "source_location": "L5",
+      "id": "canvas_videoexport_log",
+      "community": 19,
+      "norm_label": "log()"
+    },
+    {
       "label": "getFFmpeg()",
       "file_type": "code",
       "source_file": "canvas/videoExport.ts",
-      "source_location": "L6",
+      "source_location": "L13",
       "id": "canvas_videoexport_getffmpeg",
       "community": 19,
       "norm_label": "getffmpeg()"
@@ -1591,7 +1699,7 @@
       "label": "encodeVideoFrames()",
       "file_type": "code",
       "source_file": "canvas/videoExport.ts",
-      "source_location": "L14",
+      "source_location": "L44",
       "id": "canvas_videoexport_encodevideoframes",
       "community": 19,
       "norm_label": "encodevideoframes()"
@@ -1600,7 +1708,7 @@
       "label": "encodeVideoWithAudio()",
       "file_type": "code",
       "source_file": "canvas/videoExport.ts",
-      "source_location": "L41",
+      "source_location": "L96",
       "id": "canvas_videoexport_encodevideowithaudio",
       "community": 19,
       "norm_label": "encodevideowithaudio()"
@@ -1762,7 +1870,7 @@
       "label": "exportMixedFrames()",
       "file_type": "code",
       "source_file": "canvas/exportFrames.ts",
-      "source_location": "L192",
+      "source_location": "L195",
       "id": "canvas_exportframes_exportmixedframes",
       "community": 19,
       "norm_label": "exportmixedframes()"
@@ -1924,7 +2032,7 @@
       "label": "normalizeObjectsForSnapshot()",
       "file_type": "code",
       "source_file": "canvas/useCanvasStore.ts",
-      "source_location": "L141",
+      "source_location": "L145",
       "id": "canvas_usecanvasstore_normalizeobjectsforsnapshot",
       "community": 0,
       "norm_label": "normalizeobjectsforsnapshot()"
@@ -1933,7 +2041,7 @@
       "label": "useCanvasStore",
       "file_type": "code",
       "source_file": "canvas/useCanvasStore.ts",
-      "source_location": "L165",
+      "source_location": "L176",
       "id": "canvas_usecanvasstore_usecanvasstore",
       "community": 0,
       "norm_label": "usecanvasstore"
@@ -2034,7 +2142,7 @@
       "source_file": "canvas/useThumbnailStore.ts",
       "source_location": "L16",
       "id": "canvas_usethumbnailstore_usethumbnailstore",
-      "community": 5,
+      "community": 1,
       "norm_label": "usethumbnailstore"
     },
     {
@@ -2104,7 +2212,7 @@
       "label": "FrameGuidesProps",
       "file_type": "code",
       "source_file": "canvas/FrameGuides.tsx",
-      "source_location": "L6",
+      "source_location": "L5",
       "id": "canvas_frameguides_frameguidesprops",
       "community": 0,
       "norm_label": "frameguidesprops"
@@ -2113,7 +2221,7 @@
       "label": "FrameGuides()",
       "file_type": "code",
       "source_file": "canvas/FrameGuides.tsx",
-      "source_location": "L13",
+      "source_location": "L10",
       "id": "canvas_frameguides_frameguides",
       "community": 0,
       "norm_label": "frameguides()"
@@ -3013,7 +3121,7 @@
       "label": "createWindow()",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L58",
+      "source_location": "L74",
       "id": "electron_index_createwindow",
       "community": 4,
       "norm_label": "createwindow()"
@@ -3022,7 +3130,7 @@
       "label": "dir",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L101",
+      "source_location": "L117",
       "id": "electron_index_dir",
       "community": 4,
       "norm_label": "dir"
@@ -3031,7 +3139,7 @@
       "label": "filePath",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L104",
+      "source_location": "L120",
       "id": "electron_index_filepath",
       "community": 4,
       "norm_label": "filepath"
@@ -3040,7 +3148,7 @@
       "label": "paths",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L186",
+      "source_location": "L212",
       "id": "electron_index_paths",
       "community": 4,
       "norm_label": "paths"
@@ -3049,7 +3157,7 @@
       "label": "files",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L192",
+      "source_location": "L218",
       "id": "electron_index_files",
       "community": 4,
       "norm_label": "files"
@@ -3058,7 +3166,7 @@
       "label": "name",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L228",
+      "source_location": "L254",
       "id": "electron_index_name",
       "community": 4,
       "norm_label": "name"
@@ -3067,7 +3175,7 @@
       "label": "editor",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L229",
+      "source_location": "L255",
       "id": "electron_index_editor",
       "community": 4,
       "norm_label": "editor"
@@ -3076,7 +3184,7 @@
       "label": "existing",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L246",
+      "source_location": "L272",
       "id": "electron_index_existing",
       "community": 4,
       "norm_label": "existing"
@@ -3085,7 +3193,7 @@
       "label": "editDir",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L255",
+      "source_location": "L281",
       "id": "electron_index_editdir",
       "community": 4,
       "norm_label": "editdir"
@@ -3094,7 +3202,7 @@
       "label": "watcher",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L278",
+      "source_location": "L304",
       "id": "electron_index_watcher",
       "community": 4,
       "norm_label": "watcher"
@@ -3103,7 +3211,7 @@
       "label": "newBase64",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L285",
+      "source_location": "L311",
       "id": "electron_index_newbase64",
       "community": 4,
       "norm_label": "newbase64"
@@ -3112,7 +3220,7 @@
       "label": "MEDIA_MIME",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L346",
+      "source_location": "L382",
       "id": "electron_index_media_mime",
       "community": 4,
       "norm_label": "media_mime"
@@ -3121,7 +3229,7 @@
       "label": "pathname",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L351",
+      "source_location": "L387",
       "id": "electron_index_pathname",
       "community": 4,
       "norm_label": "pathname"
@@ -3130,7 +3238,7 @@
       "label": "rangeHeader",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L362",
+      "source_location": "L398",
       "id": "electron_index_rangeheader",
       "community": 4,
       "norm_label": "rangeheader"
@@ -3139,7 +3247,7 @@
       "label": "nodeStream",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L367",
+      "source_location": "L403",
       "id": "electron_index_nodestream",
       "community": 4,
       "norm_label": "nodestream"
@@ -3148,10 +3256,19 @@
       "label": "body",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L368",
+      "source_location": "L404",
       "id": "electron_index_body",
       "community": 4,
       "norm_label": "body"
+    },
+    {
+      "label": "corpHeaders",
+      "file_type": "code",
+      "source_file": "electron/index.ts",
+      "source_location": "L415",
+      "id": "electron_index_corpheaders",
+      "community": 4,
+      "norm_label": "corpheaders"
     },
     {
       "label": "index.ts",
@@ -3183,6 +3300,17 @@
       "confidence_score": 1.0,
       "source": "main_tsx",
       "target": "src_main_rootel"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "main.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_main_app",
+      "target": "ui_useexportstore_useexportstore"
     },
     {
       "relation": "contains",
@@ -3621,9 +3749,9 @@
       "source_file": "ui/PropertiesPanel.tsx",
       "source_location": "L1245",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_propertiespanel_tsx",
-      "target": "ui_propertiespanel_videosectionprops",
-      "confidence_score": 1.0
+      "target": "ui_propertiespanel_videosectionprops"
     },
     {
       "relation": "contains",
@@ -3631,9 +3759,19 @@
       "source_file": "ui/PropertiesPanel.tsx",
       "source_location": "L1253",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_propertiespanel_tsx",
-      "target": "ui_propertiespanel_formatduration",
-      "confidence_score": 1.0
+      "target": "ui_propertiespanel_formatduration"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ui/PropertiesPanel.tsx",
+      "source_location": "L1261",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_trimlabelstyle"
     },
     {
       "relation": "contains",
@@ -3641,9 +3779,9 @@
       "source_file": "ui/PropertiesPanel.tsx",
       "source_location": "L1259",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_propertiespanel_tsx",
-      "target": "ui_propertiespanel_videosection",
-      "confidence_score": 1.0
+      "target": "ui_propertiespanel_videosection"
     },
     {
       "relation": "contains",
@@ -3684,9 +3822,9 @@
       "source_file": "ui/PropertiesPanel.tsx",
       "source_location": "L1323",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_propertiespanel_videosection",
-      "target": "ui_propertiespanel_numinputstyle",
-      "confidence_score": 1.0
+      "target": "ui_propertiespanel_numinputstyle"
     },
     {
       "relation": "calls",
@@ -3761,9 +3899,31 @@
       "source_file": "ui/PropertiesPanel.tsx",
       "source_location": "L1272",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_propertiespanel_videosection",
-      "target": "ui_propertiespanel_formatduration",
-      "confidence_score": 1.0
+      "target": "ui_propertiespanel_formatduration"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ui/PropertiesPanel.tsx",
+      "source_location": "L1278",
+      "weight": 1.0,
+      "source": "ui_propertiespanel_videosection",
+      "target": "canvas_usecanvasstore_usecanvasstore"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "ui/PropertiesPanel.tsx",
+      "source_location": "L1284",
+      "weight": 1.0,
+      "source": "ui_propertiespanel_videosection",
+      "target": "canvas_usethumbnailstore_usethumbnailstore"
     },
     {
       "relation": "calls",
@@ -3874,6 +4034,59 @@
       "target": "ui_fontpicker_fontpicker"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ui/useExportStore.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_useexportstore_ts",
+      "target": "ui_useexportstore_exportstate"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ui/useExportStore.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_useexportstore_ts",
+      "target": "ui_useexportstore_useexportstore"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "ui/Toolbar.tsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_toolbar_tsx",
+      "target": "ui_useexportstore_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "ui/Toolbar.tsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_toolbar_tsx",
+      "target": "ui_useexportstore_useexportstore"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ui/Toolbar.tsx",
+      "source_location": "L123",
+      "weight": 1.0,
+      "source": "ui_toolbar_toolbar",
+      "target": "ui_useexportstore_useexportstore"
+    },
+    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -3916,6 +4129,36 @@
       "confidence_score": 1.0,
       "source": "ui_toolbar_tsx",
       "target": "ui_tooltip_tsx"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ui/Toolbar.tsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "ui_toolbar_tsx",
+      "target": "ui_toolbar_video_presets",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ui/Toolbar.tsx",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "ui_toolbar_tsx",
+      "target": "ui_toolbar_platform_recommended",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ui/Toolbar.tsx",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "ui_toolbar_tsx",
+      "target": "ui_toolbar_presetkey",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -3965,8 +4208,28 @@
       "source_file": "ui/Toolbar.tsx",
       "source_location": "L73",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_toolbar_tsx",
-      "target": "ui_toolbar_blobtobase64",
+      "target": "ui_toolbar_blobtobase64"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ui/Toolbar.tsx",
+      "source_location": "L105",
+      "weight": 1.0,
+      "source": "ui_toolbar_tsx",
+      "target": "ui_toolbar_videoexportsettingspanelprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "ui/Toolbar.tsx",
+      "source_location": "L116",
+      "weight": 1.0,
+      "source": "ui_toolbar_tsx",
+      "target": "ui_toolbar_videoexportsettingspanel",
       "confidence_score": 1.0
     },
     {
@@ -4051,9 +4314,9 @@
       "source_file": "ui/LayerPanel.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_layerpanel_tsx",
-      "target": "ui_iconbtnstyle_ts",
-      "confidence_score": 1.0
+      "target": "ui_iconbtnstyle_ts"
     },
     {
       "relation": "imports",
@@ -4062,9 +4325,9 @@
       "source_file": "ui/LayerPanel.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_layerpanel_tsx",
-      "target": "ui_iconbtnstyle_iconbtnstyle",
-      "confidence_score": 1.0
+      "target": "ui_iconbtnstyle_iconbtnstyle"
     },
     {
       "relation": "imports_from",
@@ -4883,9 +5146,29 @@
       "source_file": "types/canvas.ts",
       "source_location": "L198",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "types_canvas_ts",
-      "target": "types_canvas_videoobject",
-      "confidence_score": 1.0
+      "target": "types_canvas_videoobject"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "types/canvas.ts",
+      "source_location": "L243",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "types_canvas_ts",
+      "target": "types_canvas_videoexportsettings"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "types/canvas.ts",
+      "source_location": "L254",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "types_canvas_ts",
+      "target": "types_canvas_default_video_export_settings"
     },
     {
       "relation": "contains",
@@ -4937,9 +5220,9 @@
       "source_file": "canvas/exportFrames.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_exportframes_ts",
-      "target": "types_canvas_ts",
-      "confidence_score": 1.0
+      "target": "types_canvas_ts"
     },
     {
       "relation": "imports_from",
@@ -5311,9 +5594,20 @@
       "source_file": "canvas/exportFrames.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_exportframes_ts",
-      "target": "types_canvas_videoobject",
-      "confidence_score": 1.0
+      "target": "types_canvas_videoobject"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/exportFrames.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_exportframes_ts",
+      "target": "types_canvas_videoexportsettings"
     },
     {
       "relation": "imports",
@@ -5355,9 +5649,9 @@
       "source_file": "canvas/exportFrames.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_exportframes_ts",
-      "target": "types_canvas_canvasobject",
-      "confidence_score": 1.0
+      "target": "types_canvas_canvasobject"
     },
     {
       "relation": "references",
@@ -6101,9 +6395,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_usecanvasstore_ts",
-      "confidence_score": 1.0
+      "target": "canvas_usecanvasstore_ts"
     },
     {
       "relation": "imports",
@@ -6112,9 +6406,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_usecanvasstore_usecanvasstore",
-      "confidence_score": 1.0
+      "target": "canvas_usecanvasstore_usecanvasstore"
     },
     {
       "relation": "imports_from",
@@ -6123,9 +6417,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_usesnapguides_ts",
-      "confidence_score": 1.0
+      "target": "canvas_usesnapguides_ts"
     },
     {
       "relation": "imports",
@@ -6134,9 +6428,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_usesnapguides_usesnapguides",
-      "confidence_score": 1.0
+      "target": "canvas_usesnapguides_usesnapguides"
     },
     {
       "relation": "imports",
@@ -6145,9 +6439,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_usesnapguides_snapguide",
-      "confidence_score": 1.0
+      "target": "canvas_usesnapguides_snapguide"
     },
     {
       "relation": "imports_from",
@@ -6156,9 +6450,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_constants_ts",
-      "confidence_score": 1.0
+      "target": "canvas_constants_ts"
     },
     {
       "relation": "imports",
@@ -6167,9 +6461,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_constants_axislock",
-      "confidence_score": 1.0
+      "target": "canvas_constants_axislock"
     },
     {
       "relation": "imports_from",
@@ -6178,9 +6472,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_useviewportstore_ts",
-      "confidence_score": 1.0
+      "target": "canvas_useviewportstore_ts"
     },
     {
       "relation": "imports",
@@ -6189,9 +6483,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_useviewportstore_useviewportstore",
-      "confidence_score": 1.0
+      "target": "canvas_useviewportstore_useviewportstore"
     },
     {
       "relation": "imports_from",
@@ -6200,9 +6494,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_videoelementregistry_ts",
-      "confidence_score": 1.0
+      "target": "canvas_videoelementregistry_ts"
     },
     {
       "relation": "imports",
@@ -6211,9 +6505,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_videoelementregistry_registervideoelement",
-      "confidence_score": 1.0
+      "target": "canvas_videoelementregistry_registervideoelement"
     },
     {
       "relation": "imports",
@@ -6222,9 +6516,31 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_videoelementregistry_unregistervideoelement",
-      "confidence_score": 1.0
+      "target": "canvas_videoelementregistry_unregistervideoelement"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasVideoNode.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_canvasvideonode_tsx",
+      "target": "canvas_canvaspathnode_tsx"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasVideoNode.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_canvasvideonode_tsx",
+      "target": "canvas_canvaspathnode_anchorstopathdata"
     },
     {
       "relation": "contains",
@@ -6232,9 +6548,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_canvasvideonode_canvasvideonodeprops",
-      "confidence_score": 1.0
+      "target": "canvas_canvasvideonode_canvasvideonodeprops"
     },
     {
       "relation": "contains",
@@ -6242,9 +6558,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_canvasvideonode_canvasvideonodeinnerprops",
-      "confidence_score": 1.0
+      "target": "canvas_canvasvideonode_canvasvideonodeinnerprops"
     },
     {
       "relation": "contains",
@@ -6252,9 +6568,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_canvasvideonode_canvasvideonodeinner",
-      "confidence_score": 1.0
+      "target": "canvas_canvasvideonode_canvasvideonodeinner"
     },
     {
       "relation": "contains",
@@ -6262,9 +6578,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L542",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_canvasvideonode_canvasvideonodeouter",
-      "confidence_score": 1.0
+      "target": "canvas_canvasvideonode_canvasvideonodeouter"
     },
     {
       "relation": "contains",
@@ -6272,9 +6588,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L548",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_canvasvideonode_canvasvideonode",
-      "confidence_score": 1.0
+      "target": "canvas_canvasvideonode_canvasvideonode"
     },
     {
       "relation": "imports_from",
@@ -6283,9 +6599,9 @@
       "source_file": "canvas/CarouselStage.tsx",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_carouselstage_tsx",
-      "target": "canvas_canvasvideonode_tsx",
-      "confidence_score": 1.0
+      "target": "canvas_canvasvideonode_tsx"
     },
     {
       "relation": "references",
@@ -6294,9 +6610,9 @@
       "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_canvasvideonodeprops",
-      "target": "canvas_usesnapguides_snapguide",
-      "confidence_score": 1.0
+      "target": "canvas_usesnapguides_snapguide"
     },
     {
       "relation": "calls",
@@ -6349,9 +6665,9 @@
       "source_file": "canvas/CarouselStage.tsx",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_carouselstage_tsx",
-      "target": "canvas_canvasvideonode_canvasvideonode",
-      "confidence_score": 1.0
+      "target": "canvas_canvasvideonode_canvasvideonode"
     },
     {
       "relation": "imports_from",
@@ -6382,9 +6698,9 @@
       "source_file": "canvas/useAutosave.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_useautosave_ts",
-      "target": "canvas_pathutils_ts",
-      "confidence_score": 1.0
+      "target": "canvas_pathutils_ts"
     },
     {
       "relation": "imports",
@@ -6393,9 +6709,9 @@
       "source_file": "canvas/useAutosave.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_useautosave_ts",
-      "target": "canvas_pathutils_relativizevideoobjects",
-      "confidence_score": 1.0
+      "target": "canvas_pathutils_relativizevideoobjects"
     },
     {
       "relation": "contains",
@@ -7060,9 +7376,9 @@
       "source_file": "canvas/CarouselStage.tsx",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_carouselstage_tsx",
-      "target": "canvas_usevideodrop_ts",
-      "confidence_score": 1.0
+      "target": "canvas_usevideodrop_ts"
     },
     {
       "relation": "imports",
@@ -7071,9 +7387,9 @@
       "source_file": "canvas/CarouselStage.tsx",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_carouselstage_tsx",
-      "target": "canvas_usevideodrop_usevideodrop",
-      "confidence_score": 1.0
+      "target": "canvas_usevideodrop_usevideodrop"
     },
     {
       "relation": "imports_from",
@@ -7458,11 +7774,21 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "canvas/videoExport.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_videoexport_ts",
+      "target": "canvas_videoexport_log"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/videoExport.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_videoexport_ts",
-      "target": "canvas_videoexport_getffmpeg",
-      "confidence_score": 1.0
+      "target": "canvas_videoexport_getffmpeg"
     },
     {
       "relation": "contains",
@@ -7470,9 +7796,9 @@
       "source_file": "canvas/videoExport.ts",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_videoexport_ts",
-      "target": "canvas_videoexport_encodevideoframes",
-      "confidence_score": 1.0
+      "target": "canvas_videoexport_encodevideoframes"
     },
     {
       "relation": "contains",
@@ -7480,9 +7806,9 @@
       "source_file": "canvas/videoExport.ts",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_videoexport_ts",
-      "target": "canvas_videoexport_encodevideowithaudio",
-      "confidence_score": 1.0
+      "target": "canvas_videoexport_encodevideowithaudio"
     },
     {
       "relation": "imports_from",
@@ -7491,9 +7817,42 @@
       "source_file": "canvas/exportFrames.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_exportframes_ts",
-      "target": "canvas_videoexport_ts",
-      "confidence_score": 1.0
+      "target": "canvas_videoexport_ts"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/videoExport.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_videoexport_getffmpeg",
+      "target": "canvas_videoexport_log"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/videoExport.ts",
+      "source_location": "L50",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_videoexport_encodevideoframes",
+      "target": "canvas_videoexport_log"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/videoExport.ts",
+      "source_location": "L95",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_videoexport_encodevideowithaudio",
+      "target": "canvas_videoexport_log"
     },
     {
       "relation": "calls",
@@ -7502,9 +7861,9 @@
       "source_file": "canvas/videoExport.ts",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_videoexport_encodevideoframes",
-      "target": "canvas_videoexport_getffmpeg",
-      "confidence_score": 1.0
+      "target": "canvas_videoexport_getffmpeg"
     },
     {
       "relation": "calls",
@@ -7513,9 +7872,9 @@
       "source_file": "canvas/videoExport.ts",
       "source_location": "L48",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_videoexport_encodevideowithaudio",
-      "target": "canvas_videoexport_getffmpeg",
-      "confidence_score": 1.0
+      "target": "canvas_videoexport_getffmpeg"
     },
     {
       "relation": "imports",
@@ -7524,9 +7883,9 @@
       "source_file": "canvas/exportFrames.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_exportframes_ts",
-      "target": "canvas_videoexport_encodevideoframes",
-      "confidence_score": 1.0
+      "target": "canvas_videoexport_encodevideoframes"
     },
     {
       "relation": "calls",
@@ -7546,9 +7905,9 @@
       "source_file": "canvas/exportFrames.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_exportframes_ts",
-      "target": "canvas_videoexport_encodevideowithaudio",
-      "confidence_score": 1.0
+      "target": "canvas_videoexport_encodevideowithaudio"
     },
     {
       "relation": "calls",
@@ -7932,9 +8291,9 @@
       "source_file": "canvas/exportFrames.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_exportframes_ts",
-      "target": "canvas_videoelementregistry_ts",
-      "confidence_score": 1.0
+      "target": "canvas_videoelementregistry_ts"
     },
     {
       "relation": "imports",
@@ -7943,9 +8302,9 @@
       "source_file": "canvas/exportFrames.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_exportframes_ts",
-      "target": "canvas_videoelementregistry_getvideoelement",
-      "confidence_score": 1.0
+      "target": "canvas_videoelementregistry_getvideoelement"
     },
     {
       "relation": "contains",
@@ -7973,9 +8332,9 @@
       "source_file": "canvas/exportFrames.ts",
       "source_location": "L139",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_exportframes_ts",
-      "target": "canvas_exportframes_exportresult",
-      "confidence_score": 1.0
+      "target": "canvas_exportframes_exportresult"
     },
     {
       "relation": "contains",
@@ -7983,9 +8342,9 @@
       "source_file": "canvas/exportFrames.ts",
       "source_location": "L145",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_exportframes_ts",
-      "target": "canvas_exportframes_capturevideoframesequence",
-      "confidence_score": 1.0
+      "target": "canvas_exportframes_capturevideoframesequence"
     },
     {
       "relation": "contains",
@@ -7993,9 +8352,9 @@
       "source_file": "canvas/exportFrames.ts",
       "source_location": "L192",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_exportframes_ts",
-      "target": "canvas_exportframes_exportmixedframes",
-      "confidence_score": 1.0
+      "target": "canvas_exportframes_exportmixedframes"
     },
     {
       "relation": "re_exports",
@@ -8037,9 +8396,9 @@
       "source_file": "canvas/exportFrames.ts",
       "source_location": "L279",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_exportframes_exportmixedframes",
-      "target": "canvas_exportframes_capturevideoframesequence",
-      "confidence_score": 1.0
+      "target": "canvas_exportframes_capturevideoframesequence"
     },
     {
       "relation": "imports_from",
@@ -8295,9 +8654,9 @@
       "source_file": "canvas/useVideoDrop.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_usevideodrop_ts",
-      "target": "canvas_usecanvasstore_ts",
-      "confidence_score": 1.0
+      "target": "canvas_usecanvasstore_ts"
     },
     {
       "relation": "imports",
@@ -8306,9 +8665,9 @@
       "source_file": "canvas/useVideoDrop.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_usevideodrop_ts",
-      "target": "canvas_usecanvasstore_usecanvasstore",
-      "confidence_score": 1.0
+      "target": "canvas_usecanvasstore_usecanvasstore"
     },
     {
       "relation": "contains",
@@ -8316,9 +8675,9 @@
       "source_file": "canvas/useVideoDrop.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_usevideodrop_ts",
-      "target": "canvas_usevideodrop_electronfile",
-      "confidence_score": 1.0
+      "target": "canvas_usevideodrop_electronfile"
     },
     {
       "relation": "contains",
@@ -8326,9 +8685,9 @@
       "source_file": "canvas/useVideoDrop.ts",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_usevideodrop_ts",
-      "target": "canvas_usevideodrop_usevideodrop",
-      "confidence_score": 1.0
+      "target": "canvas_usevideodrop_usevideodrop"
     },
     {
       "relation": "calls",
@@ -8907,9 +9266,9 @@
       "source_file": "canvas/useKeyboardShortcuts.ts",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_usekeyboardshortcuts_ts",
-      "target": "canvas_pathutils_ts",
-      "confidence_score": 1.0
+      "target": "canvas_pathutils_ts"
     },
     {
       "relation": "imports",
@@ -8918,9 +9277,9 @@
       "source_file": "canvas/useKeyboardShortcuts.ts",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_usekeyboardshortcuts_ts",
-      "target": "canvas_pathutils_relativizevideoobjects",
-      "confidence_score": 1.0
+      "target": "canvas_pathutils_relativizevideoobjects"
     },
     {
       "relation": "contains",
@@ -8949,9 +9308,9 @@
       "source_file": "canvas/useKeyboardShortcuts.ts",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_usekeyboardshortcuts_buildprojectsnapshot",
-      "target": "canvas_pathutils_relativizevideoobjects",
-      "confidence_score": 1.0
+      "target": "canvas_pathutils_relativizevideoobjects"
     },
     {
       "relation": "contains",
@@ -8979,9 +9338,9 @@
       "source_file": "canvas/videoElementRegistry.ts",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_videoelementregistry_ts",
-      "target": "canvas_videoelementregistry_registry",
-      "confidence_score": 1.0
+      "target": "canvas_videoelementregistry_registry"
     },
     {
       "relation": "contains",
@@ -8989,9 +9348,9 @@
       "source_file": "canvas/videoElementRegistry.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_videoelementregistry_ts",
-      "target": "canvas_videoelementregistry_registervideoelement",
-      "confidence_score": 1.0
+      "target": "canvas_videoelementregistry_registervideoelement"
     },
     {
       "relation": "contains",
@@ -8999,9 +9358,9 @@
       "source_file": "canvas/videoElementRegistry.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_videoelementregistry_ts",
-      "target": "canvas_videoelementregistry_unregistervideoelement",
-      "confidence_score": 1.0
+      "target": "canvas_videoelementregistry_unregistervideoelement"
     },
     {
       "relation": "contains",
@@ -9009,9 +9368,9 @@
       "source_file": "canvas/videoElementRegistry.ts",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_videoelementregistry_ts",
-      "target": "canvas_videoelementregistry_getvideoelement",
-      "confidence_score": 1.0
+      "target": "canvas_videoelementregistry_getvideoelement"
     },
     {
       "relation": "contains",
@@ -9049,9 +9408,9 @@
       "source_file": "canvas/pathUtils.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_pathutils_ts",
-      "target": "canvas_pathutils_posixdirname",
-      "confidence_score": 1.0
+      "target": "canvas_pathutils_posixdirname"
     },
     {
       "relation": "contains",
@@ -9059,9 +9418,9 @@
       "source_file": "canvas/pathUtils.ts",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_pathutils_ts",
-      "target": "canvas_pathutils_posixrelative",
-      "confidence_score": 1.0
+      "target": "canvas_pathutils_posixrelative"
     },
     {
       "relation": "contains",
@@ -9069,9 +9428,9 @@
       "source_file": "canvas/pathUtils.ts",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_pathutils_ts",
-      "target": "canvas_pathutils_posixresolve",
-      "confidence_score": 1.0
+      "target": "canvas_pathutils_posixresolve"
     },
     {
       "relation": "contains",
@@ -9079,9 +9438,9 @@
       "source_file": "canvas/pathUtils.ts",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_pathutils_ts",
-      "target": "canvas_pathutils_relativizevideoobjects",
-      "confidence_score": 1.0
+      "target": "canvas_pathutils_relativizevideoobjects"
     },
     {
       "relation": "contains",
@@ -9089,9 +9448,9 @@
       "source_file": "canvas/pathUtils.ts",
       "source_location": "L44",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_pathutils_ts",
-      "target": "canvas_pathutils_resolvevideoobjects",
-      "confidence_score": 1.0
+      "target": "canvas_pathutils_resolvevideoobjects"
     },
     {
       "relation": "calls",
@@ -9100,9 +9459,9 @@
       "source_file": "canvas/pathUtils.ts",
       "source_location": "L31",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_pathutils_relativizevideoobjects",
-      "target": "canvas_pathutils_posixdirname",
-      "confidence_score": 1.0
+      "target": "canvas_pathutils_posixdirname"
     },
     {
       "relation": "calls",
@@ -9111,9 +9470,9 @@
       "source_file": "canvas/pathUtils.ts",
       "source_location": "L48",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_pathutils_resolvevideoobjects",
-      "target": "canvas_pathutils_posixdirname",
-      "confidence_score": 1.0
+      "target": "canvas_pathutils_posixdirname"
     },
     {
       "relation": "calls",
@@ -9122,9 +9481,9 @@
       "source_file": "canvas/pathUtils.ts",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_pathutils_relativizevideoobjects",
-      "target": "canvas_pathutils_posixrelative",
-      "confidence_score": 1.0
+      "target": "canvas_pathutils_posixrelative"
     },
     {
       "relation": "calls",
@@ -9133,9 +9492,9 @@
       "source_file": "canvas/pathUtils.ts",
       "source_location": "L54",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_pathutils_resolvevideoobjects",
-      "target": "canvas_pathutils_posixresolve",
-      "confidence_score": 1.0
+      "target": "canvas_pathutils_posixresolve"
     },
     {
       "relation": "imports_from",
@@ -10590,9 +10949,9 @@
       "source_file": "electron/index.ts",
       "source_location": "L346",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "electron_index_ts",
-      "target": "electron_index_media_mime",
-      "confidence_score": 1.0
+      "target": "electron_index_media_mime"
     },
     {
       "relation": "contains",
@@ -10600,9 +10959,9 @@
       "source_file": "electron/index.ts",
       "source_location": "L351",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "electron_index_ts",
-      "target": "electron_index_pathname",
-      "confidence_score": 1.0
+      "target": "electron_index_pathname"
     },
     {
       "relation": "contains",
@@ -10610,9 +10969,9 @@
       "source_file": "electron/index.ts",
       "source_location": "L362",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "electron_index_ts",
-      "target": "electron_index_rangeheader",
-      "confidence_score": 1.0
+      "target": "electron_index_rangeheader"
     },
     {
       "relation": "contains",
@@ -10620,9 +10979,9 @@
       "source_file": "electron/index.ts",
       "source_location": "L367",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "electron_index_ts",
-      "target": "electron_index_nodestream",
-      "confidence_score": 1.0
+      "target": "electron_index_nodestream"
     },
     {
       "relation": "contains",
@@ -10630,9 +10989,19 @@
       "source_file": "electron/index.ts",
       "source_location": "L368",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "electron_index_ts",
-      "target": "electron_index_body",
-      "confidence_score": 1.0
+      "target": "electron_index_body"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "electron/index.ts",
+      "source_location": "L415",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "electron_index_ts",
+      "target": "electron_index_corpheaders"
     },
     {
       "relation": "calls",
@@ -10669,5 +11038,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "a1294e6c519a8ab65b892c44b178caf47c89816a"
+  "built_at_commit": "b156af61b697b0d3b2d9f480420af55d1b2668d4"
 }
