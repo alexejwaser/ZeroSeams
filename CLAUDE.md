@@ -172,10 +172,10 @@ Design tokens live in `src/ui/theme.css` — the single source of truth for all 
 **Color swatches:** `input[type="color"]` gets `-webkit-appearance: none` + `::-webkit-color-swatch { border: none; border-radius: 3px }` via `theme.css`. Just set `width`/`height` inline; the CSS handles everything else.
 
 **Layout:**
-- `TitleBar` (full width, 52px) — logo, file ops, undo/redo pill
-- `ToolBar` (canvas column only, 50px) — drawing tools, frame settings, export
-- `LayerPanel` spans the full body height (starts directly below `TitleBar`, not below `ToolBar`)
-- See `src/main.tsx` for the flex nesting that achieves this
+- `TitleBar` (full width, 52px) — logo, file ops, frame settings, frames counter, preview, export, undo/redo
+- `ToolBar` (center column only, 50px) — drawing tools only (select, snap, resize mode, text, shape, pen, video, mask)
+- `LayerPanel` + `PropertiesPanel` both span the full body height (start directly below `TitleBar`, not below `ToolBar`)
+- Middle row: LayerPanel | [ToolBar + canvas column] | PropertiesPanel — see `src/main.tsx`
 
 **Konva handles:** all `borderStroke`/`anchorStroke` use `#f94608` (orange). Content-edit mode uses the same accent. Snap guides use `#f94608` for object snaps; `#ff3b5c` for frame snaps (intentionally distinct).
 

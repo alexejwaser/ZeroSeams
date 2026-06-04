@@ -65,8 +65,8 @@
     "semantic_hash": "b3105c417982827b358b9698221d7fab"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/main.tsx": {
-    "mtime": 1780507506.8739288,
-    "ast_hash": "473665356f0e31918d6f7df8d33cce2f",
+    "mtime": 1780578638.4509392,
+    "ast_hash": "3c47c40e17b20a720f7dc8c520da0d38",
     "semantic_hash": ""
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/ui/FrameSettingsPopover.tsx": {
@@ -90,8 +90,8 @@
     "semantic_hash": "eb470bb844b13eec605b56d7d6154a7f"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/ui/Toolbar.tsx": {
-    "mtime": 1780507486.2787693,
-    "ast_hash": "c25a9e9800a1b31bc3d8d096468d3ae0",
+    "mtime": 1780578920.3222547,
+    "ast_hash": "efa57fdf3959b1d61faae147a3dd2072",
     "semantic_hash": ""
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/ui/iconBtnStyle.ts": {
@@ -200,8 +200,8 @@
     "semantic_hash": "6409aaa933ad0786d8e935147e60baeb"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/canvas/CarouselStage.tsx": {
-    "mtime": 1780506255.822972,
-    "ast_hash": "7d8190ecd9efa99e7768b2bed9536fc1",
+    "mtime": 1780577813.0369408,
+    "ast_hash": "4956cffedf9116e83cfaf624342915ac",
     "semantic_hash": ""
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/canvas/SnapGuides.tsx": {
