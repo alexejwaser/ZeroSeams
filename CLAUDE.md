@@ -58,11 +58,14 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `boundBoxFunc` receives absolute screen coords — convert absolute→logical before snapping, back to absolute before returning; `logicalThreshold = 8 / scale`
 - `snapEnabled: boolean` in store; `rotationSnaps=[0,45,90,135,180,225,270,315]` on all Transformers
 - Snap is **disabled** for pen anchor drag and line endpoint drag
+- `startSnapSession(id)` / `endSnapSession()` — call at `onDragStart`/`onDragEnd` and `onTransformStart`/`onTransformEnd` on every draggable node; caches `buildTargets` result for the drag duration so it runs once per gesture, not per mousemove
 
 **History & Drag Pattern:**
 - `past[]`/`future[]` snapshots; `commitUpdate` = push snapshot; load project resets history
 - Drag pattern (all sliders): `onMouseDown` → `startDrag()` captures pre-drag state; `onChange` → `updateObject` (live, no history push); `onMouseUp` → `commitUpdate`. Ensures undo reaches pre-drag state, not mid-drag.
 - `reorderObjects` pushes history — undoable via Cmd+Z
+- `_srcVault: Map<id, {src, originalSrc?}>` lives outside history — `normalizeObjectsForSnapshot` strips base64 `src` from snapshots; `reinjectSrc` restores on undo/redo. Background-removal `src` changes are therefore not undoable at pixel level (acceptable — feature not yet wired to history).
+- `_openEditModeCount: number` tracks objects in any edit mode — `normalizeObjectsForSnapshot` skips the edit-mode clearing loop when 0 (common case). Kept in sync by `updateObject`, `commitUpdate`, and all direct mode-set actions.
 
 **Per-Object Subscription Pattern:**
 - Each canvas node: outer subscribes to `s.objects[id]` + returns null if missing/hidden; inner subscribes to `s.selectedId === id`; both `React.memo`-wrapped
