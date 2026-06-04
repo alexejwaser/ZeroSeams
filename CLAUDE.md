@@ -1,42 +1,41 @@
 # Zero Seams — AI Dev Guide
 
-## MANDATORY: Query the knowledge graph before reading files
-Before opening any source file, always run:
+## MANDATORY: Query the graph before reading files
 ```
-graphify query "<your question>"
+graphify query "<question>"        # BFS traversal, instant
+graphify path "<A>" "<B>"          # relationship between two nodes
+graphify explain "<concept>"       # focused concept deep-dive
+graphify update ./src              # after any code change (AST-only, no API cost)
 ```
-The graph lives in `graphify-out/` — BFS traversal, instant, no re-extraction needed. Only fall back to reading source files when the graph answer is incomplete or you need exact line-level detail.
+Only fall back to reading source files when the graph answer is incomplete or you need exact line-level detail.
 
-## Knowledge Graph (`graphify-out/`)
-A queryable knowledge graph of the codebase lives in `graphify-out/`. Use it before exploring code manually.
+**God nodes — touch carefully:**
+- `useCanvasStore` (39 edges) — owns all canvas state
+- `buildFilterPipeline` (18 edges) — called on every image render; LUT-cached
+- `CarouselStage` (16 edges) — canvas composition root
 
-- **Query:** `graphify query "<question>"` — BFS traversal, no re-extraction, answers from graph structure
-- **Update after code changes:** `graphify update ./src` — incremental, only re-extracts changed files
-- **Rebuild from scratch:** `/graphify` in Claude Code
-
-Key god nodes (highest edge count — touch these carefully):
-- `useCanvasStore` (39 edges) — owns all canvas state; every node, panel, and AI hook reads/writes it
-- `buildFilterPipeline` (18 edges) — called on every image node render; LUT-cached but closure refs are new per call (see issue #37)
-- `CarouselStage` (16 edges) — canvas composition root; mounts all node components
-
-Main communities: Canvas Node Components · UI Architecture Concepts · Electron IPC & Save System · Photo Filter Pipeline · AI Subsystem · Type System & Text Utilities · E2E Test Infrastructure
+## Maintaining this file
+At the end of any session that introduces non-obvious patterns, invariants, or decisions:
+- Add the invariant to the relevant section (one line rule + one line why, if not obvious)
+- Move implementation narrative to source file comments where it belongs
+- Remove entries that are now obvious from the code or duplicated in comments
+- Never add sprint history or feature changelogs — those belong in git
 
 ## What this is
 Desktop Electron app for seamless Instagram carousels. One long horizontal canvas sliced into Instagram frames.
 
-## Tech Stack
-Electron + React + TypeScript · Konva.js/react-konva · Zustand · @imgly/background-removal (WASM) · ONNX Runtime (SAM/LaMa)
-
-## Core Concepts — never break these
-- Canvas = one long surface, N frames wide
-- Frame = one Instagram slide — 1080×1080 or 1080×1350; controlled by `ratio` in store
-- `frameHeight` is dynamic — always read from store, never hardcode it
-- Objects are `global` (span canvas freely) or `pinned` (locked to a frame)
-- Export = slice canvas at frame boundaries → array of PNGs via Electron IPC
+**Stack:** Electron + React + TypeScript · Konva.js/react-konva · Zustand · @imgly/background-removal (WASM) · ONNX Runtime (SAM/LaMa) · FFmpeg WASM (video export)
 
 ## File Ownership
 - `src/canvas/` — canvas-agent · `src/ui/` — ui-agent · `src/ai/` — ai-agent
 - `src/electron/` — electron-agent · `src/store/` — shared, coordinate before editing
+
+## Core Concepts — never break these
+- Canvas = one long surface, N frames wide
+- Frame = one Instagram slide — 1080×1080 or 1080×1350; controlled by `ratio` in store
+- `frameHeight` is dynamic — always read from store, never hardcode
+- Objects are `global` (span canvas freely) or `pinned` (locked to a frame)
+- Export = slice canvas at frame boundaries → array of PNGs via Electron IPC
 
 ## Key Architecture
 
@@ -44,150 +43,109 @@ Electron + React + TypeScript · Konva.js/react-konva · Zustand · @imgly/backg
 - Frame (`frameX/Y`, `frameWidth/Height`) = visible crop viewport; `x/y/width/height` kept in sync
 - Content (`contentOffsetX/Y`, `contentWidth/Height`) = bitmap floating inside frame
 - `naturalWidth/naturalHeight` = intrinsic bitmap dims, set at drop time, never changes
-- `contentEditMode: boolean` — false = frame transformer (blue); true = content mode (orange #ff7043)
-- Transformer is always a sibling of the Group, never inside it; Rect (not Group) is the transform target in frame mode
-- `resizeMode` in store (`'advanced'|'auto'`): advanced = frame resize crops; auto = cover-fits content to new frame
+- `contentEditMode: boolean` — false = frame transformer (blue); true = content mode (orange `#f94608`)
+- Transformer is always a sibling of the Group, never inside it; Rect (not Group) is transform target in frame mode
+- `resizeMode` (`'advanced'|'auto'`): advanced = frame resize crops; auto = cover-fits content to new frame
+- Image Transformer always `keepRatio={false}`; Group transformer always `keepRatio={true}`
 
 **Multi-Select:**
-- `selectedId` — Properties Panel; `selectedIds[]` — group transformer + align/distribute; `anchorId` — alignment reference (gold #f5a623 border)
-- `setSelected(id)` sets both; `addToSelection(id)` shift+click appends; clicking selected object → promotes to `anchorId`
-- When `selectedIds.length > 1`: group `<Transformer>` active; individual transformers/draggable suppressed; marquee on empty canvas selects by overlap
+- `selectedId` — Properties Panel; `selectedIds[]` — group transformer + align/distribute; `anchorId` — alignment reference (gold `#f5a623` border)
+- `setSelected(id)` sets both; `addToSelection(id)` shift+click appends; clicking already-selected → promotes to `anchorId`
 - `commitMultipleUpdates(patches)` / `removeMultipleObjects(ids)` — atomic batch ops, single history entry
 
-**Snap** (`useSnapGuides.ts`): snaps to frame edges/centers + objects' edges/centers, 8px threshold.
-- Single: `computeSnap`/`computeSnapResize`; Group: `computeSnapGroup`/`computeSnapResizeGroup`
-- `boundBoxFunc` receives absolute screen coords — always convert absolute→logical before snapping, back to absolute before returning. `logicalThreshold = 8 / scale`.
-- `snapEnabled: boolean` in store; `snapRotation` + position/resize methods all gate on it; `rotationSnaps=[0,45,90,135,180,225,270,315]` on all Transformers
+**Snap** (`useSnapGuides.ts`):
+- Snaps to frame edges/centers + objects' edges/centers, 8px threshold
+- `boundBoxFunc` receives absolute screen coords — convert absolute→logical before snapping, back to absolute before returning; `logicalThreshold = 8 / scale`
+- `snapEnabled: boolean` in store; `rotationSnaps=[0,45,90,135,180,225,270,315]` on all Transformers
+- Snap is **disabled** for pen anchor drag and line endpoint drag
 
-**Other invariants:**
-- Shape/Ellipse: store uses bounding-box top-left `(x,y)` for ALL types; Konva Ellipse uses center — convert at render time
+**History & Drag Pattern:**
+- `past[]`/`future[]` snapshots; `commitUpdate` = push snapshot; load project resets history
+- Drag pattern (all sliders): `onMouseDown` → `startDrag()` captures pre-drag state; `onChange` → `updateObject` (live, no history push); `onMouseUp` → `commitUpdate`. Ensures undo reaches pre-drag state, not mid-drag.
+- `reorderObjects` pushes history — undoable via Cmd+Z
+
+**Per-Object Subscription Pattern:**
+- Each canvas node: outer subscribes to `s.objects[id]` + returns null if missing/hidden; inner subscribes to `s.selectedId === id`; both `React.memo`-wrapped
+- Prevents CarouselStage re-renders from cascading to nodes during drag
+- Handlers call `useCanvasStore.getState().setSelected(id)` directly — no `onSelect` prop
+
+**Shape/Text/Pen invariants:**
+- Shape/Ellipse: store uses bounding-box top-left `(x,y)`; Konva Ellipse uses center — convert at render time
 - Text: handles resize the textbox, text reflows; `scaleX/Y` always 1 after transform
-- Pen: `PathObject` with `anchors: AnchorPoint[]`; `CanvasPathNode.tsx` renders SVG; `anchorsToPathData()` exported for CarouselStage; transform bakes full affine matrix into anchors, resets node to identity
-- Image Transformer always `keepRatio={false}` — both modes allow free frame resize; the difference is content reaction: auto = cover-fill, advanced = crop. Group transformer always `keepRatio={true}`
-- Shift+drag axis-locks to nearest 0/45/90/135° axis via `axisLock(dx,dy)` in `constants.ts`
+- Pen: `PathObject` with `anchors: AnchorPoint[]`; transform bakes full affine matrix into anchors, resets node to identity
+- Shift+drag axis-locks via `axisLock(dx,dy)` in `constants.ts`
 - `locked: boolean` on every object — no handles, no drag, no double-click
-- History: `past[]`/`future[]` snapshots; `commitUpdate` = push snapshot; load project resets history
-- **Drag pattern** (range sliders): `onMouseDown` → `startDrag()` captures pre-drag objects; `onChange` → `updateObject` (live preview, no history); `onMouseUp` → `commitUpdate` (saves pre-drag snapshot so undo reaches pre-drag state, not the updateObject-mutated state). All opacity sliders, feather, and adjustment sliders follow this pattern.
-- `reorderObjects` (layer panel drag) pushes history — fully undoable via Cmd+Z
-- Thumbnails: `useThumbnailStore`, HTML Canvas 2D, triggered on `past.length` changes + mount
-- `iconBtnStyle` shared helper in `src/ui/iconBtnStyle.ts`; `Tooltip` component in `src/ui/Tooltip.tsx`
-- Export overlay: `useExportStore` (Zustand, `src/ui/useExportStore.ts`) — `exporting/exportStatus/cancelRequested`; canvas area shows greyed overlay + Cancel button while exporting; status message flows from `exportMixedFrames` → Toolbar button label
-- Frame labels: HTML div strip absolutely positioned at `top: Math.max(4, panY - 22)` in CarouselStage (not Konva Text)
-- Masking: `MaskData.kind: 'pen'|'rect'|'ellipse'`; rect/ellipse masks use Konva Transformer in edit mode; `maskModeActive` in store (transient, not in history)
-- Save: `currentFilePath` in `useSaveStatusStore`; autosave forks on it; `recentFiles.json` tracks all opened/saved locations
 
 **Photo Adjustments** (`src/canvas/adjustments/pipeline.ts`):
-- `PhotoAdjustments` on `ImageObject` (optional, backward-compatible); `DEFAULT_ADJUSTMENTS` exported from `src/types/canvas.ts`
-- `buildFilterPipeline(adj)` → `Array<(ImageData) => void>` Konva custom filters; returns `[]` when all values are 0 (zero cost for unedited images)
-- Exposure uses gamma decode → linear EV gain → re-encode (matches Lightroom's perceptual response, no harsh clipping). Contrast S-curve halved (`/200`). Highlights/shadows scaled 0.5×. Whites/blacks zones narrowed to top/bottom 25% of tonal range.
-- LUT caches (three, all module-level):
-  - `lutCache: Map<string, Uint8ClampedArray>` — 1D per-channel LUTs for exposure/contrast/whites/blacks/temperature/tint
-  - `lut3dCache: Map<string, Float32Array>` — 33×33×33 cube LUTs for saturation/vibrance/dehaze; `build3DLUT(key, fn)` fills the grid once, `sample3DLUT(lut, r, g, b)` does trilinear interpolation per pixel (no per-pixel HSL math at render time)
-  - `floatLutCache: Map<string, Float32Array>` — 256-entry scale-factor LUTs for highlights/shadows/clarity; quantized luminance index `(77r+150g+29b)>>8` replaces per-pixel float division
-- `CanvasImageNode` caches `imageRef` (not `innerGroupRef`) via `useEffect` whenever `filterPipeline` or image changes; mask cache on `innerGroupRef` is an independent layer — no conflict
-- `adjustmentsBypass: boolean` in store (transient, not in history) — `\` hold-to-compare (keydown=true, keyup=false); `Power` button in Adjustments header toggles persistently; sliders dim + `pointerEvents: none` when bypassed
-- Sliders: Lightroom Classic gradient tracks via `adjustments.css` (`::-webkit-slider-runnable-track`); double-click label, number input, or slider handle resets that param to 0; one undo step per drag (`updateObject` on drag, `commitUpdate` on mouseUp)
+- `buildFilterPipeline(adj)` → `Array<(ImageData) => void>`; returns `[]` when all values are 0 (zero cost for unedited images)
+- Three module-level LUT caches: 1D per-channel, 33³ cube (saturation/vibrance/dehaze), 256-entry float (highlights/shadows/clarity)
+- `sample3DLUT` must NOT use inner functions — one closure per pixel × 1.4M pixels causes GC freeze
+- `adjustmentsBypass: boolean` in store (transient) — `\` hold-to-compare; Power button in Adjustments header toggles persistently
+- Double-click any slider label/handle resets that param to 0; one undo step per drag
 
-## Keyboard Shortcuts
-`useKeyboardShortcuts.ts`, mounted once in CarouselStage. No-op in input/textarea.
-`V` select · `T` text · `R` shape · `P` pen · `L` line · `S` snap toggle · `\` bypass adjustments (hold) · `Esc` deselect · `⌘A` all · `⌘D` dupe · `⌘Z/⇧Z` undo/redo · `⌘]/[` layers · `⌘L` lock · arrows nudge · `⌫` delete · `⌘⇧P` preview mode toggle (disabled for custom platform)
+**Layer Effects** (`src/canvas/effects/`):
+- Adding a new effect = one file + one `registerEffect(def)` call, no framework changes
+- `buildEffectFilters(effects)` → same `Array<(ImageData) => void>` signature as adjustments pipeline
+- `CanvasImageNode` stacks: `allFilters = [...filterPipeline, ...effectFilters]`
+- `CarouselStage.tsx` imports `@/canvas/effects` as a side-effect to register all effects at startup
 
-## Layer Effects (`src/canvas/effects/`)
-Extensible framework — adding a new effect = one file + one `registerEffect(def)` call, no framework changes.
+**Export** (`src/canvas/exportFrames.ts`):
+- `stage.x()` and `stage.y()` MUST be reset to 0 before `toCanvas()` — non-zero pan offsets shift all content and break `i * frameWidth * 2` crop math
+- Hides Transformers + `guides` layer + `frame-dividers` layer before render; restores in `finally`
+- Background fills live in dedicated `background` layer (not `guides`) — ensures they appear in exported PNGs
 
-- `effects?: LayerEffect[]` on `BaseCanvasObject` — optional array, each entry has `id`, `type`, `enabled`, `params`
-- `registry.ts`: `EffectDefinition` interface (`type`, `label`, `defaultParams()`, `buildFilter(params)`, `controls[]`); `registerEffect`/`getEffectDefinition`/`getAllEffectDefinitions`
-- `buildEffectFilters(effects)`: converts active effects → `Array<(imageData: ImageData) => void>` — same signature as adjustments pipeline
-- Each canvas node component: `effectFilters = useMemo(() => buildEffectFilters(obj.effects), [obj.effects])` + `useEffect` to `.cache()`/`.clearCache()` + pass `filters` prop to Konva node
-- `CanvasImageNode` stacks effects after adjustments: `allFilters = [...filterPipeline, ...effectFilters]`
-- `EffectsSection` in PropertiesPanel: `＋ Add` picker (all registered effects), per-effect collapse/enable-toggle/delete; controls auto-generated from `EffectControlDescriptor[]` (slider/toggle/color); double-click label resets param to default; wired on all 4 object types
-- `CarouselStage.tsx` imports `@/canvas/effects` (side-effect, registers all effects at startup)
+**Video Layer** (`CanvasVideoNode.tsx`):
+- Frame/content model identical to ImageObject; extra fields: `trimStart/trimEnd`, `loop`, `startOffset`, `volume`, `posterFrame`, `mask`
+- Use `durationchange` event (not `loadedmetadata`) to read duration — ensures finite value
+- Always seek to `trimStart ?? 0` after `canplay` to force first-frame decode in Chromium
+- RAF cache throttle: skip `.cache()` + `batchDraw()` when `currentTime` unchanged; reset throttle ref to `-1` on `allFilters` change — otherwise paused-video adjustment changes never apply
+- `zeroseams-media://` scheme with Range support + CORP/COEP headers enables `SharedArrayBuffer` for FFmpeg WASM
+- Store `platform` must be subscribed as a hook in Toolbar components — `getState()` inside handlers only leaves it undefined during render
 
-**Film Grain** (`filmGrain.ts`): `intensity` (noise amplitude), `size` (block px), `irregularity` (0=uniform block noise → 1=per-pixel), `opacity` (blend scale)
-**Vignette** (`vignette.ts`): `strength`, `radius`, `feather`, `invert` toggle — dark vignette multiplies edges toward black; white vignette blends edges toward 255 (same smoothstep mask)
-**Halation** (`halation.ts`): `threshold` (bright-pixel cutoff), `radius` (blur spread), `opacity`, `color` (glow tint) — soft-ramp extraction above threshold → correct separable box blur → tinted glow screen-blended over original
+**Platform Preview Mode** (`src/ui/preview/`):
+- `previewMode: boolean` + `previewFrame: number` in store (transient, not persisted); disabled for `custom` platform
+- On open: captures all frames via `getStageInstance()` → JPEG data URLs (same crop approach as `exportFrames.ts`)
+- `FrameSlide` = static JPEG background + `<VideoOverlayItem>` overlays for any video whose x-span overlaps the frame
+- Shell registry: `registerShell(platform, Component)` — adding a platform = one file + one call
+- Frame labels in `CarouselStage` hidden when `previewMode` is true
 
-## Export (`src/canvas/exportFrames.ts`)
-`exportFrames(stage, frameCount, frameWidth, frameHeight, startFrame, endFrame)` — the full render-and-crop pipeline:
-1. Hides Transformers, text nodes set to visible, hides `guides` layer AND `frame-dividers` layer
-2. Saves `width/height/scaleX/scaleY/x/y`; sets stage to `frameCount×frameWidth` at scale 1, position (0,0)
-3. `stage.toCanvas({ pixelRatio: 2 })` → full 2× canvas; crops each frame via `drawImage`
-4. Restores all stage state in `finally`
+**Other invariants:**
+- Masking: `MaskData.kind: 'pen'|'rect'|'ellipse'`; `maskModeActive` in store (transient, not in history)
+- Save: `currentFilePath` in `useSaveStatusStore`; autosave forks on it; `recentFiles.json` tracks history
+- Export overlay: `useExportStore` — `exporting/exportStatus/cancelRequested`; status flows from `exportMixedFrames` → Toolbar label
+- Thumbnails: `useThumbnailStore`, HTML Canvas 2D, triggered on `past.length` changes + mount
+- Frame labels: HTML div strip at `top: Math.max(4, panY - 22)` in CarouselStage (not Konva Text)
+- Multi-file drop: drop coords captured synchronously before async work; 30px stagger per file
 
-**Critical invariant:** `stage.x()` and `stage.y()` (pan offsets) MUST be reset to 0 before `toCanvas()`. Konva applies the stage's x/y as a canvas transform when rendering — leaving them non-zero shifts all content in the output buffer and breaks the `i * frameWidth * 2` crop math.
-
-## Features Implemented (sprints 1–43 + issue #20)
-Canvas scaffold + Electron shell · Image frame/content model (InDesign crop/zoom) · Multi-select + snap guides + locking · Text tool + undo/redo · Context menu + layer thumbnails · Export panel (all/single/range) · Shape tool (rect/ellipse/line/arrow) + project load/save · Pen/bezier tool · Platform picker + aspect ratio (`PLATFORM_PRESETS`, `frameWidth` from store) · Frame resize modes (advanced/auto) · Trackpad pan/zoom · External photo editing (chokidar, Edit in X) · Save split-button (Save/Save As/Save a Copy) · Multi-select group transformer + marquee + anchor alignment · Image node multi-select bbox fix (frameRectRef not groupRef) · Rotation snapping + unified snap toggle · Pen anchor corner↔curve double-click toggle · Icon-first toolbar (lucide-react, 6 groups) + FrameSettingsPopover · Multi-object transform fixes (isGroupTransform, RAF re-wire) · Resize-snap coordinate space fix (absolute↔logical) · Masking system (pen/rect/ellipse, quick-mask Scissors button) · Mode-aware keepRatio · Shift+drag axis lock · UI compactness overhaul + FrameSettingsPopover · File save path fix (open-project returns filePath, autosave respects currentFilePath) · Pen path transforms + rotation center fix (rotateAroundCenter helper) · Photo adjustments slice 1 — 12 scalar sliders (exposure/contrast/highlights/shadows/whites/blacks/temperature/tint/saturation/vibrance/clarity/dehaze), gamma-correct pipeline, LUT cache, bypass toggle + `\` shortcut (issue #34) · Render optimizations: stable filter pipeline references (pipelineCache in pipeline.ts), per-object store subscriptions (outer/inner React.memo split on all 4 node components, CarouselStage no longer subscribes to s.objects), incremental thumbnail diffing via prevObjectsRef (issue #37) · Layer effects framework — extensible registry, film grain/vignette/halation, EffectsSection on all object types (issue #23) · Export fix: frame-dividers layer now hidden during export + stage.x/y reset to 0 before toCanvas (wrong slicing with any non-zero pan) · Undo/redo fixes (issue #38): `startDrag`/`commitUpdate` drag pattern ensures undo reaches pre-drag state; text opacity no longer floods history; shape/path/image opacity sliders now commit on mouseUp; `reorderObjects` now undoable; 69-test Playwright suite in `scripts/test-undo-redo.mjs` · Export background fix (issue #41): per-frame background rects moved from `guides` layer to dedicated `background` layer — background fills now visible in exported PNGs; `FrameGuides` stripped to guide decorations only · Video layer completeness (issue #42): export settings (H.264/H.265, CRF, audio bitrate, fps), trim/in-out points, per-object play/pause + scrub bar + loop toggle, masking (pen/rect/ellipse) on VideoObject · Filter pipeline LUT optimization: saturation/vibrance/dehaze migrated to 33³ cube LUT + trilinear interpolation (`build3DLUT`/`sample3DLUT`); highlights/shadows/clarity migrated to 256-entry float luminance LUT (`buildFloatLUT`) — eliminates per-pixel `rgbToHsl`/`hslToRgb` at render time; `sample3DLUT` must NOT use inner functions (one closure allocation per pixel × 1.4M pixels causes GC freeze) · Video RAF cache throttle: `lastCachedTimeRef` skips `.cache()`+`batchDraw()` when `video.currentTime` unchanged; reset to `-1` on `allFilters` change so paused-video adjustments still apply · Multi-file drop + cursor placement (issue #20): `useImageDrop`/`useVideoDrop` use `.filter()`+`forEach` so every file in a multi-drop creates its own object; drop coords converted to canvas space via `(clientX - rect.left - panX) / (CANVAS_SCALE * zoom)` captured synchronously before async work; each file centered on cursor with 30px stagger
-
-**Per-object subscription pattern** (`CanvasImageNode`, `CanvasTextNode`, `CanvasShapeNode`, `CanvasPathNode`):
-- Each node is outer/inner split: outer subscribes to `s.objects[id]`, returns null if missing/hidden, renders inner with `obj` guaranteed defined
-- Outer is `React.memo`-wrapped — stable `id`/`onGuidesChange`/`nodeRef` props mean CarouselStage re-renders do not cascade to nodes during drag
-- Inner subscribes to `s.selectedId === id` for `isSelected`; calls `useCanvasStore.getState().setSelected(id)` directly in handlers (no `onSelect` prop)
-
-**Video Layer** (`CanvasVideoNode.tsx`, `videoExport.ts`, `exportFrames.ts`):
-- `VideoObject` has `filePath` (absolute), `naturalWidth/Height/Duration`, `muted`, frame/content model identical to ImageObject; also `trimStart?/trimEnd?` (seconds), `loop?`, `mask?/maskEditMode?`
-- Import: drag-and-drop in `useImageDrop.ts` (uses `file.path` Electron API) + "Add Video" toolbar button (Film icon) via `openVideoFile` IPC; both use `durationchange` event (not `loadedmetadata`) to ensure finite duration
-- Rendering: `<video>` element created imperatively; always seeks to `trimStart ?? 0` after `canplay` to force first-frame decode in Chromium; RAF loop enforces trim boundaries and re-caches `innerGroupRef`/`videoImageRef` each tick when a mask/filter is active; play/pause gated on `videoPlayingIds` store set
-- RAF cache throttle: `lastCachedTimeRef` tracks `video.currentTime` at last `.cache()` call; both `.cache()` and `layer.batchDraw()` are skipped when `currentTime` is unchanged (paused or sub-60fps content). When `allFilters` changes, `lastCachedTimeRef` is reset to `-1` to force re-cache on the next tick even while paused — without this reset, adjustment changes on a paused video would never apply.
-- Masking: identical system to `CanvasImageNode` — `maskSceneFunc` + `innerGroupRef.cache()` + destination-in `<Shape>`; `innerCacheBoundsRef` enables per-frame re-cache so video stays live under the mask
-- Playback controls in PropertiesPanel: play/pause button, scrub bar (`isScrubbing` ref prevents interval overwrite during drag), loop toggle, current time display; trim In/Out inputs with "Set In/Set Out" buttons
-- Export settings: `VideoExportSettings` (videoCodec, crf, audioCodec, audioBitrate, frameRate) threaded through `exportMixedFrames` → `encodeVideoWithAudio/encodeVideoFrames`; `VideoExportSettingsPanel` subcomponent in Toolbar — Simple tab (Draft/Balanced/High Quality presets, platform-aware "Recommended" badge) and Advanced tab (CRF slider inverted so right=better, codec, audio bitrate, fps); panel shown only when export range contains video. `VIDEO_PRESETS` + `PLATFORM_RECOMMENDED` at module level. Store `platform` must be subscribed as a hook in Toolbar — reading it only via `getState()` inside handlers leaves it undefined during render.
-- `captureVideoFrameSequence` is trim-aware: seeks from `clipStart` and captures only `clipEnd - clipStart` seconds
-- **Video completeness sprint 2 (issue #42 deferred features):** Info panel file size (`get-file-size` IPC → `window.electronAPI.getFileSize`), volume slider (0–100%, `volume?: number` on VideoObject, export injects `-af volume=X` into FFmpeg), poster frame selector (`posterFrame?: number` — shown on canplay + on stop; Set/Reset in PropertiesPanel), adjustments + effects pipeline on video (`adjustments?: PhotoAdjustments` added, `buildFilterPipeline`/`buildEffectFilters` wired in CanvasVideoNode with RAF re-cache when filters active + no mask; `AdjustmentsSection` + `EffectsSection` added to VideoSection), start offset / playback delay (`startOffset?: number` — RAF countdown holds poster frame, then calls `vid.play()`)
-- `zeroseams-media://` scheme: registered with `corsEnabled:true, standard:true, secure:true, supportFetchAPI:true, stream:true`; handler supports Range requests; responses include `CORP: cross-origin` + `ACAO: *` headers
-- COOP/COEP: injected on all session responses via `session.defaultSession.webRequest.onHeadersReceived` — enables `SharedArrayBuffer` for FFmpeg WASM
-- FFmpeg WASM: `@ffmpeg/core` + `@ffmpeg/ffmpeg` — core files copied to `public/ffmpeg/`; `ffmpeg.load()` called with `classWorkerURL`, `coreURL`, `wasmURL` as blob URLs; `optimizeDeps.exclude` prevents Vite bundling the worker
-
-## Platform Preview Mode (`src/ui/preview/`) — issue #43
-`previewMode: boolean` + `previewFrame: number` in `useCanvasStore` (transient, not persisted). `⌘⇧P` or Eye toolbar button toggles; disabled for `custom` platform.
-
-**Architecture:** `PreviewShell` is a `position: fixed; inset: 0` overlay (z-index 1000) that dims the entire app under `rgba(0,0,0,0.75)`. On open it captures all frames via `getStageInstance()` — same crop-and-drawImage approach as `exportFrames.ts` — storing each frame as a JPEG data URL. Shell chrome (header, action bar, dots/progress) is rendered around a sliding strip of `<FrameSlide>` components.
-
-**`FrameSlide`:** static JPEG background (all non-video layers) + absolutely-positioned `<VideoOverlayItem>` components for any video objects whose x-span overlaps that frame. Videos use the frame/content model (`frameWidth/Height` for the clip box, `contentOffsetX/Y`+`contentWidth/Height` for the bitmap inside), autoplay muted, loop, and seek to `trimStart` on `canplay`. `trimEnd` is enforced via `timeupdate` listener.
-
-**Swipe:** all frames in a flex row; `translateX(-(previewFrame * displayWidth) + dragOffset)` with CSS transition `0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94)` during navigation, `transition: none` during drag. Pointer capture (`setPointerCapture`) keeps events live through the gesture. 25% rubber-band at edges. Arrow keys + `←›` buttons also navigate. `Esc` closes.
-
-**Shell registry** (`src/ui/preview/shells/registry.ts`): `registerShell(platform, Component)` / `getShell(platform)`. Instagram feed (1:1, 4:5) + story (9:16) fully implemented; TikTok/Facebook/Threads stubs registered. Adding a new platform = one file + one `registerShell` call.
-
-Frame labels in `CarouselStage` are hidden when `previewMode` is true.
-
-## Visual Design System (issue #46)
-Design tokens live in `src/ui/theme.css` — the single source of truth for all colors and the font. Import it once at the top of `src/main.tsx`.
+## Visual Design System
+Tokens in `src/ui/theme.css` — single source of truth. Imported once in `src/main.tsx`.
 
 **Palette:**
 - `--bg-base` `#fdf8f2` · `--bg-panel` `#f5ede2` · `--bg-canvas` `#ede7dc` · `--bg-surface` `#ffffff`
 - `--border` `#e8e0d5` · `--stroke` `#d4ccc2`
 - `--text-primary` `#111111` · `--text-secondary` `#555555` · `--text-muted` `#aaaaaa`
-- `--accent` `#f94608` (orange — active states, Konva handles, primary CTA)
-- `--font` `'Uncut Sans Variable', system-ui, sans-serif`
+- `--accent` `#f94608` — active states, Konva handles, primary CTA
+- `--font` — always use `var(--font)`, never hardcode `'Uncut Sans Variable'`
 
-**Font:** `UncutSans-Variable.ttf` lives in `public/fonts/`. `@font-face` in `theme.css` declares it; `body { font-family: var(--font) }` cascades everywhere. Never hardcode `'Uncut Sans Variable', system-ui, sans-serif` — use `var(--font)`.
-
-**Buttons:** pill shape everywhere (`borderRadius: 999`). Inputs/selects use `borderRadius: 6`. Cards/popovers use `borderRadius: 16`. The `.btn-raised` CSS class (in `theme.css`) gives Export-style shadow buttons their press-down hover animation — `box-shadow: 2px 4px 0 #000` at rest, `translateY(2px)` + smaller shadow on hover, fully pressed on `:active`.
-
-**`iconBtnStyle(active)`** (`src/ui/iconBtnStyle.ts`): active = orange `#f94608` fill, white icon; inactive = white fill, `#555555` icon, `#d4ccc2` border; always `borderRadius: 999`.
-
-**Sliders:** global `input[type="range"]` rule in `theme.css` applies warm thumb gradient and `background: #e8e0d5` track to ALL range inputs. Adjustments sliders add a per-slider Lightroom-style gradient via inline `background` style (overrides the default via specificity). Never add `.adj-slider` to new sliders — the global rule handles them.
-
-**Color swatches:** `input[type="color"]` gets `-webkit-appearance: none` + `::-webkit-color-swatch { border: none; border-radius: 3px }` via `theme.css`. Just set `width`/`height` inline; the CSS handles everything else.
+**Components:**
+- Buttons: pill shape (`borderRadius: 999`). Inputs/selects: `borderRadius: 6`. Cards/popovers: `borderRadius: 16`
+- `.btn-raised` (in `theme.css`): shadow button with press-down animation — `box-shadow: 2px 4px 0 #000` at rest
+- `iconBtnStyle(active)` (`src/ui/iconBtnStyle.ts`): active = `#f94608` fill + white icon; inactive = white fill + `#555` icon + `#d4ccc2` border; always `borderRadius: 999`
+- Sliders: global `input[type="range"]` in `theme.css` handles all. Adjustments sliders override track via inline `background`. Never add `.adj-slider`
+- Color swatches: `input[type="color"]` styled via `theme.css` — just set `width`/`height` inline
 
 **Layout:**
 - `TitleBar` (full width, 52px) — logo, file ops, frame settings, frames counter, preview, export, undo/redo
-- `ToolBar` (center column only, 50px) — drawing tools only (select, snap, resize mode, text, shape, pen, video, mask)
-- `LayerPanel` + `PropertiesPanel` both span the full body height (start directly below `TitleBar`, not below `ToolBar`)
+- `ToolBar` (center column only, 50px) — drawing tools only
+- `LayerPanel` + `PropertiesPanel` span full body height — start below `TitleBar`, not `ToolBar`
 - Middle row: LayerPanel | [ToolBar + canvas column] | PropertiesPanel — see `src/main.tsx`
 
-**Konva handles:** all `borderStroke`/`anchorStroke` use `#f94608` (orange). Content-edit mode uses the same accent. Snap guides use `#f94608` for object snaps; `#ff3b5c` for frame snaps (intentionally distinct).
+**Konva handles:** `borderStroke`/`anchorStroke` = `#f94608`. Snap guides: `#f94608` object snaps · `#ff3b5c` frame snaps (intentionally distinct).
+
+## Keyboard Shortcuts
+`useKeyboardShortcuts.ts`, mounted once in CarouselStage. No-op in input/textarea.
+
+`V` select · `T` text · `R` shape · `P` pen · `L` line · `S` snap toggle · `\` bypass adjustments (hold) · `Esc` deselect · `⌘A` all · `⌘D` dupe · `⌘Z/⇧Z` undo/redo · `⌘]/[` layers · `⌘L` lock · arrows nudge · `⌫` delete · `⌘⇧P` preview toggle (disabled for custom platform)
 
 ## Upcoming
-AI: background removal UI, SAM segmentation, LaMa inpainting · Font picker + Google Fonts · Templates/presets · Publish/share · Windows packaging + auto-update · Video: volume normalization meter, playback rate, info panel full video metadata (codec, bitrate), poster frame thumbnail preview in layer panel (issue #42 remaining) · Preview: TikTok/Facebook/Threads shell chrome (currently stubs), dark-mode shell variant, phone bezel option
-
-## graphify
-
-This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
-
-Rules:
-- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
-- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
-- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
-- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+AI background removal UI · SAM segmentation · LaMa inpainting · Font picker + Google Fonts · Templates/presets · Windows packaging + auto-update · Video: volume meter, playback rate, poster frame thumbnail in layer panel · Preview: TikTok/Facebook/Threads shells, dark-mode variant, phone bezel

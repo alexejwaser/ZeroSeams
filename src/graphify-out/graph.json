@@ -25,7 +25,7 @@
       "label": "rootEl",
       "file_type": "code",
       "source_file": "main.tsx",
-      "source_location": "L128",
+      "source_location": "L119",
       "id": "src_main_rootel",
       "community": 1,
       "norm_label": "rootel"
@@ -538,7 +538,7 @@
       "label": "ToolBar()",
       "file_type": "code",
       "source_file": "ui/Toolbar.tsx",
-      "source_location": "L589",
+      "source_location": "L1048",
       "id": "ui_toolbar_toolbar",
       "community": 1,
       "norm_label": "toolbar()"
@@ -1611,7 +1611,7 @@
       "source_file": "canvas/useAutosave.ts",
       "source_location": "L1",
       "id": "canvas_useautosave_ts",
-      "community": 11,
+      "community": 1,
       "norm_label": "useautosave.ts"
     },
     {
@@ -2439,7 +2439,7 @@
       "source_file": "canvas/useKeyboardShortcuts.ts",
       "source_location": "L10",
       "id": "canvas_usekeyboardshortcuts_buildprojectsnapshot",
-      "community": 11,
+      "community": 1,
       "norm_label": "buildprojectsnapshot()"
     },
     {
@@ -2592,7 +2592,7 @@
       "source_file": "canvas/pathUtils.ts",
       "source_location": "L1",
       "id": "canvas_pathutils_ts",
-      "community": 11,
+      "community": 1,
       "norm_label": "pathutils.ts"
     },
     {
@@ -2601,7 +2601,7 @@
       "source_file": "canvas/pathUtils.ts",
       "source_location": "L3",
       "id": "canvas_pathutils_posixdirname",
-      "community": 11,
+      "community": 1,
       "norm_label": "posixdirname()"
     },
     {
@@ -2610,7 +2610,7 @@
       "source_file": "canvas/pathUtils.ts",
       "source_location": "L8",
       "id": "canvas_pathutils_posixrelative",
-      "community": 11,
+      "community": 1,
       "norm_label": "posixrelative()"
     },
     {
@@ -2619,7 +2619,7 @@
       "source_file": "canvas/pathUtils.ts",
       "source_location": "L16",
       "id": "canvas_pathutils_posixresolve",
-      "community": 11,
+      "community": 1,
       "norm_label": "posixresolve()"
     },
     {
@@ -2628,7 +2628,7 @@
       "source_file": "canvas/pathUtils.ts",
       "source_location": "L26",
       "id": "canvas_pathutils_relativizevideoobjects",
-      "community": 11,
+      "community": 1,
       "norm_label": "relativizevideoobjects()"
     },
     {
@@ -2637,7 +2637,7 @@
       "source_file": "canvas/pathUtils.ts",
       "source_location": "L44",
       "id": "canvas_pathutils_resolvevideoobjects",
-      "community": 11,
+      "community": 1,
       "norm_label": "resolvevideoobjects()"
     },
     {
@@ -4324,6 +4324,17 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "ui/Toolbar.tsx",
+      "source_location": "L294",
+      "weight": 1.0,
+      "source": "ui_toolbar_titlebar",
+      "target": "ui_useexportstore_useexportstore"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "ui/Toolbar.tsx",
       "source_location": "L276",
       "weight": 1.0,
       "source": "ui_toolbar_toolbar",
@@ -4461,9 +4472,9 @@
       "source_file": "ui/Toolbar.tsx",
       "source_location": "L105",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_toolbar_tsx",
-      "target": "ui_toolbar_buildprojectjson",
-      "confidence_score": 1.0
+      "target": "ui_toolbar_buildprojectjson"
     },
     {
       "relation": "contains",
@@ -4491,9 +4502,9 @@
       "source_file": "ui/Toolbar.tsx",
       "source_location": "L259",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_toolbar_tsx",
-      "target": "ui_toolbar_titlebar",
-      "confidence_score": 1.0
+      "target": "ui_toolbar_titlebar"
     },
     {
       "relation": "contains",
@@ -4534,9 +4545,9 @@
       "source_file": "ui/index.ts",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_index_ts",
-      "target": "ui_toolbar_titlebar",
-      "confidence_score": 1.0
+      "target": "ui_toolbar_titlebar"
     },
     {
       "relation": "calls",
@@ -11931,5 +11942,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "94ab1f18883fec69c8666aea0e8cce8b90da7233"
+  "built_at_commit": "c37cdaa01d4a181f2e42b5c22ce7fad6ed17ebcf"
 }

@@ -1,16 +1,16 @@
-# Graph Report - src  (2026-06-03)
+# Graph Report - src  (2026-06-04)
 
 ## Corpus Check
-- 73 files · ~65,363 words
+- 73 files · ~65,348 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 391 nodes · 793 edges · 21 communities (16 shown, 5 thin omitted)
+- 391 nodes · 794 edges · 20 communities (15 shown, 5 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 19 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `94ab1f18`
+- Built from commit: `c37cdaa0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -26,7 +26,6 @@
 - [[_COMMUNITY_Community 8|Community 8]]
 - [[_COMMUNITY_Community 9|Community 9]]
 - [[_COMMUNITY_Community 10|Community 10]]
-- [[_COMMUNITY_Community 11|Community 11]]
 - [[_COMMUNITY_Community 12|Community 12]]
 - [[_COMMUNITY_Community 13|Community 13]]
 - [[_COMMUNITY_Community 14|Community 14]]
@@ -46,8 +45,8 @@
 10. `CanvasObject` - 8 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `buildProjectJson()` --calls--> `relativizeVideoObjects()`  [INFERRED]
-  ui/Toolbar.tsx → canvas/pathUtils.ts
+- `App()` --calls--> `useExportStore`  [INFERRED]
+  main.tsx → ui/useExportStore.ts
 - `FrameSettingsPopover()` --calls--> `useCanvasStore`  [INFERRED]
   ui/FrameSettingsPopover.tsx → canvas/useCanvasStore.ts
 - `TextSection()` --calls--> `getSelectionStyle()`  [INFERRED]
@@ -57,15 +56,15 @@
 - `VideoSection()` --calls--> `useCanvasStore`  [INFERRED]
   ui/PropertiesPanel.tsx → canvas/useCanvasStore.ts
 
-## Communities (21 total, 5 thin omitted)
+## Communities (20 total, 5 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.07
 Nodes (57): CanvasImageNode, CanvasImageNodeInner(), CanvasImageNodeInnerProps, CanvasImageNodeOuter(), CanvasImageNodeProps, anchorsToPathData(), CanvasPathNode, CanvasPathNodeInner() (+49 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.07
-Nodes (34): AIContext, AIContextValue, useAI(), AIProvider(), AIStoreState, useAIStore, useBackgroundRemoval(), UseBackgroundRemovalReturn (+26 more)
+Cohesion: 0.06
+Nodes (40): AIContext, AIContextValue, useAI(), AIProvider(), AIStoreState, useAIStore, useBackgroundRemoval(), UseBackgroundRemovalReturn (+32 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.06
@@ -103,10 +102,6 @@ Nodes (11): boxBlurH(), boxBlurV(), buildFilter(), hexToRgb(), EffectControlDesc
 Cohesion: 0.12
 Nodes (16): AnchorPoint, BaseCanvasObject, CanvasObject, CanvasObjectScope, CanvasObjectType, FontStyle, GroupObject, ImageObject (+8 more)
 
-### Community 11 - "Community 11"
-Cohesion: 0.43
-Nodes (6): posixDirname(), posixRelative(), posixResolve(), relativizeVideoObjects(), resolveVideoObjects(), buildProjectSnapshot()
-
 ## Knowledge Gaps
 - **111 isolated node(s):** `rootEl`, `FrameSettingsPopoverProps`, `PLATFORM_LABELS`, `PLATFORMS`, `numberInputStyle` (+106 more)
   These have ≤1 connection - possible missing edges or undocumented components.
@@ -115,7 +110,7 @@ Nodes (6): posixDirname(), posixRelative(), posixResolve(), relativizeVideoObjec
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `useCanvasStore` connect `Community 0` to `Community 1`, `Community 2`, `Community 7`, `Community 8`, `Community 11`?**
+- **Why does `useCanvasStore` connect `Community 0` to `Community 8`, `Community 1`, `Community 2`, `Community 7`?**
   _High betweenness centrality (0.269) - this node is a cross-community bridge._
 - **Why does `PreviewShell()` connect `Community 7` to `Community 0`?**
   _High betweenness centrality (0.077) - this node is a cross-community bridge._
@@ -128,4 +123,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.06925624811803674 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.06862745098039216 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.059322033898305086 - nodes in this community are weakly interconnected._
