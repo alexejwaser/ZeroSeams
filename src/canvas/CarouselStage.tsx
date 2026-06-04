@@ -512,7 +512,7 @@ export function CarouselStage(): React.ReactElement {
       if (e.ctrlKey) {
         // Pinch-to-zoom (macOS reports pinch as ctrlKey+wheel) or Ctrl+scroll
         const rect = el!.getBoundingClientRect()
-        const factor = e.deltaY < 0 ? 1.08 : 1 / 1.08
+        const factor = e.deltaY < 0 ? 1.03 : 1 / 1.03
         const newZoom = Math.max(0.1, Math.min(8, zoom * factor))
         const mouseX = e.clientX - rect.left
         const mouseY = e.clientY - rect.top

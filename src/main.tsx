@@ -65,7 +65,7 @@ function App(): React.ReactElement {
                 flexDirection: 'column',
                 justifyContent: 'flex-start',
                 alignItems: 'stretch',
-                padding: 24,
+                padding: 0,
                 background: 'var(--bg-canvas)',
                 boxSizing: 'border-box',
                 position: 'relative',
