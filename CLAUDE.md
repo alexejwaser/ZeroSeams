@@ -135,7 +135,7 @@ Tokens in `src/ui/theme.css` — single source of truth. Imported once in `src/m
 - `.btn-raised` (in `theme.css`): shadow button with press-down animation — `box-shadow: 2px 4px 0 #000` at rest
 - `iconBtnStyle(active)` (`src/ui/iconBtnStyle.ts`): active = `#f94608` fill + white icon; inactive = white fill + `#555` icon + `#d4ccc2` border; always `borderRadius: 999`
 - Sliders: global `input[type="range"]` in `theme.css` handles all. Adjustments sliders override track via inline `background`. Never add `.adj-slider`
-- Color swatches: `input[type="color"]` styled via `theme.css` — just set `width`/`height` inline
+- Color picker: `<ColorInput>` / `<MixedColorInput>` in `src/ui/ColorInput.tsx` (exported from `src/ui/index.ts`) — never use raw `input[type="color"]`. Popover uses `react-colorful` + HEX/RGB/HSL modes + eyedropper + 5 recent colors (localStorage `zeroseams:recentColors`). `fixed` prop uses `position: fixed` for popover — required when the trigger sits in a scrollable container. `MixedColorInput` renders a `—` overlay and shows `value=undefined` as mixed state.
 
 **Layout:**
 - `TitleBar` (full width, 52px) — logo, file ops, frame settings, frames counter, preview, export, undo/redo

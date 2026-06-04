@@ -20,6 +20,7 @@ import { iconBtnStyle } from './iconBtnStyle'
 import { PenTool, Square, Circle, Trash2, Pencil, Eye, EyeOff, AlignLeft, AlignCenter, AlignRight, Power, Plus, X, ChevronDown, ChevronRight, Volume2, VolumeX, Play, Pause, Repeat } from 'lucide-react'
 import './adjustments.css'
 import { videoElementRegistry } from '@/canvas/videoElementRegistry'
+import { ColorInput, MixedColorInput } from './ColorInput'
 
 // ---------------------------------------------------------------------------
 // rotateAroundCenter — pure utility
@@ -205,173 +206,6 @@ function MixedNumberField({
   )
 }
 
-// ---------------------------------------------------------------------------
-// ColorInput — normal
-// ---------------------------------------------------------------------------
-
-interface ColorInputProps {
-  value: string
-  onChange: (color: string) => void
-}
-
-function ColorInput({ value, onChange }: ColorInputProps): React.ReactElement {
-  const [hexText, setHexText] = React.useState(value)
-
-  React.useEffect(() => {
-    setHexText(value)
-  }, [value])
-
-  function handleSwatchChange(e: React.ChangeEvent<HTMLInputElement>): void {
-    onChange(e.target.value)
-  }
-
-  function handleTextChange(e: React.ChangeEvent<HTMLInputElement>): void {
-    setHexText(e.target.value)
-  }
-
-  function handleTextBlur(): void {
-    const cleaned = hexText.trim()
-    // Accept #rrggbb or rrggbb formats
-    if (/^#?[0-9a-fA-F]{6}$/.test(cleaned)) {
-      const normalized = cleaned.startsWith('#') ? cleaned : `#${cleaned}`
-      onChange(normalized)
-      setHexText(normalized)
-    } else {
-      // Revert to last valid value
-      setHexText(value)
-    }
-  }
-
-  function handleTextKeyDown(e: React.KeyboardEvent<HTMLInputElement>): void {
-    if (e.key === 'Enter') {
-      e.currentTarget.blur()
-    }
-  }
-
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-      <input
-        type="color"
-        value={value}
-        onChange={handleSwatchChange}
-        style={{ width: 32, height: 24, flexShrink: 0 }}
-      />
-      <input
-        type="text"
-        value={hexText}
-        onChange={handleTextChange}
-        onBlur={handleTextBlur}
-        onKeyDown={handleTextKeyDown}
-        style={{
-          flex: 1,
-          background: '#ffffff',
-          border: '1px solid #d4ccc2',
-          borderRadius: 6,
-          color: '#111111',
-          fontSize: 12,
-          padding: '3px 6px',
-          boxSizing: 'border-box',
-          outline: 'none',
-          fontFamily: 'var(--font)',
-        }}
-      />
-    </div>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// MixedColorInput — for per-span fill that may be mixed
-// ---------------------------------------------------------------------------
-
-interface MixedColorInputProps {
-  value: string | undefined   // undefined = mixed
-  onChange: (color: string) => void
-}
-
-function MixedColorInput({ value, onChange }: MixedColorInputProps): React.ReactElement {
-  const isMixed = value === undefined
-  const displayValue = isMixed ? '#808080' : value
-
-  const [hexText, setHexText] = React.useState(displayValue)
-
-  React.useEffect(() => {
-    setHexText(isMixed ? '' : (value ?? '#000000'))
-  }, [value, isMixed])
-
-  function handleSwatchChange(e: React.ChangeEvent<HTMLInputElement>): void {
-    onChange(e.target.value)
-  }
-
-  function handleTextChange(e: React.ChangeEvent<HTMLInputElement>): void {
-    setHexText(e.target.value)
-  }
-
-  function handleTextBlur(): void {
-    const cleaned = hexText.trim()
-    if (/^#?[0-9a-fA-F]{6}$/.test(cleaned)) {
-      const normalized = cleaned.startsWith('#') ? cleaned : `#${cleaned}`
-      onChange(normalized)
-      setHexText(normalized)
-    } else {
-      setHexText(isMixed ? '' : (value ?? '#000000'))
-    }
-  }
-
-  function handleTextKeyDown(e: React.KeyboardEvent<HTMLInputElement>): void {
-    if (e.key === 'Enter') {
-      e.currentTarget.blur()
-    }
-  }
-
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-      <div style={{ position: 'relative', flexShrink: 0 }}>
-        <input
-          type="color"
-          value={displayValue}
-          onChange={handleSwatchChange}
-          style={{ width: 32, height: 24, opacity: isMixed ? 0.4 : 1 }}
-        />
-        {isMixed && (
-          <span
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              color: '#fff',
-              fontSize: 10,
-              pointerEvents: 'none',
-              fontWeight: 'bold',
-            }}
-          >
-            —
-          </span>
-        )}
-      </div>
-      <input
-        type="text"
-        value={hexText}
-        placeholder={isMixed ? '—' : undefined}
-        onChange={handleTextChange}
-        onBlur={handleTextBlur}
-        onKeyDown={handleTextKeyDown}
-        style={{
-          flex: 1,
-          background: '#ffffff',
-          border: '1px solid #d4ccc2',
-          borderRadius: 6,
-          color: isMixed ? '#aaaaaa' : '#111111',
-          fontSize: 12,
-          padding: '3px 6px',
-          boxSizing: 'border-box',
-          outline: 'none',
-          fontFamily: 'var(--font)',
-        }}
-      />
-    </div>
-  )
-}
 
 // ---------------------------------------------------------------------------
 // Shared style constants
@@ -1061,12 +895,10 @@ function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): R
                     return (
                       <div key={ctrl.key} style={{ display: 'flex', alignItems: 'center', marginBottom: 5, gap: 6 }}>
                         <label style={{ color: '#555555', fontSize: 11, width: 68, flexShrink: 0 }}>{ctrl.label}</label>
-                        <input
-                          type="color"
+                        <ColorInput
                           value={val as string}
-                          onChange={e => updateParam(effect.id, ctrl.key, e.target.value, false)}
-                          onBlur={e => updateParam(effect.id, ctrl.key, e.target.value, true)}
-                          style={{ width: 36, height: 22 }}
+                          onChange={v => updateParam(effect.id, ctrl.key, v, false)}
+                          onCommit={() => updateParam(effect.id, ctrl.key, ctrl.value as string, true)}
                         />
                       </div>
                     )

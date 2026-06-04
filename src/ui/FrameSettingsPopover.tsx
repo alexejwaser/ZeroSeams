@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useCanvasStore, PLATFORM_PRESETS } from '@/canvas/useCanvasStore'
 import type { FrameRatio, Platform } from '@/types/project'
+import { ColorInput } from './ColorInput'
 
 interface FrameSettingsPopoverProps {
   onClose: () => void
@@ -203,22 +204,7 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
 
       <div style={{ ...labelStyle, marginTop: 12 }}>Background</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <input
-          type="color"
-          value={backgroundColor}
-          onChange={(e) => { setCanvasBackground(e.target.value) }}
-          style={{
-            width: 32,
-            height: 24,
-            border: '1px solid #d4ccc2',
-            borderRadius: 6,
-            cursor: 'pointer',
-            padding: 0,
-            background: 'none',
-            flexShrink: 0,
-          }}
-        />
-        <span style={{ color: '#555555', fontSize: 12, fontFamily: 'var(--font)' }}>{backgroundColor}</span>
+        <ColorInput value={backgroundColor} onChange={setCanvasBackground} />
       </div>
     </div>
   )

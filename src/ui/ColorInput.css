@@ -1,0 +1,163 @@
+/* react-colorful overrides — scoped to avoid leaking */
+
+.zs-color-picker .react-colorful {
+  width: 100%;
+  height: auto;
+}
+
+.zs-color-picker .react-colorful__saturation {
+  height: 150px;
+  flex: none;
+  border-radius: 0;
+  border-bottom: none;
+}
+
+.zs-color-picker .react-colorful__hue {
+  height: 14px;
+  border-radius: 999px;
+  margin: 10px 12px 0;
+  flex: none;
+}
+
+/* Hue slider thumb — orange pill */
+.zs-color-picker .react-colorful__hue-pointer {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--accent) !important;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+/* Hide the inner fill that would cover the accent background on the hue thumb */
+.zs-color-picker .react-colorful__hue-pointer .react-colorful__pointer-fill {
+  display: none;
+}
+
+/* Saturation pointer */
+.zs-color-picker .react-colorful__saturation-pointer {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+/* Mode toggle buttons */
+.zs-mode-btn {
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 3px 6px;
+  border-radius: 4px;
+  transition: color 0.1s, background 0.1s;
+}
+
+.zs-mode-btn:focus,
+.zs-mode-btn:focus-visible {
+  outline: none;
+}
+
+.zs-mode-btn:hover {
+  color: var(--text-secondary);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.zs-mode-btn.active {
+  color: var(--accent);
+}
+
+/* Eyedropper button */
+.zs-eyedropper-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.1s, background 0.1s;
+  padding: 0;
+}
+
+.zs-eyedropper-btn:focus,
+.zs-eyedropper-btn:focus-visible {
+  outline: none;
+}
+
+.zs-eyedropper-btn:hover {
+  color: var(--text-secondary);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.zs-eyedropper-btn.unavailable {
+  opacity: 0.35;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Channel inputs (RGB / HSL) */
+.zs-channel-row {
+  display: flex;
+  gap: 4px;
+  padding: 0 12px;
+}
+
+.zs-channel-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+}
+
+.zs-channel-label {
+  font-family: var(--font);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.zs-channel-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--bg-surface);
+  border: 1px solid var(--stroke);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: var(--font);
+  padding: 4px 4px;
+  text-align: center;
+  outline: none;
+}
+
+.zs-channel-input:focus {
+  border-color: var(--accent);
+}
+
+/* Recent colors label */
+.zs-recent-label {
+  font-family: var(--font);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 8px 12px 4px;
+  display: block;
+}

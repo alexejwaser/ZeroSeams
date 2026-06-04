@@ -19,7 +19,7 @@
       "canvas_constants_axislock",
       "canvas_constants_canvas_scale",
       "canvas_constants_snap_threshold",
-      "canvas_index_exports",
+      "canvas_exportframes_downloadframes",
       "canvas_pathutils_posixdirname",
       "canvas_pathutils_posixrelative",
       "canvas_pathutils_posixresolve",
@@ -29,13 +29,17 @@
       "canvas_usecanvasstore_canvasstate",
       "canvas_usecanvasstore_getobjectbbox",
       "canvas_usecanvasstore_historysnapshot",
+      "canvas_usecanvasstore_isineditmode",
       "canvas_usecanvasstore_makeframes",
       "canvas_usecanvasstore_normalizeobjectsforsnapshot",
       "canvas_usecanvasstore_platform_presets",
+      "canvas_usecanvasstore_reinjectsrc",
       "canvas_usekeyboardshortcuts_buildprojectsnapshot",
       "canvas_usesnapguides_buildtargets",
       "canvas_usesnapguides_computesnap",
+      "canvas_usesnapguides_computesnapfromtargets",
       "canvas_usesnapguides_computesnapresize",
+      "canvas_usesnapguides_computesnapresizefromtargets",
       "canvas_usesnapguides_dragbox",
       "canvas_usesnapguides_rotation_snap_angles",
       "canvas_usesnapguides_snapguide",
@@ -44,10 +48,13 @@
       "canvas_usevideodrop_electronfile",
       "canvas_useviewportstore_d_viewportstate",
       "canvas_useviewportstore_viewportstate",
+      "claudemd_snapcoordspace",
       "concept_autosave_pipeline",
       "concept_history_undoredo",
       "concept_masking_system",
       "concept_photo_adjustments",
+      "concept_snap_system",
+      "electron_preload_electronapi",
       "src_canvas_canvasimagenode_tsx",
       "src_canvas_canvaspathnode_tsx",
       "src_canvas_canvasshapenode_tsx",
@@ -55,6 +62,7 @@
       "src_canvas_canvasvideonode_tsx",
       "src_canvas_carouselstage_tsx",
       "src_canvas_constants_ts",
+      "src_canvas_effects_buildeffectfilters_ts",
       "src_canvas_frameguides_tsx",
       "src_canvas_index_ts",
       "src_canvas_pathutils_ts",
@@ -62,6 +70,7 @@
       "src_canvas_useautosave_ts",
       "src_canvas_usecanvasstore_ts",
       "src_canvas_usedeleteshortcut_ts",
+      "src_canvas_useexternaledit_ts",
       "src_canvas_useimagedrop_ts",
       "src_canvas_usekeyboardshortcuts_ts",
       "src_canvas_usesnapguides_ts",
@@ -71,6 +80,69 @@
       "types_electron_d_electronapi"
     ],
     "1": [
+      "ffmpeg_ffmpeg_core_addoninit",
+      "ffmpeg_ffmpeg_core_base",
+      "ffmpeg_ffmpeg_core_biginttoi53checked",
+      "ffmpeg_ffmpeg_core_cxa_throw",
+      "ffmpeg_ffmpeg_core_default_args",
+      "ffmpeg_ffmpeg_core_default_args_ffprobe",
+      "ffmpeg_ffmpeg_core_docallback",
+      "ffmpeg_ffmpeg_core_done",
+      "ffmpeg_ffmpeg_core_doreadv",
+      "ffmpeg_ffmpeg_core_dowritev",
+      "ffmpeg_ffmpeg_core_emscripten_asm_const_int",
+      "ffmpeg_ffmpeg_core_emscripten_date_now",
+      "ffmpeg_ffmpeg_core_emscripten_get_now_is_monotonic",
+      "ffmpeg_ffmpeg_core_emscripten_memcpy_big",
+      "ffmpeg_ffmpeg_core_emscripten_throw_longjmp",
+      "ffmpeg_ffmpeg_core_ensureparent",
+      "ffmpeg_ffmpeg_core_exceptioninfo",
+      "ffmpeg_ffmpeg_core_exitjs",
+      "ffmpeg_ffmpeg_core_exitstatus",
+      "ffmpeg_ffmpeg_core_fd_close",
+      "ffmpeg_ffmpeg_core_fd_fdstat_get",
+      "ffmpeg_ffmpeg_core_fd_read",
+      "ffmpeg_ffmpeg_core_fd_seek",
+      "ffmpeg_ffmpeg_core_fd_write",
+      "ffmpeg_ffmpeg_core_fs_getmode",
+      "ffmpeg_ffmpeg_core_fs_handledbypreloadplugin",
+      "ffmpeg_ffmpeg_core_fs_modestringtoflags",
+      "ffmpeg_ffmpeg_core_is_timeout",
+      "ffmpeg_ffmpeg_core_keepruntimealive",
+      "ffmpeg_ffmpeg_core_lazyuint8array",
+      "ffmpeg_ffmpeg_core_locatefile",
+      "ffmpeg_ffmpeg_core_mmap_js",
+      "ffmpeg_ffmpeg_core_munmap_js",
+      "ffmpeg_ffmpeg_core_print",
+      "ffmpeg_ffmpeg_core_printerr",
+      "ffmpeg_ffmpeg_core_proc_exit",
+      "ffmpeg_ffmpeg_core_reademasmargs",
+      "ffmpeg_ffmpeg_core_receiveprogress",
+      "ffmpeg_ffmpeg_core_removerundependency",
+      "ffmpeg_ffmpeg_core_reset",
+      "ffmpeg_ffmpeg_core_runemasmfunction",
+      "ffmpeg_ffmpeg_core_send_progress",
+      "ffmpeg_ffmpeg_core_seterrno",
+      "ffmpeg_ffmpeg_core_setlogger",
+      "ffmpeg_ffmpeg_core_setprogress",
+      "ffmpeg_ffmpeg_core_syscall_faccessat",
+      "ffmpeg_ffmpeg_core_syscall_fcntl64",
+      "ffmpeg_ffmpeg_core_syscall_fstat64",
+      "ffmpeg_ffmpeg_core_syscall_ioctl",
+      "ffmpeg_ffmpeg_core_syscall_mkdirat",
+      "ffmpeg_ffmpeg_core_syscall_newfstatat",
+      "ffmpeg_ffmpeg_core_syscall_newselect",
+      "ffmpeg_ffmpeg_core_syscall_openat",
+      "ffmpeg_ffmpeg_core_syscall_poll",
+      "ffmpeg_ffmpeg_core_syscall_renameat",
+      "ffmpeg_ffmpeg_core_syscall_rmdir",
+      "ffmpeg_ffmpeg_core_syscall_socket",
+      "ffmpeg_ffmpeg_core_syscall_stat64",
+      "ffmpeg_ffmpeg_core_trim",
+      "ffmpeg_ffmpeg_core_writechunks",
+      "public_ffmpeg_ffmpeg_core_js"
+    ],
+    "2": [
       "scripts_test_multiselect_transform_addimage",
       "scripts_test_multiselect_transform_clearall",
       "scripts_test_multiselect_transform_clickkonvacenter",
@@ -119,7 +191,7 @@
       "scripts_test_multiselect_transform_top",
       "scripts_test_multiselect_transform_wait"
     ],
-    "2": [
+    "3": [
       "claudemd_savecurrentfilepath",
       "electron_index_addrecentfile",
       "electron_index_autosaveproject",
@@ -160,9 +232,11 @@
       "electron_index_watcher",
       "electron_index_watchers",
       "electron_index_writepreferences",
+      "ffmpeg_worker_readfile",
+      "ffmpeg_worker_writefile",
       "src_electron_index_ts"
     ],
-    "3": [
+    "4": [
       "concept_nondestructive_adjustments",
       "src_types_ai_ts",
       "src_types_canvas_ts",
@@ -181,6 +255,7 @@
       "types_canvas_canvasobject",
       "types_canvas_canvasobjectscope",
       "types_canvas_default_adjustments",
+      "types_canvas_default_video_export_settings",
       "types_canvas_fontstyle",
       "types_canvas_groupobject",
       "types_canvas_imageobject",
@@ -205,7 +280,7 @@
       "types_project_frameratio",
       "types_project_platform"
     ],
-    "4": [
+    "5": [
       "concept_electron_vite_build",
       "electron_vite_config",
       "scripts_debug_selection_allinputs",
@@ -242,7 +317,151 @@
       "zeroseams_package_devdependencies_vite",
       "zeroseams_package_devdependencies_vitejs_plugin_react"
     ],
-    "5": [
+    "6": [
+      "ffmpeg_classes_ffmpeg",
+      "ffmpeg_classes_ffmpeg_off",
+      "ffmpeg_classes_ffmpeg_on",
+      "ffmpeg_classes_id",
+      "ffmpeg_classes_ids",
+      "ffmpeg_classes_trans",
+      "ffmpeg_errors_error_import_failure",
+      "ffmpeg_errors_error_not_loaded",
+      "ffmpeg_errors_error_terminated",
+      "ffmpeg_errors_error_unknown_message_type",
+      "ffmpeg_utils_getmessageid",
+      "ffmpeg_worker_createdir",
+      "ffmpeg_worker_deletedir",
+      "ffmpeg_worker_deletefile",
+      "ffmpeg_worker_exec",
+      "ffmpeg_worker_ffprobe",
+      "ffmpeg_worker_listdir",
+      "ffmpeg_worker_load",
+      "ffmpeg_worker_mount",
+      "ffmpeg_worker_rename",
+      "ffmpeg_worker_trans",
+      "ffmpeg_worker_unmount",
+      "public_ffmpeg_classes_js",
+      "public_ffmpeg_const_js",
+      "public_ffmpeg_errors_js",
+      "public_ffmpeg_index_js",
+      "public_ffmpeg_types_js",
+      "public_ffmpeg_utils_js",
+      "public_ffmpeg_worker_js"
+    ],
+    "7": [
+      "concept_rotate_around_center_rationale",
+      "src_ui_fontpicker_tsx",
+      "src_ui_propertiespanel_tsx",
+      "ui_fontpicker_mac_system_fonts",
+      "ui_propertiespanel_adjustmentssectionprops",
+      "ui_propertiespanel_alignbuttonstyle",
+      "ui_propertiespanel_aligndistributesection",
+      "ui_propertiespanel_canvassection",
+      "ui_propertiespanel_colorinput",
+      "ui_propertiespanel_distributebuttonstyle",
+      "ui_propertiespanel_effectssectionprops",
+      "ui_propertiespanel_formatduration",
+      "ui_propertiespanel_mixedcolorinput",
+      "ui_propertiespanel_mixednumberfield",
+      "ui_propertiespanel_mixednumberfieldprops",
+      "ui_propertiespanel_numberfield",
+      "ui_propertiespanel_numberfieldprops",
+      "ui_propertiespanel_numinputstyle",
+      "ui_propertiespanel_rotatearoundcenter",
+      "ui_propertiespanel_sectionlabelstyle",
+      "ui_propertiespanel_subgrouplabelstyle",
+      "ui_propertiespanel_textsection",
+      "ui_propertiespanel_textsectionprops",
+      "ui_propertiespanel_track_gradient",
+      "ui_propertiespanel_trimlabelstyle",
+      "ui_propertiespanel_videosection",
+      "ui_propertiespanel_videosectionprops"
+    ],
+    "8": [
+      "package_json",
+      "zeroseams_package_author",
+      "zeroseams_package_dependencies",
+      "zeroseams_package_dependencies_chokidar",
+      "zeroseams_package_dependencies_ffmpeg_ffmpeg",
+      "zeroseams_package_dependencies_ffmpeg_util",
+      "zeroseams_package_dependencies_imgly_background_removal",
+      "zeroseams_package_dependencies_konva",
+      "zeroseams_package_dependencies_lucide_react",
+      "zeroseams_package_dependencies_onnxruntime_web",
+      "zeroseams_package_dependencies_react",
+      "zeroseams_package_dependencies_react_dom",
+      "zeroseams_package_dependencies_react_konva",
+      "zeroseams_package_dependencies_use_image",
+      "zeroseams_package_dependencies_zustand",
+      "zeroseams_package_description",
+      "zeroseams_package_license",
+      "zeroseams_package_main",
+      "zeroseams_package_name",
+      "zeroseams_package_scripts",
+      "zeroseams_package_scripts_build",
+      "zeroseams_package_scripts_dev",
+      "zeroseams_package_scripts_lint",
+      "zeroseams_package_scripts_preview",
+      "zeroseams_package_scripts_typecheck",
+      "zeroseams_package_version"
+    ],
+    "9": [
+      "scripts_test_video_eq",
+      "scripts_test_video_errors",
+      "scripts_test_video_failures",
+      "scripts_test_video_getstate",
+      "scripts_test_video_loaded",
+      "scripts_test_video_makevideoobject",
+      "scripts_test_video_mjs",
+      "scripts_test_video_newvideoerrors",
+      "scripts_test_video_nonprotocolerrors",
+      "scripts_test_video_objects",
+      "scripts_test_video_ok",
+      "scripts_test_video_posixdirname",
+      "scripts_test_video_posixrelative",
+      "scripts_test_video_posixresolve",
+      "scripts_test_video_relativizevideoobjects",
+      "scripts_test_video_resolvevideoobjects",
+      "scripts_test_video_result",
+      "scripts_test_video_root",
+      "scripts_test_video_s",
+      "scripts_test_video_saved",
+      "scripts_test_video_ss",
+      "scripts_test_video_testvideopath",
+      "scripts_test_video_vid2",
+      "scripts_test_video_videoobj",
+      "scripts_test_video_vidobj",
+      "scripts_test_video_wait"
+    ],
+    "10": [
+      "adjustments_pipeline_adjfingerprint",
+      "adjustments_pipeline_build3dlut",
+      "adjustments_pipeline_buildfilterpipeline",
+      "adjustments_pipeline_buildfloatlut",
+      "adjustments_pipeline_buildlut",
+      "adjustments_pipeline_floatlutcache",
+      "adjustments_pipeline_hsltorgb",
+      "adjustments_pipeline_isalldefault",
+      "adjustments_pipeline_lut3dcache",
+      "adjustments_pipeline_lutcache",
+      "adjustments_pipeline_makeblacksfilter",
+      "adjustments_pipeline_makeclarityfilter",
+      "adjustments_pipeline_makecontrastfilter",
+      "adjustments_pipeline_makedehazefilter",
+      "adjustments_pipeline_makeexposurefilter",
+      "adjustments_pipeline_makehighlightsfilter",
+      "adjustments_pipeline_makesaturationfilter",
+      "adjustments_pipeline_makeshadowsfilter",
+      "adjustments_pipeline_maketemperaturefilter",
+      "adjustments_pipeline_maketintfilter",
+      "adjustments_pipeline_makevibrancefilter",
+      "adjustments_pipeline_makewhitesfilter",
+      "adjustments_pipeline_pipelinecache",
+      "adjustments_pipeline_rgbtohsl",
+      "adjustments_pipeline_sample3dlut",
+      "src_canvas_adjustments_pipeline_ts"
+    ],
+    "11": [
       "agents_agentisolation",
       "agents_agentisolation_rationale",
       "agents_aiengineer",
@@ -265,93 +484,39 @@
       "claudemd_penpath",
       "claudemd_photoadjustments",
       "claudemd_photoadjustments_rationale",
-      "claudemd_snapcoordspace",
       "claudemd_thumbnails",
-      "concept_snap_system",
       "readme_seamlesscanvas",
       "store_index_zustandstore"
     ],
-    "6": [
-      "concept_rotate_around_center_rationale",
-      "src_ui_fontpicker_tsx",
-      "src_ui_propertiespanel_tsx",
-      "ui_fontpicker_mac_system_fonts",
-      "ui_propertiespanel_adjustmentssectionprops",
-      "ui_propertiespanel_alignbuttonstyle",
-      "ui_propertiespanel_aligndistributesection",
-      "ui_propertiespanel_canvassection",
-      "ui_propertiespanel_colorinput",
-      "ui_propertiespanel_distributebuttonstyle",
-      "ui_propertiespanel_effectssection",
-      "ui_propertiespanel_effectssectionprops",
-      "ui_propertiespanel_formatduration",
-      "ui_propertiespanel_mixedcolorinput",
-      "ui_propertiespanel_mixednumberfield",
-      "ui_propertiespanel_mixednumberfieldprops",
-      "ui_propertiespanel_numberfield",
-      "ui_propertiespanel_numberfieldprops",
-      "ui_propertiespanel_numinputstyle",
-      "ui_propertiespanel_rotatearoundcenter",
-      "ui_propertiespanel_sectionlabelstyle",
-      "ui_propertiespanel_subgrouplabelstyle",
-      "ui_propertiespanel_textsection",
-      "ui_propertiespanel_textsectionprops",
-      "ui_propertiespanel_track_gradient",
-      "ui_propertiespanel_videosection",
-      "ui_propertiespanel_videosectionprops"
+    "12": [
+      "scripts_test_undo_redo_addimage",
+      "scripts_test_undo_redo_addpath",
+      "scripts_test_undo_redo_addshape",
+      "scripts_test_undo_redo_addtext",
+      "scripts_test_undo_redo_electron_bin",
+      "scripts_test_undo_redo_eq",
+      "scripts_test_undo_redo_failures",
+      "scripts_test_undo_redo_getstate",
+      "scripts_test_undo_redo_gs",
+      "scripts_test_undo_redo_mask",
+      "scripts_test_undo_redo_mjs",
+      "scripts_test_undo_redo_ok",
+      "scripts_test_undo_redo_orderbefore",
+      "scripts_test_undo_redo_orderbefore2",
+      "scripts_test_undo_redo_redo",
+      "scripts_test_undo_redo_root",
+      "scripts_test_undo_redo_s",
+      "scripts_test_undo_redo_selectobj",
+      "scripts_test_undo_redo_simulateopacityslider",
+      "scripts_test_undo_redo_ss",
+      "scripts_test_undo_redo_undo",
+      "scripts_test_undo_redo_wait",
+      "scripts_test_undo_redo_zero_adj"
     ],
-    "7": [
-      "package_json",
-      "zeroseams_package_author",
-      "zeroseams_package_dependencies",
-      "zeroseams_package_dependencies_chokidar",
-      "zeroseams_package_dependencies_imgly_background_removal",
-      "zeroseams_package_dependencies_konva",
-      "zeroseams_package_dependencies_lucide_react",
-      "zeroseams_package_dependencies_onnxruntime_web",
-      "zeroseams_package_dependencies_react",
-      "zeroseams_package_dependencies_react_dom",
-      "zeroseams_package_dependencies_react_konva",
-      "zeroseams_package_dependencies_use_image",
-      "zeroseams_package_dependencies_zustand",
-      "zeroseams_package_description",
-      "zeroseams_package_license",
-      "zeroseams_package_main",
-      "zeroseams_package_name",
-      "zeroseams_package_scripts",
-      "zeroseams_package_scripts_build",
-      "zeroseams_package_scripts_dev",
-      "zeroseams_package_scripts_lint",
-      "zeroseams_package_scripts_preview",
-      "zeroseams_package_scripts_typecheck",
-      "zeroseams_package_version"
-    ],
-    "8": [
-      "adjustments_pipeline_adjfingerprint",
-      "adjustments_pipeline_buildfilterpipeline",
-      "adjustments_pipeline_buildlut",
-      "adjustments_pipeline_hsltorgb",
-      "adjustments_pipeline_isalldefault",
-      "adjustments_pipeline_lutcache",
-      "adjustments_pipeline_makeblacksfilter",
-      "adjustments_pipeline_makeclarityfilter",
-      "adjustments_pipeline_makecontrastfilter",
-      "adjustments_pipeline_makedehazefilter",
-      "adjustments_pipeline_makeexposurefilter",
-      "adjustments_pipeline_makehighlightsfilter",
-      "adjustments_pipeline_makesaturationfilter",
-      "adjustments_pipeline_makeshadowsfilter",
-      "adjustments_pipeline_maketemperaturefilter",
-      "adjustments_pipeline_maketintfilter",
-      "adjustments_pipeline_makevibrancefilter",
-      "adjustments_pipeline_makewhitesfilter",
-      "adjustments_pipeline_pipelinecache",
-      "adjustments_pipeline_rgbtohsl",
-      "src_canvas_adjustments_pipeline_ts"
-    ],
-    "9": [
+    "13": [
       "canvas_textspans_applystyletoall",
       "canvas_textspans_applystyletorange",
+      "canvas_textspans_d_resolvedspanstyle",
       "canvas_textspans_d_selectionstyle",
       "canvas_textspans_getselectionstyle",
       "canvas_textspans_mergeadjacentspans",
@@ -370,27 +535,7 @@
       "src_canvas_textspans_ts",
       "src_canvas_usethumbnailstore_ts"
     ],
-    "10": [
-      "effects_filmgrain_buildfilter",
-      "effects_halation_boxblurh",
-      "effects_halation_boxblurv",
-      "effects_halation_buildfilter",
-      "effects_halation_hextorgb",
-      "effects_registry_effectcontroldescriptor",
-      "effects_registry_effectdefinition",
-      "effects_registry_effectparams",
-      "effects_registry_geteffectdefinition",
-      "effects_registry_registereffect",
-      "effects_registry_registry",
-      "effects_vignette_buildfilter",
-      "src_canvas_effects_buildeffectfilters_ts",
-      "src_canvas_effects_filmgrain_ts",
-      "src_canvas_effects_halation_ts",
-      "src_canvas_effects_index_ts",
-      "src_canvas_effects_registry_ts",
-      "src_canvas_effects_vignette_ts"
-    ],
-    "11": [
+    "14": [
       "tsconfig_web_json",
       "zeroseams_tsconfig_web_compileroptions",
       "zeroseams_tsconfig_web_compileroptions_composite",
@@ -410,26 +555,26 @@
       "zeroseams_tsconfig_web_include",
       "zeroseams_tsconfig_web_paths"
     ],
-    "12": [
-      "ai_aicontext_aicontext",
-      "ai_aicontext_aicontextvalue",
-      "ai_aicontext_useai",
-      "ai_useaistore_aistorestate",
-      "ai_useaistore_useaistore",
-      "ai_usebackgroundremoval_usebackgroundremovalreturn",
-      "canvas_canvasimagenode_syncgroupontransform",
-      "concept_frame_content_model",
-      "src_ai_aicontext_tsx",
-      "src_ai_aiprovider_tsx",
-      "src_ai_index_ts",
-      "src_ai_useaistore_ts",
-      "src_ai_usebackgroundremoval_ts",
-      "src_ui_contextmenu_tsx",
-      "ui_contextmenu_divider",
-      "ui_contextmenu_menuitem",
-      "ui_contextmenu_menuitemprops"
+    "15": [
+      "effects_filmgrain_buildfilter",
+      "effects_halation_boxblurh",
+      "effects_halation_boxblurv",
+      "effects_halation_buildfilter",
+      "effects_halation_hextorgb",
+      "effects_registry_effectcontroldescriptor",
+      "effects_registry_effectdefinition",
+      "effects_registry_effectparams",
+      "effects_registry_geteffectdefinition",
+      "effects_registry_registereffect",
+      "effects_registry_registry",
+      "effects_vignette_buildfilter",
+      "src_canvas_effects_filmgrain_ts",
+      "src_canvas_effects_halation_ts",
+      "src_canvas_effects_index_ts",
+      "src_canvas_effects_registry_ts",
+      "src_canvas_effects_vignette_ts"
     ],
-    "13": [
+    "16": [
       "scripts_test_save_path_consolelogs",
       "scripts_test_save_path_content",
       "scripts_test_save_path_electron_bin",
@@ -448,50 +593,13 @@
       "scripts_test_save_path_triggercanvaschange",
       "scripts_test_save_path_wait"
     ],
-    "14": [
-      "canvas_exportframes_capturevideoframesequence",
-      "canvas_exportframes_downloadframes",
-      "canvas_exportframes_exportmixedframes",
-      "canvas_exportframes_exportresult",
-      "canvas_videoelementregistry_getvideoelement",
-      "canvas_videoelementregistry_registervideoelement",
-      "canvas_videoelementregistry_registry",
-      "canvas_videoexport_encodevideoframes",
-      "canvas_videoexport_encodevideowithaudio",
-      "canvas_videoexport_getffmpeg",
-      "canvas_videoexport_log",
-      "electron_preload_electronapi",
-      "src_canvas_exportframes_ts",
-      "src_canvas_useexternaledit_ts",
-      "src_canvas_videoelementregistry_ts",
-      "src_canvas_videoexport_ts",
-      "types_canvas_videoobject"
-    ],
-    "15": [
-      "concept_adjust_bypass",
-      "concept_save_split_button",
-      "src_ui_iconbtnstyle_ts",
-      "src_ui_index_ts",
-      "src_ui_toolbar_tsx",
-      "src_ui_useexportstore_ts",
-      "src_ui_usesavestatusstore_ts",
-      "ui_propertiespanel_adjustmentssection",
-      "ui_toolbar_activetool",
-      "ui_toolbar_blobtobase64",
-      "ui_toolbar_savestatuspill",
-      "ui_toolbar_toolbar",
-      "ui_useexportstore_exportstate",
-      "ui_usesavestatusstore_d_savestatus",
-      "ui_usesavestatusstore_d_savestatusstate",
-      "ui_usesavestatusstore_savestatus",
-      "ui_usesavestatusstore_savestatusstate"
-    ],
-    "16": [
+    "17": [
       "src_types_canvas_d_ts",
       "types_canvas_d_anchorpoint",
       "types_canvas_d_basecanvasobject",
       "types_canvas_d_canvasobject",
       "types_canvas_d_canvasobjectscope",
+      "types_canvas_d_canvasobjecttype",
       "types_canvas_d_fontstyle",
       "types_canvas_d_groupobject",
       "types_canvas_d_imageobject",
@@ -504,10 +612,100 @@
       "types_canvas_d_textspan",
       "types_canvas_d_textspanstyle"
     ],
-    "17": [
+    "18": [
+      "ai_aicontext_aicontext",
+      "ai_aicontext_aicontextvalue",
+      "ai_aicontext_useai",
+      "ai_useaistore_aistorestate",
+      "ai_useaistore_useaistore",
+      "ai_usebackgroundremoval_usebackgroundremovalreturn",
+      "canvas_canvasimagenode_syncgroupontransform",
+      "concept_frame_content_model",
+      "src_ai_aicontext_tsx",
+      "src_ai_aiprovider_tsx",
+      "src_ai_index_ts",
+      "src_ai_useaistore_ts",
+      "src_ai_usebackgroundremoval_ts",
+      "src_ui_contextmenu_tsx",
+      "ui_contextmenu_divider",
+      "ui_contextmenu_menuitem",
+      "ui_contextmenu_menuitemprops"
+    ],
+    "19": [
+      "preview_previewshell_capturepreviewframes",
+      "preview_previewshell_frameslide",
+      "preview_previewshell_frameslideprops",
+      "preview_previewshell_videooverlayitem",
+      "preview_previewshell_videooverlayitemprops",
+      "shells_facebookshell_facebookshell",
+      "shells_instagramshell_instagramshell",
+      "shells_registry_getshell",
+      "shells_registry_platformshellprops",
+      "shells_registry_registershell",
+      "shells_registry_shell_registry",
+      "shells_threadsshell_threadsshell",
+      "shells_tiktokshell_tiktokshell",
+      "src_ui_preview_previewshell_tsx",
+      "src_ui_preview_shells_registry_ts",
+      "src_ui_preview_shells_threadsshell_tsx"
+    ],
+    "20": [
+      "claude_md",
+      "zeroseams_claude_codeblock_1",
+      "zeroseams_claude_core_concepts_never_break_these",
+      "zeroseams_claude_export_src_canvas_exportframes_ts",
+      "zeroseams_claude_features_implemented_sprints_1_42_issue_20",
+      "zeroseams_claude_file_ownership",
+      "zeroseams_claude_graphify",
+      "zeroseams_claude_key_architecture",
+      "zeroseams_claude_keyboard_shortcuts",
+      "zeroseams_claude_knowledge_graph_graphify_out",
+      "zeroseams_claude_layer_effects_src_canvas_effects",
+      "zeroseams_claude_mandatory_query_the_knowledge_graph_before_reading_files",
+      "zeroseams_claude_tech_stack",
+      "zeroseams_claude_upcoming",
+      "zeroseams_claude_what_this_is",
+      "zeroseams_claude_zero_seams_ai_dev_guide"
+    ],
+    "21": [
+      "canvas_exportframes_capturevideoframesequence",
+      "canvas_exportframes_exportmixedframes",
+      "canvas_exportframes_exportresult",
+      "canvas_index_exports",
+      "canvas_videoelementregistry_getvideoelement",
+      "canvas_videoelementregistry_registervideoelement",
+      "canvas_videoelementregistry_registry",
+      "canvas_videoexport_encodevideoframes",
+      "canvas_videoexport_encodevideowithaudio",
+      "canvas_videoexport_getffmpeg",
+      "canvas_videoexport_log",
+      "src_canvas_exportframes_ts",
+      "src_canvas_videoelementregistry_ts",
+      "src_canvas_videoexport_ts",
+      "types_canvas_videoobject"
+    ],
+    "22": [
+      "ffmpeg_ffmpeg_core_alignmemory",
+      "ffmpeg_ffmpeg_core_getsocketaddress",
+      "ffmpeg_ffmpeg_core_getsocketfromfd",
+      "ffmpeg_ffmpeg_core_mmapalloc",
+      "ffmpeg_ffmpeg_core_syscall_accept4",
+      "ffmpeg_ffmpeg_core_syscall_bind",
+      "ffmpeg_ffmpeg_core_syscall_connect",
+      "ffmpeg_ffmpeg_core_syscall_getpeername",
+      "ffmpeg_ffmpeg_core_syscall_getsockname",
+      "ffmpeg_ffmpeg_core_syscall_getsockopt",
+      "ffmpeg_ffmpeg_core_syscall_listen",
+      "ffmpeg_ffmpeg_core_syscall_recvfrom",
+      "ffmpeg_ffmpeg_core_syscall_sendto",
+      "ffmpeg_ffmpeg_core_writesockaddr",
+      "ffmpeg_ffmpeg_core_zeromemory"
+    ],
+    "23": [
       "scripts_test_axis_lock_addrect",
       "scripts_test_axis_lock_clickat",
       "scripts_test_axis_lock_drag",
+      "scripts_test_axis_lock_electron_bin",
       "scripts_test_axis_lock_failures",
       "scripts_test_axis_lock_getobjects",
       "scripts_test_axis_lock_getstageinfo",
@@ -520,7 +718,56 @@
       "scripts_test_axis_lock_ss",
       "scripts_test_axis_lock_wait"
     ],
-    "18": [
+    "24": [
+      "concept_save_split_button",
+      "src_main_app",
+      "src_main_rootel",
+      "src_main_tsx",
+      "src_ui_framesettingspopover_tsx",
+      "src_ui_useexportstore_ts",
+      "ui_framesettingspopover_framesettingspopoverprops",
+      "ui_framesettingspopover_labelstyle",
+      "ui_framesettingspopover_numberinputstyle",
+      "ui_framesettingspopover_platform_labels",
+      "ui_framesettingspopover_platforms",
+      "ui_framesettingspopover_segmentbuttonstyle",
+      "ui_toolbar_savestatuspill",
+      "ui_toolbar_toolbar",
+      "ui_useexportstore_exportstate"
+    ],
+    "25": [
+      "ffmpeg_ffmpeg_core_getwasmtableentry",
+      "ffmpeg_ffmpeg_core_invoke_i",
+      "ffmpeg_ffmpeg_core_invoke_ii",
+      "ffmpeg_ffmpeg_core_invoke_iii",
+      "ffmpeg_ffmpeg_core_invoke_iiii",
+      "ffmpeg_ffmpeg_core_invoke_iiiii",
+      "ffmpeg_ffmpeg_core_invoke_iiiiii",
+      "ffmpeg_ffmpeg_core_invoke_iiiiiiiii",
+      "ffmpeg_ffmpeg_core_invoke_iij",
+      "ffmpeg_ffmpeg_core_invoke_vi",
+      "ffmpeg_ffmpeg_core_invoke_vii",
+      "ffmpeg_ffmpeg_core_invoke_viiii",
+      "ffmpeg_ffmpeg_core_invoke_viiiiii",
+      "ffmpeg_ffmpeg_core_invoke_viiiiiiii"
+    ],
+    "26": [
+      "src_ui_index_ts",
+      "src_ui_toolbar_tsx",
+      "src_ui_usesavestatusstore_ts",
+      "types_canvas_videoexportsettings",
+      "ui_toolbar_activetool",
+      "ui_toolbar_blobtobase64",
+      "ui_toolbar_buildprojectjson",
+      "ui_toolbar_platform_recommended",
+      "ui_toolbar_presetkey",
+      "ui_toolbar_video_presets",
+      "ui_usesavestatusstore_d_savestatus",
+      "ui_usesavestatusstore_d_savestatusstate",
+      "ui_usesavestatusstore_savestatus",
+      "ui_usesavestatusstore_savestatusstate"
+    ],
+    "27": [
       "tsconfig_node_json",
       "zeroseams_tsconfig_node_compileroptions",
       "zeroseams_tsconfig_node_compileroptions_composite",
@@ -535,28 +782,97 @@
       "zeroseams_tsconfig_node_compileroptions_target",
       "zeroseams_tsconfig_node_include"
     ],
-    "19": [
+    "28": [
+      "ffmpeg_ffmpeg_core_abort",
+      "ffmpeg_ffmpeg_core_assert",
+      "ffmpeg_ffmpeg_core_dlopen",
+      "ffmpeg_ffmpeg_core_dlsym",
+      "ffmpeg_ffmpeg_core_getbinary",
+      "ffmpeg_ffmpeg_core_getvalue",
+      "ffmpeg_ffmpeg_core_handlemessage",
+      "ffmpeg_ffmpeg_core_initrandomfill",
+      "ffmpeg_ffmpeg_core_randomfill",
+      "ffmpeg_ffmpeg_core_setvalue",
+      "ffmpeg_ffmpeg_core_syscall_unlinkat"
+    ],
+    "29": [
+      "ffmpeg_ffmpeg_core_getnameinfo",
+      "ffmpeg_ffmpeg_core_inetntop4",
+      "ffmpeg_ffmpeg_core_inetntop6",
+      "ffmpeg_ffmpeg_core_intarrayfromstring",
+      "ffmpeg_ffmpeg_core_lengthbytesutf8",
+      "ffmpeg_ffmpeg_core_readsockaddr",
+      "ffmpeg_ffmpeg_core_stringtonewutf8",
+      "ffmpeg_ffmpeg_core_stringtoutf8",
+      "ffmpeg_ffmpeg_core_stringtoutf8array",
+      "ffmpeg_ffmpeg_core_syscall_getdents64",
+      "ffmpeg_ffmpeg_core_tzset_js"
+    ],
+    "30": [
+      "readme_md",
+      "zeroseams_readme_codeblock_1",
+      "zeroseams_readme_codeblock_2",
+      "zeroseams_readme_codeblock_3",
+      "zeroseams_readme_download",
+      "zeroseams_readme_features",
+      "zeroseams_readme_if_you_see_error_electron_uninstall_after_npm_install",
+      "zeroseams_readme_license",
+      "zeroseams_readme_running_locally",
+      "zeroseams_readme_tech_stack",
+      "zeroseams_readme_zero_seams"
+    ],
+    "31": [
+      "ffmpeg_ffmpeg_core_adddays",
+      "ffmpeg_ffmpeg_core_arraysum",
+      "ffmpeg_ffmpeg_core_gmtime_js",
+      "ffmpeg_ffmpeg_core_isleapyear",
+      "ffmpeg_ffmpeg_core_localtime_js",
+      "ffmpeg_ffmpeg_core_mktime_js",
+      "ffmpeg_ffmpeg_core_readi53fromi64",
+      "ffmpeg_ffmpeg_core_strftime",
+      "ffmpeg_ffmpeg_core_writearraytomemory",
+      "ffmpeg_ffmpeg_core_ydayfromdate"
+    ],
+    "32": [
+      "ffmpeg_ffmpeg_core_addrundependency",
+      "ffmpeg_ffmpeg_core_asyncload",
+      "ffmpeg_ffmpeg_core_createwasm",
+      "ffmpeg_ffmpeg_core_fs_createpreloadedfile",
+      "ffmpeg_ffmpeg_core_getbinarypromise",
+      "ffmpeg_ffmpeg_core_getuniquerundependency",
+      "ffmpeg_ffmpeg_core_instantiatearraybuffer",
+      "ffmpeg_ffmpeg_core_instantiateasync",
+      "ffmpeg_ffmpeg_core_isdatauri"
+    ],
+    "33": [
+      "ffmpeg_ffmpeg_core_addonpostrun",
+      "ffmpeg_ffmpeg_core_addonprerun",
+      "ffmpeg_ffmpeg_core_callruntimecallbacks",
+      "ffmpeg_ffmpeg_core_initruntime",
+      "ffmpeg_ffmpeg_core_postrun",
+      "ffmpeg_ffmpeg_core_prerun",
+      "ffmpeg_ffmpeg_core_run",
+      "ffmpeg_ffmpeg_core_settimeout"
+    ],
+    "34": [
       "concept_playwright_electron_testing",
       "concept_store_exposure_for_tests",
       "scripts_debug_selection",
       "scripts_test_axis_lock",
       "scripts_test_multiselect_transform",
       "scripts_test_save_path",
-      "scripts_verify_mask_draw",
-      "src_main_app",
-      "src_main_rootel",
-      "src_main_tsx"
+      "scripts_verify_mask_draw"
     ],
-    "20": [
-      "src_ui_framesettingspopover_tsx",
-      "ui_framesettingspopover_framesettingspopoverprops",
-      "ui_framesettingspopover_labelstyle",
-      "ui_framesettingspopover_numberinputstyle",
-      "ui_framesettingspopover_platform_labels",
-      "ui_framesettingspopover_platforms",
-      "ui_framesettingspopover_segmentbuttonstyle"
+    "35": [
+      "ffmpeg_ffmpeg_core_assert_fail",
+      "ffmpeg_ffmpeg_core_getaddrinfo",
+      "ffmpeg_ffmpeg_core_inetpton4",
+      "ffmpeg_ffmpeg_core_inetpton6",
+      "ffmpeg_ffmpeg_core_jstoi_q",
+      "ffmpeg_ffmpeg_core_utf8arraytostring",
+      "ffmpeg_ffmpeg_core_utf8tostring"
     ],
-    "21": [
+    "36": [
       "concept_tooltip_active_count",
       "src_ui_layerpanel_tsx",
       "src_ui_tooltip_tsx",
@@ -565,118 +881,182 @@
       "ui_tooltip_tooltipinner",
       "ui_tooltip_tooltipprops"
     ],
-    "22": [
+    "37": [
+      "ffmpeg_ffmpeg_core_emscripten_get_heap_max",
+      "ffmpeg_ffmpeg_core_emscripten_realloc_buffer",
+      "ffmpeg_ffmpeg_core_emscripten_resize_heap",
+      "ffmpeg_ffmpeg_core_getheapmax",
+      "ffmpeg_ffmpeg_core_updatememoryviews"
+    ],
+    "38": [
+      "ffmpeg_ffmpeg_core_environ_get",
+      "ffmpeg_ffmpeg_core_environ_sizes_get",
+      "ffmpeg_ffmpeg_core_getenvstrings",
+      "ffmpeg_ffmpeg_core_getexecutablename",
+      "ffmpeg_ffmpeg_core_stringtoascii"
+    ],
+    "39": [
+      "concept_adjust_bypass",
+      "src_ui_iconbtnstyle_ts",
+      "ui_propertiespanel_adjustmentssection",
+      "ui_propertiespanel_effectssection",
+      "ui_toolbar_titlebar"
+    ],
+    "40": [
+      "ffmpeg_ffmpeg_core_exec",
+      "ffmpeg_ffmpeg_core_ffprobe",
+      "ffmpeg_ffmpeg_core_stringstoptr",
+      "ffmpeg_ffmpeg_core_stringtoptr"
+    ],
+    "41": [
+      "claude_settings_hooks",
+      "claude_settings_hooks_pretooluse",
+      "claude_settings_json"
+    ],
+    "42": [
       "claude_settings_local_json",
       "claude_settings_local_permissions",
       "claude_settings_local_permissions_allow"
     ],
-    "23": [
+    "43": [
       "canvas_usecanvasstore_d_canvasstate",
       "canvas_usecanvasstore_d_historysnapshot",
       "src_canvas_usecanvasstore_d_ts"
     ],
-    "24": [
+    "44": [
       "src_types_electron_d_ts",
       "types_electron_d_externaleditor",
       "types_electron_d_window"
     ],
-    "25": [
+    "45": [
       "tsconfig_json",
       "zeroseams_tsconfig_files",
       "zeroseams_tsconfig_references"
     ],
-    "26": [
+    "46": [
       "claudemd_framelabels",
       "claudemd_framelabels_rationale"
     ],
-    "27": [
+    "47": [
       "claudemd_keyratio",
       "claudemd_keyratio_rationale"
     ],
-    "28": [
+    "48": [
       "claudemd_shapeellipse",
       "claudemd_shapeellipse_rationale"
     ],
-    "29": [
-      "claudemd_upcomingai",
-      "readme_ondeviceai"
-    ],
-    "30": [
+    "49": [
       "index_html_entrypoint",
       "index_html_rootdiv"
     ],
-    "31": [
+    "50": [
+      "claudemd_upcomingai",
+      "readme_ondeviceai"
+    ],
+    "51": [
       "electron_preload_handler",
       "src_electron_preload_ts"
     ],
-    "32": [
+    "52": [
       "src_store_index_ts"
     ],
-    "33": [
+    "53": [
+      "claude_agents_ui_engineer_md"
+    ],
+    "54": [
+      "claude_agents_canvas_engineer_md"
+    ],
+    "55": [
+      "claude_agents_qa_reviewer_md"
+    ],
+    "56": [
       "claude_settings_local"
     ],
-    "34": [
+    "57": [
       "canvas_textspans_textspans"
     ],
-    "35": [
+    "58": [
       "ai_index_exports"
     ],
-    "36": [
+    "59": [
       "readme_zeroseams"
     ],
-    "37": [
+    "60": [
       "readme_carouselfile"
     ]
   },
   "cohesion": {
-    "0": 0.06277436347673397,
-    "1": 0.058279370952821465,
-    "2": 0.06829268292682927,
-    "3": 0.1524390243902439,
-    "4": 0.058823529411764705,
-    "5": 0.09401709401709402,
-    "6": 0.09401709401709402,
-    "7": 0.08333333333333333,
-    "8": 0.2,
-    "9": 0.18128654970760233,
-    "10": 0.23529411764705882,
-    "11": 0.1111111111111111,
-    "12": 0.19117647058823528,
-    "13": 0.11764705882352941,
-    "14": 0.20588235294117646,
-    "15": 0.17647058823529413,
-    "16": 0.125,
-    "17": 0.1978021978021978,
-    "18": 0.15384615384615385,
-    "19": 0.26666666666666666,
-    "20": 0.2857142857142857,
-    "21": 0.3333333333333333,
-    "22": 0.6666666666666666,
-    "23": 0.6666666666666666,
-    "24": 0.6666666666666666,
-    "25": 0.6666666666666666,
-    "26": 1.0,
-    "27": 1.0,
-    "28": 1.0,
-    "29": 1.0,
-    "30": 1.0,
-    "31": 1.0,
-    "32": 1.0,
-    "33": 1.0,
-    "34": 1.0,
-    "35": 1.0,
-    "36": 1.0,
-    "37": 1.0
+    "0": 0.06322624743677376,
+    "1": 0.03825136612021858,
+    "2": 0.058279370952821465,
+    "3": 0.0664451827242525,
+    "4": 0.14634146341463414,
+    "5": 0.058823529411764705,
+    "6": 0.08620689655172414,
+    "7": 0.09401709401709402,
+    "8": 0.07692307692307693,
+    "9": 0.09230769230769231,
+    "10": 0.16307692307692306,
+    "11": 0.1,
+    "12": 0.09486166007905138,
+    "13": 0.16842105263157894,
+    "14": 0.1111111111111111,
+    "15": 0.2426470588235294,
+    "16": 0.11764705882352941,
+    "17": 0.11764705882352941,
+    "18": 0.19117647058823528,
+    "19": 0.23333333333333334,
+    "20": 0.125,
+    "21": 0.23809523809523808,
+    "22": 0.18095238095238095,
+    "23": 0.18095238095238095,
+    "24": 0.1523809523809524,
+    "25": 0.14285714285714285,
+    "26": 0.17582417582417584,
+    "27": 0.15384615384615385,
+    "28": 0.18181818181818182,
+    "29": 0.21818181818181817,
+    "30": 0.18181818181818182,
+    "31": 0.2,
+    "32": 0.2777777777777778,
+    "33": 0.25,
+    "34": 0.42857142857142855,
+    "35": 0.2857142857142857,
+    "36": 0.3333333333333333,
+    "37": 0.4,
+    "38": 0.4,
+    "39": 0.4,
+    "40": 0.5,
+    "41": 0.6666666666666666,
+    "42": 0.6666666666666666,
+    "43": 0.6666666666666666,
+    "44": 0.6666666666666666,
+    "45": 0.6666666666666666,
+    "46": 1.0,
+    "47": 1.0,
+    "48": 1.0,
+    "49": 1.0,
+    "50": 1.0,
+    "51": 1.0,
+    "52": 1.0,
+    "53": 1.0,
+    "54": 1.0,
+    "55": 1.0,
+    "56": 1.0,
+    "57": 1.0,
+    "58": 1.0,
+    "59": 1.0,
+    "60": 1.0
   },
   "gods": [
     {
-      "id": "types_canvas_canvasobject",
-      "label": "CanvasObject",
-      "degree": 18
-    },
-    {
       "id": "adjustments_pipeline_buildfilterpipeline",
       "label": "buildFilterPipeline()",
+      "degree": 19
+    },
+    {
+      "id": "types_canvas_canvasobject",
+      "label": "CanvasObject",
       "degree": 18
     },
     {
@@ -685,13 +1065,23 @@
       "degree": 14
     },
     {
-      "id": "ui_toolbar_toolbar",
-      "label": "Toolbar()",
-      "degree": 12
+      "id": "ffmpeg_ffmpeg_core_getwasmtableentry",
+      "label": "getWasmTableEntry()",
+      "degree": 14
+    },
+    {
+      "id": "zeroseams_claude_zero_seams_ai_dev_guide",
+      "label": "Zero Seams — AI Dev Guide",
+      "degree": 14
     },
     {
       "id": "canvas_usesnapguides_snapguide",
       "label": "SnapGuide",
+      "degree": 13
+    },
+    {
+      "id": "ui_toolbar_toolbar",
+      "label": "Toolbar()",
       "degree": 12
     },
     {
@@ -705,18 +1095,8 @@
       "degree": 11
     },
     {
-      "id": "types_project_carouselproject",
-      "label": "CarouselProject",
-      "degree": 10
-    },
-    {
-      "id": "types_canvas_textobject",
-      "label": "TextObject",
-      "degree": 10
-    },
-    {
-      "id": "electron_index_mainprocess",
-      "label": "Main Process (Electron)",
+      "id": "ffmpeg_ffmpeg_core_abort",
+      "label": "abort()",
       "degree": 10
     }
   ],
@@ -780,38 +1160,38 @@
   "questions": [
     {
       "type": "bridge_node",
-      "question": "Why does `Snap Guide System` connect `Community 5` to `Community 0`?",
-      "why": "High betweenness centrality (0.050) - this node is a cross-community bridge."
+      "question": "Why does `dependencies` connect `Community 8` to `Community 1`?",
+      "why": "High betweenness centrality (0.047) - this node is a cross-community bridge."
     },
     {
       "type": "bridge_node",
-      "question": "Why does `CanvasObject` connect `Community 3` to `Community 0`, `Community 16`, `Community 14`?",
-      "why": "High betweenness centrality (0.043) - this node is a cross-community bridge."
+      "question": "Why does `Electron Vite Config` connect `Community 5` to `Community 9`, `Community 23`?",
+      "why": "High betweenness centrality (0.040) - this node is a cross-community bridge."
     },
     {
-      "type": "verify_inferred",
-      "question": "Are the 2 inferred relationships involving `Toolbar()` (e.g. with `useCanvasStore.ts` and `iconBtnStyle.ts`) actually correct?",
-      "why": "`Toolbar()` has 2 INFERRED edges - model-reasoned connections that need verification."
+      "type": "bridge_node",
+      "question": "Why does `devDependencies` connect `Community 5` to `Community 8`?",
+      "why": "High betweenness centrality (0.039) - this node is a cross-community bridge."
     },
     {
       "type": "isolated_nodes",
       "question": "What connects `composite`, `noEmit`, `module` to the rest of the system?",
-      "why": "230 weakly-connected nodes found - possible documentation gaps or missing edges."
+      "why": "293 weakly-connected nodes found - possible documentation gaps or missing edges."
     },
     {
       "type": "low_cohesion",
       "question": "Should `Community 0` be split into smaller, more focused modules?",
-      "why": "Cohesion score 0.06277436347673397 - nodes in this community are weakly interconnected."
+      "why": "Cohesion score 0.06322624743677376 - nodes in this community are weakly interconnected."
     },
     {
       "type": "low_cohesion",
       "question": "Should `Community 1` be split into smaller, more focused modules?",
-      "why": "Cohesion score 0.058279370952821465 - nodes in this community are weakly interconnected."
+      "why": "Cohesion score 0.03825136612021858 - nodes in this community are weakly interconnected."
     },
     {
       "type": "low_cohesion",
       "question": "Should `Community 2` be split into smaller, more focused modules?",
-      "why": "Cohesion score 0.06829268292682927 - nodes in this community are weakly interconnected."
+      "why": "Cohesion score 0.058279370952821465 - nodes in this community are weakly interconnected."
     }
   ]
 }
