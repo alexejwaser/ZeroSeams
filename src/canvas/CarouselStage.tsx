@@ -111,7 +111,7 @@ export function CarouselStage(): React.ReactElement {
     return map.get(id)!
   }
 
-  const { computeSnapGroup, computeSnapResizeGroup, snapRotation } = useSnapGuides()
+  const { computeSnapGroup, computeSnapResizeGroup, snapRotation, startSnapSession, endSnapSession } = useSnapGuides()
   const pendingGroupGuidesRef = useRef<SnapGuide[]>([])
 
   function getGroupBBox(ids: string[]): { x: number; y: number; width: number; height: number } | null {
@@ -367,6 +367,7 @@ export function CarouselStage(): React.ReactElement {
   function handleGroupTransformEnd(): void {
     const tr = groupTransformerRef.current
     if (!tr) return
+    endSnapSession()
     // Detach immediately so the transformer cannot adjust node positions in response
     // to scale-baking or to React re-rendering updated width/height props.
     tr.nodes([])
@@ -433,6 +434,7 @@ export function CarouselStage(): React.ReactElement {
   }
 
   function handleGroupDragEnd(): void {
+    endSnapSession()
     const currentSelectedIds = useCanvasStore.getState().selectedIds
     const currentObjects = useCanvasStore.getState().objects
     const patches: Record<string, Partial<CanvasObject>> = {}
@@ -1237,7 +1239,9 @@ export function CarouselStage(): React.ReactElement {
             anchorStroke="#f94608"
             anchorSize={8}
             onTransformEnd={handleGroupTransformEnd}
+            onTransformStart={() => startSnapSession(useCanvasStore.getState().selectedIds)}
             onDragStart={() => {
+              startSnapSession(useCanvasStore.getState().selectedIds)
               const tr = groupTransformerRef.current
               if (tr) groupTransformerDragStartRef.current = { x: tr.x(), y: tr.y() }
             }}

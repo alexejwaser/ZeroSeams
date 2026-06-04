@@ -81,7 +81,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
 
   const isInMultiSelectMode = selectedIds.length > 1
   const isAnchor = anchorId === id
-  const { computeSnap, computeSnapResize, snapRotation } = useSnapGuides()
+  const { computeSnap, computeSnapResize, snapRotation, startSnapSession, endSnapSession } = useSnapGuides()
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
 
   // Memoized so React-Konva sees the same object reference between renders while
@@ -384,6 +384,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
   }
 
   function handleFrameDragEnd(e: Konva.KonvaEventObject<DragEvent>): void {
+    endSnapSession()
     const newX = e.target.x()
     const newY = e.target.y()
     onGuidesChange([])
@@ -398,6 +399,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
   }
 
   function handleFrameTransformEnd(e: Konva.KonvaEventObject<Event>): void {
+    endSnapSession()
     const rect = frameRectRef.current
     if (!rect) return
 
@@ -821,6 +823,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
         onDblClick={handleDblClick}
         onDblTap={handleDblClick}
         onDragStart={() => {
+          startSnapSession(obj.id)
           dragStartFrameXRef.current = obj.frameX
           dragStartFrameYRef.current = obj.frameY
           pendingDuplicateRef.current = false
@@ -847,6 +850,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
         keepRatio={false}
         rotationSnaps={snapEnabled ? [0, 45, 90, 135, 180, 225, 270, 315] : []}
         rotationSnapTolerance={8}
+        onTransformStart={() => startSnapSession(obj.id)}
         boundBoxFunc={(oldBox, newBox) => {
           if (newBox.width < 5 || newBox.height < 5) return oldBox
 

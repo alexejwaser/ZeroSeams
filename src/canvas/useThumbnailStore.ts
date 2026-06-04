@@ -4,6 +4,8 @@ import type { AnchorPoint, CanvasObject, ImageObject, PathObject, ShapeObject, T
 import { useCanvasStore } from './useCanvasStore'
 import { spanText } from './textSpans'
 
+const THUMBNAIL_CONCURRENCY = 3
+
 interface ThumbnailState {
   thumbnails: Record<string, string>
   pendingIds: Set<string>
@@ -302,15 +304,19 @@ export function useThumbnailGenerator(): void {
     timerRef.current = setTimeout(() => {
       timerRef.current = null
       const currentObjects = useCanvasStore.getState().objects
-      const pending = useThumbnailStore.getState().pendingIds
-      for (const id of Array.from(pending)) {
-        const obj = currentObjects[id]
-        if (!obj) {
-          clearDirty(id)
-          continue
-        }
-        generateThumbnail(obj)
-          .then((url) => {
+      const ids = Array.from(useThumbnailStore.getState().pendingIds)
+      let idx = 0
+
+      async function worker(): Promise<void> {
+        while (idx < ids.length) {
+          const id = ids[idx++]
+          const obj = currentObjects[id]
+          if (!obj) {
+            clearDirty(id)
+            continue
+          }
+          try {
+            const url = await generateThumbnail(obj)
             if (url) setThumbnail(id, url)
             clearDirty(id)
             if (obj.type === 'image') {
@@ -321,9 +327,13 @@ export function useThumbnailGenerator(): void {
                 removeThumbnail(`${id}__mask`)
               }
             }
-          })
-          .catch(() => clearDirty(id))
+          } catch {
+            clearDirty(id)
+          }
+        }
       }
+
+      void Promise.all(Array.from({ length: Math.min(THUMBNAIL_CONCURRENCY, ids.length) }, worker))
     }, 150)
   }
 

@@ -38,7 +38,7 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
   const setAnchor = useCanvasStore((s) => s.setAnchor)
   const duplicateObjectAtOrigin = useCanvasStore((s) => s.duplicateObjectAtOrigin)
   const setContextMenu = useCanvasStore((s) => s.setContextMenu)
-  const { computeSnap, computeSnapResize, snapRotation } = useSnapGuides()
+  const { computeSnap, computeSnapResize, snapRotation, startSnapSession, endSnapSession } = useSnapGuides()
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
   const { zoom, panX, panY } = useViewportStore((s) => ({ zoom: s.zoom, panX: s.panX, panY: s.panY }))
 
@@ -170,6 +170,7 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
   // --- rect/ellipse drag handlers ---
 
   function handleDragStart(): void {
+    startSnapSession(obj.id)
     dragStartXRef.current = obj.x
     dragStartYRef.current = obj.y
     pendingDuplicateRef.current = false
@@ -217,6 +218,7 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
   }
 
   function handleDragEnd(e: Konva.KonvaEventObject<DragEvent>): void {
+    endSnapSession()
     onGuidesChange([])
     const node = e.target as Konva.Shape
     let finalX: number
@@ -329,6 +331,7 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
   }
 
   function handleTransformEnd(e: Konva.KonvaEventObject<Event>): void {
+    endSnapSession()
     onGuidesChange([])
     const node = e.target as Konva.Shape
     const { x, y } = getTopLeftFromNode(node)
@@ -511,6 +514,7 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
         keepRatio={false}
         rotationSnaps={snapEnabled ? [0, 45, 90, 135, 180, 225, 270, 315] : []}
         rotationSnapTolerance={8}
+        onTransformStart={() => startSnapSession(obj.id)}
         boundBoxFunc={(oldBox, newBox) => {
           if (newBox.width < 5 || newBox.height < 5) return oldBox
           const rotation = newBox.rotation ?? 0

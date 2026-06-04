@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import type { CanvasObject, ImageObject } from '@/types/canvas'
 import { SNAP_THRESHOLD } from './constants'
 import { useCanvasStore } from './useCanvasStore'
@@ -54,16 +55,13 @@ function buildTargets(
   return { verticalTargets, horizontalTargets }
 }
 
-export function computeSnap(
+// Core snap math against pre-built target arrays — no buildTargets call.
+function computeSnapFromTargets(
   box: DragBox,
-  allObjects: CanvasObject[],
-  frameCount: number,
-  frameWidth: number,
-  frameHeight: number,
+  verticalTargets: SnapTarget[],
+  horizontalTargets: SnapTarget[],
   threshold: number,
 ): { x: number; y: number; guides: SnapGuide[] } {
-  const { verticalTargets, horizontalTargets } = buildTargets(allObjects, frameCount, frameWidth, frameHeight)
-
   const boxLeft = box.x
   const boxCenterX = box.x + box.width / 2
   const boxRight = box.x + box.width
@@ -108,22 +106,27 @@ export function computeSnap(
   return { x: snappedX, y: snappedY, guides }
 }
 
-// Snaps only the specific edge being dragged (determined by anchor name).
-// Used in Transformer boundBoxFunc so each handle snaps its own edge.
-// When keepRatio is true and a corner handle is active, snaps a single axis
-// and derives the other from the aspect ratio to preserve proportionality.
-export function computeSnapResize(
+export function computeSnap(
   box: DragBox,
-  anchor: string,
   allObjects: CanvasObject[],
   frameCount: number,
   frameWidth: number,
   frameHeight: number,
   threshold: number,
+): { x: number; y: number; guides: SnapGuide[] } {
+  const { verticalTargets, horizontalTargets } = buildTargets(allObjects, frameCount, frameWidth, frameHeight)
+  return computeSnapFromTargets(box, verticalTargets, horizontalTargets, threshold)
+}
+
+// Core resize snap math against pre-built target arrays — no buildTargets call.
+function computeSnapResizeFromTargets(
+  box: DragBox,
+  anchor: string,
+  verticalTargets: SnapTarget[],
+  horizontalTargets: SnapTarget[],
+  threshold: number,
   keepRatio?: boolean,
 ): { box: DragBox; guides: SnapGuide[] } {
-  const { verticalTargets, horizontalTargets } = buildTargets(allObjects, frameCount, frameWidth, frameHeight)
-
   const guides: SnapGuide[] = []
   let { x, y, width, height } = box
 
@@ -273,6 +276,24 @@ export function computeSnapResize(
   return { box: { x, y, width, height }, guides }
 }
 
+// Snaps only the specific edge being dragged (determined by anchor name).
+// Used in Transformer boundBoxFunc so each handle snaps its own edge.
+// When keepRatio is true and a corner handle is active, snaps a single axis
+// and derives the other from the aspect ratio to preserve proportionality.
+export function computeSnapResize(
+  box: DragBox,
+  anchor: string,
+  allObjects: CanvasObject[],
+  frameCount: number,
+  frameWidth: number,
+  frameHeight: number,
+  threshold: number,
+  keepRatio?: boolean,
+): { box: DragBox; guides: SnapGuide[] } {
+  const { verticalTargets, horizontalTargets } = buildTargets(allObjects, frameCount, frameWidth, frameHeight)
+  return computeSnapResizeFromTargets(box, anchor, verticalTargets, horizontalTargets, threshold, keepRatio)
+}
+
 const ROTATION_SNAP_ANGLES = [0, 45, 90, 135, 180, -135, -90, -45]
 const ROTATION_SNAP_THRESHOLD = 8
 
@@ -289,6 +310,8 @@ export function useSnapGuides(): {
   computeSnapGroup: (box: DragBox, excludeIds: string[]) => { x: number; y: number; guides: SnapGuide[] }
   computeSnapResizeGroup: (box: DragBox, anchor: string, excludeIds: string[], threshold: number, keepRatio?: boolean) => { box: DragBox; guides: SnapGuide[] }
   snapRotation: (degrees: number) => number
+  startSnapSession: (excludeId: string | string[]) => void
+  endSnapSession: () => void
 } {
   const objects = useCanvasStore((s) => s.objects)
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
@@ -296,6 +319,14 @@ export function useSnapGuides(): {
   const frameCount = useCanvasStore((s) => s.frameCount)
   const frameWidth = useCanvasStore((s) => s.frameWidth)
   const frameHeight = useCanvasStore((s) => s.frameHeight)
+
+  // Cache of pre-built snap targets for the duration of a drag/transform session.
+  // Built once at drag/transform start; cleared on end. Keyed by sorted excludeId(s).
+  const snapSessionRef = useRef<{
+    excludeKey: string
+    verticalTargets: SnapTarget[]
+    horizontalTargets: SnapTarget[]
+  } | null>(null)
 
   function getObjects(excludeId: string | string[]): CanvasObject[] {
     const excludeSet = new Set(Array.isArray(excludeId) ? excludeId : [excludeId])
@@ -305,23 +336,52 @@ export function useSnapGuides(): {
       .filter((obj): obj is CanvasObject => obj !== undefined)
   }
 
+  function startSnapSession(excludeId: string | string[]): void {
+    const excludeKey = Array.isArray(excludeId) ? [...excludeId].sort().join(',') : excludeId
+    const objs = getObjects(excludeId)
+    const { verticalTargets, horizontalTargets } = buildTargets(objs, frameCount, frameWidth, frameHeight)
+    snapSessionRef.current = { excludeKey, verticalTargets, horizontalTargets }
+  }
+
+  function endSnapSession(): void {
+    snapSessionRef.current = null
+  }
+
   function boundComputeSnap(box: DragBox, excludeId: string) {
     if (!snapEnabled) return { x: box.x, y: box.y, guides: [] }
+    const session = snapSessionRef.current
+    if (session && session.excludeKey === excludeId) {
+      return computeSnapFromTargets(box, session.verticalTargets, session.horizontalTargets, SNAP_THRESHOLD)
+    }
     return computeSnap(box, getObjects(excludeId), frameCount, frameWidth, frameHeight, SNAP_THRESHOLD)
   }
 
   function boundComputeSnapResize(box: DragBox, anchor: string, excludeId: string, threshold: number, keepRatio?: boolean) {
     if (!snapEnabled) return { box, guides: [] }
+    const session = snapSessionRef.current
+    if (session && session.excludeKey === excludeId) {
+      return computeSnapResizeFromTargets(box, anchor, session.verticalTargets, session.horizontalTargets, threshold, keepRatio)
+    }
     return computeSnapResize(box, anchor, getObjects(excludeId), frameCount, frameWidth, frameHeight, threshold, keepRatio)
   }
 
   function boundComputeSnapGroup(box: DragBox, excludeIds: string[]) {
     if (!snapEnabled) return { x: box.x, y: box.y, guides: [] }
+    const excludeKey = [...excludeIds].sort().join(',')
+    const session = snapSessionRef.current
+    if (session && session.excludeKey === excludeKey) {
+      return computeSnapFromTargets(box, session.verticalTargets, session.horizontalTargets, SNAP_THRESHOLD)
+    }
     return computeSnap(box, getObjects(excludeIds), frameCount, frameWidth, frameHeight, SNAP_THRESHOLD)
   }
 
   function boundComputeSnapResizeGroup(box: DragBox, anchor: string, excludeIds: string[], threshold: number, keepRatio?: boolean) {
     if (!snapEnabled) return { box, guides: [] }
+    const excludeKey = [...excludeIds].sort().join(',')
+    const session = snapSessionRef.current
+    if (session && session.excludeKey === excludeKey) {
+      return computeSnapResizeFromTargets(box, anchor, session.verticalTargets, session.horizontalTargets, threshold, keepRatio)
+    }
     return computeSnapResize(box, anchor, getObjects(excludeIds), frameCount, frameWidth, frameHeight, threshold, keepRatio)
   }
 
@@ -331,5 +391,7 @@ export function useSnapGuides(): {
     computeSnapGroup: boundComputeSnapGroup,
     computeSnapResizeGroup: boundComputeSnapResizeGroup,
     snapRotation: (degrees: number) => !snapEnabled ? degrees : _snapRotation(degrees),
+    startSnapSession,
+    endSnapSession,
   }
 }

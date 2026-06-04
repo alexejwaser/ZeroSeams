@@ -46,7 +46,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
 
   const isInMultiSelectMode = selectedIds.length > 1
   const isAnchor = anchorId === id
-  const { computeSnap, computeSnapResize, snapRotation } = useSnapGuides()
+  const { computeSnap, computeSnapResize, snapRotation, startSnapSession, endSnapSession } = useSnapGuides()
 
   const frameRectRef = useRef<Konva.Rect>(null)
   const groupRef = useRef<Konva.Group>(null)
@@ -501,6 +501,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   }
 
   function handleFrameDragEnd(e: Konva.KonvaEventObject<DragEvent>): void {
+    endSnapSession()
     const newX = e.target.x()
     const newY = e.target.y()
     onGuidesChange([])
@@ -515,6 +516,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   }
 
   function handleFrameTransformEnd(e: Konva.KonvaEventObject<Event>): void {
+    endSnapSession()
     const rect = frameRectRef.current
     if (!rect) return
 
@@ -912,6 +914,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
         onDblClick={handleDblClick}
         onDblTap={handleDblClick}
         onDragStart={() => {
+          startSnapSession(obj.id)
           dragStartFrameXRef.current = obj.frameX
           dragStartFrameYRef.current = obj.frameY
           pendingDuplicateRef.current = false
@@ -937,6 +940,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
         keepRatio={false}
         rotationSnaps={snapEnabled ? [0, 45, 90, 135, 180, 225, 270, 315] : []}
         rotationSnapTolerance={8}
+        onTransformStart={() => startSnapSession(obj.id)}
         boundBoxFunc={(oldBox, newBox) => {
           if (newBox.width < 5 || newBox.height < 5) return oldBox
 

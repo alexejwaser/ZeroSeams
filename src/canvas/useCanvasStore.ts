@@ -48,6 +48,40 @@ function getObjectBBox(obj: CanvasObject): { x: number; y: number; width: number
   return { x: obj.x, y: obj.y, width: obj.width, height: obj.height }
 }
 
+// ---------------------------------------------------------------------------
+// Opt #2 helper — edit-mode detection for a single object
+// ---------------------------------------------------------------------------
+function isInEditMode(obj: CanvasObject): boolean {
+  if (obj.type === 'image') return !!(obj as ImageObject).contentEditMode || !!(obj as ImageObject).maskEditMode
+  if (obj.type === 'video') return !!(obj as VideoObject).contentEditMode || !!(obj as VideoObject).maskEditMode
+  if (obj.type === 'path') return !!(obj as PathObject).pathEditMode
+  return false
+}
+
+// ---------------------------------------------------------------------------
+// Opt #1 helper — re-inject src/originalSrc into snapshot objects after undo/redo.
+// NOTE: this means background-removal src changes are not undoable at the pixel
+// level — the vault always holds the current (newest) src. Acceptable because
+// background removal is not yet wired to the history system.
+// ---------------------------------------------------------------------------
+function reinjectSrc(
+  objects: Record<string, CanvasObject>,
+  vault: Map<string, { src: string; originalSrc?: string }>
+): Record<string, CanvasObject> {
+  const result: Record<string, CanvasObject> = {}
+  for (const [id, obj] of Object.entries(objects)) {
+    if (obj.type === 'image') {
+      const v = vault.get(id)
+      if (v) {
+        result[id] = { ...obj, src: v.src, originalSrc: v.originalSrc } as CanvasObject
+        continue
+      }
+    }
+    result[id] = obj
+  }
+  return result
+}
+
 interface CanvasState {
   objects: Record<string, CanvasObject>
   objectOrder: string[]
@@ -144,45 +178,71 @@ interface CanvasState {
   videoPlayingIds: Set<string>
   /** Toggle play/pause for a video object. */
   toggleVideoPlay: (id: string) => void
+  // ---------------------------------------------------------------------------
+  // Opt #1: src vault — keeps base64 data URLs out of history snapshots.
+  // NOT in HistorySnapshot — intentionally excluded from past[]/future[].
+  // ---------------------------------------------------------------------------
+  _srcVault: Map<string, { src: string; originalSrc?: string }>
+  // ---------------------------------------------------------------------------
+  // Opt #2: count of objects currently in any edit mode — allows
+  // normalizeObjectsForSnapshot to skip the edit-mode loop when zero.
+  // NOT in HistorySnapshot — intentionally excluded from past[]/future[].
+  // ---------------------------------------------------------------------------
+  _openEditModeCount: number
 }
 
-function normalizeObjectsForSnapshot(objects: Record<string, CanvasObject>): Record<string, CanvasObject> {
+// ---------------------------------------------------------------------------
+// Opt #2: normalizeObjectsForSnapshot with fast path when no edit modes open.
+// Also strips src/originalSrc from ImageObjects (Opt #1).
+// ---------------------------------------------------------------------------
+function normalizeObjectsForSnapshot(
+  objects: Record<string, CanvasObject>,
+  hasOpenEditModes: boolean
+): Record<string, CanvasObject> {
   let changed = false
   const result: Record<string, CanvasObject> = {}
   for (const [id, obj] of Object.entries(objects)) {
     if (obj.type === 'image') {
       const img = obj as ImageObject
-      if (img.contentEditMode || img.maskEditMode) {
-        result[id] = { ...img, contentEditMode: false, maskEditMode: false }
-        changed = true
-        continue
-      }
+      const clearModes = hasOpenEditModes && (img.contentEditMode || img.maskEditMode)
+      // src is always non-empty on live objects, so this branch always fires for images
+      result[id] = {
+        ...img,
+        contentEditMode: clearModes ? false : img.contentEditMode,
+        maskEditMode: clearModes ? false : img.maskEditMode,
+        src: '',
+        originalSrc: undefined,
+      } as CanvasObject
+      changed = true
     } else if (obj.type === 'video') {
       const vid = obj as VideoObject
-      if (vid.contentEditMode || vid.maskEditMode) {
-        result[id] = { ...vid, contentEditMode: false, maskEditMode: false }
+      if (hasOpenEditModes && (vid.contentEditMode || vid.maskEditMode)) {
+        result[id] = { ...vid, contentEditMode: false, maskEditMode: false } as CanvasObject
         changed = true
         continue
       }
+      result[id] = obj
     } else if (obj.type === 'path') {
       const p = obj as PathObject
-      if (p.pathEditMode) {
-        result[id] = { ...p, pathEditMode: false }
+      if (hasOpenEditModes && p.pathEditMode) {
+        result[id] = { ...p, pathEditMode: false } as CanvasObject
         changed = true
         continue
       }
+      result[id] = obj
+    } else {
+      result[id] = obj
     }
-    result[id] = obj
   }
   return changed ? result : objects
 }
 
 export const useCanvasStore = create<CanvasState>((set) => {
   function pushHistoryFrom(
-    state: Pick<CanvasState, 'objects' | 'objectOrder' | 'ratio' | 'frameWidth' | 'frameHeight' | 'frames' | 'backgroundColor' | 'frameCount' | 'past'>
+    state: Pick<CanvasState, 'objects' | 'objectOrder' | 'ratio' | 'frameWidth' | 'frameHeight' | 'frames' | 'backgroundColor' | 'frameCount' | 'past' | '_openEditModeCount'>
   ): HistorySnapshot[] {
     const snapshot: HistorySnapshot = {
-      objects: normalizeObjectsForSnapshot(state.objects),
+      objects: normalizeObjectsForSnapshot(state.objects, state._openEditModeCount > 0),
       objectOrder: state.objectOrder,
       ratio: state.ratio,
       frameWidth: state.frameWidth,
@@ -228,6 +288,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
     maskModeActive: false,
     _dragStartObjects: null,
     videoPlayingIds: new Set<string>(),
+    _srcVault: new Map(),
+    _openEditModeCount: 0,
 
     addObject: (obj) => {
       let normalized = obj
@@ -237,23 +299,41 @@ export const useCanvasStore = create<CanvasState>((set) => {
           normalized = { ...s, x2: s.x + s.width, y2: s.y + s.height } as CanvasObject
         }
       }
-      return set((state) => ({
-        past: pushHistoryFrom(state),
-        future: [],
-        objects: { ...state.objects, [normalized.id]: normalized },
-        objectOrder: [...state.objectOrder, normalized.id],
-      }))
+      return set((state) => {
+        // Opt #1: seed vault for new image objects
+        let nextVault = state._srcVault
+        if (normalized.type === 'image') {
+          const img = normalized as ImageObject
+          if (img.src) {
+            nextVault = new Map(state._srcVault)
+            nextVault.set(img.id, { src: img.src, originalSrc: img.originalSrc })
+          }
+        }
+        return {
+          past: pushHistoryFrom(state),
+          future: [],
+          objects: { ...state.objects, [normalized.id]: normalized },
+          objectOrder: [...state.objectOrder, normalized.id],
+          _srcVault: nextVault,
+        }
+      })
     },
 
     updateObject: (id, patch) =>
       set((state) => {
         const existing = state.objects[id]
         if (!existing) return state
+        const newObj = { ...existing, ...patch } as CanvasObject
+        // Opt #2: track edit mode count delta
+        const wasOpen = isInEditMode(existing)
+        const isOpen = isInEditMode(newObj)
+        const countDelta = (!wasOpen && isOpen) ? 1 : (wasOpen && !isOpen) ? -1 : 0
         return {
           objects: {
             ...state.objects,
-            [id]: { ...existing, ...patch } as CanvasObject,
+            [id]: newObj,
           },
+          _openEditModeCount: state._openEditModeCount + countDelta,
         }
       }),
 
@@ -264,14 +344,34 @@ export const useCanvasStore = create<CanvasState>((set) => {
         // Use pre-drag snapshot when available so undo reaches the state before the drag started,
         // not the live-preview-mutated state that updateObject left behind.
         const snapshotObjects = state._dragStartObjects ?? state.objects
+        const newObj = { ...existing, ...patch } as CanvasObject
+
+        // Opt #1: update vault if src/originalSrc changed
+        let nextVault = state._srcVault
+        if (newObj.type === 'image') {
+          const p = patch as Partial<ImageObject>
+          if (p.src !== undefined || p.originalSrc !== undefined) {
+            nextVault = new Map(state._srcVault)
+            const img = newObj as ImageObject
+            nextVault.set(id, { src: img.src, originalSrc: img.originalSrc })
+          }
+        }
+
+        // Opt #2: track edit mode count delta
+        const wasOpen = isInEditMode(existing)
+        const isOpen = isInEditMode(newObj)
+        const countDelta = (!wasOpen && isOpen) ? 1 : (wasOpen && !isOpen) ? -1 : 0
+
         return {
           past: pushHistoryFrom({ ...state, objects: snapshotObjects }),
           future: [],
           _dragStartObjects: null,
           objects: {
             ...state.objects,
-            [id]: { ...existing, ...patch } as CanvasObject,
+            [id]: newObj,
           },
+          _srcVault: nextVault,
+          _openEditModeCount: state._openEditModeCount + countDelta,
         }
       }),
 
@@ -281,6 +381,14 @@ export const useCanvasStore = create<CanvasState>((set) => {
     removeObject: (id) =>
       set((state) => {
         const { [id]: _removed, ...rest } = state.objects
+        // Opt #1: remove from vault
+        let nextVault = state._srcVault
+        if (state._srcVault.has(id)) {
+          nextVault = new Map(state._srcVault)
+          nextVault.delete(id)
+        }
+        // Opt #2: decrement count if removed object was in edit mode
+        const removedInEditMode = state.objects[id] ? isInEditMode(state.objects[id]) : false
         return {
           past: pushHistoryFrom(state),
           future: [],
@@ -289,6 +397,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
           selectedId: state.selectedId === id ? null : state.selectedId,
           selectedIds: state.selectedIds.filter((sid) => sid !== id),
           anchorId: state.anchorId === id ? null : state.anchorId,
+          _srcVault: nextVault,
+          _openEditModeCount: state._openEditModeCount - (removedInEditMode ? 1 : 0),
         }
       }),
 
@@ -335,20 +445,55 @@ export const useCanvasStore = create<CanvasState>((set) => {
     commitMultipleUpdates: (patches) =>
       set((state) => {
         const updatedObjects = { ...state.objects }
+        let nextVault = state._srcVault
+        let countDelta = 0
         for (const [id, patch] of Object.entries(patches)) {
           const existing = state.objects[id]
           if (!existing) continue
-          updatedObjects[id] = { ...existing, ...patch } as CanvasObject
+          const newObj = { ...existing, ...patch } as CanvasObject
+          updatedObjects[id] = newObj
+
+          // Opt #1: update vault for any image with changed src
+          if (newObj.type === 'image') {
+            const p = patch as Partial<ImageObject>
+            if (p.src !== undefined || p.originalSrc !== undefined) {
+              if (nextVault === state._srcVault) nextVault = new Map(state._srcVault)
+              const img = newObj as ImageObject
+              nextVault.set(id, { src: img.src, originalSrc: img.originalSrc })
+            }
+          }
+
+          // Opt #2: accumulate edit mode count delta
+          const wasOpen = isInEditMode(existing)
+          const isOpen = isInEditMode(newObj)
+          countDelta += (!wasOpen && isOpen) ? 1 : (wasOpen && !isOpen) ? -1 : 0
         }
-        return { past: pushHistoryFrom(state), future: [], objects: updatedObjects }
+        return {
+          past: pushHistoryFrom(state),
+          future: [],
+          objects: updatedObjects,
+          _srcVault: nextVault,
+          _openEditModeCount: state._openEditModeCount + countDelta,
+        }
       }),
 
     removeMultipleObjects: (ids) =>
       set((state) => {
         const idSet = new Set(ids)
         const updatedObjects = { ...state.objects }
+        // Opt #1 + #2: process removals
+        let nextVault = state._srcVault
+        let editModeRemoved = 0
         for (const id of ids) {
+          const obj = state.objects[id]
+          if (obj) {
+            if (isInEditMode(obj)) editModeRemoved++
+          }
           delete updatedObjects[id]
+          if (state._srcVault.has(id)) {
+            if (nextVault === state._srcVault) nextVault = new Map(state._srcVault)
+            nextVault.delete(id)
+          }
         }
         return {
           past: pushHistoryFrom(state),
@@ -358,6 +503,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
           selectedId: idSet.has(state.selectedId ?? '') ? null : state.selectedId,
           selectedIds: state.selectedIds.filter((sid) => !idSet.has(sid)),
           anchorId: idSet.has(state.anchorId ?? '') ? null : state.anchorId,
+          _srcVault: nextVault,
+          _openEditModeCount: state._openEditModeCount - editModeRemoved,
         }
       }),
 
@@ -624,7 +771,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
         const previous = state.past[state.past.length - 1]
         const newPast = state.past.slice(0, state.past.length - 1)
         const currentSnapshot: HistorySnapshot = {
-          objects: state.objects,
+          // Snapshot current objects with src stripped (consistent with how we push to past)
+          objects: normalizeObjectsForSnapshot(state.objects, state._openEditModeCount > 0),
           objectOrder: state.objectOrder,
           ratio: state.ratio,
           frameWidth: state.frameWidth,
@@ -636,7 +784,9 @@ export const useCanvasStore = create<CanvasState>((set) => {
         return {
           past: newPast,
           future: [currentSnapshot, ...state.future],
-          objects: previous.objects,
+          // Opt #1: reinject current src from vault into restored snapshot.
+          // Background-removal src changes are intentionally non-undoable at pixel level.
+          objects: reinjectSrc(previous.objects, state._srcVault),
           objectOrder: previous.objectOrder,
           ratio: previous.ratio,
           frameWidth: previous.frameWidth,
@@ -644,6 +794,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
           frames: previous.frames,
           backgroundColor: previous.backgroundColor,
           frameCount: previous.frameCount,
+          // Opt #2: all edit modes are cleared on undo (snapshots store mode=false)
+          _openEditModeCount: 0,
         }
       }),
 
@@ -653,7 +805,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
         const next = state.future[0]
         const newFuture = state.future.slice(1)
         const currentSnapshot: HistorySnapshot = {
-          objects: state.objects,
+          // Snapshot current objects with src stripped
+          objects: normalizeObjectsForSnapshot(state.objects, state._openEditModeCount > 0),
           objectOrder: state.objectOrder,
           ratio: state.ratio,
           frameWidth: state.frameWidth,
@@ -665,7 +818,9 @@ export const useCanvasStore = create<CanvasState>((set) => {
         return {
           past: [...state.past, currentSnapshot],
           future: newFuture,
-          objects: next.objects,
+          // Opt #1: reinject current src from vault into restored snapshot.
+          // Background-removal src changes are intentionally non-undoable at pixel level.
+          objects: reinjectSrc(next.objects, state._srcVault),
           objectOrder: next.objectOrder,
           ratio: next.ratio,
           frameWidth: next.frameWidth,
@@ -673,6 +828,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
           frames: next.frames,
           backgroundColor: next.backgroundColor,
           frameCount: next.frameCount,
+          // Opt #2: all edit modes are cleared on redo (snapshots store mode=false)
+          _openEditModeCount: 0,
         }
       }),
 
@@ -689,7 +846,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
           }
         }
         if (!changed) return { maskDrawMode: null }
-        return { objects: updated, maskDrawMode: null }
+        return { objects: updated, maskDrawMode: null, _openEditModeCount: 0 }
       }),
 
     clearPathEditMode: () =>
@@ -705,7 +862,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
           }
         }
         if (!changed) return { maskDrawMode: null }
-        return { objects: updated, maskDrawMode: null }
+        return { objects: updated, maskDrawMode: null, _openEditModeCount: 0 }
       }),
 
     clearMaskEditMode: () =>
@@ -721,7 +878,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
           }
         }
         if (!changed) return { maskDrawMode: null }
-        return { objects: updated, maskDrawMode: null }
+        return { objects: updated, maskDrawMode: null, _openEditModeCount: 0 }
       }),
 
     enterMaskEditMode: (id) =>
@@ -738,7 +895,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
             updated[oid] = obj
           }
         }
-        return { objects: updated, maskDrawMode: null }
+        // Exactly one object is now in maskEditMode
+        return { objects: updated, maskDrawMode: null, _openEditModeCount: 1 }
       }),
 
     enterMaskDrawMode: (id, tool) =>
@@ -753,7 +911,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
             updated[oid] = obj
           }
         }
-        return { objects: updated, maskDrawMode: { id, tool } }
+        return { objects: updated, maskDrawMode: { id, tool }, _openEditModeCount: 0 }
       }),
 
     clearMaskDrawMode: () => set({ maskDrawMode: null }),
@@ -839,6 +997,14 @@ export const useCanvasStore = create<CanvasState>((set) => {
             migratedObjects[id] = obj
           }
         }
+        // Opt #1: rebuild vault from loaded objects
+        const nextVault = new Map<string, { src: string; originalSrc?: string }>()
+        for (const [id, obj] of Object.entries(migratedObjects)) {
+          if (obj.type === 'image') {
+            const img = obj as ImageObject
+            if (img.src) nextVault.set(id, { src: img.src, originalSrc: img.originalSrc })
+          }
+        }
         return {
           objects: migratedObjects,
           objectOrder: project.objectOrder,
@@ -858,6 +1024,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
           textSelection: null,
           past: [],
           future: [],
+          _srcVault: nextVault,
+          _openEditModeCount: 0,
         }
       }),
 
@@ -972,11 +1140,23 @@ export const useCanvasStore = create<CanvasState>((set) => {
         const srcIdx = state.objectOrder.indexOf(id)
         const newOrder = [...state.objectOrder]
         newOrder.splice(srcIdx + 1, 0, newId)
+
+        // Opt #1: seed vault for duplicated image
+        let nextVault = state._srcVault
+        if (duplicate.type === 'image') {
+          const img = duplicate as ImageObject
+          if (img.src) {
+            nextVault = new Map(state._srcVault)
+            nextVault.set(newId, { src: img.src, originalSrc: img.originalSrc })
+          }
+        }
+
         return {
           past: pushHistoryFrom(state),
           future: [],
           objects: { ...state.objects, [newId]: duplicate },
           objectOrder: newOrder,
+          _srcVault: nextVault,
         }
       }),
 
@@ -1039,6 +1219,16 @@ export const useCanvasStore = create<CanvasState>((set) => {
         const newOrder = [...state.objectOrder]
         newOrder.splice(srcIdx, 0, newId)
 
+        // Opt #1: seed vault for cloned image
+        let nextVault = state._srcVault
+        if (clone.type === 'image') {
+          const img = clone as ImageObject
+          if (img.src) {
+            nextVault = new Map(state._srcVault)
+            nextVault.set(newId, { src: img.src, originalSrc: img.originalSrc })
+          }
+        }
+
         return {
           past: pushHistoryFrom(state),
           future: [],
@@ -1048,6 +1238,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
             [newId]: clone,
           },
           objectOrder: newOrder,
+          _srcVault: nextVault,
         }
       }),
   }
