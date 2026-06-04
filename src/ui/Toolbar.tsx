@@ -272,7 +272,30 @@ export function TitleBar(): React.ReactElement {
   const [recentFiles, setRecentFiles] = useState<Array<{ name: string; path: string; modifiedAt: string }>>([])
   const [saveMenuOpen, setSaveMenuOpen] = useState(false)
 
+  const frameCount = useCanvasStore((s) => s.frameCount)
+  const setFrameCount = useCanvasStore((s) => s.setFrameCount)
+  const frameWidth = useCanvasStore((s) => s.frameWidth)
+  const frameHeight = useCanvasStore((s) => s.frameHeight)
+  const platform = useCanvasStore((s) => s.platform)
+  const previewMode = useCanvasStore((s) => s.previewMode)
+  const togglePreviewMode = useCanvasStore((s) => s.togglePreviewMode)
+  const objects = useCanvasStore((s) => s.objects)
+
+  const [showFrameSettings, setShowFrameSettings] = useState(false)
+  const [exportOpen, setExportOpen] = useState(false)
+  const [exportMode, setExportMode] = useState<'all' | 'single' | 'range'>('all')
+  const [exportSingle, setExportSingle] = useState(1)
+  const [exportFrom, setExportFrom] = useState(1)
+  const [exportTo, setExportTo] = useState(frameCount)
+  const [exportSettings, setExportSettings] = useState<VideoExportSettings>({ ...DEFAULT_VIDEO_EXPORT_SETTINGS })
+  const [showVideoSettings, setShowVideoSettings] = useState(false)
+  const [videoSettingsTab, setVideoSettingsTab] = useState<'simple' | 'advanced'>('simple')
+  const [selectedPreset, setSelectedPreset] = useState<'draft' | 'balanced' | 'high'>('balanced')
+  const exporting = useExportStore((s) => s.exporting)
+  const exportStatus = useExportStore((s) => s.exportStatus)
+
   const recentWrapperRef = useRef<HTMLDivElement>(null)
+  const exportWrapperRef = useRef<HTMLDivElement>(null)
 
   const undoDisabled = past.length === 0
   const redoDisabled = future.length === 0
@@ -299,6 +322,126 @@ export function TitleBar(): React.ReactElement {
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [saveMenuOpen])
+
+  // Keep exportTo in sync when frameCount changes
+  useEffect(() => {
+    setExportTo(frameCount)
+  }, [frameCount])
+
+  // Dismiss export panel on outside click
+  useEffect(() => {
+    if (!exportOpen) return
+    function handleMouseDown(e: MouseEvent): void {
+      if (exportWrapperRef.current != null && !exportWrapperRef.current.contains(e.target as Node)) {
+        setExportOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleMouseDown)
+    return () => { document.removeEventListener('mousedown', handleMouseDown) }
+  }, [exportOpen])
+
+  const hasVideoInRange = useMemo(() => {
+    const start = exportMode === 'single' ? exportSingle - 1 : exportMode === 'range' ? exportFrom - 1 : 0
+    const end = exportMode === 'single' ? exportSingle - 1 : exportMode === 'range' ? exportTo - 1 : frameCount - 1
+    return Object.values(objects).some((obj) => {
+      if (obj.type !== 'video' || !obj.visible) return false
+      const frameLeft = start * frameWidth
+      const frameRight = (end + 1) * frameWidth
+      return obj.x < frameRight && obj.x + obj.width > frameLeft
+    })
+  }, [objects, exportMode, exportSingle, exportFrom, exportTo, frameCount, frameWidth])
+
+  async function handleExportAction(): Promise<void> {
+    const stage = getStageInstance()
+    if (!stage) return
+
+    let start: number
+    let end: number
+
+    if (exportMode === 'all') {
+      start = 0
+      end = frameCount - 1
+    } else if (exportMode === 'single') {
+      start = exportSingle - 1
+      end = exportSingle - 1
+    } else {
+      start = exportFrom - 1
+      end = exportTo - 1
+    }
+
+    const { setExporting, setExportStatus, reset: resetExport } = useExportStore.getState()
+    setExporting(true)
+    setExportStatus('Exporting…')
+    useExportStore.setState({ cancelRequested: false })
+    void window.electronAPI.clearExportLog()
+    try {
+      const storeObjects = useCanvasStore.getState().objects
+      const results = await exportMixedFrames(
+        stage, storeObjects, frameCount, frameWidth, frameHeight, start, end,
+        setExportStatus,
+        () => useExportStore.getState().cancelRequested,
+        exportSettings,
+      )
+      for (const result of results) {
+        const frameNum = result.frameIndex + 1
+        const base64 = await blobToBase64(result.blob)
+        if (result.type === 'mp4') {
+          const filename = `frame-${frameNum}.mp4`
+          const saveResult = await window.electronAPI.saveVideoFile(filename, base64)
+          console.log(`[export] ${filename}: ${saveResult.success ? 'saved' : 'ERROR: ' + saveResult.error}`)
+        } else {
+          const filename = `frame-${frameNum}.png`
+          const saveResult = await window.electronAPI.saveFile(filename, base64)
+          console.log(`[export] ${filename}: ${saveResult.success ? 'saved' : 'ERROR: ' + saveResult.error}`)
+        }
+      }
+    } catch (err) {
+      const msg = String(err)
+      if (!msg.includes('cancelled')) {
+        console.error('[export] failed:', err)
+        alert(`Export failed: ${msg}`)
+      }
+    } finally {
+      resetExport()
+      setExportOpen(false)
+    }
+  }
+
+  function handleMinus(): void {
+    setFrameCount(frameCount - 1)
+  }
+
+  function handlePlus(): void {
+    setFrameCount(frameCount + 1)
+  }
+
+  const videoSettingsBtnStyle = (active: boolean): React.CSSProperties => ({
+    padding: '0 8px',
+    height: 24,
+    background: active ? '#f94608' : '#ffffff',
+    color: active ? '#fff' : '#555555',
+    border: `1px solid ${active ? '#f94608' : '#d4ccc2'}`,
+    borderRadius: 999,
+    cursor: 'pointer',
+    fontSize: 12,
+    fontWeight: active ? 'bold' : 'normal',
+    transition: 'background 0.15s, color 0.15s',
+    whiteSpace: 'nowrap' as const,
+  })
+
+  const titleBarSegmentButtonStyle = (active: boolean): React.CSSProperties => ({
+    padding: '3px 10px',
+    height: 24,
+    background: active ? '#f94608' : 'transparent',
+    color: active ? '#fff' : '#555555',
+    border: 'none',
+    borderRadius: 999,
+    cursor: 'pointer',
+    fontSize: 12,
+    fontWeight: active ? 'bold' : 'normal',
+    transition: 'background 0.15s, color 0.15s',
+    whiteSpace: 'nowrap' as const,
+  })
 
   async function handleOpen(): Promise<void> {
     setLoadingProject(true)
@@ -568,6 +711,322 @@ export function TitleBar(): React.ReactElement {
 
       <div style={{ flex: 1 }} />
 
+      {/* Frame Settings */}
+      <div style={{ position: 'relative' }}>
+        <button
+          onClick={() => setShowFrameSettings(v => !v)}
+          style={{
+            ...iconBtnStyle(showFrameSettings),
+            width: 'auto',
+            padding: '0 10px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+          }}
+        >
+          <LayoutTemplate size={15} strokeWidth={1.5}/>
+          <span style={{ fontSize: 12, fontFamily: 'var(--font)' }}>Frame Settings</span>
+        </button>
+        {showFrameSettings && <FrameSettingsPopover onClose={() => setShowFrameSettings(false)}/>}
+      </div>
+
+      {divider}
+
+      {/* Frame count */}
+      <span style={{ color: '#555555', fontSize: 13, fontFamily: 'var(--font)' }}>Frames:</span>
+      <div style={{ display: 'flex', alignItems: 'center', background: '#ffffff', border: '1px solid #d4ccc2', borderRadius: 999, padding: '2px 6px', gap: 4 }}>
+        <Tooltip label="Remove frame">
+          <button
+            onClick={handleMinus}
+            disabled={frameCount <= 1}
+            style={{
+              width: 20,
+              height: 20,
+              background: 'none',
+              color: frameCount <= 1 ? '#aaaaaa' : '#555555',
+              border: 'none',
+              borderRadius: 999,
+              cursor: frameCount <= 1 ? 'default' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 0,
+            }}
+          >
+            <Minus size={13} strokeWidth={1.5}/>
+          </button>
+        </Tooltip>
+        <span
+          style={{
+            color: '#111111',
+            fontSize: 14,
+            fontWeight: 'bold',
+            minWidth: 16,
+            textAlign: 'center',
+            fontFamily: 'var(--font)',
+          }}
+        >
+          {frameCount}
+        </span>
+        <Tooltip label="Add frame">
+          <button
+            onClick={handlePlus}
+            disabled={frameCount >= 10}
+            style={{
+              width: 20,
+              height: 20,
+              background: 'none',
+              color: frameCount >= 10 ? '#aaaaaa' : '#555555',
+              border: 'none',
+              borderRadius: 999,
+              cursor: frameCount >= 10 ? 'default' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 0,
+            }}
+          >
+            <Plus size={13} strokeWidth={1.5}/>
+          </button>
+        </Tooltip>
+      </div>
+
+      {divider}
+
+      {/* Preview button */}
+      <Tooltip label="Preview" shortcut="⌘⇧P" description="Preview carousel in platform mockup">
+        <button
+          onClick={togglePreviewMode}
+          disabled={platform === 'custom'}
+          aria-pressed={previewMode}
+          style={iconBtnStyle(previewMode, platform === 'custom')}
+        >
+          <Eye size={15} />
+        </button>
+      </Tooltip>
+
+      {/* Export */}
+      <div ref={exportWrapperRef} style={{ position: 'relative' }}>
+        <Tooltip label="Export">
+          <button
+            className="btn-raised"
+            onClick={() => { setExportOpen((v) => !v) }}
+            style={{
+              padding: '5px 14px',
+              background: '#f94608',
+              color: '#fff',
+              border: '1px solid #000000',
+              borderRadius: 999,
+              cursor: 'pointer',
+              fontSize: 13,
+              fontWeight: 'bold',
+              whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+              fontFamily: 'var(--font)',
+            }}
+          >
+            <ImageDown size={14} />
+            Export
+          </button>
+        </Tooltip>
+
+        {exportOpen && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '100%',
+              right: 0,
+              zIndex: 1000,
+              marginTop: 6,
+              background: '#ffffff',
+              border: '1px solid #e8e0d5',
+              borderRadius: 16,
+              boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+              padding: '12px',
+              minWidth: 220,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 10,
+              fontFamily: 'var(--font)',
+            }}
+          >
+            {/* Mode segmented control */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                background: '#f5ede2',
+                borderRadius: 999,
+                padding: '2px',
+                border: '1px solid #e8e0d5',
+              }}
+            >
+              {(['all', 'single', 'range'] as const).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setExportMode(mode)}
+                  style={titleBarSegmentButtonStyle(exportMode === mode)}
+                >
+                  {mode === 'all' ? 'All' : mode === 'single' ? 'Single' : 'Range'}
+                </button>
+              ))}
+            </div>
+
+            {exportMode === 'single' && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <label style={{ color: '#555555', fontSize: 12 }}>Frame</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={frameCount}
+                  value={exportSingle}
+                  onChange={(e) => setExportSingle(Number(e.target.value))}
+                  style={{
+                    width: 48,
+                    height: 24,
+                    background: '#ffffff',
+                    color: '#333333',
+                    border: '1px solid #d4ccc2',
+                    borderRadius: 6,
+                    fontSize: 12,
+                    textAlign: 'center',
+                    padding: '0 4px',
+                  }}
+                />
+              </div>
+            )}
+
+            {exportMode === 'range' && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <label style={{ color: '#555555', fontSize: 12 }}>From</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={frameCount}
+                  value={exportFrom}
+                  onChange={(e) => setExportFrom(Number(e.target.value))}
+                  style={{
+                    width: 48,
+                    height: 24,
+                    background: '#ffffff',
+                    color: '#333333',
+                    border: '1px solid #d4ccc2',
+                    borderRadius: 6,
+                    fontSize: 12,
+                    textAlign: 'center',
+                    padding: '0 4px',
+                  }}
+                />
+                <label style={{ color: '#555555', fontSize: 12 }}>To</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={frameCount}
+                  value={exportTo}
+                  onChange={(e) => setExportTo(Number(e.target.value))}
+                  style={{
+                    width: 48,
+                    height: 24,
+                    background: '#ffffff',
+                    color: '#333333',
+                    border: '1px solid #d4ccc2',
+                    borderRadius: 6,
+                    fontSize: 12,
+                    textAlign: 'center',
+                    padding: '0 4px',
+                  }}
+                />
+              </div>
+            )}
+
+            {hasVideoInRange && (
+              <div
+                style={{
+                  borderTop: '1px solid #e8e0d5',
+                  paddingTop: 8,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 8,
+                }}
+              >
+                <button
+                  onClick={() => setShowVideoSettings((v) => !v)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    width: '100%',
+                  }}
+                >
+                  <span
+                    style={{
+                      color: '#555555',
+                      fontSize: 11,
+                      fontWeight: 'bold',
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    Video Settings
+                  </span>
+                  {showVideoSettings
+                    ? <ChevronUp size={13} color="#aaaaaa" strokeWidth={1.5}/>
+                    : <ChevronDown size={13} color="#aaaaaa" strokeWidth={1.5}/>}
+                </button>
+
+                {showVideoSettings && (
+                  <VideoExportSettingsPanel
+                    platform={platform}
+                    tab={videoSettingsTab}
+                    onTabChange={setVideoSettingsTab}
+                    preset={selectedPreset}
+                    onPresetChange={(key) => {
+                      setSelectedPreset(key)
+                      setExportSettings((s) => ({
+                        ...s,
+                        crf: VIDEO_PRESETS[key].crf,
+                        audioBitrate: VIDEO_PRESETS[key].audioBitrate,
+                      }))
+                    }}
+                    settings={exportSettings}
+                    onSettingsChange={setExportSettings}
+                    videoSettingsBtnStyle={videoSettingsBtnStyle}
+                  />
+                )}
+              </div>
+            )}
+
+            <button
+              className={exporting ? '' : 'btn-raised'}
+              onClick={() => { void handleExportAction() }}
+              disabled={exporting}
+              style={{
+                height: 32,
+                background: exporting ? '#aaaaaa' : '#f94608',
+                color: '#fff',
+                border: exporting ? 'none' : '1px solid #000000',
+                borderRadius: 999,
+                cursor: exporting ? 'default' : 'pointer',
+                fontSize: 13,
+                fontWeight: 'bold',
+                fontFamily: 'var(--font)',
+              }}
+            >
+              {exporting ? (exportStatus || 'Exporting…') : 'Export Frames'}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {divider}
+
       {/* Undo/Redo pill */}
       <div style={{ display: 'flex', alignItems: 'center', background: '#ffffff', border: '1px solid #d4ccc2', borderRadius: 999, padding: 3, gap: 2 }}>
         <Tooltip label="Undo" shortcut="⌘Z">
@@ -589,17 +1048,12 @@ export function TitleBar(): React.ReactElement {
 export function ToolBar(): React.ReactElement {
   const activeTool = useCanvasStore((s) => s.activeTool)
   const setActiveTool = useCanvasStore((s) => s.setActiveTool)
-  const frameCount = useCanvasStore((s) => s.frameCount)
-  const setFrameCount = useCanvasStore((s) => s.setFrameCount)
   const frameWidth = useCanvasStore((s) => s.frameWidth)
   const frameHeight = useCanvasStore((s) => s.frameHeight)
-  const platform = useCanvasStore((s) => s.platform)
   const resizeMode = useCanvasStore((s) => s.resizeMode)
   const setResizeMode = useCanvasStore((s) => s.setResizeMode)
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
   const toggleSnap = useCanvasStore((s) => s.toggleSnap)
-  const previewMode = useCanvasStore((s) => s.previewMode)
-  const togglePreviewMode = useCanvasStore((s) => s.togglePreviewMode)
   const activeShapeKind = useCanvasStore((s) => s.activeShapeKind)
   const setActiveShapeKind = useCanvasStore((s) => s.setActiveShapeKind)
   const selectedId = useCanvasStore((s) => s.selectedId)
@@ -612,119 +1066,8 @@ export function ToolBar(): React.ReactElement {
 
   const selectedObj = selectedId != null ? objects[selectedId] : undefined
 
-  const [exportOpen, setExportOpen] = useState(false)
-  const [exportMode, setExportMode] = useState<'all' | 'single' | 'range'>('all')
-  const [exportSingle, setExportSingle] = useState(1)
-  const [exportFrom, setExportFrom] = useState(1)
-  const [exportTo, setExportTo] = useState(frameCount)
-  const exporting = useExportStore((s) => s.exporting)
-  const exportStatus = useExportStore((s) => s.exportStatus)
-  const { setExporting, setExportStatus, reset: resetExport } = useExportStore.getState()
-  const [showFrameSettings, setShowFrameSettings] = useState(false)
-  const [exportSettings, setExportSettings] = useState<VideoExportSettings>({ ...DEFAULT_VIDEO_EXPORT_SETTINGS })
-  const [showVideoSettings, setShowVideoSettings] = useState(false)
-  const [videoSettingsTab, setVideoSettingsTab] = useState<'simple' | 'advanced'>('simple')
-  const [selectedPreset, setSelectedPreset] = useState<'draft' | 'balanced' | 'high'>('balanced')
-
-  const exportWrapperRef = useRef<HTMLDivElement>(null)
-
-  // Keep exportTo in sync when frameCount changes
-  useEffect(() => {
-    setExportTo(frameCount)
-  }, [frameCount])
-
-  // Dismiss export panel on outside click
-  useEffect(() => {
-    if (!exportOpen) return
-
-    function handleMouseDown(e: MouseEvent): void {
-      if (exportWrapperRef.current != null && !exportWrapperRef.current.contains(e.target as Node)) {
-        setExportOpen(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleMouseDown)
-    return () => { document.removeEventListener('mousedown', handleMouseDown) }
-  }, [exportOpen])
-
-  // Compute whether the selected export range contains any visible video objects
-  const currentObjects = objects
-  const hasVideoInRange = useMemo(() => {
-    const start = exportMode === 'single' ? exportSingle - 1 : exportMode === 'range' ? exportFrom - 1 : 0
-    const end = exportMode === 'single' ? exportSingle - 1 : exportMode === 'range' ? exportTo - 1 : frameCount - 1
-    return Object.values(currentObjects).some((obj) => {
-      if (obj.type !== 'video' || !obj.visible) return false
-      const frameLeft = start * frameWidth
-      const frameRight = (end + 1) * frameWidth
-      return obj.x < frameRight && obj.x + obj.width > frameLeft
-    })
-  }, [currentObjects, exportMode, exportSingle, exportFrom, exportTo, frameCount, frameWidth])
-
-  async function handleExportAction(): Promise<void> {
-    const stage = getStageInstance()
-    if (!stage) return
-
-    let start: number
-    let end: number
-
-    if (exportMode === 'all') {
-      start = 0
-      end = frameCount - 1
-    } else if (exportMode === 'single') {
-      start = exportSingle - 1
-      end = exportSingle - 1
-    } else {
-      start = exportFrom - 1
-      end = exportTo - 1
-    }
-
-    setExporting(true)
-    setExportStatus('Exporting…')
-    useExportStore.setState({ cancelRequested: false })
-    void window.electronAPI.clearExportLog()
-    try {
-      const storeObjects = useCanvasStore.getState().objects
-      const results = await exportMixedFrames(
-        stage, storeObjects, frameCount, frameWidth, frameHeight, start, end,
-        setExportStatus,
-        () => useExportStore.getState().cancelRequested,
-        exportSettings,
-      )
-      for (const result of results) {
-        const frameNum = result.frameIndex + 1
-        const base64 = await blobToBase64(result.blob)
-        if (result.type === 'mp4') {
-          const filename = `frame-${frameNum}.mp4`
-          const saveResult = await window.electronAPI.saveVideoFile(filename, base64)
-          console.log(`[export] ${filename}: ${saveResult.success ? 'saved' : 'ERROR: ' + saveResult.error}`)
-        } else {
-          const filename = `frame-${frameNum}.png`
-          const saveResult = await window.electronAPI.saveFile(filename, base64)
-          console.log(`[export] ${filename}: ${saveResult.success ? 'saved' : 'ERROR: ' + saveResult.error}`)
-        }
-      }
-    } catch (err) {
-      const msg = String(err)
-      if (!msg.includes('cancelled')) {
-        console.error('[export] failed:', err)
-        alert(`Export failed: ${msg}`)
-      }
-    } finally {
-      resetExport()
-      setExportOpen(false)
-    }
-  }
-
   function handleToolClick(tool: ActiveTool): void {
     setActiveTool(tool)
-  }
-
-  function handleMinus(): void {
-    setFrameCount(frameCount - 1)
-  }
-
-  function handlePlus(): void {
-    setFrameCount(frameCount + 1)
   }
 
   async function handleAddVideo(): Promise<void> {
@@ -781,21 +1124,6 @@ export function ToolBar(): React.ReactElement {
     background: active ? '#f94608' : 'transparent',
     color: active ? '#fff' : '#555555',
     border: 'none',
-    borderRadius: 999,
-    cursor: 'pointer',
-    fontSize: 12,
-    fontWeight: active ? 'bold' : 'normal',
-    transition: 'background 0.15s, color 0.15s',
-    whiteSpace: 'nowrap' as const,
-  })
-
-  // Shared style for video settings segment buttons
-  const videoSettingsBtnStyle = (active: boolean): React.CSSProperties => ({
-    padding: '0 8px',
-    height: 24,
-    background: active ? '#f94608' : '#ffffff',
-    color: active ? '#fff' : '#555555',
-    border: `1px solid ${active ? '#f94608' : '#d4ccc2'}`,
     borderRadius: 999,
     cursor: 'pointer',
     fontSize: 12,
@@ -960,325 +1288,6 @@ export function ToolBar(): React.ReactElement {
           ))}
         </div>
       )}
-
-      <div style={{ flex: 1 }} />
-
-      {/* Group 4 — Frame Settings */}
-      <div style={{ position: 'relative' }}>
-        <button
-          onClick={() => setShowFrameSettings(v => !v)}
-          style={{
-            ...iconBtnStyle(showFrameSettings),
-            width: 'auto',
-            padding: '0 10px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-          }}
-          title="Frame Settings"
-        >
-          <LayoutTemplate size={15} strokeWidth={1.5}/>
-          <span style={{ fontSize: 12, fontFamily: 'var(--font)' }}>Frame Settings</span>
-        </button>
-        {showFrameSettings && <FrameSettingsPopover onClose={() => setShowFrameSettings(false)}/>}
-      </div>
-
-      {divider}
-
-      {/* Group 5 — Frame count */}
-      <span style={{ color: '#555555', fontSize: 13, fontFamily: 'var(--font)' }}>Frames:</span>
-      <div style={{ display: 'flex', alignItems: 'center', background: '#ffffff', border: '1px solid #d4ccc2', borderRadius: 999, padding: '2px 6px', gap: 4 }}>
-        <Tooltip label="Remove frame">
-          <button
-            onClick={handleMinus}
-            disabled={frameCount <= 1}
-            style={{
-              width: 20,
-              height: 20,
-              background: 'none',
-              color: frameCount <= 1 ? '#aaaaaa' : '#555555',
-              border: 'none',
-              borderRadius: 999,
-              cursor: frameCount <= 1 ? 'default' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 0,
-            }}
-          >
-            <Minus size={13} strokeWidth={1.5}/>
-          </button>
-        </Tooltip>
-        <span
-          style={{
-            color: '#111111',
-            fontSize: 14,
-            fontWeight: 'bold',
-            minWidth: 16,
-            textAlign: 'center',
-            fontFamily: 'var(--font)',
-          }}
-        >
-          {frameCount}
-        </span>
-        <Tooltip label="Add frame">
-          <button
-            onClick={handlePlus}
-            disabled={frameCount >= 10}
-            style={{
-              width: 20,
-              height: 20,
-              background: 'none',
-              color: frameCount >= 10 ? '#aaaaaa' : '#555555',
-              border: 'none',
-              borderRadius: 999,
-              cursor: frameCount >= 10 ? 'default' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 0,
-            }}
-          >
-            <Plus size={13} strokeWidth={1.5}/>
-          </button>
-        </Tooltip>
-      </div>
-
-      {divider}
-
-      {/* Preview button */}
-      <Tooltip label="Preview" shortcut="⌘⇧P" description="Preview carousel in platform mockup">
-        <button
-          onClick={togglePreviewMode}
-          disabled={platform === 'custom'}
-          aria-pressed={previewMode}
-          style={iconBtnStyle(previewMode, platform === 'custom')}
-        >
-          <Eye size={15} />
-        </button>
-      </Tooltip>
-
-      {/* Group 6 — Export */}
-      <div ref={exportWrapperRef} style={{ position: 'relative' }}>
-        <Tooltip label="Export">
-          <button
-            className="btn-raised"
-            onClick={() => { setExportOpen((v) => !v) }}
-            style={{
-              padding: '5px 14px',
-              background: '#f94608',
-              color: '#fff',
-              border: '1px solid #000000',
-              borderRadius: 999,
-              cursor: 'pointer',
-              fontSize: 13,
-              fontWeight: 'bold',
-              whiteSpace: 'nowrap',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-              fontFamily: 'var(--font)',
-            }}
-          >
-            <ImageDown size={14} />
-            Export
-          </button>
-        </Tooltip>
-
-        {exportOpen && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '100%',
-              right: 0,
-              zIndex: 1000,
-              marginTop: 6,
-              background: '#ffffff',
-              border: '1px solid #e8e0d5',
-              borderRadius: 16,
-              boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-              padding: '12px',
-              minWidth: 220,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 10,
-              fontFamily: 'var(--font)',
-            }}
-          >
-            {/* Mode segmented control */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2,
-                background: '#f5ede2',
-                borderRadius: 999,
-                padding: '2px',
-                border: '1px solid #e8e0d5',
-              }}
-            >
-              {(['all', 'single', 'range'] as const).map((mode) => (
-                <button
-                  key={mode}
-                  onClick={() => setExportMode(mode)}
-                  style={segmentButtonStyle(exportMode === mode)}
-                >
-                  {mode === 'all' ? 'All' : mode === 'single' ? 'Single' : 'Range'}
-                </button>
-              ))}
-            </div>
-
-            {exportMode === 'single' && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <label style={{ color: '#555555', fontSize: 12 }}>Frame</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={frameCount}
-                  value={exportSingle}
-                  onChange={(e) => setExportSingle(Number(e.target.value))}
-                  style={{
-                    width: 48,
-                    height: 24,
-                    background: '#ffffff',
-                    color: '#333333',
-                    border: '1px solid #d4ccc2',
-                    borderRadius: 6,
-                    fontSize: 12,
-                    textAlign: 'center',
-                    padding: '0 4px',
-                  }}
-                />
-              </div>
-            )}
-
-            {exportMode === 'range' && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <label style={{ color: '#555555', fontSize: 12 }}>From</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={frameCount}
-                  value={exportFrom}
-                  onChange={(e) => setExportFrom(Number(e.target.value))}
-                  style={{
-                    width: 48,
-                    height: 24,
-                    background: '#ffffff',
-                    color: '#333333',
-                    border: '1px solid #d4ccc2',
-                    borderRadius: 6,
-                    fontSize: 12,
-                    textAlign: 'center',
-                    padding: '0 4px',
-                  }}
-                />
-                <label style={{ color: '#555555', fontSize: 12 }}>To</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={frameCount}
-                  value={exportTo}
-                  onChange={(e) => setExportTo(Number(e.target.value))}
-                  style={{
-                    width: 48,
-                    height: 24,
-                    background: '#ffffff',
-                    color: '#333333',
-                    border: '1px solid #d4ccc2',
-                    borderRadius: 6,
-                    fontSize: 12,
-                    textAlign: 'center',
-                    padding: '0 4px',
-                  }}
-                />
-              </div>
-            )}
-
-            {/* Video Settings — shown only when the selected range contains a visible video */}
-            {hasVideoInRange && (
-              <div
-                style={{
-                  borderTop: '1px solid #e8e0d5',
-                  paddingTop: 8,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 8,
-                }}
-              >
-                {/* Section header / toggle */}
-                <button
-                  onClick={() => setShowVideoSettings((v) => !v)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    background: 'none',
-                    border: 'none',
-                    padding: 0,
-                    cursor: 'pointer',
-                    width: '100%',
-                  }}
-                >
-                  <span
-                    style={{
-                      color: '#555555',
-                      fontSize: 11,
-                      fontWeight: 'bold',
-                      letterSpacing: '0.06em',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    Video Settings
-                  </span>
-                  {showVideoSettings
-                    ? <ChevronUp size={13} color="#aaaaaa" strokeWidth={1.5}/>
-                    : <ChevronDown size={13} color="#aaaaaa" strokeWidth={1.5}/>}
-                </button>
-
-                {showVideoSettings && (
-                  <VideoExportSettingsPanel
-                    platform={platform}
-                    tab={videoSettingsTab}
-                    onTabChange={setVideoSettingsTab}
-                    preset={selectedPreset}
-                    onPresetChange={(key) => {
-                      setSelectedPreset(key)
-                      setExportSettings((s) => ({
-                        ...s,
-                        crf: VIDEO_PRESETS[key].crf,
-                        audioBitrate: VIDEO_PRESETS[key].audioBitrate,
-                      }))
-                    }}
-                    settings={exportSettings}
-                    onSettingsChange={setExportSettings}
-                    videoSettingsBtnStyle={videoSettingsBtnStyle}
-                  />
-                )}
-              </div>
-            )}
-
-            <button
-              className={exporting ? '' : 'btn-raised'}
-              onClick={() => { void handleExportAction() }}
-              disabled={exporting}
-              style={{
-                height: 32,
-                background: exporting ? '#aaaaaa' : '#f94608',
-                color: '#fff',
-                border: exporting ? 'none' : '1px solid #000000',
-                borderRadius: 999,
-                cursor: exporting ? 'default' : 'pointer',
-                fontSize: 13,
-                fontWeight: 'bold',
-                fontFamily: 'var(--font)',
-              }}
-            >
-              {exporting ? (exportStatus || 'Exporting…') : 'Export Frames'}
-            </button>
-          </div>
-        )}
-      </div>
     </div>
   )
 }

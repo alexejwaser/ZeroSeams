@@ -36,7 +36,7 @@ function App(): React.ReactElement {
       >
         <LayerPanel />
 
-        {/* Right column: toolbar + canvas + properties */}
+        {/* Center column: toolbar + canvas */}
         <div
           style={{
             display: 'flex',
@@ -45,73 +45,64 @@ function App(): React.ReactElement {
             overflow: 'hidden',
           }}
         >
-          {/* Tool bar — spans only the right column */}
+          {/* Tool bar — drawing tools only */}
           <ToolBar />
 
-          {/* Canvas + properties row */}
+          {/* Canvas area */}
           <div
             style={{
-              display: 'flex',
               flex: 1,
               overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-start',
+              alignItems: 'stretch',
+              padding: 0,
+              background: 'var(--bg-canvas)',
+              boxSizing: 'border-box',
+              position: 'relative',
             }}
           >
-            {/* Canvas area */}
-            <div
-              style={{
-                flex: 1,
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-start',
-                alignItems: 'stretch',
-                padding: 0,
-                background: 'var(--bg-canvas)',
-                boxSizing: 'border-box',
-                position: 'relative',
-              }}
-            >
-              <CarouselStage />
-              <PreviewShell />
+            <CarouselStage />
+            <PreviewShell />
 
-              {exporting && (
-                <div
+            {exporting && (
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'rgba(0,0,0,0.6)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 16,
+                  zIndex: 500,
+                }}
+              >
+                <div style={{ color: 'var(--text-primary)', fontSize: 15, fontWeight: 600 }}>
+                  {exportStatus || 'Exporting…'}
+                </div>
+                <button
+                  onClick={requestCancel}
                   style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'rgba(0,0,0,0.6)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 16,
-                    zIndex: 500,
+                    padding: '6px 18px',
+                    background: 'var(--bg-surface)',
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--stroke)',
+                    borderRadius: 999,
+                    cursor: 'pointer',
+                    fontSize: 13,
                   }}
                 >
-                  <div style={{ color: 'var(--text-primary)', fontSize: 15, fontWeight: 600 }}>
-                    {exportStatus || 'Exporting…'}
-                  </div>
-                  <button
-                    onClick={requestCancel}
-                    style={{
-                      padding: '6px 18px',
-                      background: 'var(--bg-surface)',
-                      color: 'var(--text-primary)',
-                      border: '1px solid var(--stroke)',
-                      borderRadius: 999,
-                      cursor: 'pointer',
-                      fontSize: 13,
-                    }}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <PropertiesPanel />
+                  Cancel
+                </button>
+              </div>
+            )}
           </div>
         </div>
+
+        <PropertiesPanel />
       </div>
 
       {/* Portal-based context menu — renders to document.body */}
