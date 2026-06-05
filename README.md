@@ -1,33 +1,44 @@
 # Zero Seams
 
-**A free, open-source desktop app for creating seamless Instagram carousels.**
+**Free, open-source desktop app for seamless Instagram carousels.**
 
-Zero Seams gives you one long canvas that you slice into frames — perfect for those multi-slide Instagram posts where the image flows continuously across slides. No subscriptions, no cloud, no complexity.
+Most carousel tools are either clunky web editors or professional software (Photoshop, InDesign) that costs a small fortune and treats a social post like a brochure project. Zero Seams is built for exactly one thing: carousels. The whole canvas is one long horizontal surface — you design freely across it, and the app slices it into frames automatically.
 
-> Built as a side project, primarily using AI tools (Claude Code). A free and approachable alternative to expensive tools like Photoshop or InDesign that are simply overkill for making social media carousels.
-
-![Zero Seams screenshot](docs/screenshot.png)
+The design deliberately avoids the sterile, over-engineered look of most design software. It's opinionated, warm, and gets out of your way.
 
 ---
 
 ## Features
 
-- **Seamless canvas** — one infinite horizontal surface, automatically divided into Instagram-sized frames (1:1 or 4:5)
-- **Full design toolkit** — images, text, shapes, bezier paths, lines
-- **InDesign-style image cropping** — click to select the frame, double-click to reposition the image inside it
-- **Layers panel** — reorder, lock, hide, rename objects
-- **Snap & align** — smart snap guides + multi-select align/distribute
-- **Export** — exports all frames (or a range) as PNGs, ready to post
-- **Project save/load** — save your work as a `.carousel` file and pick up where you left off
-- **On-device AI** *(in progress)* — background removal, object segmentation, inpainting — all running locally, no data leaves your machine
+**Canvas & workflow**
+- Single continuous canvas divided into Instagram-sized frames (1:1 or 4:5)
+- Frame count is dynamic — add or remove slides at any time
+- Project save/load as `.carousel` files
 
-## Download
+**Design tools**
+- Images, video, text, shapes, bezier paths, freeform lines
+- InDesign-style image cropping — frame and content are independent layers; double-click to reposition the image inside its frame
+- Grid and collage layouts with drag-to-fill cells
+- Layer panel — reorder, lock, hide, rename
+- Smart snap guides with align/distribute across multiple objects
+- Guidelines (horizontal/vertical rulers)
+- Photo adjustments (exposure, contrast, saturation, highlights, shadows, etc.)
+- Layer effects
+- Non-destructive mask shapes (pen, rect, ellipse)
 
-> Releases coming soon. For now, clone and run locally (see below).
+**Export**
+- PNG, JPEG, or TIFF — all frames or a selected range
+- 1×, 2×, or 3× resolution
+- Optional file size cap for JPEG
 
-## Running Locally
+**On-device AI** *(in progress)*
+- Background removal, object segmentation, inpainting — all running locally; no data leaves your machine
 
-**Requirements:** Node.js 18+ and npm 9+.
+---
+
+## Getting Started
+
+Requires Node.js 18+ and npm 9+.
 
 ```bash
 git clone https://github.com/alexejwaser/zeroseams.git
@@ -36,29 +47,15 @@ npm install
 npm run dev
 ```
 
-### If you see `Error: Electron uninstall` after `npm install`
+`npm install` handles everything including the Electron binary. No extra steps needed.
 
-This means the Electron binary wasn't downloaded — the postinstall download can fail due to network timeouts or proxies. Fix it by running the install script manually, then retry:
-
-```bash
-node node_modules/electron/install.js
-npm run dev
-```
-
-If that still fails, reinstall Electron directly:
-
-```bash
-npm install electron --save-dev
-npm run dev
-```
+---
 
 ## Tech Stack
 
-- **Electron** — desktop shell
-- **React + TypeScript** — UI
-- **Konva.js** — canvas engine
-- **Zustand** — state management
-- **@imgly/background-removal** — on-device AI background removal
+Electron · React · TypeScript · Konva.js · Zustand · FFmpeg WASM · ONNX Runtime
+
+---
 
 ## License
 
