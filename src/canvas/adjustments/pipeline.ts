@@ -1,6 +1,10 @@
 import type { PhotoAdjustments } from '../../types/canvas'
 import { DEFAULT_ADJUSTMENTS } from '../../types/canvas'
 
+function evict<V>(cache: Map<string, V>, max = 64): void {
+  if (cache.size > max) cache.delete(cache.keys().next().value!)
+}
+
 // ---------------------------------------------------------------------------
 // LUT cache
 // ---------------------------------------------------------------------------
@@ -12,6 +16,7 @@ function buildLUT(key: string, fn: (i: number) => number): Uint8ClampedArray {
   const lut = new Uint8ClampedArray(256)
   for (let i = 0; i < 256; i++) lut[i] = Math.max(0, Math.min(255, Math.round(fn(i))))
   lutCache.set(key, lut)
+  evict(lutCache)
   return lut
 }
 
@@ -45,6 +50,7 @@ function build3DLUT(
     }
   }
   lut3dCache.set(key, lut)
+  evict(lut3dCache)
   return lut
 }
 
@@ -85,6 +91,7 @@ function buildFloatLUT(key: string, fn: (lIdx: number) => number): Float32Array 
   const lut = new Float32Array(256)
   for (let i = 0; i < 256; i++) lut[i] = fn(i)
   floatLutCache.set(key, lut)
+  evict(floatLutCache)
   return lut
 }
 
@@ -374,5 +381,6 @@ export function buildFilterPipeline(adj: PhotoAdjustments): Array<(imageData: Im
   if (adj.clarity !== 0)      filters.push(makeClarityFilter(adj.clarity))
   if (adj.dehaze !== 0)       filters.push(makeDehazeFilter(adj.dehaze))
   pipelineCache.set(key, filters)
+  evict(pipelineCache)
   return filters
 }

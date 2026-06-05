@@ -127,7 +127,7 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
   const isInMultiSelectMode = selectedIds.length > 1
   const isAnchor = anchorId === id
   const setContextMenu = useCanvasStore((s) => s.setContextMenu)
-  const { computeSnapResize } = useSnapGuides()
+  const { computeSnapResize, startSnapSession, endSnapSession } = useSnapGuides()
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
   const { zoom, panX, panY } = useViewportStore((s) => ({ zoom: s.zoom, panX: s.panX, panY: s.panY }))
   const pendingGuidesRef = useRef<SnapGuide[]>([])
@@ -374,6 +374,7 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
   // coords remain the single source of truth (as they are during drag/edit).
 
   function handleTransformEnd(): void {
+    endSnapSession()
     const node = pathRef.current
     if (!node) return
     const t = node.getTransform()
@@ -444,6 +445,7 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
           keepRatio={true}
           rotationSnaps={snapEnabled ? [0, 45, 90, 135, 180, 225, 270, 315] : []}
           rotationSnapTolerance={8}
+          onTransformStart={() => startSnapSession(obj.id)}
           onTransformEnd={handleTransformEnd}
           boundBoxFunc={(oldBox, newBox) => {
             if (newBox.width < 5 || newBox.height < 5) return oldBox
