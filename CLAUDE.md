@@ -161,7 +161,7 @@ Tokens in `src/ui/theme.css` — single source of truth. Imported once in `src/m
 
 **Layout:**
 - `TitleBar` (full width, 52px) — logo, file ops, frame settings, frames counter, preview, export, undo/redo
-- `ToolBar` (center column only, 62px) — three labeled groups: **Transform** (Select, Snap, Crop/Autofill), **Add** (Text, Shape, Pen, Image, Video), **Layout** (Grid, Guideline, visibility toggle); `ToolGroup` helper at module scope renders the group label (`top: -13px, left: 0` absolute) above the buttons; toolbar uses `alignItems: flex-end` + `paddingBottom: 10` so labels sit in the space above the icons
+- `ToolBar` (center column only, 62px) — `position: absolute; top: 0; zIndex: 10` over the canvas column; gradient background (`--bg-base` solid top 50% → transparent bottom) so canvas shows through; center column must be `position: relative`; three labeled groups: **Transform** (Select, Snap, Crop/Autofill), **Add** (Text, Shape, Pen, Image, Video), **Layout** (Grid, Guideline, visibility toggle); `ToolGroup` helper at module scope renders the group label (`top: -13px, left: 0` absolute) above the buttons; toolbar uses `alignItems: flex-end` + `paddingBottom: 10` so labels sit in the space above the icons
 - `LayerPanel` + `PropertiesPanel` span full body height — start below `TitleBar`, not `ToolBar`
 - Middle row: LayerPanel | [ToolBar + canvas column] | PropertiesPanel — see `src/main.tsx`
 

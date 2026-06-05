@@ -1351,14 +1351,17 @@ export function ToolBar(): React.ReactElement {
       style={{
         display: 'flex',
         alignItems: 'flex-end',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 10,
         height: 62,
         padding: '0 20px 10px',
         gap: 0,
-        background: 'var(--bg-base)',
-        borderBottom: '1px solid var(--border)',
+        background: 'linear-gradient(to bottom, var(--bg-base) 0%, var(--bg-base) 50%, transparent 100%)',
         boxSizing: 'border-box',
         fontFamily: 'var(--font)',
-        flexShrink: 0,
       }}
     >
       {/* ── Transform ─────────────────────────────────────────────────────────── */}

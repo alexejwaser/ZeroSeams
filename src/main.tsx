@@ -43,6 +43,7 @@ function App(): React.ReactElement {
             flexDirection: 'column',
             flex: 1,
             overflow: 'hidden',
+            position: 'relative',
           }}
         >
           {/* Tool bar — drawing tools only */}
