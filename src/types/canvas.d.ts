@@ -1,4 +1,4 @@
-export type CanvasObjectType = 'image' | 'text' | 'shape' | 'group' | 'path';
+export type CanvasObjectType = 'image' | 'text' | 'shape' | 'group' | 'path' | 'video' | 'guideline';
 export type CanvasObjectScope = 'global' | 'pinned';
 export interface BaseCanvasObject {
     /** Unique stable identifier (nanoid / uuid) */
@@ -133,4 +133,11 @@ export interface GroupObject extends BaseCanvasObject {
     type: 'group';
     childIds: string[];
 }
-export type CanvasObject = ImageObject | TextObject | ShapeObject | GroupObject | PathObject;
+export interface GuidelineObject extends BaseCanvasObject {
+    type: 'guideline';
+    orientation: 'horizontal' | 'vertical';
+    position: number;
+    frameIndex: number;
+    spanAllFrames: boolean;
+}
+export type CanvasObject = ImageObject | TextObject | ShapeObject | GroupObject | PathObject | GuidelineObject;

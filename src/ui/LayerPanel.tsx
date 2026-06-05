@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
 import { useThumbnailStore } from '@/canvas/useThumbnailStore'
-import type { CanvasObject, CanvasObjectType, GroupObject, ImageObject, VideoObject } from '@/types/canvas'
+import type { CanvasObject, CanvasObjectType, GroupObject, GuidelineObject, ImageObject, VideoObject } from '@/types/canvas'
 import Tooltip from './Tooltip'
 import { iconBtnStyle } from './iconBtnStyle'
 import { Link2, Star, Lock, LockOpen, Eye, EyeOff, Volume2, VolumeX, ChevronDown, ChevronRight, Layers } from 'lucide-react'
@@ -14,6 +14,7 @@ function typeLabel(type: CanvasObjectType): string {
     case 'group': return 'Group'
     case 'path': return 'Path'
     case 'video': return 'Video'
+    case 'guideline': return 'Guideline'
   }
 }
 
@@ -38,8 +39,9 @@ export function LayerPanel(): React.ReactElement {
   const [dropPos, setDropPos] = useState<{ id: string; side: 'before' | 'after' } | null>(null)
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
 
-  // Reversed: top layer (last in objectOrder) appears first in list
-  const reversedOrder = [...objectOrder].reverse()
+  // Reversed: top layer (last in objectOrder) appears first in list.
+  // Guidelines are managed via the toolbar eye toggle, not shown here.
+  const reversedOrder = [...objectOrder].reverse().filter((id) => objects[id]?.type !== 'guideline')
 
   function handleRowClick(e: React.MouseEvent<HTMLDivElement>, id: string): void {
     if (e.shiftKey) {
@@ -69,6 +71,11 @@ export function LayerPanel(): React.ReactElement {
     const obj = objects[id]
     if (!obj) return 'Unknown'
     if (obj.name) return obj.name
+    if (obj.type === 'guideline') {
+      const g = obj as GuidelineObject
+      const orient = g.orientation === 'horizontal' ? 'Horizontal' : 'Vertical'
+      return `${orient} Guideline ${originalIndex + 1}`
+    }
     return `${typeLabel(obj.type)} ${originalIndex + 1}`
   }
 
@@ -265,6 +272,22 @@ export function LayerPanel(): React.ReactElement {
                   }}
                 >
                   <Layers size={14} strokeWidth={1.5} />
+                </div>
+              ) : obj.type === 'guideline' ? (
+                <div
+                  style={{
+                    width: 26, height: 26, flexShrink: 0, borderRadius: 4,
+                    background: '#f5ede2', border: '1px solid #e8e0d5',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    {(obj as GuidelineObject).orientation === 'horizontal' ? (
+                      <line x1="1" y1="7" x2="13" y2="7" stroke="#4A90E2" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/>
+                    ) : (
+                      <line x1="7" y1="1" x2="7" y2="13" stroke="#4A90E2" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/>
+                    )}
+                  </svg>
                 </div>
               ) : (
                 <div

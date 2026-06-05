@@ -1,7 +1,7 @@
 // CanvasObject — every element that lives on the carousel canvas.
 // Agents must use this interface; never use `any` for canvas objects.
 
-export type CanvasObjectType = 'image' | 'text' | 'shape' | 'group' | 'path' | 'video'
+export type CanvasObjectType = 'image' | 'text' | 'shape' | 'group' | 'path' | 'video' | 'guideline'
 
 export type CanvasObjectScope =
   | 'global'   // spans the full canvas freely
@@ -297,4 +297,14 @@ export type ExportResult =
   | { frameIndex: number; type: 'png' | 'jpeg' | 'tiff'; blob: Blob; extension: string }
   | { frameIndex: number; type: 'mp4'; blob: Blob; extension: string }
 
-export type CanvasObject = ImageObject | TextObject | ShapeObject | GroupObject | PathObject | VideoObject
+export interface GuidelineObject extends BaseCanvasObject {
+  type: 'guideline'
+  orientation: 'horizontal' | 'vertical'
+  /** y-coordinate for horizontal, x-coordinate for vertical, in canvas coords */
+  position: number
+  /** Frame index this guideline belongs to. -1 means global (spanAllFrames). */
+  frameIndex: number
+  spanAllFrames: boolean
+}
+
+export type CanvasObject = ImageObject | TextObject | ShapeObject | GroupObject | PathObject | VideoObject | GuidelineObject

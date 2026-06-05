@@ -45,6 +45,8 @@ export async function exportFrames(
   // 2. Hide frame guides (background rects) and divider lines
   const guidesLayer = stage.findOne<Konva.Layer>('.guides')
   if (guidesLayer) guidesLayer.hide()
+  const guidelineOverlayLayer = stage.findOne<Konva.Layer>('.guideline-overlay')
+  if (guidelineOverlayLayer) guidelineOverlayLayer.hide()
   const dividersLayer = stage.findOne<Konva.Layer>('.frame-dividers')
   if (dividersLayer) dividersLayer.hide()
 
@@ -138,6 +140,7 @@ export async function exportFrames(
     stage.draw()
 
     if (guidesLayer) guidesLayer.show()
+    if (guidelineOverlayLayer) guidelineOverlayLayer.show()
     if (dividersLayer) dividersLayer.show()
     transformers.forEach((t) => t.show())
     textNodes.forEach((n) => n.opacity(0))
@@ -254,6 +257,8 @@ export async function exportMixedFrames(
   })
   const guidesLayer = stage.findOne<Konva.Layer>('.guides')
   if (guidesLayer) guidesLayer.hide()
+  const guidelineOverlayLayer = stage.findOne<Konva.Layer>('.guideline-overlay')
+  if (guidelineOverlayLayer) guidelineOverlayLayer.hide()
   const dividersLayer = stage.findOne<Konva.Layer>('.frame-dividers')
   if (dividersLayer) dividersLayer.hide()
 
@@ -410,6 +415,7 @@ export async function exportMixedFrames(
     stage.y(origY)
     stage.draw()
     if (guidesLayer) guidesLayer.show()
+    if (guidelineOverlayLayer) guidelineOverlayLayer.show()
     if (dividersLayer) dividersLayer.show()
     transformers.forEach((t) => t.show())
     textNodes.forEach((n) => n.opacity(0))

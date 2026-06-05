@@ -13,6 +13,7 @@ export type {
   GroupObject,
   AnchorPoint,
   PathObject,
+  GuidelineObject,
   CanvasObject,
 } from './canvas'
 

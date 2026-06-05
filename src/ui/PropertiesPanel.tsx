@@ -6,7 +6,7 @@ import { useAIStore } from '@/ai'
 import { useExternalEdit } from '@/canvas/useExternalEdit'
 import { useSaveStatusStore } from './useSaveStatusStore'
 import type { BackgroundRemovalOperation } from '@/types/ai'
-import type { ImageObject, TextObject, ShapeObject, PathObject, VideoObject, GroupObject, FontStyle, MaskData, PhotoAdjustments, LayerEffect, CanvasObject } from '@/types/canvas'
+import type { ImageObject, TextObject, ShapeObject, PathObject, VideoObject, GroupObject, GuidelineObject, FontStyle, MaskData, PhotoAdjustments, LayerEffect, CanvasObject } from '@/types/canvas'
 import { DEFAULT_ADJUSTMENTS } from '@/types/canvas'
 import { getAllEffectDefinitions, getEffectDefinition } from '@/canvas/effects'
 import { GRID_TEMPLATES } from '../canvas/gridTemplates'
@@ -1622,6 +1622,7 @@ export function PropertiesPanel(): React.ReactElement {
   const alignObjects = useCanvasStore((s) => s.alignObjects)
   const anchorId = useCanvasStore((s) => s.anchorId)
   const setAnchor = useCanvasStore((s) => s.setAnchor)
+  const setGuidelineOrientation = useCanvasStore((s) => s.setGuidelineOrientation)
 
   const thumbnails = useThumbnailStore((s) => s.thumbnails)
   const distributeObjects = useCanvasStore((s) => s.distributeObjects)
@@ -1655,6 +1656,7 @@ export function PropertiesPanel(): React.ReactElement {
   const isPath = selectedObj?.type === 'path'
   const isVideo = selectedObj?.type === 'video'
   const isGroup = selectedObj?.type === 'group'
+  const isGuideline = selectedObj?.type === 'guideline'
   const isMultiSelect = selectedIds.length > 1
   const isNoneSelected = selectedId === null && selectedIds.length === 0
 
@@ -1762,7 +1764,7 @@ export function PropertiesPanel(): React.ReactElement {
         )}
 
         {/* Single object selected: per-object properties */}
-        {!isMultiSelect && selectedObj !== null && !isImage && !isText && !isShape && !isPath && !isVideo && (
+        {!isMultiSelect && selectedObj !== null && !isImage && !isText && !isShape && !isPath && !isVideo && !isGroup && !isGuideline && (
           <div
             style={{
               padding: '20px 12px',
@@ -2021,6 +2023,58 @@ export function PropertiesPanel(): React.ReactElement {
                 <span style={{ fontSize: 12, color: 'var(--text-secondary)', minWidth: 24, textAlign: 'right' }}>
                   {group.gridGap ?? 8}
                 </span>
+              </div>
+            </div>
+          )
+        })()}
+
+        {/* Guideline object */}
+        {!isMultiSelect && selectedObj !== null && isGuideline && (() => {
+          const g = selectedObj as GuidelineObject
+          return (
+            <div style={{ padding: '12px 12px 0' }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Guideline
+              </div>
+              <NumberField
+                label={g.orientation === 'horizontal' ? 'Y Position' : 'X Position'}
+                value={Math.round(g.position)}
+                step={1}
+                onChange={(val) => commitUpdate(g.id, { position: val })}
+              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Orientation</label>
+                <div style={{ display: 'flex', gap: 4 }}>
+                  {(['horizontal', 'vertical'] as const).map((o) => (
+                    <button
+                      key={o}
+                      onClick={() => commitUpdate(g.id, { orientation: o })}
+                      style={{
+                        padding: '2px 8px',
+                        fontSize: 11,
+                        borderRadius: 6,
+                        border: '1px solid',
+                        borderColor: g.orientation === o ? '#f94608' : '#d4ccc2',
+                        background: g.orientation === o ? '#f94608' : '#ffffff',
+                        color: g.orientation === o ? '#ffffff' : '#555555',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {o === 'horizontal' ? 'H' : 'V'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>All frames</label>
+                <input
+                  type="checkbox"
+                  checked={g.spanAllFrames}
+                  onChange={(e) => commitUpdate(g.id, {
+                    spanAllFrames: e.target.checked,
+                    frameIndex: e.target.checked ? -1 : Math.max(0, g.frameIndex),
+                  })}
+                />
               </div>
             </div>
           )

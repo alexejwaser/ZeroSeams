@@ -10,7 +10,7 @@ import { relativizeVideoObjects, resolveVideoObjects } from '@/canvas/pathUtils'
 import {
   MousePointer2, Type, Square, Circle, Minus, PenTool,
   Undo2, Redo2, FolderOpen, Save, ImageDown,
-  ChevronDown, ChevronUp, Plus, LayoutTemplate, Check, AlertTriangle, Film, Eye,
+  ChevronDown, ChevronUp, Plus, LayoutTemplate, Check, AlertTriangle, Film, Eye, EyeOff,
 } from 'lucide-react'
 import Tooltip from './Tooltip'
 import type { Platform } from '@/types/project'
@@ -36,7 +36,7 @@ import { useExportStore } from './useExportStore'
 import { GridPicker } from './GridPicker'
 import type { GridTemplate } from '../canvas/gridTemplates'
 
-type ActiveTool = 'select' | 'text' | 'shape' | 'pen' | 'grid'
+type ActiveTool = 'select' | 'text' | 'shape' | 'pen' | 'grid' | 'guideline'
 
 const CROP_ICON = (
   <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -1211,6 +1211,10 @@ export function TitleBar(): React.ReactElement {
 export function ToolBar(): React.ReactElement {
   const activeTool = useCanvasStore((s) => s.activeTool)
   const setActiveTool = useCanvasStore((s) => s.setActiveTool)
+  const guidelineOrientation = useCanvasStore((s) => s.guidelineOrientation)
+  const setGuidelineOrientation = useCanvasStore((s) => s.setGuidelineOrientation)
+  const guidelinesVisible = useCanvasStore((s) => s.guidelinesVisible)
+  const toggleGuidelinesVisible = useCanvasStore((s) => s.toggleGuidelinesVisible)
   const frameWidth = useCanvasStore((s) => s.frameWidth)
   const frameHeight = useCanvasStore((s) => s.frameHeight)
   const resizeMode = useCanvasStore((s) => s.resizeMode)
@@ -1420,6 +1424,71 @@ export function ToolBar(): React.ReactElement {
           </svg>
         </button>
       </Tooltip>
+
+      <Tooltip label="Guideline" shortcut="G" description="Add ruler guideline">
+        <button
+          onClick={() => handleToolClick('guideline')}
+          style={iconBtnStyle(activeTool === 'guideline')}
+        >
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <line x1="1" y1="7.5" x2="14" y2="7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/>
+            <line x1="7.5" y1="1" x2="7.5" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2" opacity="0.35"/>
+          </svg>
+        </button>
+      </Tooltip>
+
+      <Tooltip label={guidelinesVisible ? 'Hide guidelines' : 'Show guidelines'}>
+        <button
+          onClick={toggleGuidelinesVisible}
+          style={iconBtnStyle(!guidelinesVisible)}
+        >
+          {guidelinesVisible ? <Eye size={15} /> : <EyeOff size={15} />}
+        </button>
+      </Tooltip>
+
+      {activeTool === 'guideline' && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            background: '#ffffff',
+            borderRadius: 999,
+            padding: '2px',
+            border: '1px solid #d4ccc2',
+            marginLeft: 4,
+          }}
+        >
+          <Tooltip label="Horizontal" shortcut="X">
+            <button
+              onClick={() => setGuidelineOrientation('horizontal')}
+              style={{
+                ...iconBtnStyle(guidelineOrientation === 'horizontal'),
+                width: 28,
+                height: 28,
+                fontSize: 11,
+                fontWeight: 600,
+              }}
+            >
+              H
+            </button>
+          </Tooltip>
+          <Tooltip label="Vertical" shortcut="X">
+            <button
+              onClick={() => setGuidelineOrientation('vertical')}
+              style={{
+                ...iconBtnStyle(guidelineOrientation === 'vertical'),
+                width: 28,
+                height: 28,
+                fontSize: 11,
+                fontWeight: 600,
+              }}
+            >
+              V
+            </button>
+          </Tooltip>
+        </div>
+      )}
 
       {selectedObj?.type === 'image' && (
         <Tooltip label="Mask mode" description="Next stroke becomes a mask">

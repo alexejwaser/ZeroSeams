@@ -125,6 +125,15 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `replaceGridCell(cellId, newObj)` atomically swaps a cell (e.g. ImageObject → VideoObject), updating parent `childIds` and `objectOrder`
 - Gap slider and group transform must update ALL child types (image + video) — filtering by `child.type === 'image'` breaks video cells
 
+**Guidelines** (`src/canvas/CanvasGuidelineNode.tsx`):
+- `GuidelineObject` extends `BaseCanvasObject`: `orientation: 'horizontal'|'vertical'`, `position: number` (canvas-absolute), `frameIndex: number` (-1 = global), `spanAllFrames: boolean`
+- Position encoded in Konva node `x`/`y` props, NOT in `points` — `points` are always relative to node origin; encoding position in points causes double-speed drag (React re-render + Konva offset compound)
+- Rendered in `guideline-overlay` layer, which sits above `objects` layer and is hidden during export (both export functions hide/restore it by name `.guideline-overlay`)
+- `guidelinesVisible: boolean` in store (transient) — toolbar eye toggle; guidelines excluded from LayerPanel entirely
+- `buildTargets()` in `useSnapGuides.ts` has a `'guideline'` branch: pushes `position` directly into snap targets and `continue`s — skips bbox processing
+- `getObjectBBox` in store guards `type === 'guideline'` → returns zero-size rect at `(obj.x, obj.y)`
+- Drag uses `startSnapSession`/`endSnapSession` + `computeSnap` in `onDragMove`; axis constraint enforced imperatively (`node.x(fixedX)` for horizontal, `node.y(0)` for vertical)
+
 **Other invariants:**
 - Masking: `MaskData.kind: 'pen'|'rect'|'ellipse'`; `maskModeActive` in store (transient, not in history)
 - Save: `currentFilePath` in `useSaveStatusStore`; autosave forks on it; `recentFiles.json` tracks history

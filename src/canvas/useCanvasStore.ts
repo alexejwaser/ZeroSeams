@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { CanvasObject, ImageObject, GroupObject, ShapeObject, PathObject, ShapeKind, TextObject, MaskData, VideoObject } from '@/types/canvas'
+import type { CanvasObject, ImageObject, GroupObject, ShapeObject, PathObject, ShapeKind, TextObject, MaskData, VideoObject, GuidelineObject } from '@/types/canvas'
 import type { GridTemplate } from './gridTemplates'
 import type { Frame, FrameRatio, Platform, CarouselProject } from '@/types/project'
 
@@ -42,6 +42,7 @@ function makeFrames(count: number): Frame[] {
 }
 
 function getObjectBBox(obj: CanvasObject): { x: number; y: number; width: number; height: number } {
+  if (obj.type === 'guideline') return { x: obj.x, y: obj.y, width: 0, height: 0 }
   if (obj.type === 'image') {
     const img = obj as ImageObject
     return { x: img.frameX, y: img.frameY, width: img.frameWidth, height: img.frameHeight }
@@ -96,7 +97,9 @@ interface CanvasState {
   frameHeight: number
   frames: Frame[]
   backgroundColor: string
-  activeTool: 'select' | 'text' | 'shape' | 'pen'
+  activeTool: 'select' | 'text' | 'shape' | 'pen' | 'guideline'
+  guidelineOrientation: 'horizontal' | 'vertical'
+  guidelinesVisible: boolean
   resizeMode: 'advanced' | 'auto'
   setResizeMode: (mode: 'advanced' | 'auto') => void
   snapEnabled: boolean
@@ -138,7 +141,9 @@ interface CanvasState {
   commitMultipleUpdates: (patches: Record<string, Partial<CanvasObject>>) => void
   removeMultipleObjects: (ids: string[]) => void
   setFrameCount: (n: number) => void
-  setActiveTool: (tool: 'select' | 'text' | 'shape' | 'pen') => void
+  setActiveTool: (tool: 'select' | 'text' | 'shape' | 'pen' | 'guideline') => void
+  setGuidelineOrientation: (orientation: 'horizontal' | 'vertical') => void
+  toggleGuidelinesVisible: () => void
   reorderObjects: (fromId: string, toId: string, side: 'before' | 'after') => void
   toggleLock: (id: string) => void
   alignObjects: (anchor: 'left' | 'right' | 'top' | 'bottom' | 'centerH' | 'centerV') => void
@@ -278,6 +283,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
     frames: makeFrames(2),
     backgroundColor: '#ffffff',
     activeTool: 'select',
+    guidelineOrientation: 'horizontal',
+    guidelinesVisible: true,
     resizeMode: 'auto',
     snapEnabled: true,
     adjustmentsBypass: false,
@@ -620,6 +627,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
       }),
 
     setActiveTool: (tool) => set({ activeTool: tool }),
+    setGuidelineOrientation: (orientation) => set({ guidelineOrientation: orientation }),
+    toggleGuidelinesVisible: () => set((s) => ({ guidelinesVisible: !s.guidelinesVisible })),
 
     setResizeMode: (mode) => set({ resizeMode: mode }),
 

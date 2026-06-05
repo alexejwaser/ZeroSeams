@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import type { CanvasObject, ImageObject } from '@/types/canvas'
+import type { CanvasObject, ImageObject, GuidelineObject } from '@/types/canvas'
 import { SNAP_THRESHOLD } from './constants'
 import { useCanvasStore } from './useCanvasStore'
 
@@ -37,6 +37,17 @@ function buildTargets(
   horizontalTargets.push({ position: frameHeight, kind: 'frame' })
 
   for (const obj of allObjects) {
+    // Guidelines ARE snap targets, not snappable objects — skip bbox processing
+    if (obj.type === 'guideline') {
+      const g = obj as GuidelineObject
+      if (g.orientation === 'horizontal') {
+        horizontalTargets.push({ position: g.position, kind: 'object' })
+      } else {
+        verticalTargets.push({ position: g.position, kind: 'object' })
+      }
+      continue
+    }
+
     let objX: number, objY: number, objW: number, objH: number
     if (obj.type === 'image') {
       const img = obj as ImageObject

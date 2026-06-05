@@ -24,6 +24,7 @@ import '@/canvas/effects'
 import { ColorInput } from '@/ui/ColorInput'
 import { CanvasGroupNode } from './CanvasGroupNode'
 import { GridCellOverlay } from './GridCellOverlay'
+import { CanvasGuidelineNode } from './CanvasGuidelineNode'
 export { exportFrames } from './exportFrames'
 
 // Module-level mutable reference so external callers can access the stage
@@ -66,6 +67,8 @@ export function CarouselStage(): React.ReactElement {
   const enterMaskDrawMode = useCanvasStore((s) => s.enterMaskDrawMode)
   const setFrameBackground = useCanvasStore((s) => s.setFrameBackground)
   const previewMode = useCanvasStore((s) => s.previewMode)
+  const guidelineOrientation = useCanvasStore((s) => s.guidelineOrientation)
+  const setGuidelineOrientation = useCanvasStore((s) => s.setGuidelineOrientation)
 
   // Viewport store
   const zoom = useViewportStore((s) => s.zoom)
@@ -154,6 +157,7 @@ export function CarouselStage(): React.ReactElement {
   const maskPenDownRef = useRef<{ x: number; y: number } | null>(null)
   const maskPenDragRef = useRef<{ dx: number; dy: number } | null>(null)
   const [maskCursorPos, setMaskCursorPos] = useState<{ x: number; y: number } | null>(null)
+  const [guidelinePreview, setGuidelinePreview] = useState<number | null>(null)
 
   // Container size (for Stage width/height)
   const [containerSize, setContainerSize] = useState({ width: 800, height: 600 })
@@ -240,6 +244,11 @@ export function CarouselStage(): React.ReactElement {
       maskPenDragRef.current = null
     }
   }, [maskDrawMode])
+
+  // Clear guideline placement preview when tool changes away
+  useEffect(() => {
+    if (activeTool !== 'guideline') setGuidelinePreview(null)
+  }, [activeTool])
 
   // Pen tool: Escape commits the open path (not closed)
   useEffect(() => {
@@ -564,7 +573,7 @@ export function CarouselStage(): React.ReactElement {
         cursor: isSpacePanning ? 'grab'
           : maskDrawMode ? 'crosshair'
           : activeTool === 'text' ? 'text'
-          : (activeTool === 'shape' || activeTool === 'pen') ? 'crosshair'
+          : (activeTool === 'shape' || activeTool === 'pen' || activeTool === 'guideline') ? 'crosshair'
           : 'default',
       }}
       onMouseDown={handleContainerMouseDown}
@@ -632,6 +641,41 @@ export function CarouselStage(): React.ReactElement {
           // Block Stage events when panning
           if (isPanningRef.current) return
           if (e.evt.button === 1) return  // middle mouse belongs to container-level pan
+
+          // --- Guideline placement ---
+          if (activeTool === 'guideline') {
+            const stage = e.target.getStage()
+            if (!stage) return
+            const pos = stage.getRelativePointerPosition()
+            if (!pos) return
+            const frameIndex = Math.floor(pos.x / frameWidth)
+            const clampedFrameIndex = Math.max(0, Math.min(frameCount - 1, frameIndex))
+            const newId = crypto.randomUUID()
+            addObject({
+              id: newId,
+              type: 'guideline',
+              orientation: guidelineOrientation,
+              position: guidelineOrientation === 'horizontal' ? pos.y : pos.x,
+              frameIndex: clampedFrameIndex,
+              spanAllFrames: false,
+              scope: 'pinned',
+              pinnedFrame: clampedFrameIndex,
+              x: guidelineOrientation === 'horizontal' ? 0 : pos.x,
+              y: guidelineOrientation === 'horizontal' ? pos.y : 0,
+              width: guidelineOrientation === 'horizontal' ? frameWidth : 0,
+              height: guidelineOrientation === 'horizontal' ? 0 : frameHeight,
+              rotation: 0,
+              scaleX: 1,
+              scaleY: 1,
+              opacity: 1,
+              visible: true,
+              locked: false,
+              zIndex: objectOrder.length,
+            } as CanvasObject)
+            setGuidelinePreview(null)
+            setActiveTool('select')
+            return
+          }
 
           // --- Mask draw mode ---
           if (maskDrawMode !== null) {
@@ -865,6 +909,20 @@ export function CarouselStage(): React.ReactElement {
                 dx: cx - penMouseDownPosRef.current.x,
                 dy: cy - penMouseDownPosRef.current.y,
               }
+            }
+            return
+          }
+
+          // --- Guideline placement preview ---
+          if (activeTool === 'guideline') {
+            const stage = e.target.getStage()
+            if (!stage) return
+            const pos = stage.getRelativePointerPosition()
+            if (!pos) return
+            if (guidelineOrientation === 'horizontal') {
+              setGuidelinePreview(pos.y)
+            } else {
+              setGuidelinePreview(pos.x)
             }
             return
           }
@@ -1136,7 +1194,7 @@ export function CarouselStage(): React.ReactElement {
           })}
         </Layer>
 
-        {/* Layer 1: guides/snap decorations — hidden during export */}
+        {/* Layer 1: frame guides — hidden during export */}
         <Layer name="guides" listening={false}>
           <FrameGuides
             frameCount={frameCount}
@@ -1461,7 +1519,33 @@ export function CarouselStage(): React.ReactElement {
           })()}
         </Layer>
 
-        {/* Layer 3: frame divider lines — always on top of all media */}
+        {/* Layer 3: guideline overlay — above all media, hidden during export */}
+        <Layer name="guideline-overlay" listening={activeTool === 'guideline' ? false : undefined}>
+          {objectOrder
+            .filter((id) => useCanvasStore.getState().objects[id]?.type === 'guideline')
+            .map((id) => (
+              <CanvasGuidelineNode key={id} id={id} />
+            ))
+          }
+          {activeTool === 'guideline' && guidelinePreview !== null && (
+            <KonvaLine
+              points={
+                guidelineOrientation === 'horizontal'
+                  ? [0, guidelinePreview, frameWidth * frameCount, guidelinePreview]
+                  : [guidelinePreview, 0, guidelinePreview, frameHeight]
+              }
+              stroke="#4A90E2"
+              strokeWidth={1}
+              strokeScaleEnabled={false}
+              dash={[8, 6]}
+              listening={false}
+              opacity={0.6}
+              perfectDrawEnabled={false}
+            />
+          )}
+        </Layer>
+
+        {/* Layer 4: frame divider lines — always on top of all media */}
         <Layer name="frame-dividers" listening={false}>
           {Array.from({ length: frameCount - 1 }, (_, i) => {
             const x = (i + 1) * frameWidth

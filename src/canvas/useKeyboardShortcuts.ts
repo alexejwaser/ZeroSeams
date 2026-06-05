@@ -51,6 +51,7 @@ export function useKeyboardShortcuts(): void {
   const redo = useCanvasStore((s) => s.redo)
   const toggleSnap = useCanvasStore((s) => s.toggleSnap)
   const setAdjustmentsBypass = useCanvasStore((s) => s.setAdjustmentsBypass)
+  const setGuidelineOrientation = useCanvasStore((s) => s.setGuidelineOrientation)
 
   const nudgeActive = useRef(false)
   const nudgeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -84,6 +85,18 @@ export function useKeyboardShortcuts(): void {
         if (e.key === 'p') {
           setActiveTool('pen')
           return
+        }
+        if (e.key === 'g') {
+          setActiveTool('guideline')
+          return
+        }
+        if (e.key === 'x' || e.key === 'Tab') {
+          const currentState = useCanvasStore.getState()
+          if (currentState.activeTool === 'guideline') {
+            e.preventDefault()
+            setGuidelineOrientation(currentState.guidelineOrientation === 'horizontal' ? 'vertical' : 'horizontal')
+            return
+          }
         }
         if (e.key === 's') { toggleSnap(); return }
         if (e.key === '\\') { setAdjustmentsBypass(true); return }
@@ -355,5 +368,6 @@ export function useKeyboardShortcuts(): void {
     redo,
     toggleSnap,
     setAdjustmentsBypass,
+    setGuidelineOrientation,
   ])
 }
