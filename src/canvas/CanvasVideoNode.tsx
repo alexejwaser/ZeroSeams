@@ -46,6 +46,10 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
 
   const isInMultiSelectMode = selectedIds.length > 1
   const isAnchor = anchorId === id
+  const isParentGroupSelected = useCanvasStore(
+    (s) => obj.parentGroupId != null && s.selectedId === obj.parentGroupId,
+  )
+  const isGridCell = obj.parentGroupId != null
   const { computeSnap, computeSnapResize, snapRotation, startSnapSession, endSnapSession } = useSnapGuides()
 
   const frameRectRef = useRef<Konva.Rect>(null)
@@ -886,8 +890,11 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
         strokeEnabled={obj.contentEditMode || isInMultiSelect}
         strokeScaleEnabled={false}
         perfectDrawEnabled={false}
-        draggable={!obj.locked && !obj.contentEditMode && !obj.maskEditMode && !isDrawTarget && !isInMultiSelectMode && !(maskModeActive && isSelected && (activeTool === 'shape' || activeTool === 'pen'))}
-        listening={!obj.contentEditMode && !obj.maskEditMode && !isDrawTarget}
+        draggable={!obj.locked && !obj.contentEditMode && !obj.maskEditMode && !isDrawTarget && !isInMultiSelectMode && !isGridCell && !(maskModeActive && isSelected && (activeTool === 'shape' || activeTool === 'pen'))}
+        listening={
+          !obj.contentEditMode && !obj.maskEditMode && !isDrawTarget &&
+          !(isGridCell && isParentGroupSelected && !isSelected)
+        }
         onMouseDown={(e) => {
           if (isInMultiSelectMode) {
             rectMouseDownPosRef.current = { x: e.evt.clientX, y: e.evt.clientY }
@@ -905,6 +912,8 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
                 if (Math.sqrt(dx * dx + dy * dy) > 3) return
               }
               setAnchor(anchorId === obj.id ? null : obj.id)
+            } else if (isGridCell && !isParentGroupSelected && !isSelected && obj.parentGroupId) {
+              useCanvasStore.getState().setSelected(obj.parentGroupId)
             } else {
               useCanvasStore.getState().setSelected(id)
             }

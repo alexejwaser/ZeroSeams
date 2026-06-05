@@ -134,6 +134,7 @@ export function GridCellOverlay() {
     display: 'flex',
     alignItems: 'center',
     gap: 4,
+    pointerEvents: 'auto',
   }
 
   return (
@@ -158,7 +159,9 @@ export function GridCellOverlay() {
               alignItems: 'center',
               justifyContent: 'center',
               gap: 6,
-              pointerEvents: 'auto',
+              // Container is transparent to pointer events — only the buttons intercept.
+              // This lets single-clicks on empty cell space pass through to the Konva group hit rect.
+              pointerEvents: 'none',
             }}
           >
             <button onClick={() => { void handleFillImage(cell.id) }} style={btnStyle}>

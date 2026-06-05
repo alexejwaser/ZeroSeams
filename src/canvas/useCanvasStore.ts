@@ -174,6 +174,7 @@ interface CanvasState {
   ) => void
   addGrid: (template: GridTemplate, canvasX: number, canvasY: number) => void
   replaceGridCell: (cellId: string, replacement: CanvasObject) => void
+  disconnectGridCell: (cellId: string) => void
   /** Transient — captures pre-drag object state so commitUpdate can save the correct pre-drag snapshot. Not in history. */
   _dragStartObjects: Record<string, CanvasObject> | null
   /** Call onMouseDown before any updateObject drag calls. commitUpdate will use this snapshot for the history entry. */
@@ -400,6 +401,68 @@ export const useCanvasStore = create<CanvasState>((set) => {
 
     removeObject: (id) =>
       set((state) => {
+        const existing = state.objects[id]
+        // Grid cells with media: restore to empty placeholder instead of deleting,
+        // so the cell slot stays in the grid and can be refilled.
+        if (existing?.parentGroupId && existing.type === 'image' && !(existing as ImageObject).isEmpty) {
+          const cell = existing as ImageObject
+          const placeholder: ImageObject = {
+            ...cell,
+            isEmpty: true,
+            src: '',
+            naturalWidth: 0, naturalHeight: 0,
+            contentWidth: 0, contentHeight: 0,
+            contentOffsetX: 0, contentOffsetY: 0,
+            contentEditMode: false,
+            maskEditMode: false,
+            adjustments: undefined,
+            mask: undefined,
+          }
+          let nextVault = state._srcVault
+          if (state._srcVault.has(id)) {
+            nextVault = new Map(state._srcVault)
+            nextVault.delete(id)
+          }
+          return {
+            past: pushHistoryFrom(state),
+            future: [],
+            objects: { ...state.objects, [id]: placeholder },
+            selectedId: state.selectedId === id ? null : state.selectedId,
+            selectedIds: state.selectedIds.filter((sid) => sid !== id),
+            _srcVault: nextVault,
+            _openEditModeCount: state._openEditModeCount - (isInEditMode(cell) ? 1 : 0),
+          }
+        }
+        // Video grid cells: restore to empty image placeholder
+        if (existing?.parentGroupId && existing.type === 'video') {
+          const cell = existing as VideoObject
+          const placeholder: ImageObject = {
+            id: cell.id,
+            type: 'image',
+            isEmpty: true,
+            parentGroupId: cell.parentGroupId,
+            src: '',
+            frameX: cell.frameX, frameY: cell.frameY,
+            frameWidth: cell.frameWidth, frameHeight: cell.frameHeight,
+            x: cell.x, y: cell.y, width: cell.width, height: cell.height,
+            naturalWidth: 0, naturalHeight: 0,
+            contentWidth: 0, contentHeight: 0,
+            contentOffsetX: 0, contentOffsetY: 0,
+            contentEditMode: false, maskEditMode: false,
+            backgroundRemoved: false,
+            rotation: cell.rotation, scaleX: cell.scaleX, scaleY: cell.scaleY,
+            opacity: cell.opacity, visible: cell.visible, locked: cell.locked,
+            scope: cell.scope, zIndex: cell.zIndex,
+          }
+          return {
+            past: pushHistoryFrom(state),
+            future: [],
+            objects: { ...state.objects, [id]: placeholder },
+            selectedId: state.selectedId === id ? null : state.selectedId,
+            selectedIds: state.selectedIds.filter((sid) => sid !== id),
+            _openEditModeCount: state._openEditModeCount - (isInEditMode(cell) ? 1 : 0),
+          }
+        }
         const { [id]: _removed, ...rest } = state.objects
         // Opt #1: remove from vault
         let nextVault = state._srcVault
@@ -408,7 +471,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
           nextVault.delete(id)
         }
         // Opt #2: decrement count if removed object was in edit mode
-        const removedInEditMode = state.objects[id] ? isInEditMode(state.objects[id]) : false
+        const removedInEditMode = existing ? isInEditMode(existing) : false
         return {
           past: pushHistoryFrom(state),
           future: [],
@@ -1383,6 +1446,32 @@ export const useCanvasStore = create<CanvasState>((set) => {
           objects: updatedObjects,
           objectOrder: newOrder,
           _srcVault: nextVault,
+        }
+      }),
+
+    disconnectGridCell: (cellId) =>
+      set((state) => {
+        const cell = state.objects[cellId]
+        if (!cell?.parentGroupId) return state
+
+        const parentGroup = state.objects[cell.parentGroupId] as GroupObject | undefined
+        const updatedObjects = { ...state.objects }
+
+        // Remove cell from parent group's childIds
+        if (parentGroup) {
+          updatedObjects[parentGroup.id] = {
+            ...parentGroup,
+            childIds: parentGroup.childIds.filter((cid) => cid !== cellId),
+          }
+        }
+
+        // Clear parentGroupId on the cell so it becomes a standalone object
+        updatedObjects[cellId] = { ...cell, parentGroupId: undefined }
+
+        return {
+          past: pushHistoryFrom(state),
+          future: [],
+          objects: updatedObjects,
         }
       }),
   }

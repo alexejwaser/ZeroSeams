@@ -1758,13 +1758,35 @@ export function PropertiesPanel(): React.ReactElement {
 
         {/* Video object */}
         {!isMultiSelect && selectedObj !== null && isVideo && selectedId !== null && (
-          <VideoSection
-            videoObj={selectedObj as VideoObject}
-            selectedId={selectedId}
-            onStartDrag={startDrag}
-            onUpdate={updateObject}
-            onCommit={commitUpdate}
-          />
+          <>
+            <VideoSection
+              videoObj={selectedObj as VideoObject}
+              selectedId={selectedId}
+              onStartDrag={startDrag}
+              onUpdate={updateObject}
+              onCommit={commitUpdate}
+            />
+            {selectedObj.parentGroupId && (
+              <div style={{ padding: '0 12px 12px' }}>
+                <button
+                  onClick={() => useCanvasStore.getState().disconnectGridCell(selectedId)}
+                  style={{
+                    width: '100%',
+                    padding: '6px 0',
+                    background: 'none',
+                    border: '1px solid var(--stroke)',
+                    borderRadius: 6,
+                    fontSize: 11,
+                    fontFamily: 'var(--font)',
+                    color: 'var(--text-secondary)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Disconnect from grid
+                </button>
+              </div>
+            )}
+          </>
         )}
 
         {/* Text object */}
@@ -2037,6 +2059,26 @@ export function PropertiesPanel(): React.ReactElement {
                 {(imgObj as ImageObject).isEmpty && (
                   <div style={{ padding: '4px 0 8px', color: 'var(--text-muted)', fontSize: 12, fontStyle: 'italic' }}>
                     No media — click + to add
+                  </div>
+                )}
+                {imgObj.parentGroupId && (
+                  <div style={{ marginTop: 8, marginBottom: 4 }}>
+                    <button
+                      onClick={() => useCanvasStore.getState().disconnectGridCell(imgObj.id)}
+                      style={{
+                        width: '100%',
+                        padding: '6px 0',
+                        background: 'none',
+                        border: '1px solid var(--stroke)',
+                        borderRadius: 6,
+                        fontSize: 11,
+                        fontFamily: 'var(--font)',
+                        color: 'var(--text-secondary)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Disconnect from grid
+                    </button>
                   </div>
                 )}
                 <div style={{ color: '#555555', fontSize: 11, marginTop: 8, marginBottom: 8 }}>
