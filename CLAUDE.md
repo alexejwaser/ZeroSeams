@@ -10,7 +10,7 @@ graphify update ./src              # after any code change (AST-only, no API cos
 Only fall back to reading source files when the graph answer is incomplete or you need exact line-level detail.
 
 **God nodes — touch carefully:**
-- `useCanvasStore` (39 edges) — owns all canvas state
+- `useCanvasStore` (45+ edges) — owns all canvas state
 - `buildFilterPipeline` (18 edges) — called on every image render; LUT-cached
 - `CarouselStage` (16 edges) — canvas composition root
 
@@ -111,6 +111,16 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `FrameSlide` = static JPEG background + `<VideoOverlayItem>` overlays for any video whose x-span overlaps the frame
 - Shell registry: `registerShell(platform, Component)` — adding a platform = one file + one call
 - Frame labels in `CarouselStage` hidden when `previewMode` is true
+
+**Grid/Collage System** (`src/canvas/gridTemplates.ts`, `CanvasGroupNode.tsx`, `GridCellOverlay.tsx`):
+- `GroupObject` with `isGrid: true` owns N `ImageObject`/`VideoObject` cells via `childIds`; `gridTemplateId` references the template used
+- `gridTemplates.ts` `cells(groupW, groupH, gap)` is pure — zero hardcoded pixels; always proportional to group dimensions
+- `parentGroupId` on `BaseCanvasObject` drives click routing: single click → select group; `listening={false}` on cells when group selected + cell not entered (passes events through to group hit rect)
+- Delete on a cell with `parentGroupId` restores an empty placeholder (`isEmpty: true`) — never removes the cell slot from the grid
+- `disconnectGridCell(id)` removes the cell from `childIds` and clears `parentGroupId`, making it a standalone object
+- `GridCellOverlay` container must be `pointerEvents: none`; only the `+image`/`+video` buttons set `pointerEvents: auto` — otherwise the div captures clicks before Konva hit-tests the group rect
+- `replaceGridCell(cellId, newObj)` atomically swaps a cell (e.g. ImageObject → VideoObject), updating parent `childIds` and `objectOrder`
+- Gap slider and group transform must update ALL child types (image + video) — filtering by `child.type === 'image'` breaks video cells
 
 **Other invariants:**
 - Masking: `MaskData.kind: 'pen'|'rect'|'ellipse'`; `maskModeActive` in store (transient, not in history)
