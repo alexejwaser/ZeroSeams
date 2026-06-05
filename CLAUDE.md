@@ -162,9 +162,9 @@ Tokens in `src/ui/theme.css` — single source of truth. Imported once in `src/m
 
 **Layout:**
 - `TitleBar` (full width, 52px) — logo, file ops, frame settings, frames counter, preview, export, undo/redo
-- `ToolBar` (center column only, 62px) — `position: absolute; top: 0; zIndex: 10` over the canvas column; gradient background (`--bg-base` solid top 50% → transparent bottom) so canvas shows through; center column must be `position: relative`; three labeled groups: **Transform** (Select, Snap, Crop/Autofill), **Add** (Text, Shape, Pen, Image, Video), **Layout** (Grid, Guideline, visibility toggle); `ToolGroup` helper at module scope renders the group label (`top: -13px, left: 0` absolute) above the buttons; toolbar uses `alignItems: flex-end` + `paddingBottom: 10` so labels sit in the space above the icons
-- `LayerPanel` + `PropertiesPanel` span full body height — start below `TitleBar`, not `ToolBar`
-- Middle row: LayerPanel | [ToolBar + canvas column] | PropertiesPanel — see `src/main.tsx`
+- `ToolBar` (center column only, 62px) — `position: absolute; top: 0; left: 240; right: 300; zIndex: 10` — constrained to the gap between panels so it never extends under them; gradient background (`--bg-base` solid top 50% → transparent bottom); three labeled groups: **Transform** (Select, Snap, Crop/Autofill), **Add** (Text, Shape, Pen, Image, Video), **Layout** (Grid, Guideline, visibility toggle); `ToolGroup` helper at module scope renders the group label (`top: -13px, left: 0` absolute) above buttons; `alignItems: flex-end` + `paddingBottom: 10`
+- `LayerPanel` + `PropertiesPanel` are `position: absolute` inside the center column — `left: 0` / `right: 0`, `top: 0`, `zIndex: 20` (above toolbar gradient); height driven by `ResizeObserver`, `max-height: calc(100vh - 52px)`; `borderRadius: 0 0 16px 16px`; sticky header; `panel-scroll` class applies slim 4px scrollbar
+- Middle row: center column only (panels float inside it) — see `src/main.tsx`
 
 **Konva handles:** `borderStroke`/`anchorStroke` = `#f94608`. Snap guides: `#f94608` object snaps · `#ff3b5c` frame snaps (intentionally distinct).
 

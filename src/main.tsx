@@ -26,7 +26,7 @@ function App(): React.ReactElement {
       {/* Title bar — full width */}
       <TitleBar />
 
-      {/* Middle row: layer panel + right column */}
+      {/* Middle row: center column fills full width */}
       <div
         style={{
           display: 'flex',
@@ -34,9 +34,7 @@ function App(): React.ReactElement {
           overflow: 'hidden',
         }}
       >
-        <LayerPanel />
-
-        {/* Center column: toolbar + canvas */}
+        {/* Center column: toolbar + canvas + floating panels */}
         <div
           style={{
             display: 'flex',
@@ -46,6 +44,10 @@ function App(): React.ReactElement {
             position: 'relative',
           }}
         >
+          {/* Floating sidebars — position themselves absolutely */}
+          <LayerPanel />
+          <PropertiesPanel />
+
           {/* Tool bar — drawing tools only */}
           <ToolBar />
 
@@ -102,8 +104,6 @@ function App(): React.ReactElement {
             )}
           </div>
         </div>
-
-        <PropertiesPanel />
       </div>
 
       {/* Portal-based context menu — renders to document.body */}

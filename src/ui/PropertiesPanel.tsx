@@ -1638,6 +1638,16 @@ export function PropertiesPanel(): React.ReactElement {
   const effectiveFilePath = currentFilePath ?? autosaveFilePath
   const [externalEditor, setExternalEditor] = useState<ExternalEditor | null>(null)
 
+  const [panelHeight, setPanelHeight] = useState<number | 'auto'>('auto')
+  const innerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!innerRef.current) return
+    const ro = new ResizeObserver(([entry]) => setPanelHeight(entry.contentRect.height))
+    ro.observe(innerRef.current)
+    return () => ro.disconnect()
+  }, [])
+
   useEffect(() => {
     void window.electronAPI.getExternalEditor().then(setExternalEditor)
   }, [])
@@ -1705,17 +1715,26 @@ export function PropertiesPanel(): React.ReactElement {
       id="properties-panel"
       onMouseDown={handlePanelMouseDown}
       style={{
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        zIndex: 20,
         width: 300,
-        flexShrink: 0,
-        height: '100%',
+        boxSizing: 'border-box',
         background: 'var(--bg-panel)',
         borderLeft: '1px solid var(--border)',
-        display: 'flex',
-        flexDirection: 'column',
-        boxSizing: 'border-box',
+        borderBottom: '1px solid var(--border)',
+        borderRadius: '0 0 16px 16px',
         overflow: 'hidden',
+        height: panelHeight,
+        transition: 'height 120ms ease-out',
       }}
     >
+      <div
+        ref={innerRef}
+        style={{ maxHeight: 'calc(100vh - 52px)', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}
+        className="panel-scroll"
+      >
       {/* Title */}
       <div
         style={{
@@ -1727,7 +1746,10 @@ export function PropertiesPanel(): React.ReactElement {
           textTransform: 'uppercase',
           fontFamily: 'var(--font)',
           borderBottom: '1px solid #e8e0d5',
-          flexShrink: 0,
+          position: 'sticky',
+          top: 0,
+          background: 'var(--bg-panel)',
+          zIndex: 1,
         }}
       >
         Properties
@@ -1736,11 +1758,11 @@ export function PropertiesPanel(): React.ReactElement {
       {/* Body */}
       <div
         style={{
-          flex: 1,
-          overflowY: 'auto',
           overflowX: 'hidden',
           display: 'flex',
           flexDirection: 'column',
+          paddingBottom: 16,
+          paddingRight: 4,
         }}
       >
         {/* Multi-select: align/distribute */}
@@ -2524,9 +2546,6 @@ export function PropertiesPanel(): React.ReactElement {
           )
         })()}
 
-        {/* Spacer pushes AI Tools to bottom */}
-        <div style={{ flex: 1 }} />
-
         {/* AI Tools section — only when an image is selected (not multi-select) */}
         {!isMultiSelect && isImage && selectedObj !== null && (
           <div
@@ -2685,6 +2704,7 @@ export function PropertiesPanel(): React.ReactElement {
             )}
           </div>
         )}
+      </div>
       </div>
     </div>
   )

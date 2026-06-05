@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
 import { useThumbnailStore } from '@/canvas/useThumbnailStore'
 import type { CanvasObject, CanvasObjectType, GroupObject, GuidelineObject, ImageObject, VideoObject } from '@/types/canvas'
@@ -38,6 +38,16 @@ export function LayerPanel(): React.ReactElement {
   const dragId = useRef<string | null>(null)
   const [dropPos, setDropPos] = useState<{ id: string; side: 'before' | 'after' } | null>(null)
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
+
+  const [panelHeight, setPanelHeight] = useState<number | 'auto'>('auto')
+  const innerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!innerRef.current) return
+    const ro = new ResizeObserver(([entry]) => setPanelHeight(entry.contentRect.height))
+    ro.observe(innerRef.current)
+    return () => ro.disconnect()
+  }, [])
 
   // Reversed: top layer (last in objectOrder) appears first in list.
   // Guidelines are managed via the toolbar eye toggle, not shown here.
@@ -82,159 +92,230 @@ export function LayerPanel(): React.ReactElement {
   return (
     <div
       style={{
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        zIndex: 20,
         width: 240,
-        flexShrink: 0,
-        height: '100%',
+        boxSizing: 'border-box',
         background: 'var(--bg-panel)',
         borderRight: '1px solid var(--border)',
-        display: 'flex',
-        flexDirection: 'column',
-        boxSizing: 'border-box',
+        borderBottom: '1px solid var(--border)',
+        borderRadius: '0 0 16px 16px',
         overflow: 'hidden',
+        height: panelHeight,
+        transition: 'height 120ms ease-out',
       }}
     >
-      {/* Title */}
       <div
-        style={{
-          padding: '12px 12px 8px',
-          color: 'var(--text-primary)',
-          fontSize: 13,
-          fontWeight: 700,
-          fontFamily: 'var(--font)',
-          letterSpacing: '0.08em',
-          textTransform: 'uppercase',
-          borderBottom: '1px solid var(--border)',
-          flexShrink: 0,
-        }}
+        ref={innerRef}
+        style={{ maxHeight: 'calc(100vh - 52px)', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}
+        className="panel-scroll"
       >
-        Layers
-      </div>
+        {/* Title */}
+        <div
+          style={{
+            padding: '12px 12px 8px',
+            color: 'var(--text-primary)',
+            fontSize: 13,
+            fontWeight: 700,
+            fontFamily: 'var(--font)',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            borderBottom: '1px solid var(--border)',
+            position: 'sticky',
+            top: 0,
+            background: 'var(--bg-panel)',
+            zIndex: 1,
+          }}
+        >
+          Layers
+        </div>
 
-      {/* Scrollable list */}
-      <div
-        style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: '4px 6px',
-        }}
-      >
-        {reversedOrder.length === 0 && (
-          <div
-            style={{
-              padding: '16px 6px',
-              color: 'var(--text-muted)',
-              fontSize: 12,
-            }}
-          >
-            No layers yet
-          </div>
-        )}
-        {(() => {
-          // Build set of all group child IDs to exclude from top-level rendering
-          const groupChildIds = new Set<string>()
-          reversedOrder.forEach(id => {
-            const o = objects[id]
-            if (o?.type === 'group') {
-              (o as GroupObject).childIds.forEach(cid => groupChildIds.add(cid))
-            }
-          })
-
-          return reversedOrder.filter(id => !groupChildIds.has(id)).flatMap((id) => {
-          const obj = objects[id]
-          if (!obj) return []
-          const originalIndex = objectOrder.indexOf(id)
-          const isSelected = selectedIds.includes(id) || selectedId === id
-          const isAnchor = anchorId === id
-          const isDropBefore = dropPos?.id === id && dropPos.side === 'before'
-          const isDropAfter = dropPos?.id === id && dropPos.side === 'after'
-          const canBeAnchor = selectedIds.length > 1 && selectedIds.includes(id)
-          const isVideo = obj.type === 'video'
-          const isGroupObj = obj.type === 'group'
-          const isExpanded = expandedGroups.has(id)
-
-          const mainRow = (
+        {/* Scrollable list */}
+        <div
+          style={{
+            flex: 1,
+            padding: '4px 6px',
+          }}
+        >
+          {reversedOrder.length === 0 && (
             <div
-              key={id}
-              draggable={true}
-              onClick={(e) => handleRowClick(e, id)}
-              onDragStart={(e) => {
-                dragId.current = id
-                e.dataTransfer.setData('text/plain', id)
-                e.dataTransfer.effectAllowed = 'move'
-              }}
-              onDragOver={(e) => {
-                e.preventDefault()
-                e.dataTransfer.dropEffect = 'move'
-                const rect = e.currentTarget.getBoundingClientRect()
-                const side = e.clientY < rect.top + rect.height / 2 ? 'before' : 'after'
-                setDropPos({ id, side })
-              }}
-              onDragLeave={(e) => {
-                if (!e.currentTarget.contains(e.relatedTarget as Node)) setDropPos(null)
-              }}
-              onDrop={(e) => {
-                e.preventDefault()
-                const fromId = dragId.current ?? e.dataTransfer.getData('text/plain')
-                const side = dropPos?.id === id ? dropPos.side : 'before'
-                if (fromId && fromId !== id) reorderObjects(fromId, id, side)
-                dragId.current = null
-                setDropPos(null)
-              }}
-              onDragEnd={() => { dragId.current = null; setDropPos(null) }}
               style={{
-                height: 36,
-                display: 'flex',
-                alignItems: 'center',
-                padding: '0 8px',
-                background: isSelected ? '#ffffff' : 'transparent',
-                border: isSelected ? '1px solid #e8e0d5' : '1px solid transparent',
-                borderRadius: 12,
-                cursor: 'pointer',
-                userSelect: 'none',
-                gap: 6,
-                outline: isAnchor ? '2px solid #f5a623' : 'none',
-                borderTop: isDropBefore ? '2px solid #f94608' : undefined,
-                borderBottom: isDropAfter ? '2px solid #f94608' : undefined,
-                boxSizing: 'border-box',
-                marginBottom: 2,
+                padding: '16px 6px',
+                color: 'var(--text-muted)',
+                fontSize: 12,
               }}
             >
-              {/* Collapse toggle for groups */}
-              {isGroupObj && (
-                <button
-                  draggable={false}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setExpandedGroups(prev => {
-                      const next = new Set(prev)
-                      if (next.has(id)) { next.delete(id) } else { next.add(id) }
-                      return next
-                    })
-                  }}
-                  style={{
-                    flexShrink: 0,
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: '0 2px',
-                    color: '#aaaaaa',
-                    display: 'flex',
-                    alignItems: 'center',
-                    fontSize: 9,
-                  }}
-                >
-                  {isExpanded ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
-                </button>
-              )}
-              {/* Thumbnail(s) — dual if image has a mask */}
-              {obj.type === 'image' && (obj as ImageObject).mask != null ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
-                  {/* Image thumbnail */}
-                  <div
-                    onClick={(e) => { e.stopPropagation(); setSelected(id) }}
+              No layers yet
+            </div>
+          )}
+          {(() => {
+            // Build set of all group child IDs to exclude from top-level rendering
+            const groupChildIds = new Set<string>()
+            reversedOrder.forEach(id => {
+              const o = objects[id]
+              if (o?.type === 'group') {
+                (o as GroupObject).childIds.forEach(cid => groupChildIds.add(cid))
+              }
+            })
+
+            return reversedOrder.filter(id => !groupChildIds.has(id)).flatMap((id) => {
+            const obj = objects[id]
+            if (!obj) return []
+            const originalIndex = objectOrder.indexOf(id)
+            const isSelected = selectedIds.includes(id) || selectedId === id
+            const isAnchor = anchorId === id
+            const isDropBefore = dropPos?.id === id && dropPos.side === 'before'
+            const isDropAfter = dropPos?.id === id && dropPos.side === 'after'
+            const canBeAnchor = selectedIds.length > 1 && selectedIds.includes(id)
+            const isVideo = obj.type === 'video'
+            const isGroupObj = obj.type === 'group'
+            const isExpanded = expandedGroups.has(id)
+
+            const mainRow = (
+              <div
+                key={id}
+                draggable={true}
+                onClick={(e) => handleRowClick(e, id)}
+                onDragStart={(e) => {
+                  dragId.current = id
+                  e.dataTransfer.setData('text/plain', id)
+                  e.dataTransfer.effectAllowed = 'move'
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  e.dataTransfer.dropEffect = 'move'
+                  const rect = e.currentTarget.getBoundingClientRect()
+                  const side = e.clientY < rect.top + rect.height / 2 ? 'before' : 'after'
+                  setDropPos({ id, side })
+                }}
+                onDragLeave={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget as Node)) setDropPos(null)
+                }}
+                onDrop={(e) => {
+                  e.preventDefault()
+                  const fromId = dragId.current ?? e.dataTransfer.getData('text/plain')
+                  const side = dropPos?.id === id ? dropPos.side : 'before'
+                  if (fromId && fromId !== id) reorderObjects(fromId, id, side)
+                  dragId.current = null
+                  setDropPos(null)
+                }}
+                onDragEnd={() => { dragId.current = null; setDropPos(null) }}
+                style={{
+                  height: 36,
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '0 8px',
+                  background: isSelected ? '#ffffff' : 'transparent',
+                  border: isSelected ? '1px solid #e8e0d5' : '1px solid transparent',
+                  borderRadius: 12,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  gap: 6,
+                  outline: isAnchor ? '2px solid #f5a623' : 'none',
+                  borderTop: isDropBefore ? '2px solid #f94608' : undefined,
+                  borderBottom: isDropAfter ? '2px solid #f94608' : undefined,
+                  boxSizing: 'border-box',
+                  marginBottom: 2,
+                }}
+              >
+                {/* Collapse toggle for groups */}
+                {isGroupObj && (
+                  <button
+                    draggable={false}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setExpandedGroups(prev => {
+                        const next = new Set(prev)
+                        if (next.has(id)) { next.delete(id) } else { next.add(id) }
+                        return next
+                      })
+                    }}
                     style={{
-                      width: 24, height: 24, borderRadius: 3, overflow: 'hidden',
-                      background: '#f5ede2', border: '1px solid #e8e0d5', cursor: 'pointer', flexShrink: 0,
+                      flexShrink: 0,
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '0 2px',
+                      color: '#aaaaaa',
+                      display: 'flex',
+                      alignItems: 'center',
+                      fontSize: 9,
+                    }}
+                  >
+                    {isExpanded ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
+                  </button>
+                )}
+                {/* Thumbnail(s) — dual if image has a mask */}
+                {obj.type === 'image' && (obj as ImageObject).mask != null ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
+                    {/* Image thumbnail */}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); setSelected(id) }}
+                      style={{
+                        width: 24, height: 24, borderRadius: 3, overflow: 'hidden',
+                        background: '#f5ede2', border: '1px solid #e8e0d5', cursor: 'pointer', flexShrink: 0,
+                      }}
+                    >
+                      {thumbnails[id] != null ? (
+                        <img src={thumbnails[id]} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="" draggable={false} />
+                      ) : (
+                        <div style={{ width: '100%', height: '100%', background: '#e8e0d5' }} />
+                      )}
+                    </div>
+                    <span style={{ color: '#aaaaaa', fontSize: 10, flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                      <Link2 size={11} strokeWidth={1.5}/>
+                    </span>
+                    {/* Mask thumbnail */}
+                    <Tooltip label="Edit mask">
+                    <div
+                      onClick={(e) => { e.stopPropagation(); enterMaskEditMode(id) }}
+                      style={{
+                        width: 24, height: 24, borderRadius: 3, overflow: 'hidden',
+                        background: '#f5ede2', border: '1px solid #e8e0d5', cursor: 'pointer', flexShrink: 0,
+                      }}
+                    >
+                      {thumbnails[`${id}__mask`] != null ? (
+                        <img src={thumbnails[`${id}__mask`]} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="mask" draggable={false} />
+                      ) : (
+                        <div style={{ width: '100%', height: '100%', background: '#e8e0d5' }} />
+                      )}
+                    </div>
+                    </Tooltip>
+                  </div>
+                ) : isGroupObj ? (
+                  <div
+                    style={{
+                      width: 26, height: 26, flexShrink: 0, borderRadius: 4,
+                      background: '#f5ede2', border: '1px solid #e8e0d5',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: '#aaaaaa',
+                    }}
+                  >
+                    <Layers size={14} strokeWidth={1.5} />
+                  </div>
+                ) : obj.type === 'guideline' ? (
+                  <div
+                    style={{
+                      width: 26, height: 26, flexShrink: 0, borderRadius: 4,
+                      background: '#f5ede2', border: '1px solid #e8e0d5',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      {(obj as GuidelineObject).orientation === 'horizontal' ? (
+                        <line x1="1" y1="7" x2="13" y2="7" stroke="#4A90E2" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/>
+                      ) : (
+                        <line x1="7" y1="1" x2="7" y2="13" stroke="#4A90E2" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/>
+                      )}
+                    </svg>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      width: 26, height: 26, flexShrink: 0, borderRadius: 4,
+                      overflow: 'hidden', background: '#f5ede2', border: '1px solid #e8e0d5',
                     }}
                   >
                     {thumbnails[id] != null ? (
@@ -243,306 +324,247 @@ export function LayerPanel(): React.ReactElement {
                       <div style={{ width: '100%', height: '100%', background: '#e8e0d5' }} />
                     )}
                   </div>
-                  <span style={{ color: '#aaaaaa', fontSize: 10, flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-                    <Link2 size={11} strokeWidth={1.5}/>
-                  </span>
-                  {/* Mask thumbnail */}
-                  <Tooltip label="Edit mask">
-                  <div
-                    onClick={(e) => { e.stopPropagation(); enterMaskEditMode(id) }}
-                    style={{
-                      width: 24, height: 24, borderRadius: 3, overflow: 'hidden',
-                      background: '#f5ede2', border: '1px solid #e8e0d5', cursor: 'pointer', flexShrink: 0,
-                    }}
-                  >
-                    {thumbnails[`${id}__mask`] != null ? (
-                      <img src={thumbnails[`${id}__mask`]} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="mask" draggable={false} />
-                    ) : (
-                      <div style={{ width: '100%', height: '100%', background: '#e8e0d5' }} />
-                    )}
-                  </div>
+                )}
+
+                {/* Name */}
+                <span
+                  style={{
+                    flex: 1,
+                    color: obj.visible ? 'var(--text-primary)' : 'var(--text-muted)',
+                    fontSize: 13,
+                    fontFamily: 'var(--font)',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  {getDisplayName(id, originalIndex)}
+                </span>
+
+                {/* Anchor button — visible only in multi-select mode */}
+                {canBeAnchor && (
+                  <Tooltip label="Set as reference">
+                    <button
+                      draggable={false}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setAnchor(isAnchor ? null : id)
+                      }}
+                      style={{
+                        flexShrink: 0,
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '0 2px',
+                        fontSize: 12,
+                        lineHeight: '1',
+                        color: isAnchor ? '#f5a623' : '#aaaaaa',
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Star size={13} strokeWidth={1.5} fill={isAnchor ? 'gold' : 'none'} color={isAnchor ? 'gold' : '#aaaaaa'}/>
+                    </button>
                   </Tooltip>
-                </div>
-              ) : isGroupObj ? (
-                <div
-                  style={{
-                    width: 26, height: 26, flexShrink: 0, borderRadius: 4,
-                    background: '#f5ede2', border: '1px solid #e8e0d5',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: '#aaaaaa',
-                  }}
-                >
-                  <Layers size={14} strokeWidth={1.5} />
-                </div>
-              ) : obj.type === 'guideline' ? (
-                <div
-                  style={{
-                    width: 26, height: 26, flexShrink: 0, borderRadius: 4,
-                    background: '#f5ede2', border: '1px solid #e8e0d5',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    {(obj as GuidelineObject).orientation === 'horizontal' ? (
-                      <line x1="1" y1="7" x2="13" y2="7" stroke="#4A90E2" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/>
-                    ) : (
-                      <line x1="7" y1="1" x2="7" y2="13" stroke="#4A90E2" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/>
-                    )}
-                  </svg>
-                </div>
-              ) : (
-                <div
-                  style={{
-                    width: 26, height: 26, flexShrink: 0, borderRadius: 4,
-                    overflow: 'hidden', background: '#f5ede2', border: '1px solid #e8e0d5',
-                  }}
-                >
-                  {thumbnails[id] != null ? (
-                    <img src={thumbnails[id]} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="" draggable={false} />
-                  ) : (
-                    <div style={{ width: '100%', height: '100%', background: '#e8e0d5' }} />
-                  )}
-                </div>
-              )}
+                )}
 
-              {/* Name */}
-              <span
-                style={{
-                  flex: 1,
-                  color: obj.visible ? 'var(--text-primary)' : 'var(--text-muted)',
-                  fontSize: 13,
-                  fontFamily: 'var(--font)',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  pointerEvents: 'none',
-                }}
-              >
-                {getDisplayName(id, originalIndex)}
-              </span>
+                {/* Mute toggle — video rows only */}
+                {isVideo && (
+                  <Tooltip label={(obj as VideoObject).muted ? 'Unmute' : 'Mute'}>
+                    <button
+                      draggable={false}
+                      onClick={(e) => handleMuteClick(e, obj as VideoObject)}
+                      style={{
+                        ...iconBtnStyle(false),
+                        width: 22,
+                        height: 22,
+                        flexShrink: 0,
+                        background: 'none',
+                        border: 'none',
+                        color: (obj as VideoObject).muted ? '#f94608' : '#aaaaaa',
+                      }}
+                    >
+                      {(obj as VideoObject).muted
+                        ? <VolumeX size={12} strokeWidth={1.5}/>
+                        : <Volume2 size={12} strokeWidth={1.5}/>}
+                    </button>
+                  </Tooltip>
+                )}
 
-              {/* Anchor button — visible only in multi-select mode */}
-              {canBeAnchor && (
-                <Tooltip label="Set as reference">
+                {/* Lock toggle */}
+                <Tooltip label={obj.locked ? 'Unlock' : 'Lock'}>
                   <button
                     draggable={false}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setAnchor(isAnchor ? null : id)
-                    }}
+                    onClick={(e) => handleLockClick(e, id)}
                     style={{
                       flexShrink: 0,
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
                       padding: '0 2px',
-                      fontSize: 12,
+                      fontSize: 13,
                       lineHeight: '1',
-                      color: isAnchor ? '#f5a623' : '#aaaaaa',
+                      color: obj.locked ? '#f94608' : '#aaaaaa',
                       display: 'flex',
                       alignItems: 'center',
                     }}
                   >
-                    <Star size={13} strokeWidth={1.5} fill={isAnchor ? 'gold' : 'none'} color={isAnchor ? 'gold' : '#aaaaaa'}/>
+                    {obj.locked ? <Lock size={13} strokeWidth={1.5}/> : <LockOpen size={13} strokeWidth={1.5}/>}
                   </button>
                 </Tooltip>
-              )}
 
-              {/* Mute toggle — video rows only */}
-              {isVideo && (
-                <Tooltip label={(obj as VideoObject).muted ? 'Unmute' : 'Mute'}>
+                {/* Eye toggle */}
+                <Tooltip label={obj.visible ? 'Hide layer' : 'Show layer'}>
                   <button
                     draggable={false}
-                    onClick={(e) => handleMuteClick(e, obj as VideoObject)}
+                    onClick={(e) => handleEyeClick(e, obj)}
                     style={{
-                      ...iconBtnStyle(false),
-                      width: 22,
-                      height: 22,
                       flexShrink: 0,
                       background: 'none',
                       border: 'none',
-                      color: (obj as VideoObject).muted ? '#f94608' : '#aaaaaa',
+                      cursor: 'pointer',
+                      padding: '0 2px',
+                      fontSize: 14,
+                      lineHeight: '1',
+                      color: obj.visible ? '#f94608' : '#aaaaaa',
+                      display: 'flex',
+                      alignItems: 'center',
                     }}
                   >
-                    {(obj as VideoObject).muted
-                      ? <VolumeX size={12} strokeWidth={1.5}/>
-                      : <Volume2 size={12} strokeWidth={1.5}/>}
+                    {obj.visible ? <Eye size={13} strokeWidth={1.5}/> : <EyeOff size={13} strokeWidth={1.5}/>}
                   </button>
                 </Tooltip>
-              )}
+              </div>
+            )
 
-              {/* Lock toggle */}
-              <Tooltip label={obj.locked ? 'Unlock' : 'Lock'}>
-                <button
-                  draggable={false}
-                  onClick={(e) => handleLockClick(e, id)}
-                  style={{
-                    flexShrink: 0,
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: '0 2px',
-                    fontSize: 13,
-                    lineHeight: '1',
-                    color: obj.locked ? '#f94608' : '#aaaaaa',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                >
-                  {obj.locked ? <Lock size={13} strokeWidth={1.5}/> : <LockOpen size={13} strokeWidth={1.5}/>}
-                </button>
-              </Tooltip>
-
-              {/* Eye toggle */}
-              <Tooltip label={obj.visible ? 'Hide layer' : 'Show layer'}>
-                <button
-                  draggable={false}
-                  onClick={(e) => handleEyeClick(e, obj)}
-                  style={{
-                    flexShrink: 0,
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: '0 2px',
-                    fontSize: 14,
-                    lineHeight: '1',
-                    color: obj.visible ? '#f94608' : '#aaaaaa',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                >
-                  {obj.visible ? <Eye size={13} strokeWidth={1.5}/> : <EyeOff size={13} strokeWidth={1.5}/>}
-                </button>
-              </Tooltip>
-            </div>
-          )
-
-          // Render child rows for expanded groups
-          if (isGroupObj && isExpanded) {
-            const groupObj = obj as GroupObject
-            const childRows = groupObj.childIds.map((childId) => {
-              const childObj = objects[childId]
-              if (!childObj) return null
-              const childOriginalIndex = objectOrder.indexOf(childId)
-              const childIsSelected = selectedIds.includes(childId) || selectedId === childId
-              const childIsAnchor = anchorId === childId
-              const childIsDropBefore = dropPos?.id === childId && dropPos.side === 'before'
-              const childIsDropAfter = dropPos?.id === childId && dropPos.side === 'after'
-              const childCanBeAnchor = selectedIds.length > 1 && selectedIds.includes(childId)
-              return (
-                <div
-                  key={childId}
-                  onClick={(e) => handleRowClick(e, childId)}
-                  style={{
-                    height: 36,
-                    display: 'flex',
-                    alignItems: 'center',
-                    paddingLeft: 24,
-                    paddingRight: 8,
-                    background: childIsSelected ? '#ffffff' : 'transparent',
-                    border: childIsSelected ? '1px solid #e8e0d5' : '1px solid transparent',
-                    borderRadius: 12,
-                    cursor: 'pointer',
-                    userSelect: 'none',
-                    gap: 6,
-                    outline: childIsAnchor ? '2px solid #f5a623' : 'none',
-                    borderTop: childIsDropBefore ? '2px solid #f94608' : undefined,
-                    borderBottom: childIsDropAfter ? '2px solid #f94608' : undefined,
-                    boxSizing: 'border-box',
-                    marginBottom: 2,
-                  }}
-                >
-                  {/* Thumbnail */}
+            // Render child rows for expanded groups
+            if (isGroupObj && isExpanded) {
+              const groupObj = obj as GroupObject
+              const childRows = groupObj.childIds.map((childId) => {
+                const childObj = objects[childId]
+                if (!childObj) return null
+                const childOriginalIndex = objectOrder.indexOf(childId)
+                const childIsSelected = selectedIds.includes(childId) || selectedId === childId
+                const childIsAnchor = anchorId === childId
+                const childIsDropBefore = dropPos?.id === childId && dropPos.side === 'before'
+                const childIsDropAfter = dropPos?.id === childId && dropPos.side === 'after'
+                const childCanBeAnchor = selectedIds.length > 1 && selectedIds.includes(childId)
+                return (
                   <div
+                    key={childId}
+                    onClick={(e) => handleRowClick(e, childId)}
                     style={{
-                      width: 26, height: 26, flexShrink: 0, borderRadius: 4,
-                      overflow: 'hidden', background: '#f5ede2', border: '1px solid #e8e0d5',
+                      height: 36,
+                      display: 'flex',
+                      alignItems: 'center',
+                      paddingLeft: 24,
+                      paddingRight: 8,
+                      background: childIsSelected ? '#ffffff' : 'transparent',
+                      border: childIsSelected ? '1px solid #e8e0d5' : '1px solid transparent',
+                      borderRadius: 12,
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      gap: 6,
+                      outline: childIsAnchor ? '2px solid #f5a623' : 'none',
+                      borderTop: childIsDropBefore ? '2px solid #f94608' : undefined,
+                      borderBottom: childIsDropAfter ? '2px solid #f94608' : undefined,
+                      boxSizing: 'border-box',
+                      marginBottom: 2,
                     }}
                   >
-                    {thumbnails[childId] != null ? (
-                      <img src={thumbnails[childId]} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="" draggable={false} />
-                    ) : (
-                      <div style={{ width: '100%', height: '100%', background: '#e8e0d5' }} />
+                    {/* Thumbnail */}
+                    <div
+                      style={{
+                        width: 26, height: 26, flexShrink: 0, borderRadius: 4,
+                        overflow: 'hidden', background: '#f5ede2', border: '1px solid #e8e0d5',
+                      }}
+                    >
+                      {thumbnails[childId] != null ? (
+                        <img src={thumbnails[childId]} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="" draggable={false} />
+                      ) : (
+                        <div style={{ width: '100%', height: '100%', background: '#e8e0d5' }} />
+                      )}
+                    </div>
+
+                    {/* Name */}
+                    <span
+                      style={{
+                        flex: 1,
+                        color: childObj.visible ? 'var(--text-primary)' : 'var(--text-muted)',
+                        fontSize: 12,
+                        fontFamily: 'var(--font)',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        pointerEvents: 'none',
+                      }}
+                    >
+                      {getDisplayName(childId, childOriginalIndex)}
+                    </span>
+
+                    {/* Anchor button */}
+                    {childCanBeAnchor && (
+                      <Tooltip label="Set as reference">
+                        <button
+                          draggable={false}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setAnchor(childIsAnchor ? null : childId)
+                          }}
+                          style={{
+                            flexShrink: 0, background: 'none', border: 'none',
+                            cursor: 'pointer', padding: '0 2px', lineHeight: '1',
+                            color: childIsAnchor ? '#f5a623' : '#aaaaaa',
+                            display: 'flex', alignItems: 'center',
+                          }}
+                        >
+                          <Star size={13} strokeWidth={1.5} fill={childIsAnchor ? 'gold' : 'none'} color={childIsAnchor ? 'gold' : '#aaaaaa'}/>
+                        </button>
+                      </Tooltip>
                     )}
-                  </div>
 
-                  {/* Name */}
-                  <span
-                    style={{
-                      flex: 1,
-                      color: childObj.visible ? 'var(--text-primary)' : 'var(--text-muted)',
-                      fontSize: 12,
-                      fontFamily: 'var(--font)',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      pointerEvents: 'none',
-                    }}
-                  >
-                    {getDisplayName(childId, childOriginalIndex)}
-                  </span>
-
-                  {/* Anchor button */}
-                  {childCanBeAnchor && (
-                    <Tooltip label="Set as reference">
+                    {/* Lock toggle */}
+                    <Tooltip label={childObj.locked ? 'Unlock' : 'Lock'}>
                       <button
                         draggable={false}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setAnchor(childIsAnchor ? null : childId)
-                        }}
+                        onClick={(e) => { e.stopPropagation(); toggleLock(childId) }}
                         style={{
                           flexShrink: 0, background: 'none', border: 'none',
                           cursor: 'pointer', padding: '0 2px', lineHeight: '1',
-                          color: childIsAnchor ? '#f5a623' : '#aaaaaa',
+                          color: childObj.locked ? '#f94608' : '#aaaaaa',
                           display: 'flex', alignItems: 'center',
                         }}
                       >
-                        <Star size={13} strokeWidth={1.5} fill={childIsAnchor ? 'gold' : 'none'} color={childIsAnchor ? 'gold' : '#aaaaaa'}/>
+                        {childObj.locked ? <Lock size={13} strokeWidth={1.5}/> : <LockOpen size={13} strokeWidth={1.5}/>}
                       </button>
                     </Tooltip>
-                  )}
 
-                  {/* Lock toggle */}
-                  <Tooltip label={childObj.locked ? 'Unlock' : 'Lock'}>
-                    <button
-                      draggable={false}
-                      onClick={(e) => { e.stopPropagation(); toggleLock(childId) }}
-                      style={{
-                        flexShrink: 0, background: 'none', border: 'none',
-                        cursor: 'pointer', padding: '0 2px', lineHeight: '1',
-                        color: childObj.locked ? '#f94608' : '#aaaaaa',
-                        display: 'flex', alignItems: 'center',
-                      }}
-                    >
-                      {childObj.locked ? <Lock size={13} strokeWidth={1.5}/> : <LockOpen size={13} strokeWidth={1.5}/>}
-                    </button>
-                  </Tooltip>
+                    {/* Eye toggle */}
+                    <Tooltip label={childObj.visible ? 'Hide layer' : 'Show layer'}>
+                      <button
+                        draggable={false}
+                        onClick={(e) => { e.stopPropagation(); updateObject(childId, { visible: !childObj.visible }) }}
+                        style={{
+                          flexShrink: 0, background: 'none', border: 'none',
+                          cursor: 'pointer', padding: '0 2px', lineHeight: '1',
+                          color: childObj.visible ? '#f94608' : '#aaaaaa',
+                          display: 'flex', alignItems: 'center',
+                        }}
+                      >
+                        {childObj.visible ? <Eye size={13} strokeWidth={1.5}/> : <EyeOff size={13} strokeWidth={1.5}/>}
+                      </button>
+                    </Tooltip>
+                  </div>
+                )
+              }).filter(Boolean)
+              return [mainRow, ...childRows]
+            }
 
-                  {/* Eye toggle */}
-                  <Tooltip label={childObj.visible ? 'Hide layer' : 'Show layer'}>
-                    <button
-                      draggable={false}
-                      onClick={(e) => { e.stopPropagation(); updateObject(childId, { visible: !childObj.visible }) }}
-                      style={{
-                        flexShrink: 0, background: 'none', border: 'none',
-                        cursor: 'pointer', padding: '0 2px', lineHeight: '1',
-                        color: childObj.visible ? '#f94608' : '#aaaaaa',
-                        display: 'flex', alignItems: 'center',
-                      }}
-                    >
-                      {childObj.visible ? <Eye size={13} strokeWidth={1.5}/> : <EyeOff size={13} strokeWidth={1.5}/>}
-                    </button>
-                  </Tooltip>
-                </div>
-              )
-            }).filter(Boolean)
-            return [mainRow, ...childRows]
-          }
-
-          return [mainRow]
-        })
-        })()}
+            return [mainRow]
+          })
+          })()}
+        </div>
       </div>
     </div>
   )
