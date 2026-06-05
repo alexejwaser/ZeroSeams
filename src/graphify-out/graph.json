@@ -9,7 +9,7 @@
       "source_file": "main.tsx",
       "source_location": "L1",
       "id": "main_tsx",
-      "community": 35,
+      "community": 39,
       "norm_label": "main.tsx"
     },
     {
@@ -18,16 +18,16 @@
       "source_file": "main.tsx",
       "source_location": "L10",
       "id": "src_main_app",
-      "community": 35,
+      "community": 39,
       "norm_label": "app()"
     },
     {
       "label": "rootEl",
       "file_type": "code",
       "source_file": "main.tsx",
-      "source_location": "L119",
+      "source_location": "L120",
       "id": "src_main_rootel",
-      "community": 35,
+      "community": 39,
       "norm_label": "rootel"
     },
     {
@@ -252,14 +252,14 @@
       "source_file": "ui/PropertiesPanel.tsx",
       "source_location": "L720",
       "id": "ui_propertiespanel_effectssection",
-      "community": 39,
+      "community": 35,
       "norm_label": "effectssection()"
     },
     {
       "label": "AdjustmentsSectionProps",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L931",
+      "source_location": "L934",
       "id": "ui_propertiespanel_adjustmentssectionprops",
       "community": 10,
       "norm_label": "adjustmentssectionprops"
@@ -268,7 +268,7 @@
       "label": "subGroupLabelStyle",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L941",
+      "source_location": "L944",
       "id": "ui_propertiespanel_subgrouplabelstyle",
       "community": 10,
       "norm_label": "subgrouplabelstyle"
@@ -277,7 +277,7 @@
       "label": "TRACK_GRADIENT",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L951",
+      "source_location": "L954",
       "id": "ui_propertiespanel_track_gradient",
       "community": 10,
       "norm_label": "track_gradient"
@@ -286,16 +286,16 @@
       "label": "AdjustmentsSection()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L966",
+      "source_location": "L969",
       "id": "ui_propertiespanel_adjustmentssection",
-      "community": 39,
+      "community": 35,
       "norm_label": "adjustmentssection()"
     },
     {
       "label": "VideoSectionProps",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L1071",
+      "source_location": "L1075",
       "id": "ui_propertiespanel_videosectionprops",
       "community": 10,
       "norm_label": "videosectionprops"
@@ -304,7 +304,7 @@
       "label": "formatDuration()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L1079",
+      "source_location": "L1083",
       "id": "ui_propertiespanel_formatduration",
       "community": 10,
       "norm_label": "formatduration()"
@@ -313,7 +313,7 @@
       "label": "trimLabelStyle",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L1086",
+      "source_location": "L1090",
       "id": "ui_propertiespanel_trimlabelstyle",
       "community": 10,
       "norm_label": "trimlabelstyle"
@@ -322,7 +322,7 @@
       "label": "VideoSection()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L1096",
+      "source_location": "L1100",
       "id": "ui_propertiespanel_videosection",
       "community": 10,
       "norm_label": "videosection()"
@@ -331,7 +331,7 @@
       "label": "PropertiesPanel()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L1609",
+      "source_location": "L1607",
       "id": "ui_propertiespanel_propertiespanel",
       "community": 17,
       "norm_label": "propertiespanel()"
@@ -511,7 +511,7 @@
       "label": "ToolBar()",
       "file_type": "code",
       "source_file": "ui/Toolbar.tsx",
-      "source_location": "L1231",
+      "source_location": "L1235",
       "id": "ui_toolbar_toolbar",
       "community": 27,
       "norm_label": "toolbar()"
@@ -522,7 +522,7 @@
       "source_file": "ui/iconBtnStyle.ts",
       "source_location": "L1",
       "id": "ui_iconbtnstyle_ts",
-      "community": 39,
+      "community": 35,
       "norm_label": "iconbtnstyle.ts"
     },
     {
@@ -531,7 +531,7 @@
       "source_file": "ui/iconBtnStyle.ts",
       "source_location": "L3",
       "id": "ui_iconbtnstyle_iconbtnstyle",
-      "community": 39,
+      "community": 35,
       "norm_label": "iconbtnstyle()"
     },
     {
@@ -567,7 +567,7 @@
       "source_file": "ui/LayerPanel.tsx",
       "source_location": "L1",
       "id": "ui_layerpanel_tsx",
-      "community": 39,
+      "community": 35,
       "norm_label": "layerpanel.tsx"
     },
     {
@@ -754,7 +754,7 @@
       "label": "loadRecentColors()",
       "file_type": "code",
       "source_file": "ui/ColorInput.tsx",
-      "source_location": "L11",
+      "source_location": "L12",
       "id": "ui_colorinput_loadrecentcolors",
       "community": 21,
       "norm_label": "loadrecentcolors()"
@@ -763,7 +763,7 @@
       "label": "pushRecentColor()",
       "file_type": "code",
       "source_file": "ui/ColorInput.tsx",
-      "source_location": "L20",
+      "source_location": "L21",
       "id": "ui_colorinput_pushrecentcolor",
       "community": 21,
       "norm_label": "pushrecentcolor()"
@@ -772,7 +772,7 @@
       "label": "normalizeHex()",
       "file_type": "code",
       "source_file": "ui/ColorInput.tsx",
-      "source_location": "L29",
+      "source_location": "L30",
       "id": "ui_colorinput_normalizehex",
       "community": 21,
       "norm_label": "normalizehex()"
@@ -781,7 +781,7 @@
       "label": "hexToRgb()",
       "file_type": "code",
       "source_file": "ui/ColorInput.tsx",
-      "source_location": "L34",
+      "source_location": "L35",
       "id": "ui_colorinput_hextorgb",
       "community": 21,
       "norm_label": "hextorgb()"
@@ -790,7 +790,7 @@
       "label": "clamp()",
       "file_type": "code",
       "source_file": "ui/ColorInput.tsx",
-      "source_location": "L39",
+      "source_location": "L40",
       "id": "ui_colorinput_clamp",
       "community": 21,
       "norm_label": "clamp()"
@@ -799,7 +799,7 @@
       "label": "rgbToHex()",
       "file_type": "code",
       "source_file": "ui/ColorInput.tsx",
-      "source_location": "L43",
+      "source_location": "L44",
       "id": "ui_colorinput_rgbtohex",
       "community": 21,
       "norm_label": "rgbtohex()"
@@ -808,7 +808,7 @@
       "label": "hexToHsl()",
       "file_type": "code",
       "source_file": "ui/ColorInput.tsx",
-      "source_location": "L47",
+      "source_location": "L48",
       "id": "ui_colorinput_hextohsl",
       "community": 21,
       "norm_label": "hextohsl()"
@@ -817,7 +817,7 @@
       "label": "hslToHex()",
       "file_type": "code",
       "source_file": "ui/ColorInput.tsx",
-      "source_location": "L62",
+      "source_location": "L63",
       "id": "ui_colorinput_hsltohex",
       "community": 21,
       "norm_label": "hsltohex()"
@@ -826,7 +826,7 @@
       "label": "ColorMode",
       "file_type": "code",
       "source_file": "ui/ColorInput.tsx",
-      "source_location": "L83",
+      "source_location": "L84",
       "id": "ui_colorinput_colormode",
       "community": 21,
       "norm_label": "colormode"
@@ -835,7 +835,7 @@
       "label": "UseColorPopoverOptions",
       "file_type": "code",
       "source_file": "ui/ColorInput.tsx",
-      "source_location": "L85",
+      "source_location": "L86",
       "id": "ui_colorinput_usecolorpopoveroptions",
       "community": 21,
       "norm_label": "usecolorpopoveroptions"
@@ -844,7 +844,7 @@
       "label": "useColorPopover()",
       "file_type": "code",
       "source_file": "ui/ColorInput.tsx",
-      "source_location": "L91",
+      "source_location": "L92",
       "id": "ui_colorinput_usecolorpopover",
       "community": 21,
       "norm_label": "usecolorpopover()"
@@ -853,7 +853,7 @@
       "label": "PopoverProps",
       "file_type": "code",
       "source_file": "ui/ColorInput.tsx",
-      "source_location": "L246",
+      "source_location": "L247",
       "id": "ui_colorinput_popoverprops",
       "community": 21,
       "norm_label": "popoverprops"
@@ -862,7 +862,7 @@
       "label": "ColorPopover()",
       "file_type": "code",
       "source_file": "ui/ColorInput.tsx",
-      "source_location": "L271",
+      "source_location": "L272",
       "id": "ui_colorinput_colorpopover",
       "community": 21,
       "norm_label": "colorpopover()"
@@ -871,7 +871,7 @@
       "label": "ColorInputProps",
       "file_type": "code",
       "source_file": "ui/ColorInput.tsx",
-      "source_location": "L445",
+      "source_location": "L447",
       "id": "ui_colorinput_colorinputprops",
       "community": 17,
       "norm_label": "colorinputprops"
@@ -880,16 +880,16 @@
       "label": "ColorInput()",
       "file_type": "code",
       "source_file": "ui/ColorInput.tsx",
-      "source_location": "L453",
+      "source_location": "L455",
       "id": "ui_colorinput_colorinput",
-      "community": 25,
+      "community": 21,
       "norm_label": "colorinput()"
     },
     {
       "label": "MixedColorInputProps",
       "file_type": "code",
       "source_file": "ui/ColorInput.tsx",
-      "source_location": "L507",
+      "source_location": "L509",
       "id": "ui_colorinput_mixedcolorinputprops",
       "community": 17,
       "norm_label": "mixedcolorinputprops"
@@ -898,7 +898,7 @@
       "label": "MixedColorInput()",
       "file_type": "code",
       "source_file": "ui/ColorInput.tsx",
-      "source_location": "L515",
+      "source_location": "L517",
       "id": "ui_colorinput_mixedcolorinput",
       "community": 21,
       "norm_label": "mixedcolorinput()"
@@ -2635,7 +2635,7 @@
       "label": "normalizeObjectsForSnapshot()",
       "file_type": "code",
       "source_file": "canvas/useCanvasStore.ts",
-      "source_location": "L209",
+      "source_location": "L214",
       "id": "canvas_usecanvasstore_normalizeobjectsforsnapshot",
       "community": 0,
       "norm_label": "normalizeobjectsforsnapshot()"
@@ -2644,7 +2644,7 @@
       "label": "useCanvasStore",
       "file_type": "code",
       "source_file": "canvas/useCanvasStore.ts",
-      "source_location": "L251",
+      "source_location": "L256",
       "id": "canvas_usecanvasstore_usecanvasstore",
       "community": 0,
       "norm_label": "usecanvasstore"
@@ -7694,7 +7694,7 @@
       "file_type": "code",
       "source_file": "src/main.tsx",
       "source_location": "L1",
-      "community": 35,
+      "community": 39,
       "norm_label": "main.tsx",
       "id": "src_main_tsx"
     },
@@ -8730,7 +8730,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 39,
+      "community": 35,
       "norm_label": "photo adjustments bypass toggle (hold-to-compare \\ key + persistent power button)",
       "id": "concept_adjust_bypass"
     },
@@ -11200,9 +11200,9 @@
       "source_file": "ui/Toolbar.tsx",
       "source_location": "L94",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_toolbar_tsx",
-      "target": "ui_toolbar_toolgroup",
-      "confidence_score": 1.0
+      "target": "ui_toolbar_toolgroup"
     },
     {
       "relation": "contains",
@@ -11833,6 +11833,17 @@
       "confidence_score": 1.0,
       "source": "ui_tooltip_tsx",
       "target": "ui_tooltip_tooltipinner"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "ui/ColorInput.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "ui_colorinput_tsx",
+      "target": "ui_tooltip_tsx",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -33740,5 +33751,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "8ffc633dc3219e13c877382b4e366c72829398c6"
+  "built_at_commit": "09e24297b0cd55bd13500935a5edf08807adaf9a"
 }

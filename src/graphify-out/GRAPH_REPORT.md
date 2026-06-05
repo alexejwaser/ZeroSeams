@@ -1,16 +1,16 @@
 # Graph Report - src  (2026-06-05)
 
 ## Corpus Check
-- 79 files · ~77,260 words
+- 79 files · ~77,433 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1040 nodes · 2298 edges · 70 communities (53 shown, 17 thin omitted)
+- 1040 nodes · 2299 edges · 70 communities (54 shown, 16 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 67 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8ffc633d`
+- Built from commit: `09e24297`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -103,7 +103,7 @@
 - `Zustand Store (src/store/index.ts)` --shares_data_with--> `History (past/future snapshots)`  [INFERRED]
   src/store/index.ts → CLAUDE.md
 
-## Communities (70 total, 17 thin omitted)
+## Communities (70 total, 16 thin omitted)
 
 ### Community 0 - "Canvas Node Rendering"
 Cohesion: 0.05
@@ -190,8 +190,8 @@ Cohesion: 0.19
 Nodes (17): AnchorPoint, BaseCanvasObject, CanvasObject, CanvasObjectScope, CanvasObjectType, FontStyle, GroupObject, GuidelineObject (+9 more)
 
 ### Community 21 - "Color Input UI"
-Cohesion: 0.26
-Nodes (14): clamp(), ColorMode, ColorPopover(), hexToHsl(), hexToRgb(), hslToHex(), loadRecentColors(), MixedColorInput() (+6 more)
+Cohesion: 0.25
+Nodes (15): clamp(), ColorInput(), ColorMode, ColorPopover(), hexToHsl(), hexToRgb(), hslToHex(), loadRecentColors() (+7 more)
 
 ### Community 22 - "CLAUDE.md Architecture Docs"
 Cohesion: 0.12
@@ -206,8 +206,8 @@ Cohesion: 0.18
 Nodes (8): clickAt(), drag(), ELECTRON_BIN, failures, getStageInfo(), k2p(), ROOT, wait()
 
 ### Community 25 - "App Root & Frame Settings"
-Cohesion: 0.33
-Nodes (8): ColorInput(), FrameSettingsPopover(), FrameSettingsPopoverProps, labelStyle, numberInputStyle, PLATFORM_LABELS, PLATFORMS, segmentButtonStyle()
+Cohesion: 0.36
+Nodes (7): FrameSettingsPopover(), FrameSettingsPopoverProps, labelStyle, numberInputStyle, PLATFORM_LABELS, PLATFORMS, segmentButtonStyle()
 
 ### Community 26 - "FFmpeg Wasm Invoke Helpers"
 Cohesion: 0.14
@@ -245,6 +245,10 @@ Nodes (9): addRunDependency(), asyncLoad(), createWasm(), FS_createPreloadedFile
 Cohesion: 0.25
 Nodes (8): addOnPostRun(), addOnPreRun(), callRuntimeCallbacks(), initRuntime(), postRun(), preRun(), run(), setTimeout()
 
+### Community 35 - "Autosave & Save Status"
+Cohesion: 0.40
+Nodes (4): Photo Adjustments Bypass Toggle (hold-to-compare \ key + persistent Power button), iconBtnStyle(), AdjustmentsSection(), EffectsSection()
+
 ### Community 36 - "FFmpeg String Utilities"
 Cohesion: 0.29
 Nodes (7): ___assert_fail(), _getaddrinfo(), inetPton4(), inetPton6(), jstoi_q(), UTF8ArrayToString(), UTF8ToString()
@@ -258,8 +262,8 @@ Cohesion: 0.43
 Nodes (7): Playwright Electron Integration Testing Pattern, Window Store Exposure for E2E Tests (__canvasStore__, __viewportStore__, __saveStatusStore__), debug-selection Playwright Script, test-axis-lock Playwright Script, test-multiselect-transform Playwright Script, test-save-path Playwright Script, verify-mask-draw Playwright Script
 
 ### Community 39 - "Layer Panel & Tooltip"
-Cohesion: 0.20
-Nodes (9): Photo Adjustments Bypass Toggle (hold-to-compare \ key + persistent Power button), Module-level activeTooltipCount (instant tooltip on hover when any tooltip is visible), iconBtnStyle(), typeLabel(), AdjustmentsSection(), EffectsSection(), Tooltip(), TooltipInner() (+1 more)
+Cohesion: 0.23
+Nodes (7): Module-level activeTooltipCount (instant tooltip on hover when any tooltip is visible), App(), rootEl, typeLabel(), Tooltip(), TooltipInner(), TooltipProps
 
 ### Community 40 - "Mask Draw Verify Script"
 Cohesion: 0.40
@@ -292,7 +296,7 @@ Nodes (5): CellRect, GRID_TEMPLATES, GridTemplate, uniformGrid(), GridPickerProp
 ## Knowledge Gaps
 - **208 isolated node(s):** `AlignDistributeSectionProps`, `VideoExportSettingsPanelProps`, `UseColorPopoverOptions`, `ImageFormat`, `DEFAULT_IMAGE_EXPORT_SETTINGS` (+203 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **17 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **16 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_

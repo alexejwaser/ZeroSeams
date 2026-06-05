@@ -242,6 +242,7 @@ graphify
 grid
 group
 guide
+guideline
 guides
 halation
 handle

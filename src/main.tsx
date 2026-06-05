@@ -64,6 +64,7 @@ function App(): React.ReactElement {
               background: 'var(--bg-canvas)',
               boxSizing: 'border-box',
               position: 'relative',
+              zIndex: 0,
             }}
           >
             <CarouselStage />
