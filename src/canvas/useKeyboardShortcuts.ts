@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useCanvasStore } from './useCanvasStore'
 import { useViewportStore } from './useViewportStore'
 import { useSaveStatusStore } from '@/ui/useSaveStatusStore'
@@ -44,12 +44,16 @@ export function useKeyboardShortcuts(): void {
   const removeObject = useCanvasStore((s) => s.removeObject)
   const removeMultipleObjects = useCanvasStore((s) => s.removeMultipleObjects)
   const commitUpdate = useCanvasStore((s) => s.commitUpdate)
-  const commitMultipleUpdates = useCanvasStore((s) => s.commitMultipleUpdates)
-  const moveObject = useCanvasStore((s) => s.moveObject)
+  const startDrag = useCanvasStore((s) => s.startDrag)
+  const updateObject = useCanvasStore((s) => s.updateObject)
+  const commitDraggedState = useCanvasStore((s) => s.commitDraggedState)
   const undo = useCanvasStore((s) => s.undo)
   const redo = useCanvasStore((s) => s.redo)
   const toggleSnap = useCanvasStore((s) => s.toggleSnap)
   const setAdjustmentsBypass = useCanvasStore((s) => s.setAdjustmentsBypass)
+
+  const nudgeActive = useRef(false)
+  const nudgeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent): void {
@@ -112,7 +116,7 @@ export function useKeyboardShortcuts(): void {
         return
       }
 
-      // Arrow keys — nudge
+      // Arrow keys — nudge (coalesced: one history entry per burst)
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         if (selectedIds.length === 0 && !selectedId) return
         e.preventDefault()
@@ -120,57 +124,67 @@ export function useKeyboardShortcuts(): void {
         const dx = e.key === 'ArrowLeft' ? -delta : e.key === 'ArrowRight' ? delta : 0
         const dy = e.key === 'ArrowUp' ? -delta : e.key === 'ArrowDown' ? delta : 0
 
+        // Snapshot pre-burst state on the first keydown in a burst
+        if (!nudgeActive.current) {
+          startDrag()
+          nudgeActive.current = true
+        }
+
+        // Live preview via updateObject (no history push)
+        const liveObjects = useCanvasStore.getState().objects
         if (selectedIds.length > 1) {
-          const patches: Record<string, import('@/types/canvas').CanvasObject> = {}
           for (const id of selectedIds) {
-            const o = objects[id]
+            const o = liveObjects[id]
             if (!o || o.locked) continue
             if (o.type === 'image') {
               const img = o as ImageObject
-              patches[id] = { ...img, frameX: img.frameX + dx, frameY: img.frameY + dy, x: img.x + dx, y: img.y + dy }
+              updateObject(id, { frameX: img.frameX + dx, frameY: img.frameY + dy, x: img.x + dx, y: img.y + dy })
             } else if (o.type === 'path') {
               const p = o as PathObject
               const newAnchors = p.anchors.map((a) => ({ ...a, x: a.x + dx, y: a.y + dy }))
               const bbox = computePathBBox(newAnchors)
-              patches[id] = { ...p, anchors: newAnchors, x: bbox.x, y: bbox.y, width: bbox.width, height: bbox.height }
+              updateObject(id, { anchors: newAnchors, x: bbox.x, y: bbox.y, width: bbox.width, height: bbox.height })
             } else if (o.type === 'shape') {
               const s = o as ShapeObject
               if (s.kind === 'line' || s.kind === 'arrow') {
-                patches[id] = { ...s, x: s.x + dx, y: s.y + dy, x2: (s.x2 ?? s.x + s.width) + dx, y2: (s.y2 ?? s.y + s.height) + dy }
+                updateObject(id, { x: s.x + dx, y: s.y + dy, x2: (s.x2 ?? s.x + s.width) + dx, y2: (s.y2 ?? s.y + s.height) + dy })
               } else {
-                patches[id] = { ...o, x: o.x + dx, y: o.y + dy }
+                updateObject(id, { x: o.x + dx, y: o.y + dy })
               }
             } else {
-              patches[id] = { ...o, x: o.x + dx, y: o.y + dy }
+              updateObject(id, { x: o.x + dx, y: o.y + dy })
             }
           }
-          commitMultipleUpdates(patches as Record<string, import('@/types/canvas').CanvasObject>)
-          return
+        } else {
+          if (!selectedId) return
+          const obj = liveObjects[selectedId]
+          if (!obj || obj.locked) return
+          if (obj.type === 'image') {
+            const img = obj as ImageObject
+            updateObject(selectedId, { frameX: img.frameX + dx, frameY: img.frameY + dy, x: img.x + dx, y: img.y + dy })
+          } else if (obj.type === 'shape') {
+            const s = obj as ShapeObject
+            if (s.kind === 'line' || s.kind === 'arrow') {
+              updateObject(selectedId, { x: s.x + dx, y: s.y + dy, x2: (s.x2 ?? s.x + s.width) + dx, y2: (s.y2 ?? s.y + s.height) + dy })
+            } else {
+              updateObject(selectedId, { x: obj.x + dx, y: obj.y + dy })
+            }
+          } else if (obj.type === 'path') {
+            const p = obj as PathObject
+            const newAnchors = p.anchors.map((a) => ({ ...a, x: a.x + dx, y: a.y + dy }))
+            const bbox = computePathBBox(newAnchors)
+            updateObject(selectedId, { anchors: newAnchors, x: bbox.x, y: bbox.y, width: bbox.width, height: bbox.height })
+          } else {
+            updateObject(selectedId, { x: obj.x + dx, y: obj.y + dy })
+          }
         }
 
-        if (!selectedId) return
-        const obj = objects[selectedId]
-        if (!obj || obj.locked) return
-        if (obj.type === 'image') {
-          const img = obj as ImageObject
-          commitUpdate(selectedId, {
-            frameX: img.frameX + dx,
-            frameY: img.frameY + dy,
-            x: img.x + dx,
-            y: img.y + dy,
-          })
-        } else if (obj.type === 'shape') {
-          const s = obj as ShapeObject
-          if (s.kind === 'line' || s.kind === 'arrow') {
-            moveObject(selectedId, dx, dy)
-          } else {
-            commitUpdate(selectedId, { x: obj.x + dx, y: obj.y + dy })
-          }
-        } else if (obj.type === 'path') {
-          moveObject(selectedId, dx, dy)
-        } else {
-          commitUpdate(selectedId, { x: obj.x + dx, y: obj.y + dy })
-        }
+        // Debounce: push one history entry ~300ms after the last keydown in the burst
+        if (nudgeTimer.current) clearTimeout(nudgeTimer.current)
+        nudgeTimer.current = setTimeout(() => {
+          commitDraggedState()
+          nudgeActive.current = false
+        }, 300)
         return
       }
 
@@ -334,8 +348,9 @@ export function useKeyboardShortcuts(): void {
     removeObject,
     removeMultipleObjects,
     commitUpdate,
-    commitMultipleUpdates,
-    moveObject,
+    startDrag,
+    updateObject,
+    commitDraggedState,
     undo,
     redo,
     toggleSnap,

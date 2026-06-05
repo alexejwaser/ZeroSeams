@@ -179,6 +179,7 @@ interface CanvasState {
   _dragStartObjects: Record<string, CanvasObject> | null
   /** Call onMouseDown before any updateObject drag calls. commitUpdate will use this snapshot for the history entry. */
   startDrag: () => void
+  commitDraggedState: () => void
   /** Transient — set of VideoObject ids currently playing. Not in history. */
   videoPlayingIds: Set<string>
   /** Toggle play/pause for a video object. */
@@ -398,6 +399,13 @@ export const useCanvasStore = create<CanvasState>((set) => {
 
     startDrag: () =>
       set((state) => ({ _dragStartObjects: state.objects })),
+
+    commitDraggedState: () =>
+      set((state) => ({
+        past: pushHistoryFrom({ ...state, objects: state._dragStartObjects ?? state.objects }),
+        future: [],
+        _dragStartObjects: null,
+      })),
 
     removeObject: (id) =>
       set((state) => {

@@ -5,13 +5,15 @@
  * Run: node scripts/test-undo-redo.mjs
  * Requires: npm run build first
  */
-import { _electron as electron } from 'playwright'
+import { chromium } from 'playwright'
+import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import fs from 'node:fs'
 
 const ROOT = path.resolve(fileURLToPath(import.meta.url), '../..')
 const ELECTRON_BIN = path.join(ROOT, 'node_modules/electron/dist/Electron.app/Contents/MacOS/Electron')
+const CDP_PORT = 9229
 const SHOTS = '/tmp/zeroseams-undo-redo-tests'
 fs.mkdirSync(SHOTS, { recursive: true })
 
@@ -28,14 +30,28 @@ function eq(a, b, msg) {
   ok(pass, pass ? msg : `${msg} — got ${JSON.stringify(a)}, want ${JSON.stringify(b)}`)
 }
 
-// ─── Launch ───────────────────────────────────────────────────────────────────
+// ─── Launch via CDP (electron.launch + Playwright 1.60/Electron 42 has target-detection bug) ──
 console.log('Launching app…')
-const app = await electron.launch({
-  executablePath: ELECTRON_BIN,
-  args: [path.join(ROOT, 'out/main/index.js')],
-  timeout: 30_000,
+const electronProc = spawn(ELECTRON_BIN, [
+  `--remote-debugging-port=${CDP_PORT}`,
+  path.join(ROOT, 'out/main/index.js'),
+], { stdio: 'pipe' })
+
+// Wait for DevTools to be ready
+await new Promise((resolve, reject) => {
+  const timer = setTimeout(() => reject(new Error('Electron DevTools port timeout')), 20_000)
+  electronProc.stderr.on('data', (d) => {
+    if (d.toString().includes('DevTools listening')) { clearTimeout(timer); resolve() }
+  })
+  electronProc.on('exit', (code) => reject(new Error(`Electron exited with code ${code}`)))
 })
-const page = app.windows().find(w => !w.url().startsWith('devtools://')) ?? await app.firstWindow()
+await new Promise(r => setTimeout(r, 3000)) // wait for renderer to load
+
+const browser = await chromium.connectOverCDP(`http://localhost:${CDP_PORT}`)
+const app = {
+  close: async () => { await browser.close(); electronProc.kill() },
+}
+const page = browser.contexts()[0].pages()[0]
 page.on('console', m => { if (m.type() === 'error') console.error(`  [renderer error] ${m.text()}`) })
 
 const ss   = (n) => page.screenshot({ path: `${SHOTS}/${n}.png` }).then(() => console.log(`    📸 ${n}`))
@@ -642,6 +658,118 @@ console.log('\n── I. Edge cases ──')
     const s = window.__canvasStore__.getState()
     for (const id of [...s.objectOrder]) s.removeObject(id)
   })
+  await wait(100)
+}
+
+// ── J. Rotation slider coalescing ────────────────────────────────────────────
+console.log('\n── J. Rotation slider coalescing ──')
+
+{
+  const id = await addShape()
+  await selectObj(id)
+  await wait(200)
+
+  // Find the rotation range slider (first range input whose sibling label says "Rotation")
+  const result = await page.evaluate(() => {
+    const labels = [...document.querySelectorAll('label')]
+    const lbl = labels.find(l => l.textContent.trim() === 'Rotation')
+    if (!lbl) return { error: 'rotation label not found' }
+    const slider = lbl.parentElement?.querySelector('input[type="range"]') ?? null
+    if (!slider) return { error: 'rotation slider not found' }
+
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set
+    const store = window.__canvasStore__.getState()
+
+    // mousedown — triggers startDrag (captures pre-drag snapshot)
+    slider.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    const before = store.past.length
+
+    // Several intermediate onChange events — should NOT push history
+    for (const v of [10, 20, 30, 45]) {
+      setter.call(slider, String(v))
+      slider.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+    const afterInputs = window.__canvasStore__.getState().past.length
+
+    // mouseup — triggers commitUpdate (single history entry)
+    slider.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
+    const afterMouseup = window.__canvasStore__.getState().past.length
+
+    return { before, inputDelta: afterInputs - before, mouseupDelta: afterMouseup - before }
+  })
+
+  if (result.error) {
+    ok(false, `rotation slider found — ${result.error}`)
+  } else {
+    eq(result.inputDelta, 0, 'rotation onChange does not push history (drag pattern)')
+    eq(result.mouseupDelta, 1, 'rotation mouseup pushes exactly 1 history entry')
+
+    // Undo restores pre-rotation state
+    const beforeUndo = await getState()
+    await undo()
+    await wait(100)
+    const afterUndo = await getState()
+    eq(afterUndo.objects[id]?.rotation ?? 0, 0, 'undo restores rotation to 0')
+    eq(afterUndo.pastLen, beforeUndo.pastLen - 1, 'past shrinks by 1 after undo')
+  }
+
+  // Cleanup
+  await page.evaluate((oid) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    gs().removeObject(oid)
+  }, id)
+  await wait(100)
+}
+
+// ── K. Arrow-key nudge coalescing ─────────────────────────────────────────────
+console.log('\n── K. Arrow-key nudge coalescing ──')
+
+{
+  const id = await addShape()
+  await selectObj(id)
+  await wait(200)
+
+  const startX = await page.evaluate((oid) => window.__canvasStore__.getState().objects[oid]?.x ?? 0, id)
+  const beforeLen = (await getState()).pastLen
+
+  // Dispatch 5 rapid ArrowRight keypresses (no modifier = 1px each)
+  await page.evaluate(() => {
+    for (let i = 0; i < 5; i++) {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }))
+    }
+  })
+  await wait(100)
+
+  // During debounce window: canvas updated but no history entry yet
+  const duringDebounce = await getState()
+  const liveX = duringDebounce.objects[id]?.x ?? startX
+  ok(liveX === startX + 5, `canvas updated live during nudge burst (x = ${startX} + 5 = ${startX + 5})`)
+  eq(duringDebounce.pastLen, beforeLen, 'no history entry yet during debounce window')
+
+  // Wait for debounce to fire (300ms)
+  await wait(400)
+  const afterDebounce = await getState()
+  eq(afterDebounce.pastLen, beforeLen + 1, '5 arrow presses coalesce into 1 history entry')
+
+  // Undo restores to original position
+  await undo()
+  await wait(100)
+  const afterUndo = await getState()
+  eq(afterUndo.objects[id]?.x ?? -1, startX, 'undo restores object to pre-burst position')
+
+  // Redo returns to nudged position
+  await page.evaluate(() => window.__canvasStore__.getState().redo())
+  await wait(100)
+  const afterRedo = await getState()
+  eq(afterRedo.objects[id]?.x ?? -1, startX + 5, 'redo returns object to nudged position')
+
+  // Cleanup
+  await page.evaluate((oid) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    gs().removeObject(oid)
+  }, id)
   await wait(100)
 }
 

@@ -506,8 +506,17 @@ function TextSection({
         <input
           type="range" min={-360} max={360} step={1}
           value={Math.round(textObj.rotation ?? 0)}
+          onMouseDown={onStartDrag}
           onChange={e => {
             const newRot = Number(e.target.value)
+            const { x, y, rotation } = rotateAroundCenter(
+              textObj.x, textObj.y, textObj.width, textObj.height,
+              textObj.rotation ?? 0, newRot,
+            )
+            onUpdate(selectedId, { rotation, x, y } as Partial<TextObject>)
+          }}
+          onMouseUp={e => {
+            const newRot = Number((e.target as HTMLInputElement).value)
             const { x, y, rotation } = rotateAroundCenter(
               textObj.x, textObj.y, textObj.width, textObj.height,
               textObj.rotation ?? 0, newRot,
@@ -1329,8 +1338,17 @@ function VideoSection({
         <input
           type="range" min={-360} max={360} step={1}
           value={Math.round(videoObj.rotation ?? 0)}
+          onMouseDown={onStartDrag}
           onChange={e => {
             const newRot = Number(e.target.value)
+            const { x: fx, y: fy, rotation } = rotateAroundCenter(
+              videoObj.frameX, videoObj.frameY, videoObj.frameWidth, videoObj.frameHeight,
+              videoObj.rotation ?? 0, newRot,
+            )
+            onUpdate(selectedId, { rotation, frameX: fx, frameY: fy, x: fx, y: fy })
+          }}
+          onMouseUp={e => {
+            const newRot = Number((e.target as HTMLInputElement).value)
             const { x: fx, y: fy, rotation } = rotateAroundCenter(
               videoObj.frameX, videoObj.frameY, videoObj.frameWidth, videoObj.frameHeight,
               videoObj.rotation ?? 0, newRot,
@@ -1822,8 +1840,20 @@ export function PropertiesPanel(): React.ReactElement {
                 <input
                   type="range" min={-360} max={360} step={1}
                   value={Math.round(shapeObj.rotation ?? 0)}
+                  onMouseDown={startDrag}
                   onChange={e => {
                     const newRot = Number(e.target.value)
+                    if (shapeObj.kind === 'ellipse') {
+                      updateObject(shapeObj.id, { rotation: newRot })
+                    } else {
+                      updateObject(shapeObj.id, rotateAroundCenter(
+                        shapeObj.x, shapeObj.y, shapeObj.width, shapeObj.height,
+                        shapeObj.rotation ?? 0, newRot,
+                      ))
+                    }
+                  }}
+                  onMouseUp={e => {
+                    const newRot = Number((e.target as HTMLInputElement).value)
                     if (shapeObj.kind === 'ellipse') {
                       commitUpdate(shapeObj.id, { rotation: newRot })
                     } else {
@@ -2011,8 +2041,17 @@ export function PropertiesPanel(): React.ReactElement {
                   <input
                     type="range" min={-360} max={360} step={1}
                     value={Math.round(imgObj.rotation ?? 0)}
+                    onMouseDown={startDrag}
                     onChange={e => {
                       const newRot = Number(e.target.value)
+                      const { x: fx, y: fy, rotation } = rotateAroundCenter(
+                        imgObj.frameX, imgObj.frameY, imgObj.frameWidth, imgObj.frameHeight,
+                        imgObj.rotation ?? 0, newRot,
+                      )
+                      updateObject(imgObj.id, { rotation, frameX: fx, frameY: fy, x: fx, y: fy })
+                    }}
+                    onMouseUp={e => {
+                      const newRot = Number((e.target as HTMLInputElement).value)
                       const { x: fx, y: fy, rotation } = rotateAroundCenter(
                         imgObj.frameX, imgObj.frameY, imgObj.frameWidth, imgObj.frameHeight,
                         imgObj.rotation ?? 0, newRot,
