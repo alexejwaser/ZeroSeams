@@ -22,6 +22,8 @@ import { useKeyboardShortcuts } from './useKeyboardShortcuts'
 import { useThumbnailGenerator } from './useThumbnailStore'
 import '@/canvas/effects'
 import { ColorInput } from '@/ui/ColorInput'
+import { CanvasGroupNode } from './CanvasGroupNode'
+import { GridCellOverlay } from './GridCellOverlay'
 export { exportFrames } from './exportFrames'
 
 // Module-level mutable reference so external callers can access the stage
@@ -618,6 +620,8 @@ export function CarouselStage(): React.ReactElement {
           </div>
         )
       })}
+      {/* Empty grid cell +image/+video buttons — absolute-positioned over the canvas */}
+      <GridCellOverlay />
       <Stage
         ref={stageRef}
         width={containerSize.width}
@@ -1197,6 +1201,9 @@ export function CarouselStage(): React.ReactElement {
                   nodeRef={getOrCreateNodeRef(id)}
                 />
               )
+            }
+            if (type === 'group') {
+              return <CanvasGroupNode key={id} id={id} />
             }
             return null
           })}

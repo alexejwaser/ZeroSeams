@@ -156,6 +156,26 @@ ipcMain.handle('open-video-file', async () => {
   return { canceled: false, filePath: filePaths[0] }
 })
 
+ipcMain.handle('open-image-file', async () => {
+  const win = BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0]
+  const { canceled, filePaths } = await dialog.showOpenDialog(win, {
+    filters: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'heic'] }],
+    properties: ['openFile'],
+  })
+  if (canceled || filePaths.length === 0) return { canceled: true }
+  const filePath = filePaths[0]
+  const ext = filePath.split('.').pop()?.toLowerCase() ?? ''
+  const mimeMap: Record<string, string> = {
+    jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png',
+    gif: 'image/gif', webp: 'image/webp', avif: 'image/avif', heic: 'image/heic',
+  }
+  const mime = mimeMap[ext] ?? 'image/jpeg'
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const buf = require('fs').readFileSync(filePath) as Buffer
+  const dataUrl = `data:${mime};base64,${buf.toString('base64')}`
+  return { canceled: false, data: dataUrl }
+})
+
 ipcMain.handle(
   'save-project-as',
   async (_event, { json }: { json: string }) => {

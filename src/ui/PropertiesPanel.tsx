@@ -6,9 +6,10 @@ import { useAIStore } from '@/ai'
 import { useExternalEdit } from '@/canvas/useExternalEdit'
 import { useSaveStatusStore } from './useSaveStatusStore'
 import type { BackgroundRemovalOperation } from '@/types/ai'
-import type { ImageObject, TextObject, ShapeObject, PathObject, VideoObject, FontStyle, MaskData, PhotoAdjustments, LayerEffect } from '@/types/canvas'
+import type { ImageObject, TextObject, ShapeObject, PathObject, VideoObject, GroupObject, FontStyle, MaskData, PhotoAdjustments, LayerEffect, CanvasObject } from '@/types/canvas'
 import { DEFAULT_ADJUSTMENTS } from '@/types/canvas'
 import { getAllEffectDefinitions, getEffectDefinition } from '@/canvas/effects'
+import { GRID_TEMPLATES } from '../canvas/gridTemplates'
 import {
   getSelectionStyle,
   applyStyleToRange,
@@ -1635,6 +1636,7 @@ export function PropertiesPanel(): React.ReactElement {
   const isShape = selectedObj?.type === 'shape'
   const isPath = selectedObj?.type === 'path'
   const isVideo = selectedObj?.type === 'video'
+  const isGroup = selectedObj?.type === 'group'
   const isMultiSelect = selectedIds.length > 1
   const isNoneSelected = selectedId === null && selectedIds.length === 0
 
@@ -1924,6 +1926,54 @@ export function PropertiesPanel(): React.ReactElement {
           )
         })()}
 
+
+        {/* Group object (grid) */}
+        {!isMultiSelect && selectedObj !== null && isGroup && (() => {
+          const group = selectedObj as GroupObject
+          if (!group.isGrid) return null
+          return (
+            <div style={{ padding: '0 16px 16px' }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Grid
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 12, color: 'var(--text-secondary)', minWidth: 32 }}>Gap</span>
+                <input
+                  type="range"
+                  min={0} max={40} step={1}
+                  value={group.gridGap ?? 8}
+                  onMouseDown={() => startDrag(group.id)}
+                  onChange={e => {
+                    const newGap = Number(e.target.value)
+                    updateObject(group.id, { gridGap: newGap })
+                    const template = GRID_TEMPLATES.find(t => t.id === group.gridTemplateId)
+                    if (template) {
+                      const cells = template.cells(group.width, group.height, newGap)
+                      group.childIds.forEach((childId, i) => {
+                        const cell = cells[i]
+                        if (!cell) return
+                        const child = useCanvasStore.getState().objects[childId]
+                        if (!child || child.type !== 'image') return
+                        updateObject(childId, {
+                          frameX: group.x + cell.x, frameY: group.y + cell.y,
+                          frameWidth: cell.w, frameHeight: cell.h,
+                          x: group.x + cell.x, y: group.y + cell.y,
+                          width: cell.w, height: cell.h,
+                        } as Partial<CanvasObject>)
+                      })
+                    }
+                  }}
+                  onMouseUp={() => commitUpdate(group.id, {})}
+                  style={{ flex: 1 }}
+                />
+                <span style={{ fontSize: 12, color: 'var(--text-secondary)', minWidth: 24, textAlign: 'right' }}>
+                  {group.gridGap ?? 8}
+                </span>
+              </div>
+            </div>
+          )
+        })()}
+
         {/* Image object */}
         {!isMultiSelect && selectedObj !== null && isImage && (() => {
           const imgObj = selectedObj as ImageObject
@@ -1984,6 +2034,11 @@ export function PropertiesPanel(): React.ReactElement {
                     style={numInputStyle(44)}
                   />
                 </div>
+                {(imgObj as ImageObject).isEmpty && (
+                  <div style={{ padding: '4px 0 8px', color: 'var(--text-muted)', fontSize: 12, fontStyle: 'italic' }}>
+                    No media — click + to add
+                  </div>
+                )}
                 <div style={{ color: '#555555', fontSize: 11, marginTop: 8, marginBottom: 8 }}>
                   Double-click image to edit content
                 </div>
@@ -2176,20 +2231,24 @@ export function PropertiesPanel(): React.ReactElement {
                     </>
                   )}
                 </div>
-                <AdjustmentsSection
-                  imgObj={imgObj}
-                  selectedId={selectedId!}
-                  bypass={adjustmentsBypass}
-                  onToggleBypass={toggleAdjustmentsBypass}
-                  onStartDrag={startDrag}
-                  onUpdate={(adj) => updateObject(selectedId!, { adjustments: adj })}
-                  onCommit={(adj) => commitUpdate(selectedId!, { adjustments: adj })}
-                />
-                <EffectsSection
-                  effects={imgObj.effects}
-                  onUpdate={(fx) => updateObject(selectedId!, { effects: fx })}
-                  onCommit={(fx) => commitUpdate(selectedId!, { effects: fx })}
-                />
+                {!(imgObj as ImageObject).isEmpty && (
+                  <>
+                    <AdjustmentsSection
+                      imgObj={imgObj}
+                      selectedId={selectedId!}
+                      bypass={adjustmentsBypass}
+                      onToggleBypass={toggleAdjustmentsBypass}
+                      onStartDrag={startDrag}
+                      onUpdate={(adj) => updateObject(selectedId!, { adjustments: adj })}
+                      onCommit={(adj) => commitUpdate(selectedId!, { adjustments: adj })}
+                    />
+                    <EffectsSection
+                      effects={imgObj.effects}
+                      onUpdate={(fx) => updateObject(selectedId!, { effects: fx })}
+                      onCommit={(fx) => commitUpdate(selectedId!, { effects: fx })}
+                    />
+                  </>
+                )}
               </div>
             )
           }

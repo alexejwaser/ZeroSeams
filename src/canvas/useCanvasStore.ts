@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import type { CanvasObject, ImageObject, ShapeObject, PathObject, ShapeKind, TextObject, MaskData, VideoObject } from '@/types/canvas'
+import type { CanvasObject, ImageObject, GroupObject, ShapeObject, PathObject, ShapeKind, TextObject, MaskData, VideoObject } from '@/types/canvas'
+import type { GridTemplate } from './gridTemplates'
 import type { Frame, FrameRatio, Platform, CarouselProject } from '@/types/project'
 
 export const PLATFORM_PRESETS: Record<Platform, Array<{ ratio: FrameRatio; label: string; width: number; height: number }>> = {
@@ -170,6 +171,7 @@ interface CanvasState {
     originPos: { x: number; y: number } | { frameX: number; frameY: number },
     finalPos: { x: number; y: number } | { frameX: number; frameY: number },
   ) => void
+  addGrid: (template: GridTemplate, canvasX: number, canvasY: number) => void
   /** Transient — captures pre-drag object state so commitUpdate can save the correct pre-drag snapshot. Not in history. */
   _dragStartObjects: Record<string, CanvasObject> | null
   /** Call onMouseDown before any updateObject drag calls. commitUpdate will use this snapshot for the history entry. */
@@ -1239,6 +1241,84 @@ export const useCanvasStore = create<CanvasState>((set) => {
           },
           objectOrder: newOrder,
           _srcVault: nextVault,
+        }
+      }),
+
+    addGrid: (template, canvasX, canvasY) =>
+      set((state) => {
+        const { frameWidth, frameHeight } = state
+        const groupW = frameWidth
+        const groupH = frameHeight
+        const gap = 8
+        const cells = template.cells(groupW, groupH, gap)
+
+        const groupId = crypto.randomUUID()
+        const cellIds = cells.map(() => crypto.randomUUID())
+
+        const group: GroupObject = {
+          id: groupId,
+          type: 'group',
+          childIds: cellIds,
+          isGrid: true,
+          gridGap: gap,
+          gridTemplateId: template.id,
+          x: canvasX,
+          y: canvasY,
+          width: groupW,
+          height: groupH,
+          scaleX: 1,
+          scaleY: 1,
+          rotation: 0,
+          opacity: 1,
+          visible: true,
+          locked: false,
+          scope: 'global',
+          zIndex: 0,
+        }
+
+        const cellsById: Record<string, CanvasObject> = {}
+        cells.forEach((cell, i) => {
+          const cellId = cellIds[i]
+          const img: ImageObject = {
+            id: cellId,
+            type: 'image',
+            isEmpty: true,
+            src: '',
+            backgroundRemoved: false,
+            frameX: canvasX + cell.x,
+            frameY: canvasY + cell.y,
+            frameWidth: cell.w,
+            frameHeight: cell.h,
+            x: canvasX + cell.x,
+            y: canvasY + cell.y,
+            width: cell.w,
+            height: cell.h,
+            contentOffsetX: 0,
+            contentOffsetY: 0,
+            contentWidth: 0,
+            contentHeight: 0,
+            naturalWidth: 0,
+            naturalHeight: 0,
+            contentEditMode: false,
+            maskEditMode: false,
+            rotation: 0,
+            opacity: 1,
+            visible: true,
+            locked: false,
+            scaleX: 1,
+            scaleY: 1,
+            scope: 'global',
+            zIndex: 0,
+          }
+          cellsById[cellId] = img
+        })
+
+        // isEmpty cells have no src — no vault entries needed
+        return {
+          past: pushHistoryFrom(state),
+          future: [],
+          objects: { ...state.objects, [groupId]: group, ...cellsById },
+          objectOrder: [...state.objectOrder, groupId, ...cellIds],
         }
       }),
   }

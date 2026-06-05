@@ -45,6 +45,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   openVideoFile: (): Promise<{ canceled: boolean; filePath?: string }> =>
     ipcRenderer.invoke('open-video-file'),
+  openImageFile: (): Promise<{ canceled: boolean; data?: string }> =>
+    ipcRenderer.invoke('open-image-file'),
   appendExportLog: (line: string): Promise<void> =>
     ipcRenderer.invoke('append-export-log', { line }),
   clearExportLog: (): Promise<void> =>

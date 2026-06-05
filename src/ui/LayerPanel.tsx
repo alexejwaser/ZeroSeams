@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
 import { useThumbnailStore } from '@/canvas/useThumbnailStore'
-import type { CanvasObject, CanvasObjectType, ImageObject, VideoObject } from '@/types/canvas'
+import type { CanvasObject, CanvasObjectType, GroupObject, ImageObject, VideoObject } from '@/types/canvas'
 import Tooltip from './Tooltip'
 import { iconBtnStyle } from './iconBtnStyle'
 import { Link2, Star, Lock, LockOpen, Eye, EyeOff, Volume2, VolumeX } from 'lucide-react'
@@ -36,6 +36,7 @@ export function LayerPanel(): React.ReactElement {
 
   const dragId = useRef<string | null>(null)
   const [dropPos, setDropPos] = useState<{ id: string; side: 'before' | 'after' } | null>(null)
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
 
   // Reversed: top layer (last in objectOrder) appears first in list
   const reversedOrder = [...objectOrder].reverse()
@@ -121,9 +122,19 @@ export function LayerPanel(): React.ReactElement {
             No layers yet
           </div>
         )}
-        {reversedOrder.map((id) => {
+        {(() => {
+          // Build set of all group child IDs to exclude from top-level rendering
+          const groupChildIds = new Set<string>()
+          reversedOrder.forEach(id => {
+            const o = objects[id]
+            if (o?.type === 'group') {
+              (o as GroupObject).childIds.forEach(cid => groupChildIds.add(cid))
+            }
+          })
+
+          return reversedOrder.filter(id => !groupChildIds.has(id)).flatMap((id) => {
           const obj = objects[id]
-          if (!obj) return null
+          if (!obj) return []
           const originalIndex = objectOrder.indexOf(id)
           const isSelected = selectedIds.includes(id) || selectedId === id
           const isAnchor = anchorId === id
@@ -131,8 +142,10 @@ export function LayerPanel(): React.ReactElement {
           const isDropAfter = dropPos?.id === id && dropPos.side === 'after'
           const canBeAnchor = selectedIds.length > 1 && selectedIds.includes(id)
           const isVideo = obj.type === 'video'
+          const isGroupObj = obj.type === 'group'
+          const isExpanded = expandedGroups.has(id)
 
-          return (
+          const mainRow = (
             <div
               key={id}
               draggable={true}
@@ -179,6 +192,33 @@ export function LayerPanel(): React.ReactElement {
                 marginBottom: 2,
               }}
             >
+              {/* Collapse toggle for groups */}
+              {isGroupObj && (
+                <button
+                  draggable={false}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setExpandedGroups(prev => {
+                      const next = new Set(prev)
+                      if (next.has(id)) { next.delete(id) } else { next.add(id) }
+                      return next
+                    })
+                  }}
+                  style={{
+                    flexShrink: 0,
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '0 2px',
+                    color: '#aaaaaa',
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: 9,
+                  }}
+                >
+                  {isExpanded ? '▼' : '▶'}
+                </button>
+              )}
               {/* Thumbnail(s) — dual if image has a mask */}
               {obj.type === 'image' && (obj as ImageObject).mask != null ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
@@ -341,7 +381,133 @@ export function LayerPanel(): React.ReactElement {
               </Tooltip>
             </div>
           )
-        })}
+
+          // Render child rows for expanded groups
+          if (isGroupObj && isExpanded) {
+            const groupObj = obj as GroupObject
+            const childRows = groupObj.childIds.map((childId) => {
+              const childObj = objects[childId]
+              if (!childObj) return null
+              const childOriginalIndex = objectOrder.indexOf(childId)
+              const childIsSelected = selectedIds.includes(childId) || selectedId === childId
+              const childIsAnchor = anchorId === childId
+              const childIsDropBefore = dropPos?.id === childId && dropPos.side === 'before'
+              const childIsDropAfter = dropPos?.id === childId && dropPos.side === 'after'
+              const childCanBeAnchor = selectedIds.length > 1 && selectedIds.includes(childId)
+              return (
+                <div
+                  key={childId}
+                  onClick={(e) => handleRowClick(e, childId)}
+                  style={{
+                    height: 36,
+                    display: 'flex',
+                    alignItems: 'center',
+                    paddingLeft: 24,
+                    paddingRight: 8,
+                    background: childIsSelected ? '#ffffff' : 'transparent',
+                    border: childIsSelected ? '1px solid #e8e0d5' : '1px solid transparent',
+                    borderRadius: 12,
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    gap: 6,
+                    outline: childIsAnchor ? '2px solid #f5a623' : 'none',
+                    borderTop: childIsDropBefore ? '2px solid #f94608' : undefined,
+                    borderBottom: childIsDropAfter ? '2px solid #f94608' : undefined,
+                    boxSizing: 'border-box',
+                    marginBottom: 2,
+                  }}
+                >
+                  {/* Thumbnail */}
+                  <div
+                    style={{
+                      width: 26, height: 26, flexShrink: 0, borderRadius: 4,
+                      overflow: 'hidden', background: '#f5ede2', border: '1px solid #e8e0d5',
+                    }}
+                  >
+                    {thumbnails[childId] != null ? (
+                      <img src={thumbnails[childId]} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="" draggable={false} />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', background: '#e8e0d5' }} />
+                    )}
+                  </div>
+
+                  {/* Name */}
+                  <span
+                    style={{
+                      flex: 1,
+                      color: childObj.visible ? 'var(--text-primary)' : 'var(--text-muted)',
+                      fontSize: 12,
+                      fontFamily: 'var(--font)',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {getDisplayName(childId, childOriginalIndex)}
+                  </span>
+
+                  {/* Anchor button */}
+                  {childCanBeAnchor && (
+                    <Tooltip label="Set as reference">
+                      <button
+                        draggable={false}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setAnchor(childIsAnchor ? null : childId)
+                        }}
+                        style={{
+                          flexShrink: 0, background: 'none', border: 'none',
+                          cursor: 'pointer', padding: '0 2px', lineHeight: '1',
+                          color: childIsAnchor ? '#f5a623' : '#aaaaaa',
+                          display: 'flex', alignItems: 'center',
+                        }}
+                      >
+                        <Star size={13} strokeWidth={1.5} fill={childIsAnchor ? 'gold' : 'none'} color={childIsAnchor ? 'gold' : '#aaaaaa'}/>
+                      </button>
+                    </Tooltip>
+                  )}
+
+                  {/* Lock toggle */}
+                  <Tooltip label={childObj.locked ? 'Unlock' : 'Lock'}>
+                    <button
+                      draggable={false}
+                      onClick={(e) => { e.stopPropagation(); toggleLock(childId) }}
+                      style={{
+                        flexShrink: 0, background: 'none', border: 'none',
+                        cursor: 'pointer', padding: '0 2px', lineHeight: '1',
+                        color: childObj.locked ? '#f94608' : '#aaaaaa',
+                        display: 'flex', alignItems: 'center',
+                      }}
+                    >
+                      {childObj.locked ? <Lock size={13} strokeWidth={1.5}/> : <LockOpen size={13} strokeWidth={1.5}/>}
+                    </button>
+                  </Tooltip>
+
+                  {/* Eye toggle */}
+                  <Tooltip label={childObj.visible ? 'Hide layer' : 'Show layer'}>
+                    <button
+                      draggable={false}
+                      onClick={(e) => { e.stopPropagation(); updateObject(childId, { visible: !childObj.visible }) }}
+                      style={{
+                        flexShrink: 0, background: 'none', border: 'none',
+                        cursor: 'pointer', padding: '0 2px', lineHeight: '1',
+                        color: childObj.visible ? '#f94608' : '#aaaaaa',
+                        display: 'flex', alignItems: 'center',
+                      }}
+                    >
+                      {childObj.visible ? <Eye size={13} strokeWidth={1.5}/> : <EyeOff size={13} strokeWidth={1.5}/>}
+                    </button>
+                  </Tooltip>
+                </div>
+              )
+            }).filter(Boolean)
+            return [mainRow, ...childRows]
+          }
+
+          return [mainRow]
+        })
+        })()}
       </div>
     </div>
   )

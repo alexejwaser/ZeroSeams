@@ -42,6 +42,8 @@ export interface ImageObject extends BaseCanvasObject {
   type: 'image'
   /** Data URL or resolved file path (after IPC load) */
   src: string
+  /** When true, cell has no media yet — renders placeholder */
+  isEmpty?: boolean
   /** True when background has been removed (AI-processed copy) */
   backgroundRemoved: boolean
   /** Original src before any AI processing */
@@ -193,6 +195,12 @@ export interface PathObject extends BaseCanvasObject {
 export interface GroupObject extends BaseCanvasObject {
   type: 'group'
   childIds: string[]
+  /** When true, this group was created by the grid layout engine */
+  isGrid?: boolean
+  /** Gap in canvas pixels between grid cells */
+  gridGap?: number
+  /** References the GridTemplate.id used to build this group */
+  gridTemplateId?: string
 }
 
 export interface VideoObject extends BaseCanvasObject {

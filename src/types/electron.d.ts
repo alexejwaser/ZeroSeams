@@ -43,6 +43,7 @@ interface Window {
     resolveVideoPath(relativeFilePath: string, projectFilePath: string): Promise<{ filePath: string }>
     makeRelativePath(fromDir: string, toPath: string): Promise<{ relativePath: string }>
     openVideoFile(): Promise<{ canceled: boolean; filePath?: string }>
+    openImageFile(): Promise<{ canceled: boolean; data?: string }>
     appendExportLog(line: string): Promise<void>
     clearExportLog(): Promise<void>
     getFileSize(filePath: string): Promise<{ size: number }>

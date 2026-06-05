@@ -536,6 +536,18 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
     })
   }
 
+  // Empty cell placeholder — render a muted fill rect; skip all image-loading logic.
+  if (obj.isEmpty) {
+    return (
+      <Rect
+        x={obj.frameX} y={obj.frameY}
+        width={obj.frameWidth} height={obj.frameHeight}
+        fill="#e8e0d5" stroke="#d4ccc2" strokeWidth={1}
+        listening={false}
+      />
+    )
+  }
+
   if (!image) return null
 
   const isInMultiSelect = isInMultiSelectMode && selectedIds.includes(obj.id)

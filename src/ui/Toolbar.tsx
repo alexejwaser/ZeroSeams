@@ -33,8 +33,10 @@ type PresetKey = 'draft' | 'balanced' | 'high'
 import { iconBtnStyle } from './iconBtnStyle'
 import { FrameSettingsPopover } from './FrameSettingsPopover'
 import { useExportStore } from './useExportStore'
+import { GridPicker } from './GridPicker'
+import type { GridTemplate } from '../canvas/gridTemplates'
 
-type ActiveTool = 'select' | 'text' | 'shape' | 'pen'
+type ActiveTool = 'select' | 'text' | 'shape' | 'pen' | 'grid'
 
 const CROP_ICON = (
   <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -1064,6 +1066,8 @@ export function ToolBar(): React.ReactElement {
   const addObject = useCanvasStore((s) => s.addObject)
   const objectOrder = useCanvasStore((s) => s.objectOrder)
 
+  const [gridPickerAnchor, setGridPickerAnchor] = useState<HTMLElement | null>(null)
+
   const selectedObj = selectedId != null ? objects[selectedId] : undefined
 
   function handleToolClick(tool: ActiveTool): void {
@@ -1237,6 +1241,25 @@ export function ToolBar(): React.ReactElement {
         </button>
       </Tooltip>
 
+
+      <Tooltip label="Grid">
+        <button
+          style={iconBtnStyle(activeTool === 'grid')}
+          title="Grid"
+          onClick={e => {
+            setActiveTool('grid')
+            setGridPickerAnchor(e.currentTarget)
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/>
+            <rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/>
+            <rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/>
+            <rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/>
+          </svg>
+        </button>
+      </Tooltip>
+
       {selectedObj?.type === 'image' && (
         <Tooltip label="Mask mode" description="Next stroke becomes a mask">
           <button
@@ -1255,6 +1278,17 @@ export function ToolBar(): React.ReactElement {
           </button>
         </Tooltip>
       )}
+
+      <GridPicker
+        anchorEl={gridPickerAnchor}
+        onClose={() => { setGridPickerAnchor(null); setActiveTool('select') }}
+        onSelect={(template: GridTemplate) => {
+          const { addGrid } = useCanvasStore.getState()
+          addGrid(template, 0, 0)
+          setGridPickerAnchor(null)
+          setActiveTool('select')
+        }}
+      />
 
       {activeTool === 'shape' && (
         <div
