@@ -98,7 +98,7 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
     obj.childIds.forEach((childId, i) => {
       const cell = cells[i]
       if (!cell) return
-      const child = useCanvasStore.getState().objects[childId] as ImageObject | undefined
+      const child = useCanvasStore.getState().objects[childId] as (ImageObject & VideoObject) | undefined
       if (!child) return
       const patch: Partial<ImageObject> = {
         frameX: newX + cell.x,

@@ -1975,7 +1975,7 @@ export function PropertiesPanel(): React.ReactElement {
                         const cell = cells[i]
                         if (!cell) return
                         const child = useCanvasStore.getState().objects[childId]
-                        if (!child || child.type !== 'image') return
+                        if (!child) return
                         updateObject(childId, {
                           frameX: group.x + cell.x, frameY: group.y + cell.y,
                           frameWidth: cell.w, frameHeight: cell.h,
