@@ -4,8 +4,8 @@ import { getStageInstance } from '@/canvas/CarouselStage'
 import { exportMixedFrames } from '@/canvas/exportFrames'
 import { useSaveStatusStore, type SaveStatus } from './useSaveStatusStore'
 import type { CarouselProject } from '@/types/project'
-import type { ShapeKind, VideoExportSettings } from '@/types/canvas'
-import { DEFAULT_VIDEO_EXPORT_SETTINGS } from '@/types/canvas'
+import type { ShapeKind, VideoExportSettings, ImageExportSettings, ImageFormat } from '@/types/canvas'
+import { DEFAULT_VIDEO_EXPORT_SETTINGS, DEFAULT_IMAGE_EXPORT_SETTINGS } from '@/types/canvas'
 import { relativizeVideoObjects, resolveVideoObjects } from '@/canvas/pathUtils'
 import {
   MousePointer2, Type, Square, Circle, Minus, PenTool,
@@ -293,6 +293,10 @@ export function TitleBar(): React.ReactElement {
   const [showVideoSettings, setShowVideoSettings] = useState(false)
   const [videoSettingsTab, setVideoSettingsTab] = useState<'simple' | 'advanced'>('simple')
   const [selectedPreset, setSelectedPreset] = useState<'draft' | 'balanced' | 'high'>('balanced')
+  const [filenameTemplate, setFilenameTemplate] = useState('frame_{frame}')
+  const [imageSettings, setImageSettings] = useState<ImageExportSettings>({ ...DEFAULT_IMAGE_EXPORT_SETTINGS })
+  const [exportPixelRatio, setExportPixelRatio] = useState<1 | 2 | 3>(2)
+  const [maxFileSizeUnit, setMaxFileSizeUnit] = useState<'KB' | 'MB'>('KB')
   const exporting = useExportStore((s) => s.exporting)
   const exportStatus = useExportStore((s) => s.exportStatus)
 
@@ -377,25 +381,29 @@ export function TitleBar(): React.ReactElement {
     useExportStore.setState({ cancelRequested: false })
     void window.electronAPI.clearExportLog()
     try {
+      // Pick a folder once — replaces per-frame save dialogs
+      const { folderPath, cancelled } = await window.electronAPI.showFolderDialog()
+      if (cancelled || !folderPath) {
+        return
+      }
+
       const storeObjects = useCanvasStore.getState().objects
       const results = await exportMixedFrames(
         stage, storeObjects, frameCount, frameWidth, frameHeight, start, end,
         setExportStatus,
         () => useExportStore.getState().cancelRequested,
         exportSettings,
+        imageSettings,
+        exportPixelRatio,
       )
+
+      // Write each result to the selected folder
       for (const result of results) {
         const frameNum = result.frameIndex + 1
+        const filename = filenameTemplate.replace('{frame}', String(frameNum)) + '.' + result.extension
         const base64 = await blobToBase64(result.blob)
-        if (result.type === 'mp4') {
-          const filename = `frame-${frameNum}.mp4`
-          const saveResult = await window.electronAPI.saveVideoFile(filename, base64)
-          console.log(`[export] ${filename}: ${saveResult.success ? 'saved' : 'ERROR: ' + saveResult.error}`)
-        } else {
-          const filename = `frame-${frameNum}.png`
-          const saveResult = await window.electronAPI.saveFile(filename, base64)
-          console.log(`[export] ${filename}: ${saveResult.success ? 'saved' : 'ERROR: ' + saveResult.error}`)
-        }
+        const writeResult = await window.electronAPI.writeFileToFolder(folderPath, filename, base64)
+        console.log(`[export] ${filename}: ${writeResult.success ? 'saved' : 'ERROR: ' + writeResult.error}`)
       }
     } catch (err) {
       const msg = String(err)
@@ -842,8 +850,8 @@ export function TitleBar(): React.ReactElement {
               right: 0,
               zIndex: 1000,
               marginTop: 6,
-              background: '#ffffff',
-              border: '1px solid #e8e0d5',
+              background: 'var(--bg-panel)',
+              border: '1px solid var(--border)',
               borderRadius: 16,
               boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
               padding: '12px',
@@ -860,10 +868,10 @@ export function TitleBar(): React.ReactElement {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 2,
-                background: '#f5ede2',
+                background: 'var(--bg-panel)',
                 borderRadius: 999,
                 padding: '2px',
-                border: '1px solid #e8e0d5',
+                border: '1px solid var(--border)',
               }}
             >
               {(['all', 'single', 'range'] as const).map((mode) => (
@@ -879,7 +887,7 @@ export function TitleBar(): React.ReactElement {
 
             {exportMode === 'single' && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <label style={{ color: '#555555', fontSize: 12 }}>Frame</label>
+                <label style={{ color: 'var(--text-secondary)', fontSize: 12, fontFamily: 'var(--font)' }}>Frame</label>
                 <input
                   type="number"
                   min={1}
@@ -889,11 +897,12 @@ export function TitleBar(): React.ReactElement {
                   style={{
                     width: 48,
                     height: 24,
-                    background: '#ffffff',
-                    color: '#333333',
-                    border: '1px solid #d4ccc2',
+                    background: 'var(--bg-surface)',
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--stroke)',
                     borderRadius: 6,
                     fontSize: 12,
+                    fontFamily: 'var(--font)',
                     textAlign: 'center',
                     padding: '0 4px',
                   }}
@@ -903,7 +912,7 @@ export function TitleBar(): React.ReactElement {
 
             {exportMode === 'range' && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <label style={{ color: '#555555', fontSize: 12 }}>From</label>
+                <label style={{ color: 'var(--text-secondary)', fontSize: 12, fontFamily: 'var(--font)' }}>From</label>
                 <input
                   type="number"
                   min={1}
@@ -913,16 +922,17 @@ export function TitleBar(): React.ReactElement {
                   style={{
                     width: 48,
                     height: 24,
-                    background: '#ffffff',
-                    color: '#333333',
-                    border: '1px solid #d4ccc2',
+                    background: 'var(--bg-surface)',
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--stroke)',
                     borderRadius: 6,
                     fontSize: 12,
+                    fontFamily: 'var(--font)',
                     textAlign: 'center',
                     padding: '0 4px',
                   }}
                 />
-                <label style={{ color: '#555555', fontSize: 12 }}>To</label>
+                <label style={{ color: 'var(--text-secondary)', fontSize: 12, fontFamily: 'var(--font)' }}>To</label>
                 <input
                   type="number"
                   min={1}
@@ -932,11 +942,12 @@ export function TitleBar(): React.ReactElement {
                   style={{
                     width: 48,
                     height: 24,
-                    background: '#ffffff',
-                    color: '#333333',
-                    border: '1px solid #d4ccc2',
+                    background: 'var(--bg-surface)',
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--stroke)',
                     borderRadius: 6,
                     fontSize: 12,
+                    fontFamily: 'var(--font)',
                     textAlign: 'center',
                     padding: '0 4px',
                   }}
@@ -944,10 +955,159 @@ export function TitleBar(): React.ReactElement {
               </div>
             )}
 
+            {/* ── Filename template ─────────────────────────────────────── */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <label style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: 'var(--font)' }}>
+                Filename
+              </label>
+              <input
+                type="text"
+                value={filenameTemplate}
+                onChange={e => setFilenameTemplate(e.target.value)}
+                placeholder="frame_{frame}"
+                style={{
+                  fontFamily: 'var(--font)',
+                  fontSize: 12,
+                  borderRadius: 6,
+                  border: '1px solid var(--border)',
+                  padding: '4px 8px',
+                  background: 'var(--bg-surface)',
+                  color: 'var(--text-primary)',
+                  outline: 'none',
+                }}
+              />
+              <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'var(--font)' }}>
+                Preview: {filenameTemplate.replace('{frame}', '1')}.{imageSettings.format === 'jpeg' ? 'jpg' : imageSettings.format === 'tiff' ? 'tif' : 'png'}
+              </span>
+            </div>
+
+            {/* ── Format selector ───────────────────────────────────────────── */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <label style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: 'var(--font)' }}>
+                Format
+              </label>
+              <div style={{ display: 'flex', gap: 4 }}>
+                {(['png', 'jpeg', 'tiff'] as ImageFormat[]).map(fmt => (
+                  <button
+                    key={fmt}
+                    onClick={() => setImageSettings(s => ({ ...s, format: fmt }))}
+                    style={{
+                      fontFamily: 'var(--font)',
+                      fontSize: 12,
+                      borderRadius: 999,
+                      border: imageSettings.format === fmt ? '1.5px solid var(--accent)' : '1px solid var(--stroke)',
+                      padding: '3px 10px',
+                      background: imageSettings.format === fmt ? 'var(--accent)' : 'var(--bg-surface)',
+                      color: imageSettings.format === fmt ? '#fff' : 'var(--text-secondary)',
+                      cursor: 'pointer',
+                      textTransform: 'uppercase' as const,
+                    }}
+                  >
+                    {fmt === 'jpeg' ? 'JPG' : fmt.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Quality slider (JPEG and TIFF only) ───────────────────────── */}
+            {imageSettings.format !== 'png' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <label style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: 'var(--font)' }}>
+                  Quality: {imageSettings.quality}%
+                </label>
+                <input
+                  type="range"
+                  min={0} max={100}
+                  value={imageSettings.quality}
+                  onChange={e => setImageSettings(s => ({ ...s, quality: Number(e.target.value) }))}
+                />
+              </div>
+            )}
+
+            {/* ── Max file size (JPEG only) ──────────────────────────────────── */}
+            {imageSettings.format === 'jpeg' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <label style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: 'var(--font)' }}>
+                  Max file size <span style={{ color: 'var(--text-muted)' }}>(optional)</span>
+                </label>
+                <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                  <input
+                    type="number"
+                    min={1}
+                    placeholder="—"
+                    value={imageSettings.maxFileSizeKB ?? ''}
+                    onChange={e => {
+                      const v = e.target.value === '' ? undefined : Number(e.target.value)
+                      const kb = v === undefined ? undefined : maxFileSizeUnit === 'MB' ? v * 1024 : v
+                      setImageSettings(s => ({ ...s, maxFileSizeKB: kb }))
+                    }}
+                    style={{
+                      fontFamily: 'var(--font)',
+                      fontSize: 12,
+                      borderRadius: 6,
+                      border: '1px solid var(--border)',
+                      padding: '4px 8px',
+                      background: 'var(--bg-surface)',
+                      color: 'var(--text-primary)',
+                      width: 70,
+                      outline: 'none',
+                    }}
+                  />
+                  <select
+                    value={maxFileSizeUnit}
+                    onChange={e => setMaxFileSizeUnit(e.target.value as 'KB' | 'MB')}
+                    style={{
+                      fontFamily: 'var(--font)',
+                      fontSize: 12,
+                      borderRadius: 6,
+                      border: '1px solid var(--border)',
+                      padding: '4px 6px',
+                      background: 'var(--bg-surface)',
+                      color: 'var(--text-secondary)',
+                      outline: 'none',
+                    }}
+                  >
+                    <option value="KB">KB</option>
+                    <option value="MB">MB</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {/* ── Resolution ────────────────────────────────────────────────── */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <label style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: 'var(--font)' }}>
+                Resolution
+              </label>
+              <div style={{ display: 'flex', gap: 4 }}>
+                {([1, 2, 3] as const).map(r => (
+                  <button
+                    key={r}
+                    onClick={() => setExportPixelRatio(r)}
+                    style={{
+                      fontFamily: 'var(--font)',
+                      fontSize: 12,
+                      borderRadius: 999,
+                      border: exportPixelRatio === r ? '1.5px solid var(--accent)' : '1px solid var(--stroke)',
+                      padding: '3px 10px',
+                      background: exportPixelRatio === r ? 'var(--accent)' : 'var(--bg-surface)',
+                      color: exportPixelRatio === r ? '#fff' : 'var(--text-secondary)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {r}×
+                  </button>
+                ))}
+              </div>
+              <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'var(--font)' }}>
+                {frameWidth * exportPixelRatio} × {frameHeight * exportPixelRatio} px
+              </span>
+            </div>
+
             {hasVideoInRange && (
               <div
                 style={{
-                  borderTop: '1px solid #e8e0d5',
+                  borderTop: '1px solid var(--border)',
                   paddingTop: 8,
                   display: 'flex',
                   flexDirection: 'column',
@@ -969,18 +1129,19 @@ export function TitleBar(): React.ReactElement {
                 >
                   <span
                     style={{
-                      color: '#555555',
+                      color: 'var(--text-secondary)',
                       fontSize: 11,
                       fontWeight: 'bold',
                       letterSpacing: '0.06em',
                       textTransform: 'uppercase',
+                      fontFamily: 'var(--font)',
                     }}
                   >
                     Video Settings
                   </span>
                   {showVideoSettings
-                    ? <ChevronUp size={13} color="#aaaaaa" strokeWidth={1.5}/>
-                    : <ChevronDown size={13} color="#aaaaaa" strokeWidth={1.5}/>}
+                    ? <ChevronUp size={13} style={{ color: 'var(--text-muted)' }} strokeWidth={1.5}/>
+                    : <ChevronDown size={13} style={{ color: 'var(--text-muted)' }} strokeWidth={1.5}/>}
                 </button>
 
                 {showVideoSettings && (
@@ -1011,8 +1172,8 @@ export function TitleBar(): React.ReactElement {
               disabled={exporting}
               style={{
                 height: 32,
-                background: exporting ? '#aaaaaa' : '#f94608',
-                color: '#fff',
+                background: exporting ? 'var(--text-muted)' : 'var(--accent)',
+                color: 'var(--bg-surface)',
                 border: exporting ? 'none' : '1px solid #000000',
                 borderRadius: 999,
                 cursor: exporting ? 'default' : 'pointer',

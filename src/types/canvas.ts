@@ -278,4 +278,23 @@ export const DEFAULT_VIDEO_EXPORT_SETTINGS: VideoExportSettings = {
   frameRate: 'source',
 }
 
+export type ImageFormat = 'png' | 'jpeg' | 'tiff'
+
+export interface ImageExportSettings {
+  format: ImageFormat
+  /** 0–100; used for JPEG and TIFF */
+  quality: number
+  /** Optional KB cap; JPEG only — encoder reduces quality until under budget */
+  maxFileSizeKB?: number
+}
+
+export const DEFAULT_IMAGE_EXPORT_SETTINGS: ImageExportSettings = {
+  format: 'png',
+  quality: 90,
+}
+
+export type ExportResult =
+  | { frameIndex: number; type: 'png' | 'jpeg' | 'tiff'; blob: Blob; extension: string }
+  | { frameIndex: number; type: 'mp4'; blob: Blob; extension: string }
+
 export type CanvasObject = ImageObject | TextObject | ShapeObject | GroupObject | PathObject | VideoObject

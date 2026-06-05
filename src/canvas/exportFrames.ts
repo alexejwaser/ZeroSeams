@@ -1,10 +1,11 @@
 import type Konva from 'konva'
-import type { CanvasObject, VideoObject, VideoExportSettings } from '../types/canvas'
+import UTIF from 'utif'
+import type { CanvasObject, VideoObject, VideoExportSettings, ImageExportSettings, ExportResult } from '../types/canvas'
 import { getVideoElement } from './videoElementRegistry'
 import { encodeVideoFrames, encodeVideoWithAudio } from './videoExport'
 
 /**
- * Exports each carousel frame as a PNG Blob at 2x pixel ratio (2160×2160 for
+ * Exports each carousel frame as a PNG/JPEG/TIFF Blob at 2x pixel ratio (2160×2160 for
  * 1080×1080 frames).
  *
  * Konva v9 stage.toCanvas() does not support cropping via { x, y, width, height }
@@ -13,6 +14,11 @@ import { encodeVideoFrames, encodeVideoWithAudio } from './videoExport'
  *   2. Call stage.toCanvas({ pixelRatio: 2 }) to get the full canvas at 2x.
  *   3. Crop each frame manually using Canvas 2D drawImage.
  *   4. Restore stage to its display state in the finally block.
+ *
+ * Format behaviour:
+ *   - 'png'  → lossless, extension 'png'
+ *   - 'jpeg' → lossy; if maxFileSizeKB is set, quality is stepped down until under budget; extension 'jpg'
+ *   - 'tiff' → lossless via UTIF.encodeImage; extension 'tif'
  */
 export async function exportFrames(
   stage: Konva.Stage,
@@ -21,7 +27,9 @@ export async function exportFrames(
   frameHeight: number,
   startFrame = 0,
   endFrame = frameCount - 1,
-): Promise<Blob[]> {
+  imageSettings?: ImageExportSettings,
+  pixelRatio = 2,
+): Promise<Array<{ blob: Blob; extension: string }>> {
   // 1. Hide Transformer handles so selection UI is absent from export
   const transformers = stage.find<Konva.Transformer>('Transformer')
   transformers.forEach((t) => t.hide())
@@ -56,16 +64,18 @@ export async function exportFrames(
   stage.y(0)
   stage.draw()
 
-  const blobs: Blob[] = []
+  const results: Array<{ blob: Blob; extension: string }> = []
 
   try {
-    // Render the full canvas once at 2x. stage.toCanvas({ x, y, width, height })
+    // Render the full canvas once at the requested pixel ratio. stage.toCanvas({ x, y, width, height })
     // in Konva v9 does NOT crop — it always outputs the full stage dimensions.
     // Instead we export the whole thing and crop each frame manually via drawImage.
-    const PIXEL_RATIO = 2
+    const PIXEL_RATIO = pixelRatio
     const fullCanvas = stage.toCanvas({ pixelRatio: PIXEL_RATIO })
     // fullCanvas is now (frameCount * frameWidth * PIXEL_RATIO) × (frameHeight * PIXEL_RATIO)
     console.log('[export] fullCanvas:', fullCanvas.width, '×', fullCanvas.height)
+
+    const format = imageSettings?.format ?? 'png'
 
     for (let i = startFrame; i <= endFrame; i++) {
       const cropCanvas = document.createElement('canvas')
@@ -83,12 +93,39 @@ export async function exportFrames(
         frameWidth * PIXEL_RATIO, frameHeight * PIXEL_RATIO, // dest size
       )
 
-      const blob = await new Promise<Blob | null>((resolve) => {
-        cropCanvas.toBlob((b) => resolve(b), 'image/png')
-      })
+      let blob: Blob
+      let extension: string
 
-      console.log(`[export] frame ${i}: src x=${i * frameWidth * PIXEL_RATIO} blob=${blob ? blob.size : 'NULL'}`)
-      if (blob) blobs.push(blob)
+      if (format === 'jpeg') {
+        let q = (imageSettings?.quality ?? 90) / 100
+        let dataUrl = cropCanvas.toDataURL('image/jpeg', q)
+        if (imageSettings?.maxFileSizeKB) {
+          const maxBytes = imageSettings.maxFileSizeKB * 1024
+          while (dataUrl.length * 0.75 > maxBytes && q > 0.1) {
+            q = Math.max(q - 0.05, 0.1)
+            dataUrl = cropCanvas.toDataURL('image/jpeg', q)
+          }
+        }
+        const res = await fetch(dataUrl)
+        blob = await res.blob()
+        extension = 'jpg'
+      } else if (format === 'tiff') {
+        const imgData = ctx.getImageData(0, 0, cropCanvas.width, cropCanvas.height)
+        const tiffBuffer = UTIF.encodeImage(new Uint8Array(imgData.data.buffer), cropCanvas.width, cropCanvas.height)
+        blob = new Blob([tiffBuffer], { type: 'image/tiff' })
+        extension = 'tif'
+      } else {
+        // Default: PNG
+        const pngBlob = await new Promise<Blob | null>((resolve) => {
+          cropCanvas.toBlob((b) => resolve(b), 'image/png')
+        })
+        if (!pngBlob) throw new Error(`PNG blob was null for frame ${i}`)
+        blob = pngBlob
+        extension = 'png'
+      }
+
+      console.log(`[export] frame ${i}: src x=${i * frameWidth * PIXEL_RATIO} format=${format} blob=${blob.size}`)
+      results.push({ blob, extension })
     }
   } finally {
     // Restore stage to display state
@@ -106,13 +143,15 @@ export async function exportFrames(
     textNodes.forEach((n) => n.opacity(0))
   }
 
-  return blobs
+  return results
 }
 
 /**
- * Saves each frame PNG to ~/Downloads via Electron IPC.
+ * Saves each frame to ~/Downloads via Electron IPC.
  * Anchor-click downloads are blocked by Electron's Chromium for multi-file
  * sequences — IPC + fs.writeFile is the reliable alternative.
+ *
+ * @deprecated Prefer exportMixedFrames which handles video frames too.
  */
 export async function downloadFrames(blobs: Blob[]): Promise<void> {
   for (let i = 0; i < blobs.length; i++) {
@@ -136,10 +175,6 @@ export async function downloadFrames(blobs: Blob[]): Promise<void> {
   }
 }
 
-export type ExportResult =
-  | { frameIndex: number; type: 'png'; blob: Blob }
-  | { frameIndex: number; type: 'mp4'; blob: Blob }
-
 const EXPORT_FPS = 30
 
 async function captureVideoFrameSequence(
@@ -152,8 +187,9 @@ async function captureVideoFrameSequence(
   videoElements: HTMLVideoElement[],
   onFrame?: (f: number) => void,
   clipStart = 0,
+  pixelRatio = 2,
 ): Promise<Blob[]> {
-  const PIXEL_RATIO = 1
+  const PIXEL_RATIO = pixelRatio
   const totalFrames = Math.ceil(durationSeconds * fps)
   const pngBlobs: Blob[] = []
 
@@ -203,6 +239,8 @@ export async function exportMixedFrames(
   onStatus?: (msg: string) => void,
   isCancelled?: () => boolean,
   exportSettings?: VideoExportSettings,
+  imageSettings?: ImageExportSettings,
+  pixelRatio = 2,
 ): Promise<ExportResult[]> {
   const start = startFrame ?? 0
   const end = endFrame ?? frameCount - 1
@@ -236,8 +274,12 @@ export async function exportMixedFrames(
 
   const results: ExportResult[] = []
 
+  // Derive the extension for static frames once, so the loop doesn't repeat it
+  const imageFormat = imageSettings?.format ?? 'png'
+  const imageExtension = imageFormat === 'jpeg' ? 'jpg' : imageFormat === 'tiff' ? 'tif' : 'png'
+
   try {
-    const PIXEL_RATIO = 2
+    const PIXEL_RATIO = pixelRatio
 
     for (let i = start; i <= end; i++) {
       if (isCancelled?.()) throw new Error('Export cancelled')
@@ -253,7 +295,7 @@ export async function exportMixedFrames(
       )
 
       if (videoObjectsInFrame.length === 0) {
-        // Static frame — PNG export
+        // Static frame — export with requested image format
         const fullCanvas = stage.toCanvas({ pixelRatio: PIXEL_RATIO })
         const cropCanvas = document.createElement('canvas')
         cropCanvas.width = frameWidth * PIXEL_RATIO
@@ -267,10 +309,34 @@ export async function exportMixedFrames(
           0, 0,
           frameWidth * PIXEL_RATIO, frameHeight * PIXEL_RATIO,
         )
-        const blob = await new Promise<Blob | null>((resolve) => {
-          cropCanvas.toBlob((b) => resolve(b), 'image/png')
-        })
-        if (blob) results.push({ frameIndex: i, type: 'png', blob })
+
+        let blob: Blob
+
+        if (imageFormat === 'jpeg') {
+          let q = (imageSettings?.quality ?? 90) / 100
+          let dataUrl = cropCanvas.toDataURL('image/jpeg', q)
+          if (imageSettings?.maxFileSizeKB) {
+            const maxBytes = imageSettings.maxFileSizeKB * 1024
+            while (dataUrl.length * 0.75 > maxBytes && q > 0.1) {
+              q = Math.max(q - 0.05, 0.1)
+              dataUrl = cropCanvas.toDataURL('image/jpeg', q)
+            }
+          }
+          const res = await fetch(dataUrl)
+          blob = await res.blob()
+        } else if (imageFormat === 'tiff') {
+          const imgData = ctx.getImageData(0, 0, cropCanvas.width, cropCanvas.height)
+          const tiffBuffer = UTIF.encodeImage(new Uint8Array(imgData.data.buffer), cropCanvas.width, cropCanvas.height)
+          blob = new Blob([tiffBuffer], { type: 'image/tiff' })
+        } else {
+          const pngBlob = await new Promise<Blob | null>((resolve) => {
+            cropCanvas.toBlob((b) => resolve(b), 'image/png')
+          })
+          if (!pngBlob) throw new Error(`PNG blob was null for frame ${i}`)
+          blob = pngBlob
+        }
+
+        results.push({ frameIndex: i, type: imageFormat, blob, extension: imageExtension })
       } else {
         // Video frame — capture frame sequence and encode to MP4
         onStatus?.(`Rendering video frame ${i + 1}…`)
@@ -317,6 +383,7 @@ export async function exportMixedFrames(
           videoEls,
           (f) => onStatus?.(`Capturing frame ${i + 1} (${f}/${totalFramesToCapture})…`),
           clipStart,
+          PIXEL_RATIO,
         )
         console.log(`[exportFrames] frame ${i}: captured ${pngBlobs.length} PNG blobs`)
 
@@ -327,11 +394,11 @@ export async function exportMixedFrames(
         const audioSource = videoObjectsInFrame.find((obj) => !obj.muted)
         let mp4Blob: Blob
         if (audioSource) {
-          mp4Blob = await encodeVideoWithAudio(pngBlobs, EXPORT_FPS, frameWidth, frameHeight, audioSource.filePath, onStatus, exportSettings, audioSource.volume)
+          mp4Blob = await encodeVideoWithAudio(pngBlobs, EXPORT_FPS, frameWidth * PIXEL_RATIO, frameHeight * PIXEL_RATIO, audioSource.filePath, onStatus, exportSettings, audioSource.volume)
         } else {
-          mp4Blob = await encodeVideoFrames(pngBlobs, EXPORT_FPS, frameWidth, frameHeight, onStatus, exportSettings)
+          mp4Blob = await encodeVideoFrames(pngBlobs, EXPORT_FPS, frameWidth * PIXEL_RATIO, frameHeight * PIXEL_RATIO, onStatus, exportSettings)
         }
-        results.push({ frameIndex: i, type: 'mp4', blob: mp4Blob })
+        results.push({ frameIndex: i, type: 'mp4', blob: mp4Blob, extension: 'mp4' })
       }
     }
   } finally {

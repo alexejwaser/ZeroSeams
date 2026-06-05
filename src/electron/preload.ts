@@ -59,4 +59,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('make-relative-path', { fromDir, toPath }),
   getFileSize: (filePath: string): Promise<{ size: number }> =>
     ipcRenderer.invoke('get-file-size', { filePath }),
+  showFolderDialog: (): Promise<{ folderPath?: string; cancelled: boolean }> =>
+    ipcRenderer.invoke('show-folder-dialog'),
+  writeFileToFolder: (folderPath: string, filename: string, base64: string): Promise<{ success: boolean; error?: string }> =>
+    ipcRenderer.invoke('write-file-to-folder', folderPath, filename, base64),
 })

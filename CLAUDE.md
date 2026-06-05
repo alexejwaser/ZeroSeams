@@ -93,9 +93,12 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `CarouselStage.tsx` imports `@/canvas/effects` as a side-effect to register all effects at startup
 
 **Export** (`src/canvas/exportFrames.ts`):
-- `stage.x()` and `stage.y()` MUST be reset to 0 before `toCanvas()` — non-zero pan offsets shift all content and break `i * frameWidth * 2` crop math
+- `stage.x()` and `stage.y()` MUST be reset to 0 before `toCanvas()` — non-zero pan offsets shift all content and break `i * frameWidth * pixelRatio` crop math
 - Hides Transformers + `guides` layer + `frame-dividers` layer before render; restores in `finally`
 - Background fills live in dedicated `background` layer (not `guides`) — ensures they appear in exported PNGs
+- `pixelRatio` (default 2) is threaded as a parameter through `exportFrames`, `captureVideoFrameSequence`, and `exportMixedFrames` — never hardcode it; user controls it via the export dialog `1×/2×/3×` selector
+- Batch export: single `show-folder-dialog` IPC call → all frames written via `write-file-to-folder`; no per-frame save dialog
+- `ImageExportSettings` (`src/types/canvas.ts`) controls format (png/jpeg/tiff), quality (0–100), and optional `maxFileSizeKB` cap (JPEG only — quality iterated down in steps of 5)
 
 **Video Layer** (`CanvasVideoNode.tsx`):
 - Frame/content model identical to ImageObject; extra fields: `trimStart/trimEnd`, `loop`, `startOffset`, `volume`, `posterFrame`, `mask`

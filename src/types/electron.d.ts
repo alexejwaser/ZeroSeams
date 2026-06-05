@@ -47,5 +47,7 @@ interface Window {
     appendExportLog(line: string): Promise<void>
     clearExportLog(): Promise<void>
     getFileSize(filePath: string): Promise<{ size: number }>
+    showFolderDialog(): Promise<{ folderPath?: string; cancelled: boolean }>
+    writeFileToFolder(folderPath: string, filename: string, base64: string): Promise<{ success: boolean; error?: string }>
   }
 }

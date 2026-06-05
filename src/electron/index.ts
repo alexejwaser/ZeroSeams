@@ -383,6 +383,25 @@ ipcMain.handle('clear-export-log', async () => {
   await writeFile(EXPORT_LOG, '--- new export ---\n')
 })
 
+ipcMain.handle('show-folder-dialog', async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory', 'createDirectory'],
+    title: 'Choose export folder',
+  })
+  return { folderPath: result.filePaths[0], cancelled: result.canceled }
+})
+
+ipcMain.handle('write-file-to-folder', async (_event, folderPath: string, filename: string, base64: string) => {
+  try {
+    const filePath = join(folderPath, filename)
+    const buffer = Buffer.from(base64, 'base64')
+    await writeFile(filePath, buffer)
+    return { success: true }
+  } catch (err: any) {
+    return { success: false, error: err.message }
+  }
+})
+
 ipcMain.handle('get-file-size', async (_event, { filePath }: { filePath: string }) => {
   try {
     const { size } = await stat(filePath)

@@ -168,6 +168,9 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
           </button>
         ))}
       </div>
+      <div style={{ fontSize: 11, color: '#aaaaaa', fontFamily: 'var(--font)', marginTop: 5 }}>
+        {frameWidth} × {frameHeight} px
+      </div>
 
       {platform === 'custom' && (
         <>
