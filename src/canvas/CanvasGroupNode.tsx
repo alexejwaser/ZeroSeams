@@ -9,6 +9,25 @@ import { useSnapGuides } from './useSnapGuides'
 import { GRID_TEMPLATES } from './gridTemplates'
 import { CANVAS_SCALE } from './constants'
 
+// Returns the childId whose frame bounds contain the given logical canvas point.
+function hitTestCell(
+  obj: GroupObject,
+  logicalX: number,
+  logicalY: number,
+): string | undefined {
+  const state = useCanvasStore.getState()
+  return obj.childIds.find((cid) => {
+    const cell = state.objects[cid] as ImageObject | undefined
+    if (!cell) return false
+    return (
+      logicalX >= cell.frameX &&
+      logicalX <= cell.frameX + cell.frameWidth &&
+      logicalY >= cell.frameY &&
+      logicalY <= cell.frameY + cell.frameHeight
+    )
+  })
+}
+
 interface CanvasGroupNodeProps {
   id: string
   onGuidesChange: (guides: SnapGuide[]) => void
@@ -32,6 +51,11 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
   const panX = useViewportStore((s) => s.panX)
   const panY = useViewportStore((s) => s.panY)
   const zoom = useViewportStore((s) => s.zoom)
+
+  // True when any child cell is individually selected (user has "entered" the grid).
+  // In that state the group rect steps back (listening=false) so the cell's own
+  // transformer and drag handles take over without interference.
+  const isCellSelected = useCanvasStore((s) => obj.childIds.includes(s.selectedId ?? ''))
 
   const { computeSnap, computeSnapResize, startSnapSession, endSnapSession } = useSnapGuides()
 
@@ -187,18 +211,31 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
         width={obj.width}
         height={obj.height}
         fill="transparent"
-        stroke={isSelected ? '#f94608' : 'transparent'}
-        strokeWidth={isSelected ? 1 : 0}
+        stroke={isSelected && !isCellSelected ? '#f94608' : 'transparent'}
+        strokeWidth={isSelected && !isCellSelected ? 1 : 0}
         strokeScaleEnabled={false}
-        draggable={!obj.locked}
+        // Stop listening when a child cell is entered — let cell's own handlers take over
+        listening={!obj.locked && !isCellSelected}
+        draggable={!obj.locked && !isCellSelected}
         rotation={obj.rotation ?? 0}
         onClick={() => setSelected(id)}
         onTap={() => setSelected(id)}
+        onDblClick={(e) => {
+          // Double-click enters the group: find which cell was hit and select it
+          const stage = e.target.getStage()
+          if (!stage) return
+          const pos = stage.getPointerPosition()
+          if (!pos) return
+          const scale = CANVAS_SCALE * zoom
+          const logicalX = (pos.x - panX) / scale
+          const logicalY = (pos.y - panY) / scale
+          const hitCell = hitTestCell(obj, logicalX, logicalY)
+          if (hitCell) setSelected(hitCell)
+        }}
         onDragStart={handleDragStart}
         onDragMove={handleDragMove}
         onDragEnd={handleDragEnd}
         onTransformEnd={handleTransformEnd}
-        listening={!obj.locked}
       />
       {isSelected && (
         <Transformer

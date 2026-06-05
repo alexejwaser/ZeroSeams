@@ -1301,6 +1301,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
             id: cellId,
             type: 'image',
             isEmpty: true,
+            parentGroupId: groupId,
             src: '',
             backgroundRemoved: false,
             frameX: canvasX + cell.x,
@@ -1347,27 +1348,33 @@ export const useCanvasStore = create<CanvasState>((set) => {
           (o) => o.type === 'group' && (o as GroupObject).childIds.includes(cellId),
         ) as GroupObject | undefined
 
+        // Propagate parentGroupId from the old cell so filled cells still route clicks to group
+        const oldCell = state.objects[cellId]
+        const parentGroupId = (oldCell as ImageObject | undefined)?.parentGroupId ?? parentGroup?.id
+        const replacementWithParent: CanvasObject =
+          parentGroupId ? { ...replacement, parentGroupId } as CanvasObject : replacement
+
         const updatedObjects = { ...state.objects }
         delete updatedObjects[cellId]
-        updatedObjects[replacement.id] = replacement
+        updatedObjects[replacementWithParent.id] = replacementWithParent
 
         // Splice the new id into the parent group's childIds at the same position
         if (parentGroup) {
           const idx = parentGroup.childIds.indexOf(cellId)
           const newChildIds = [...parentGroup.childIds]
-          newChildIds[idx] = replacement.id
+          newChildIds[idx] = replacementWithParent.id
           updatedObjects[parentGroup.id] = { ...parentGroup, childIds: newChildIds }
         }
 
-        // Replace cellId with replacement.id in objectOrder
-        const newOrder = state.objectOrder.map((id) => (id === cellId ? replacement.id : id))
+        // Replace cellId with replacementWithParent.id in objectOrder
+        const newOrder = state.objectOrder.map((id) => (id === cellId ? replacementWithParent.id : id))
 
         // Update src vault for image replacements (keeps base64 out of history snapshots)
         let nextVault = state._srcVault
-        if (replacement.type === 'image') {
-          const img = replacement as ImageObject
+        if (replacementWithParent.type === 'image') {
+          const img = replacementWithParent as ImageObject
           nextVault = new Map(state._srcVault)
-          nextVault.set(replacement.id, { src: img.src, originalSrc: img.originalSrc })
+          nextVault.set(replacementWithParent.id, { src: img.src, originalSrc: img.originalSrc })
         }
 
         return {

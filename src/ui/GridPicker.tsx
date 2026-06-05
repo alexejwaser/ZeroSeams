@@ -20,7 +20,7 @@ export function GridPicker({ anchorEl, onClose, onSelect }: GridPickerProps): Re
     }
     const rect = anchorEl.getBoundingClientRect()
     const popoverW = 340
-    const popoverH = 420 // generous estimate: title + 6 rows of 4 thumbnails + padding
+    const popoverH = Math.min(680, window.innerHeight - 80) // 6 rows of thumbnails
 
     let top = rect.bottom + 6
     let left = rect.left
@@ -76,6 +76,8 @@ export function GridPicker({ anchorEl, onClose, onSelect }: GridPickerProps): Re
         width: 340,
         boxSizing: 'border-box',
         fontFamily: 'var(--font)',
+        maxHeight: 'calc(100vh - 80px)',
+        overflowY: 'auto',
       }}
     >
       {/* Title */}
@@ -85,6 +87,10 @@ export function GridPicker({ anchorEl, onClose, onSelect }: GridPickerProps): Re
           fontWeight: 600,
           color: 'var(--text-primary)',
           marginBottom: 10,
+          position: 'sticky',
+          top: 0,
+          background: 'var(--bg-panel)',
+          paddingBottom: 4,
         }}
       >
         Grid

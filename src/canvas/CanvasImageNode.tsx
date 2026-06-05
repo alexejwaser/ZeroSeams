@@ -81,6 +81,11 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
 
   const isInMultiSelectMode = selectedIds.length > 1
   const isAnchor = anchorId === id
+  // For grid cells: single-click selects the parent group; double-click enters the cell
+  const isParentGroupSelected = useCanvasStore(
+    (s) => obj.parentGroupId != null && s.selectedId === obj.parentGroupId,
+  )
+  const isGridCell = obj.parentGroupId != null
   const { computeSnap, computeSnapResize, snapRotation, startSnapSession, endSnapSession } = useSnapGuides()
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
 
@@ -806,8 +811,13 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
         strokeEnabled={obj.contentEditMode || isInMultiSelect}
         strokeScaleEnabled={false}
         perfectDrawEnabled={false}
-        draggable={!obj.locked && !obj.contentEditMode && !obj.maskEditMode && !isDrawTarget && !isInMultiSelectMode && !(maskModeActive && isSelected && (activeTool === 'shape' || activeTool === 'pen'))}
-        listening={!obj.contentEditMode && !obj.maskEditMode && !isDrawTarget}
+        draggable={!obj.locked && !obj.contentEditMode && !obj.maskEditMode && !isDrawTarget && !isInMultiSelectMode && !isGridCell && !(maskModeActive && isSelected && (activeTool === 'shape' || activeTool === 'pen'))}
+        listening={
+          !obj.contentEditMode && !obj.maskEditMode && !isDrawTarget &&
+          // When a grid cell's parent group is selected (but this cell isn't entered yet),
+          // pass all events through to the group's hit rect underneath.
+          !(isGridCell && isParentGroupSelected && !isSelected)
+        }
         onMouseDown={(e) => {
           if (isInMultiSelectMode) {
             rectMouseDownPosRef.current = { x: e.evt.clientX, y: e.evt.clientY }
@@ -826,6 +836,9 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
                 if (Math.sqrt(dx * dx + dy * dy) > 3) return
               }
               setAnchor(anchorId === obj.id ? null : obj.id)
+            } else if (isGridCell && !isParentGroupSelected && !isSelected && obj.parentGroupId) {
+              // Single click on a grid cell when group isn't yet selected → select the group
+              useCanvasStore.getState().setSelected(obj.parentGroupId)
             } else {
               useCanvasStore.getState().setSelected(id)
             }

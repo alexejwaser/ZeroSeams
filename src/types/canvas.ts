@@ -44,6 +44,8 @@ export interface ImageObject extends BaseCanvasObject {
   src: string
   /** When true, cell has no media yet — renders placeholder */
   isEmpty?: boolean
+  /** Set on cells created by addGrid — routes single-click to the parent group */
+  parentGroupId?: string
   /** True when background has been removed (AI-processed copy) */
   backgroundRemoved: boolean
   /** Original src before any AI processing */
