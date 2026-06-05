@@ -128,6 +128,7 @@ interface CanvasState {
   // actions
   addObject: (obj: CanvasObject) => void
   updateObject: (id: string, patch: Partial<CanvasObject>) => void
+  updateObjects: (patches: Record<string, Partial<CanvasObject>>) => void
   commitUpdate: (id: string, patch: Partial<CanvasObject>) => void
   removeObject: (id: string) => void
   setSelected: (id: string | null) => void
@@ -337,6 +338,22 @@ export const useCanvasStore = create<CanvasState>((set) => {
           },
           _openEditModeCount: state._openEditModeCount + countDelta,
         }
+      }),
+
+    updateObjects: (patches) =>
+      set((state) => {
+        const updatedObjects = { ...state.objects }
+        let countDelta = 0
+        for (const [id, patch] of Object.entries(patches)) {
+          const existing = state.objects[id]
+          if (!existing) continue
+          const newObj = { ...existing, ...patch } as CanvasObject
+          updatedObjects[id] = newObj
+          const wasOpen = isInEditMode(existing)
+          const isOpen = isInEditMode(newObj)
+          countDelta += (!wasOpen && isOpen) ? 1 : (wasOpen && !isOpen) ? -1 : 0
+        }
+        return { objects: updatedObjects, _openEditModeCount: state._openEditModeCount + countDelta }
       }),
 
     commitUpdate: (id, patch) =>

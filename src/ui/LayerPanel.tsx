@@ -4,7 +4,7 @@ import { useThumbnailStore } from '@/canvas/useThumbnailStore'
 import type { CanvasObject, CanvasObjectType, GroupObject, ImageObject, VideoObject } from '@/types/canvas'
 import Tooltip from './Tooltip'
 import { iconBtnStyle } from './iconBtnStyle'
-import { Link2, Star, Lock, LockOpen, Eye, EyeOff, Volume2, VolumeX } from 'lucide-react'
+import { Link2, Star, Lock, LockOpen, Eye, EyeOff, Volume2, VolumeX, ChevronDown, ChevronRight } from 'lucide-react'
 
 function typeLabel(type: CanvasObjectType): string {
   switch (type) {
@@ -216,7 +216,7 @@ export function LayerPanel(): React.ReactElement {
                     fontSize: 9,
                   }}
                 >
-                  {isExpanded ? '▼' : '▶'}
+                  {isExpanded ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
                 </button>
               )}
               {/* Thumbnail(s) — dual if image has a mask */}

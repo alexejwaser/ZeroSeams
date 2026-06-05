@@ -620,8 +620,6 @@ export function CarouselStage(): React.ReactElement {
           </div>
         )
       })}
-      {/* Empty grid cell +image/+video buttons — absolute-positioned over the canvas */}
-      <GridCellOverlay />
       <Stage
         ref={stageRef}
         width={containerSize.width}
@@ -1203,7 +1201,7 @@ export function CarouselStage(): React.ReactElement {
               )
             }
             if (type === 'group') {
-              return <CanvasGroupNode key={id} id={id} />
+              return <CanvasGroupNode key={id} id={id} onGuidesChange={setActiveGuides} />
             }
             return null
           })}
@@ -1485,6 +1483,9 @@ export function CarouselStage(): React.ReactElement {
           />
         </Layer>
       </Stage>
+
+      {/* Empty grid cell +image/+video buttons — rendered after Stage so they sit above the canvas */}
+      <GridCellOverlay />
 
       {/* Zoom indicator badge */}
       <div style={{
