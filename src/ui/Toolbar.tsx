@@ -303,8 +303,10 @@ export function TitleBar(): React.ReactElement {
   const togglePreviewMode = useCanvasStore((s) => s.togglePreviewMode)
   const objects = useCanvasStore((s) => s.objects)
 
-  const [showFrameSettings, setShowFrameSettings] = useState(false)
-  const [exportOpen, setExportOpen] = useState(false)
+  const showFrameSettings = useCanvasStore((s) => s.showFrameSettings)
+  const setShowFrameSettings = useCanvasStore((s) => s.setShowFrameSettings)
+  const exportOpen = useCanvasStore((s) => s.exportOpen)
+  const setExportOpen = useCanvasStore((s) => s.setExportOpen)
   const [exportMode, setExportMode] = useState<'all' | 'single' | 'range'>('all')
   const [exportSingle, setExportSingle] = useState(1)
   const [exportFrom, setExportFrom] = useState(1)
@@ -743,20 +745,22 @@ export function TitleBar(): React.ReactElement {
 
       {/* Frame Settings */}
       <div style={{ position: 'relative' }}>
-        <button
-          onClick={() => setShowFrameSettings(v => !v)}
-          style={{
-            ...iconBtnStyle(showFrameSettings),
-            width: 'auto',
-            padding: '0 10px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-          }}
-        >
-          <LayoutTemplate size={15} strokeWidth={1.5}/>
-          <span style={{ fontSize: 12, fontFamily: 'var(--font)' }}>Frame Settings</span>
-        </button>
+        <Tooltip label="Frame Settings" shortcut="F">
+          <button
+            onClick={() => setShowFrameSettings(v => !v)}
+            style={{
+              ...iconBtnStyle(showFrameSettings),
+              width: 'auto',
+              padding: '0 10px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+            }}
+          >
+            <LayoutTemplate size={15} strokeWidth={1.5}/>
+            <span style={{ fontSize: 12, fontFamily: 'var(--font)' }}>Frame Settings</span>
+          </button>
+        </Tooltip>
         {showFrameSettings && <FrameSettingsPopover onClose={() => setShowFrameSettings(false)}/>}
       </div>
 
@@ -765,7 +769,7 @@ export function TitleBar(): React.ReactElement {
       {/* Frame count */}
       <span style={{ color: '#555555', fontSize: 13, fontFamily: 'var(--font)' }}>Frames:</span>
       <div style={{ display: 'flex', alignItems: 'center', background: '#ffffff', border: '1px solid #d4ccc2', borderRadius: 999, padding: '2px 6px', gap: 4 }}>
-        <Tooltip label="Remove frame">
+        <Tooltip label="Remove frame" shortcut="⌘←">
           <button
             onClick={handleMinus}
             disabled={frameCount <= 1}
@@ -798,7 +802,7 @@ export function TitleBar(): React.ReactElement {
         >
           {frameCount}
         </span>
-        <Tooltip label="Add frame">
+        <Tooltip label="Add frame" shortcut="⌘→">
           <button
             onClick={handlePlus}
             disabled={frameCount >= 10}
@@ -837,7 +841,7 @@ export function TitleBar(): React.ReactElement {
 
       {/* Export */}
       <div ref={exportWrapperRef} style={{ position: 'relative' }}>
-        <Tooltip label="Export">
+        <Tooltip label="Export" shortcut="⌘E">
           <button
             className="btn-raised"
             onClick={() => { setExportOpen((v) => !v) }}
@@ -1539,10 +1543,9 @@ export function ToolBar(): React.ReactElement {
       )}
 
       {selectedObj?.type === 'image' && (
-        <Tooltip label="Mask mode" description="Next stroke becomes a mask">
+        <Tooltip label="Mask mode" shortcut="M" description="Next stroke becomes a mask">
           <button
             style={iconBtnStyle(maskModeActive)}
-            title="Mask mode — next stroke becomes a mask"
             onClick={() => {
               setMaskModeActive(false)
               setSelected(null)

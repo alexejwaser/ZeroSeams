@@ -247,9 +247,9 @@ export function LayerPanel(): React.ReactElement {
                     <Link2 size={11} strokeWidth={1.5}/>
                   </span>
                   {/* Mask thumbnail */}
+                  <Tooltip label="Edit mask">
                   <div
                     onClick={(e) => { e.stopPropagation(); enterMaskEditMode(id) }}
-                    title="Click to edit mask"
                     style={{
                       width: 24, height: 24, borderRadius: 3, overflow: 'hidden',
                       background: '#f5ede2', border: '1px solid #e8e0d5', cursor: 'pointer', flexShrink: 0,
@@ -261,6 +261,7 @@ export function LayerPanel(): React.ReactElement {
                       <div style={{ width: '100%', height: '100%', background: '#e8e0d5' }} />
                     )}
                   </div>
+                  </Tooltip>
                 </div>
               ) : isGroupObj ? (
                 <div

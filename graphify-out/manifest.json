@@ -65,9 +65,9 @@
     "semantic_hash": "b3105c417982827b358b9698221d7fab"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/main.tsx": {
-    "mtime": 1780578638.4509392,
-    "ast_hash": "3c47c40e17b20a720f7dc8c520da0d38",
-    "semantic_hash": "3c47c40e17b20a720f7dc8c520da0d38"
+    "mtime": 1780689681.5094347,
+    "ast_hash": "fabef40c7810e37772aea87adfd08f84",
+    "semantic_hash": "fabef40c7810e37772aea87adfd08f84"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/ui/FrameSettingsPopover.tsx": {
     "mtime": 1780678932.9213114,
@@ -75,8 +75,8 @@
     "semantic_hash": "ae87258101ff03de5beb92a8e4006074"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/ui/PropertiesPanel.tsx": {
-    "mtime": 1780680124.1792908,
-    "ast_hash": "2ecd03ce92f532dd1d70902a6c27bace",
+    "mtime": 1780690632.8559768,
+    "ast_hash": "dad55fa4a02b02679038b90d6f0d4662",
     "semantic_hash": ""
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/ui/FontPicker.tsx": {
@@ -90,8 +90,8 @@
     "semantic_hash": "eb470bb844b13eec605b56d7d6154a7f"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/ui/Toolbar.tsx": {
-    "mtime": 1780688963.373145,
-    "ast_hash": "48001ac2f967eb0890699bd217c90dca",
+    "mtime": 1780690841.9424024,
+    "ast_hash": "fb4091c246de1c9272ad63c78d7f5bfa",
     "semantic_hash": ""
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/ui/iconBtnStyle.ts": {
@@ -100,8 +100,8 @@
     "semantic_hash": "c5f049f4ac9b5fd3d7a481610bf7f3ae"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/ui/LayerPanel.tsx": {
-    "mtime": 1780687582.0517073,
-    "ast_hash": "df014a3294035656cd404a665c5ff119",
+    "mtime": 1780690878.8164458,
+    "ast_hash": "9375b94009b1dbd4dfbf0aa256ebd394",
     "semantic_hash": ""
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/ui/Tooltip.tsx": {
@@ -137,12 +137,12 @@
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/types/canvas.ts": {
     "mtime": 1780679649.3351004,
     "ast_hash": "b6682b8b41522df3e6fb74c885973b95",
-    "semantic_hash": ""
+    "semantic_hash": "b6682b8b41522df3e6fb74c885973b95"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/types/canvas.d.ts": {
     "mtime": 1780679650.9172308,
     "ast_hash": "eb9f0bf3aba6a47495a3ed40bb3e3008",
-    "semantic_hash": ""
+    "semantic_hash": "eb9f0bf3aba6a47495a3ed40bb3e3008"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/types/project.d.ts": {
     "mtime": 1779488790.7094352,
@@ -162,7 +162,7 @@
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/types/index.ts": {
     "mtime": 1780679654.4889603,
     "ast_hash": "d9a5f162ac7c7576c9dfbea196543117",
-    "semantic_hash": ""
+    "semantic_hash": "d9a5f162ac7c7576c9dfbea196543117"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/types/index.d.ts": {
     "mtime": 1779488790.709127,
@@ -202,7 +202,7 @@
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/canvas/CarouselStage.tsx": {
     "mtime": 1780680432.0448182,
     "ast_hash": "b976a94465463df1820ca7ba26236270",
-    "semantic_hash": ""
+    "semantic_hash": "b976a94465463df1820ca7ba26236270"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/canvas/SnapGuides.tsx": {
     "mtime": 1780506249.0070384,
@@ -217,7 +217,7 @@
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/canvas/useSnapGuides.ts": {
     "mtime": 1780679900.8007991,
     "ast_hash": "1ac74f721cf1edfddf5ea778cb1ed73e",
-    "semantic_hash": ""
+    "semantic_hash": "1ac74f721cf1edfddf5ea778cb1ed73e"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/canvas/useExternalEdit.ts": {
     "mtime": 1779488790.706229,
@@ -227,7 +227,7 @@
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/canvas/exportFrames.ts": {
     "mtime": 1780680444.9746811,
     "ast_hash": "3ac6e9580b13143c48677540de410cb4",
-    "semantic_hash": ""
+    "semantic_hash": "3ac6e9580b13143c48677540de410cb4"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/canvas/CanvasImageNode.tsx": {
     "mtime": 1780668015.591926,
@@ -240,8 +240,8 @@
     "semantic_hash": "01cbe4d4c7faa5ab44e929224cee55d8"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/canvas/useCanvasStore.ts": {
-    "mtime": 1780687576.7728286,
-    "ast_hash": "b00b4d5cef66bf7b7ce39751f72200f3",
+    "mtime": 1780690837.913145,
+    "ast_hash": "be76d0c089bc21c5da20d07717a54a70",
     "semantic_hash": ""
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/canvas/CanvasTextNode.tsx": {
@@ -260,8 +260,8 @@
     "semantic_hash": "8ed0a04af409c9bb4c720a2feb032caf"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/canvas/useKeyboardShortcuts.ts": {
-    "mtime": 1780680137.5017161,
-    "ast_hash": "68233f2eb578273e9be5917326e047a7",
+    "mtime": 1780690863.0161095,
+    "ast_hash": "0e88fd81e0d8ab54d39285ad90ac7a40",
     "semantic_hash": ""
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/canvas/index.ts": {
@@ -525,9 +525,9 @@
     "semantic_hash": "af5d27d76cd4e0559092e07d94af0d09"
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/ui/ColorInput.tsx": {
-    "mtime": 1780585269.9299905,
-    "ast_hash": "dd7b696e1c4fdb3992e211e0f1e3c083",
-    "semantic_hash": "dd7b696e1c4fdb3992e211e0f1e3c083"
+    "mtime": 1780690888.0638027,
+    "ast_hash": "898b0b532a5579afbdab3afa77cc91a9",
+    "semantic_hash": ""
   },
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/canvas/GridCellOverlay.tsx": {
     "mtime": 1780668423.6158423,
@@ -547,6 +547,6 @@
   "/Users/alexejwaser/Documents/GitHub/ZeroSeams/src/canvas/CanvasGuidelineNode.tsx": {
     "mtime": 1780687608.6794903,
     "ast_hash": "f8e1b98729dc7a276c051b88dd29faff",
-    "semantic_hash": ""
+    "semantic_hash": "f8e1b98729dc7a276c051b88dd29faff"
   }
 }

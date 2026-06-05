@@ -777,13 +777,14 @@ function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): R
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
         <div style={{ ...sectionLabelStyle, marginBottom: 0 }}>Effects</div>
         <div style={{ position: 'relative' }} ref={pickerRef}>
-          <button
-            style={{ ...iconBtnStyle(true), width: 22, height: 22 }}
-            onClick={() => setPickerOpen(v => !v)}
-            title="Add effect"
-          >
-            <Plus size={12} />
-          </button>
+          <Tooltip label="Add effect">
+            <button
+              style={{ ...iconBtnStyle(true), width: 22, height: 22 }}
+              onClick={() => setPickerOpen(v => !v)}
+            >
+              <Plus size={12} />
+            </button>
+          </Tooltip>
           {pickerOpen && (
             <div style={{
               position: 'absolute', right: 0, top: 26, zIndex: 100,
@@ -834,20 +835,22 @@ function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): R
               >
                 {def.label}
               </span>
-              <button
-                style={{ ...iconBtnStyle(effect.enabled), width: 20, height: 20 }}
-                onClick={() => toggleEnabled(effect.id)}
-                title={effect.enabled ? 'Disable effect' : 'Enable effect'}
-              >
-                {effect.enabled ? <Eye size={11} /> : <EyeOff size={11} />}
-              </button>
-              <button
-                style={{ ...iconBtnStyle(false), width: 20, height: 20, color: '#555555' }}
-                onClick={() => removeEffect(effect.id)}
-                title="Remove effect"
-              >
-                <X size={11} />
-              </button>
+              <Tooltip label={effect.enabled ? 'Disable effect' : 'Enable effect'}>
+                <button
+                  style={{ ...iconBtnStyle(effect.enabled), width: 20, height: 20 }}
+                  onClick={() => toggleEnabled(effect.id)}
+                >
+                  {effect.enabled ? <Eye size={11} /> : <EyeOff size={11} />}
+                </button>
+              </Tooltip>
+              <Tooltip label="Remove effect">
+                <button
+                  style={{ ...iconBtnStyle(false), width: 20, height: 20, color: '#555555' }}
+                  onClick={() => removeEffect(effect.id)}
+                >
+                  <X size={11} />
+                </button>
+              </Tooltip>
             </div>
 
             {/* Effect controls */}
@@ -1015,13 +1018,14 @@ function AdjustmentsSection({ imgObj, selectedId: _selectedId, bypass, onToggleB
     <div style={{ borderTop: '1px solid #e8e0d5', paddingTop: 10, marginTop: 4 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
         <div style={{ ...sectionLabelStyle, marginBottom: 0 }}>Adjustments</div>
-        <button
-          style={{ ...iconBtnStyle(!bypass), width: 22, height: 22 }}
-          onClick={onToggleBypass}
-          title={bypass ? 'Show adjustments (\\)' : 'Bypass adjustments (\\)'}
-        >
-          <Power size={12} />
-        </button>
+        <Tooltip label={bypass ? 'Show adjustments' : 'Bypass adjustments'} shortcut="\">
+          <button
+            style={{ ...iconBtnStyle(!bypass), width: 22, height: 22 }}
+            onClick={onToggleBypass}
+          >
+            <Power size={12} />
+          </button>
+        </Tooltip>
       </div>
 
       <div style={{ opacity: bypass ? 0.35 : 1, pointerEvents: bypass ? 'none' : 'auto' }}>
@@ -1481,7 +1485,6 @@ function VideoSection({
               <div style={{ display: 'flex', gap: 6 }}>
                 <Tooltip label="Pen mask">
                   <button
-                    title="Pen mask"
                     onClick={() => { enterMaskDrawModeV(selectedId, 'pen') }}
                     style={iconBtnStyle()}
                   >
@@ -1490,7 +1493,6 @@ function VideoSection({
                 </Tooltip>
                 <Tooltip label="Rectangle mask">
                   <button
-                    title="Rectangle mask"
                     onClick={() => { enterMaskDrawModeV(selectedId, 'rect') }}
                     style={iconBtnStyle()}
                   >
@@ -1499,7 +1501,6 @@ function VideoSection({
                 </Tooltip>
                 <Tooltip label="Oval mask">
                   <button
-                    title="Oval mask"
                     onClick={() => { enterMaskDrawModeV(selectedId, 'ellipse') }}
                     style={iconBtnStyle()}
                   >
@@ -1528,7 +1529,6 @@ function VideoSection({
               )}
               <Tooltip label="Edit mask">
                 <button
-                  title="Edit mask"
                   onClick={() => { enterMaskEditModeV(selectedId) }}
                   style={{ ...iconBtnStyle(), flex: 1, width: 'auto' }}
                 >
@@ -1537,7 +1537,6 @@ function VideoSection({
               </Tooltip>
               <Tooltip label={videoObj.mask.visible ? 'Hide mask' : 'Show mask'}>
                 <button
-                  title={videoObj.mask.visible ? 'Hide mask' : 'Show mask'}
                   onClick={() => {
                     onCommit(selectedId, { mask: { ...videoObj.mask!, visible: !videoObj.mask!.visible } })
                   }}
@@ -1550,7 +1549,6 @@ function VideoSection({
               </Tooltip>
               <Tooltip label="Delete mask">
                 <button
-                  title="Delete mask"
                   onClick={() => {
                     onCommit(selectedId, { mask: undefined })
                   }}
@@ -2247,7 +2245,6 @@ export function PropertiesPanel(): React.ReactElement {
                         <div style={{ display: 'flex', gap: 6 }}>
                           <Tooltip label="Pen mask">
                             <button
-                              title="Pen mask"
                               onClick={() => { if (selectedId) enterMaskDrawMode(selectedId, 'pen') }}
                               style={iconBtnStyle()}
                             >
@@ -2256,7 +2253,6 @@ export function PropertiesPanel(): React.ReactElement {
                           </Tooltip>
                           <Tooltip label="Rectangle mask">
                             <button
-                              title="Rectangle mask"
                               onClick={() => { if (selectedId) enterMaskDrawMode(selectedId, 'rect') }}
                               style={iconBtnStyle()}
                             >
@@ -2265,7 +2261,6 @@ export function PropertiesPanel(): React.ReactElement {
                           </Tooltip>
                           <Tooltip label="Oval mask">
                             <button
-                              title="Oval mask"
                               onClick={() => { if (selectedId) enterMaskDrawMode(selectedId, 'ellipse') }}
                               style={iconBtnStyle()}
                             >
@@ -2294,7 +2289,6 @@ export function PropertiesPanel(): React.ReactElement {
                         )}
                         <Tooltip label="Edit mask">
                           <button
-                            title="Edit mask"
                             onClick={() => { if (selectedId) enterMaskEditMode(selectedId) }}
                             style={{ ...iconBtnStyle(), flex: 1, width: 'auto' }}
                           >
@@ -2303,7 +2297,6 @@ export function PropertiesPanel(): React.ReactElement {
                         </Tooltip>
                         <Tooltip label={imgObj.mask.visible ? 'Hide mask' : 'Show mask'}>
                           <button
-                            title={imgObj.mask.visible ? 'Hide mask' : 'Show mask'}
                             onClick={() => {
                               if (selectedId) commitUpdate(selectedId, { mask: { ...imgObj.mask!, visible: !imgObj.mask!.visible } })
                             }}
@@ -2316,7 +2309,6 @@ export function PropertiesPanel(): React.ReactElement {
                         </Tooltip>
                         <Tooltip label="Delete mask">
                           <button
-                            title="Delete mask"
                             onClick={() => {
                               if (selectedId) commitUpdate(selectedId, { mask: undefined })
                             }}

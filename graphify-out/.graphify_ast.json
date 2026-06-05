@@ -1,60 +1,207 @@
 {
   "nodes": [
     {
-      "id": "src_ui_framesettingspopover_tsx",
-      "label": "FrameSettingsPopover.tsx",
+      "id": "src_main_tsx",
+      "label": "main.tsx",
       "file_type": "code",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
+      "source_file": "src/main.tsx",
       "source_location": "L1"
     },
     {
-      "id": "ui_framesettingspopover_framesettingspopoverprops",
-      "label": "FrameSettingsPopoverProps",
+      "id": "src_main_app",
+      "label": "App()",
       "file_type": "code",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
-      "source_location": "L6"
-    },
-    {
-      "id": "ui_framesettingspopover_platform_labels",
-      "label": "PLATFORM_LABELS",
-      "file_type": "code",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
+      "source_file": "src/main.tsx",
       "source_location": "L10"
     },
     {
-      "id": "ui_framesettingspopover_platforms",
-      "label": "PLATFORMS",
+      "id": "src_main_rootel",
+      "label": "rootEl",
       "file_type": "code",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
-      "source_location": "L18"
+      "source_file": "src/main.tsx",
+      "source_location": "L120"
     },
     {
-      "id": "ui_framesettingspopover_segmentbuttonstyle",
-      "label": "segmentButtonStyle()",
+      "id": "src_ui_propertiespanel_tsx",
+      "label": "PropertiesPanel.tsx",
       "file_type": "code",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
-      "source_location": "L20"
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1"
     },
     {
-      "id": "ui_framesettingspopover_numberinputstyle",
-      "label": "numberInputStyle",
+      "id": "ui_propertiespanel_rotatearoundcenter",
+      "label": "rotateAroundCenter()",
       "file_type": "code",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
-      "source_location": "L37"
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L36"
     },
     {
-      "id": "ui_framesettingspopover_labelstyle",
-      "label": "labelStyle",
+      "id": "ui_propertiespanel_numinputstyle",
+      "label": "numInputStyle()",
       "file_type": "code",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
-      "source_location": "L50"
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L56"
     },
     {
-      "id": "ui_framesettingspopover_framesettingspopover",
-      "label": "FrameSettingsPopover()",
+      "id": "ui_propertiespanel_numberfieldprops",
+      "label": "NumberFieldProps",
       "file_type": "code",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
-      "source_location": "L61"
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L71"
+    },
+    {
+      "id": "ui_propertiespanel_numberfield",
+      "label": "NumberField()",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L80"
+    },
+    {
+      "id": "ui_propertiespanel_mixednumberfieldprops",
+      "label": "MixedNumberFieldProps",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L141"
+    },
+    {
+      "id": "ui_propertiespanel_mixednumberfield",
+      "label": "MixedNumberField()",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L150"
+    },
+    {
+      "id": "ui_propertiespanel_sectionlabelstyle",
+      "label": "sectionLabelStyle",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L215"
+    },
+    {
+      "id": "ui_propertiespanel_alignbuttonstyle",
+      "label": "alignButtonStyle()",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L226"
+    },
+    {
+      "id": "ui_propertiespanel_distributebuttonstyle",
+      "label": "distributeButtonStyle()",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L238"
+    },
+    {
+      "id": "ui_propertiespanel_aligndistributesectionprops",
+      "label": "AlignDistributeSectionProps",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L254"
+    },
+    {
+      "id": "ui_propertiespanel_aligndistributesection",
+      "label": "AlignDistributeSection()",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L264"
+    },
+    {
+      "id": "ui_propertiespanel_canvassection",
+      "label": "CanvasSection()",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L391"
+    },
+    {
+      "id": "ui_propertiespanel_textsectionprops",
+      "label": "TextSectionProps",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L403"
+    },
+    {
+      "id": "ui_propertiespanel_textsection",
+      "label": "TextSection()",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L413"
+    },
+    {
+      "id": "ui_propertiespanel_effectssectionprops",
+      "label": "EffectsSectionProps",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L714"
+    },
+    {
+      "id": "ui_propertiespanel_effectssection",
+      "label": "EffectsSection()",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L720"
+    },
+    {
+      "id": "ui_propertiespanel_adjustmentssectionprops",
+      "label": "AdjustmentsSectionProps",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L931"
+    },
+    {
+      "id": "ui_propertiespanel_subgrouplabelstyle",
+      "label": "subGroupLabelStyle",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L941"
+    },
+    {
+      "id": "ui_propertiespanel_track_gradient",
+      "label": "TRACK_GRADIENT",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L951"
+    },
+    {
+      "id": "ui_propertiespanel_adjustmentssection",
+      "label": "AdjustmentsSection()",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L966"
+    },
+    {
+      "id": "ui_propertiespanel_videosectionprops",
+      "label": "VideoSectionProps",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1071"
+    },
+    {
+      "id": "ui_propertiespanel_formatduration",
+      "label": "formatDuration()",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1079"
+    },
+    {
+      "id": "ui_propertiespanel_trimlabelstyle",
+      "label": "trimLabelStyle",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1086"
+    },
+    {
+      "id": "ui_propertiespanel_videosection",
+      "label": "VideoSection()",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1096"
+    },
+    {
+      "id": "ui_propertiespanel_propertiespanel",
+      "label": "PropertiesPanel()",
+      "file_type": "code",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1609"
     },
     {
       "id": "src_ui_toolbar_tsx",
@@ -99,46 +246,74 @@
       "source_location": "L62"
     },
     {
+      "id": "ui_toolbar_toolgroup",
+      "label": "ToolGroup()",
+      "file_type": "code",
+      "source_file": "src/ui/Toolbar.tsx",
+      "source_location": "L94"
+    },
+    {
       "id": "ui_toolbar_blobtobase64",
       "label": "blobToBase64()",
       "file_type": "code",
       "source_file": "src/ui/Toolbar.tsx",
-      "source_location": "L94"
+      "source_location": "L114"
     },
     {
       "id": "ui_toolbar_buildprojectjson",
       "label": "buildProjectJson()",
       "file_type": "code",
       "source_file": "src/ui/Toolbar.tsx",
-      "source_location": "L107"
+      "source_location": "L127"
     },
     {
       "id": "ui_toolbar_videoexportsettingspanelprops",
       "label": "VideoExportSettingsPanelProps",
       "file_type": "code",
       "source_file": "src/ui/Toolbar.tsx",
-      "source_location": "L129"
+      "source_location": "L149"
     },
     {
       "id": "ui_toolbar_videoexportsettingspanel",
       "label": "VideoExportSettingsPanel()",
       "file_type": "code",
       "source_file": "src/ui/Toolbar.tsx",
-      "source_location": "L140"
+      "source_location": "L160"
     },
     {
       "id": "ui_toolbar_titlebar",
       "label": "TitleBar()",
       "file_type": "code",
       "source_file": "src/ui/Toolbar.tsx",
-      "source_location": "L261"
+      "source_location": "L281"
     },
     {
       "id": "ui_toolbar_toolbar",
       "label": "ToolBar()",
       "file_type": "code",
       "source_file": "src/ui/Toolbar.tsx",
-      "source_location": "L1211"
+      "source_location": "L1231"
+    },
+    {
+      "id": "src_ui_layerpanel_tsx",
+      "label": "LayerPanel.tsx",
+      "file_type": "code",
+      "source_file": "src/ui/LayerPanel.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "ui_layerpanel_typelabel",
+      "label": "typeLabel()",
+      "file_type": "code",
+      "source_file": "src/ui/LayerPanel.tsx",
+      "source_location": "L9"
+    },
+    {
+      "id": "ui_layerpanel_layerpanel",
+      "label": "LayerPanel()",
+      "file_type": "code",
+      "source_file": "src/ui/LayerPanel.tsx",
+      "source_location": "L21"
     },
     {
       "id": "src_types_canvas_ts",
@@ -316,32 +491,256 @@
       "source_location": "L296"
     },
     {
-      "id": "types_canvas_canvasobject",
-      "label": "CanvasObject",
+      "id": "types_canvas_guidelineobject",
+      "label": "GuidelineObject",
       "file_type": "code",
       "source_file": "src/types/canvas.ts",
       "source_location": "L300"
     },
     {
-      "id": "src_types_electron_d_ts",
-      "label": "electron.d.ts",
+      "id": "types_canvas_canvasobject",
+      "label": "CanvasObject",
       "file_type": "code",
-      "source_file": "src/types/electron.d.ts",
+      "source_file": "src/types/canvas.ts",
+      "source_location": "L310"
+    },
+    {
+      "id": "src_types_canvas_d_ts",
+      "label": "canvas.d.ts",
+      "file_type": "code",
+      "source_file": "src/types/canvas.d.ts",
       "source_location": "L1"
     },
     {
-      "id": "types_electron_d_externaleditor",
-      "label": "ExternalEditor",
+      "id": "types_canvas_d_canvasobjecttype",
+      "label": "CanvasObjectType",
       "file_type": "code",
-      "source_file": "src/types/electron.d.ts",
+      "source_file": "src/types/canvas.d.ts",
       "source_location": "L1"
     },
     {
-      "id": "types_electron_d_window",
-      "label": "Window",
+      "id": "types_canvas_d_canvasobjectscope",
+      "label": "CanvasObjectScope",
       "file_type": "code",
-      "source_file": "src/types/electron.d.ts",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L2"
+    },
+    {
+      "id": "types_canvas_d_basecanvasobject",
+      "label": "BaseCanvasObject",
+      "file_type": "code",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L3"
+    },
+    {
+      "id": "types_canvas_d_imageobject",
+      "label": "ImageObject",
+      "file_type": "code",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L23"
+    },
+    {
+      "id": "types_canvas_d_maskdata",
+      "label": "MaskData",
+      "file_type": "code",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L50"
+    },
+    {
+      "id": "types_canvas_d_photoadjustments",
+      "label": "PhotoAdjustments",
+      "file_type": "code",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L60"
+    },
+    {
+      "id": "types_canvas_d_fontstyle",
+      "label": "FontStyle",
+      "file_type": "code",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L75"
+    },
+    {
+      "id": "types_canvas_d_textspanstyle",
+      "label": "TextSpanStyle",
+      "file_type": "code",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L77"
+    },
+    {
+      "id": "types_canvas_d_textspan",
+      "label": "TextSpan",
+      "file_type": "code",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L85"
+    },
+    {
+      "id": "types_canvas_d_textobject",
+      "label": "TextObject",
+      "file_type": "code",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L89"
+    },
+    {
+      "id": "types_canvas_d_shapekind",
+      "label": "ShapeKind",
+      "file_type": "code",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L100"
+    },
+    {
+      "id": "types_canvas_d_shapeobject",
+      "label": "ShapeObject",
+      "file_type": "code",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L101"
+    },
+    {
+      "id": "types_canvas_d_anchorpoint",
+      "label": "AnchorPoint",
+      "file_type": "code",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L111"
+    },
+    {
+      "id": "types_canvas_d_pathobject",
+      "label": "PathObject",
+      "file_type": "code",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L123"
+    },
+    {
+      "id": "types_canvas_d_groupobject",
+      "label": "GroupObject",
+      "file_type": "code",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L132"
+    },
+    {
+      "id": "types_canvas_d_guidelineobject",
+      "label": "GuidelineObject",
+      "file_type": "code",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L136"
+    },
+    {
+      "id": "types_canvas_d_canvasobject",
+      "label": "CanvasObject",
+      "file_type": "code",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L143"
+    },
+    {
+      "id": "src_types_index_ts",
+      "label": "index.ts",
+      "file_type": "code",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_canvas_carouselstage_tsx",
+      "label": "CarouselStage.tsx",
+      "file_type": "code",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "canvas_carouselstage_getstageinstance",
+      "label": "getStageInstance()",
+      "file_type": "code",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L34"
+    },
+    {
+      "id": "canvas_carouselstage_carouselstage",
+      "label": "CarouselStage()",
+      "file_type": "code",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L38"
+    },
+    {
+      "id": "src_canvas_usesnapguides_ts",
+      "label": "useSnapGuides.ts",
+      "file_type": "code",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "canvas_usesnapguides_snapguide",
+      "label": "SnapGuide",
+      "file_type": "code",
+      "source_file": "src/canvas/useSnapGuides.ts",
       "source_location": "L6"
+    },
+    {
+      "id": "canvas_usesnapguides_dragbox",
+      "label": "DragBox",
+      "file_type": "code",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L12"
+    },
+    {
+      "id": "canvas_usesnapguides_snaptarget",
+      "label": "SnapTarget",
+      "file_type": "code",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L19"
+    },
+    {
+      "id": "canvas_usesnapguides_buildtargets",
+      "label": "buildTargets()",
+      "file_type": "code",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L21"
+    },
+    {
+      "id": "canvas_usesnapguides_computesnapfromtargets",
+      "label": "computeSnapFromTargets()",
+      "file_type": "code",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L70"
+    },
+    {
+      "id": "canvas_usesnapguides_computesnap",
+      "label": "computeSnap()",
+      "file_type": "code",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L120"
+    },
+    {
+      "id": "canvas_usesnapguides_computesnapresizefromtargets",
+      "label": "computeSnapResizeFromTargets()",
+      "file_type": "code",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L133"
+    },
+    {
+      "id": "canvas_usesnapguides_computesnapresize",
+      "label": "computeSnapResize()",
+      "file_type": "code",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L294"
+    },
+    {
+      "id": "canvas_usesnapguides_rotation_snap_angles",
+      "label": "ROTATION_SNAP_ANGLES",
+      "file_type": "code",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L308"
+    },
+    {
+      "id": "canvas_usesnapguides_snaprotation",
+      "label": "_snapRotation()",
+      "file_type": "code",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L311"
+    },
+    {
+      "id": "canvas_usesnapguides_usesnapguides",
+      "label": "useSnapGuides()",
+      "file_type": "code",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L318"
     },
     {
       "id": "src_canvas_exportframes_ts",
@@ -362,366 +761,788 @@
       "label": "downloadFrames()",
       "file_type": "code",
       "source_file": "src/canvas/exportFrames.ts",
-      "source_location": "L156"
+      "source_location": "L159"
     },
     {
       "id": "canvas_exportframes_capturevideoframesequence",
       "label": "captureVideoFrameSequence()",
       "file_type": "code",
       "source_file": "src/canvas/exportFrames.ts",
-      "source_location": "L180"
+      "source_location": "L183"
     },
     {
       "id": "canvas_exportframes_exportmixedframes",
       "label": "exportMixedFrames()",
       "file_type": "code",
       "source_file": "src/canvas/exportFrames.ts",
-      "source_location": "L231"
+      "source_location": "L234"
     },
     {
-      "id": "src_electron_preload_ts",
-      "label": "preload.ts",
+      "id": "src_canvas_canvasguidelinenode_tsx",
+      "label": "CanvasGuidelineNode.tsx",
       "file_type": "code",
-      "source_file": "src/electron/preload.ts",
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
       "source_location": "L1"
     },
     {
-      "id": "electron_preload_handler",
-      "label": "handler()",
+      "id": "canvas_canvasguidelinenode_props",
+      "label": "Props",
       "file_type": "code",
-      "source_file": "src/electron/preload.ts",
-      "source_location": "L41"
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
+      "source_location": "L8"
     },
     {
-      "id": "src_electron_index_ts",
-      "label": "index.ts",
+      "id": "canvas_canvasguidelinenode_innerprops",
+      "label": "InnerProps",
       "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L1"
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
+      "source_location": "L12"
     },
     {
-      "id": "electron_index_getzeroseamsdir",
-      "label": "getZeroSeamsDir()",
+      "id": "canvas_canvasguidelinenode_canvasguidelinenodeinner",
+      "label": "CanvasGuidelineNodeInner()",
       "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L9"
-    },
-    {
-      "id": "electron_index_getpreferencespath",
-      "label": "getPreferencesPath()",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L13"
-    },
-    {
-      "id": "electron_index_getrecentfilespath",
-      "label": "getRecentFilesPath()",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
       "source_location": "L17"
     },
     {
-      "id": "electron_index_addrecentfile",
-      "label": "addRecentFile()",
+      "id": "canvas_canvasguidelinenode_canvasguidelinenodeouter",
+      "label": "CanvasGuidelineNodeOuter()",
       "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L21"
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
+      "source_location": "L110"
     },
     {
-      "id": "electron_index_preferences",
-      "label": "Preferences",
+      "id": "canvas_canvasguidelinenode_canvasguidelinenode",
+      "label": "CanvasGuidelineNode",
       "file_type": "code",
-      "source_file": "src/electron/index.ts",
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
+      "source_location": "L118"
+    },
+    {
+      "id": "src_canvas_usecanvasstore_ts",
+      "label": "useCanvasStore.ts",
+      "file_type": "code",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "canvas_usecanvasstore_platform_presets",
+      "label": "PLATFORM_PRESETS",
+      "file_type": "code",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L6"
+    },
+    {
+      "id": "canvas_usecanvasstore_historysnapshot",
+      "label": "HistorySnapshot",
+      "file_type": "code",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L29"
+    },
+    {
+      "id": "canvas_usecanvasstore_makeframes",
+      "label": "makeFrames()",
+      "file_type": "code",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L36"
+    },
+    {
+      "id": "canvas_usecanvasstore_getobjectbbox",
+      "label": "getObjectBBox()",
+      "file_type": "code",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L44"
+    },
+    {
+      "id": "canvas_usecanvasstore_isineditmode",
+      "label": "isInEditMode()",
+      "file_type": "code",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L56"
+    },
+    {
+      "id": "canvas_usecanvasstore_reinjectsrc",
+      "label": "reinjectSrc()",
+      "file_type": "code",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L69"
+    },
+    {
+      "id": "canvas_usecanvasstore_canvasstate",
+      "label": "CanvasState",
+      "file_type": "code",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L87"
+    },
+    {
+      "id": "canvas_usecanvasstore_normalizeobjectsforsnapshot",
+      "label": "normalizeObjectsForSnapshot()",
+      "file_type": "code",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L209"
+    },
+    {
+      "id": "canvas_usecanvasstore_usecanvasstore",
+      "label": "useCanvasStore",
+      "file_type": "code",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L251"
+    },
+    {
+      "id": "src_canvas_usekeyboardshortcuts_ts",
+      "label": "useKeyboardShortcuts.ts",
+      "file_type": "code",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "canvas_usekeyboardshortcuts_buildprojectsnapshot",
+      "label": "buildProjectSnapshot()",
+      "file_type": "code",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L10"
+    },
+    {
+      "id": "canvas_usekeyboardshortcuts_usekeyboardshortcuts",
+      "label": "useKeyboardShortcuts()",
+      "file_type": "code",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
       "source_location": "L31"
-    },
-    {
-      "id": "electron_index_externaleditor",
-      "label": "ExternalEditor",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L35"
-    },
-    {
-      "id": "electron_index_readpreferences",
-      "label": "readPreferences()",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L40"
-    },
-    {
-      "id": "electron_index_writepreferences",
-      "label": "writePreferences()",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L49"
-    },
-    {
-      "id": "electron_index_watchers",
-      "label": "watchers",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L53"
-    },
-    {
-      "id": "electron_index_tempfiles",
-      "label": "tempFiles",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L54"
-    },
-    {
-      "id": "electron_index_createwindow",
-      "label": "createWindow()",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L74"
-    },
-    {
-      "id": "electron_index_dir",
-      "label": "dir",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L117"
-    },
-    {
-      "id": "electron_index_filepath",
-      "label": "filePath",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L120"
-    },
-    {
-      "id": "electron_index_mimemap",
-      "label": "mimeMap",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L168"
-    },
-    {
-      "id": "electron_index_buf",
-      "label": "buf",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L174"
-    },
-    {
-      "id": "electron_index_paths",
-      "label": "paths",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L232"
-    },
-    {
-      "id": "electron_index_files",
-      "label": "files",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L238"
-    },
-    {
-      "id": "electron_index_name",
-      "label": "name",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L274"
-    },
-    {
-      "id": "electron_index_editor",
-      "label": "editor",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L275"
-    },
-    {
-      "id": "electron_index_existing",
-      "label": "existing",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L292"
-    },
-    {
-      "id": "electron_index_editdir",
-      "label": "editDir",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L301"
-    },
-    {
-      "id": "electron_index_watcher",
-      "label": "watcher",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L324"
-    },
-    {
-      "id": "electron_index_newbase64",
-      "label": "newBase64",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L331"
-    },
-    {
-      "id": "electron_index_buffer",
-      "label": "buffer",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L397"
-    },
-    {
-      "id": "electron_index_media_mime",
-      "label": "MEDIA_MIME",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L430"
-    },
-    {
-      "id": "electron_index_pathname",
-      "label": "pathname",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L435"
-    },
-    {
-      "id": "electron_index_rangeheader",
-      "label": "rangeHeader",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L446"
-    },
-    {
-      "id": "electron_index_nodestream",
-      "label": "nodeStream",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L451"
-    },
-    {
-      "id": "electron_index_body",
-      "label": "body",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L452"
-    },
-    {
-      "id": "electron_index_corpheaders",
-      "label": "corpHeaders",
-      "file_type": "code",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L463"
     }
   ],
   "edges": [
     {
-      "source": "src_ui_framesettingspopover_tsx",
-      "target": "react",
+      "source": "src_main_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_ui_theme_css",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
+      "source_file": "src/main.tsx",
       "source_location": "L1",
       "weight": 1.0
     },
     {
-      "source": "src_ui_framesettingspopover_tsx",
-      "target": "usecanvasstore",
+      "source": "src_main_tsx",
+      "target": "react",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
+      "source_file": "src/main.tsx",
       "source_location": "L2",
       "weight": 1.0
     },
     {
-      "source": "src_ui_framesettingspopover_tsx",
-      "target": "project",
+      "source": "src_main_tsx",
+      "target": "client",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
+      "source_file": "src/main.tsx",
       "source_location": "L3",
       "weight": 1.0
     },
     {
-      "source": "src_ui_framesettingspopover_tsx",
-      "target": "users_alexejwaser_documents_github_zeroseams_src_ui_colorinput_tsx",
+      "source": "src_main_tsx",
+      "target": "canvas",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
+      "source_file": "src/main.tsx",
       "source_location": "L4",
       "weight": 1.0
     },
     {
-      "source": "src_ui_framesettingspopover_tsx",
-      "target": "ui_colorinput_colorinput",
-      "relation": "imports",
+      "source": "src_main_tsx",
+      "target": "ui",
+      "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
-      "source_location": "L4",
+      "source_file": "src/main.tsx",
+      "source_location": "L5",
       "weight": 1.0
     },
     {
-      "source": "src_ui_framesettingspopover_tsx",
-      "target": "ui_framesettingspopover_framesettingspopoverprops",
-      "relation": "contains",
+      "source": "src_main_tsx",
+      "target": "useexportstore",
+      "relation": "imports_from",
+      "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
+      "source_file": "src/main.tsx",
       "source_location": "L6",
       "weight": 1.0
     },
     {
-      "source": "src_ui_framesettingspopover_tsx",
-      "target": "ui_framesettingspopover_platform_labels",
+      "source": "src_main_tsx",
+      "target": "previewshell",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/main.tsx",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "src_main_tsx",
+      "target": "ai",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/main.tsx",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "src_main_tsx",
+      "target": "src_main_app",
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
+      "source_file": "src/main.tsx",
       "source_location": "L10",
       "weight": 1.0
     },
     {
-      "source": "src_ui_framesettingspopover_tsx",
-      "target": "ui_framesettingspopover_platforms",
+      "source": "src_main_tsx",
+      "target": "src_main_rootel",
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
+      "source_file": "src/main.tsx",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "usecanvasstore",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "usethumbnailstore",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ai",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ai",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "useexternaledit",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_ui_usesavestatusstore_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_usesavestatusstore_usesavestatusstore",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ai",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "canvas",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "canvas",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "effects",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_gridtemplates_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "canvas_gridtemplates_grid_templates",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "textspans",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_ui_fontpicker_tsx",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L18",
       "weight": 1.0
     },
     {
-      "source": "src_ui_framesettingspopover_tsx",
-      "target": "ui_framesettingspopover_segmentbuttonstyle",
-      "relation": "contains",
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_fontpicker_fontpicker",
+      "relation": "imports",
+      "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_ui_tooltip_tsx",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_ui_iconbtnstyle_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L20",
       "weight": 1.0
     },
     {
-      "source": "src_ui_framesettingspopover_tsx",
-      "target": "ui_framesettingspopover_numberinputstyle",
-      "relation": "contains",
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_iconbtnstyle_iconbtnstyle",
+      "relation": "imports",
+      "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
-      "source_location": "L37",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
-      "source": "src_ui_framesettingspopover_tsx",
-      "target": "ui_framesettingspopover_labelstyle",
-      "relation": "contains",
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "lucide_react",
+      "relation": "imports_from",
+      "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
-      "source_location": "L50",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
-      "source": "src_ui_framesettingspopover_tsx",
-      "target": "ui_framesettingspopover_framesettingspopover",
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_ui_adjustments_css",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "videoelementregistry",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_ui_colorinput_tsx",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_colorinput_colorinput",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_colorinput_mixedcolorinput",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_rotatearoundcenter",
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/ui/FrameSettingsPopover.tsx",
-      "source_location": "L61",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_numinputstyle",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_numberfieldprops",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L71",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_numberfield",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L80",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_mixednumberfieldprops",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L141",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_mixednumberfield",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L150",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_sectionlabelstyle",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L215",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_alignbuttonstyle",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L226",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_distributebuttonstyle",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L238",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_aligndistributesectionprops",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L254",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_aligndistributesection",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L264",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_canvassection",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L391",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_textsectionprops",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L403",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_textsection",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L413",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_effectssectionprops",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L714",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_effectssection",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L720",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_adjustmentssectionprops",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L931",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_subgrouplabelstyle",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L941",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_track_gradient",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L951",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_adjustmentssection",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L966",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_videosectionprops",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1071",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_formatduration",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1079",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_trimlabelstyle",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1086",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_videosection",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1096",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_propertiespanel_tsx",
+      "target": "ui_propertiespanel_propertiespanel",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1609",
+      "weight": 1.0
+    },
+    {
+      "source": "ui_propertiespanel_aligndistributesection",
+      "target": "ui_propertiespanel_alignbuttonstyle",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L290",
+      "weight": 1.0
+    },
+    {
+      "source": "ui_propertiespanel_aligndistributesection",
+      "target": "ui_propertiespanel_distributebuttonstyle",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L329",
+      "weight": 1.0
+    },
+    {
+      "source": "ui_propertiespanel_textsection",
+      "target": "ui_propertiespanel_numinputstyle",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L539",
+      "weight": 1.0
+    },
+    {
+      "source": "ui_propertiespanel_videosection",
+      "target": "ui_propertiespanel_formatduration",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1139",
+      "weight": 1.0
+    },
+    {
+      "source": "ui_propertiespanel_videosection",
+      "target": "ui_propertiespanel_numinputstyle",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1181",
       "weight": 1.0
     },
     {
@@ -913,7 +1734,7 @@
     },
     {
       "source": "src_ui_toolbar_tsx",
-      "target": "src_ui_framesettingspopover_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_ui_framesettingspopover_tsx",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -1011,7 +1832,7 @@
     },
     {
       "source": "src_ui_toolbar_tsx",
-      "target": "ui_toolbar_blobtobase64",
+      "target": "ui_toolbar_toolgroup",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/Toolbar.tsx",
@@ -1020,11 +1841,20 @@
     },
     {
       "source": "src_ui_toolbar_tsx",
+      "target": "ui_toolbar_blobtobase64",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/Toolbar.tsx",
+      "source_location": "L114",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_toolbar_tsx",
       "target": "ui_toolbar_buildprojectjson",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/Toolbar.tsx",
-      "source_location": "L107",
+      "source_location": "L127",
       "weight": 1.0
     },
     {
@@ -1033,7 +1863,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/Toolbar.tsx",
-      "source_location": "L129",
+      "source_location": "L149",
       "weight": 1.0
     },
     {
@@ -1042,7 +1872,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/Toolbar.tsx",
-      "source_location": "L140",
+      "source_location": "L160",
       "weight": 1.0
     },
     {
@@ -1051,7 +1881,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/Toolbar.tsx",
-      "source_location": "L261",
+      "source_location": "L281",
       "weight": 1.0
     },
     {
@@ -1060,7 +1890,105 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/Toolbar.tsx",
-      "source_location": "L1211",
+      "source_location": "L1231",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_layerpanel_tsx",
+      "target": "react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/LayerPanel.tsx",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_layerpanel_tsx",
+      "target": "usecanvasstore",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/LayerPanel.tsx",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_layerpanel_tsx",
+      "target": "usethumbnailstore",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/LayerPanel.tsx",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_layerpanel_tsx",
+      "target": "canvas",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/LayerPanel.tsx",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_layerpanel_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_ui_tooltip_tsx",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/LayerPanel.tsx",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_layerpanel_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_ui_iconbtnstyle_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/LayerPanel.tsx",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_layerpanel_tsx",
+      "target": "ui_iconbtnstyle_iconbtnstyle",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/LayerPanel.tsx",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_layerpanel_tsx",
+      "target": "lucide_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/LayerPanel.tsx",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_layerpanel_tsx",
+      "target": "ui_layerpanel_typelabel",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/LayerPanel.tsx",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ui_layerpanel_tsx",
+      "target": "ui_layerpanel_layerpanel",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/LayerPanel.tsx",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -1281,7 +2209,7 @@
     },
     {
       "source": "src_types_canvas_ts",
-      "target": "types_canvas_canvasobject",
+      "target": "types_canvas_guidelineobject",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/types/canvas.ts",
@@ -1289,21 +2217,1212 @@
       "weight": 1.0
     },
     {
-      "source": "src_types_electron_d_ts",
-      "target": "types_electron_d_externaleditor",
+      "source": "src_types_canvas_ts",
+      "target": "types_canvas_canvasobject",
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/types/electron.d.ts",
+      "source_file": "src/types/canvas.ts",
+      "source_location": "L310",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_canvas_d_ts",
+      "target": "types_canvas_d_canvasobjecttype",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/canvas.d.ts",
       "source_location": "L1",
       "weight": 1.0
     },
     {
-      "source": "src_types_electron_d_ts",
-      "target": "types_electron_d_window",
+      "source": "src_types_canvas_d_ts",
+      "target": "types_canvas_d_canvasobjectscope",
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/types/electron.d.ts",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_canvas_d_ts",
+      "target": "types_canvas_d_basecanvasobject",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_canvas_d_ts",
+      "target": "types_canvas_d_imageobject",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_canvas_d_ts",
+      "target": "types_canvas_d_maskdata",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_canvas_d_ts",
+      "target": "types_canvas_d_photoadjustments",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L60",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_canvas_d_ts",
+      "target": "types_canvas_d_fontstyle",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L75",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_canvas_d_ts",
+      "target": "types_canvas_d_textspanstyle",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_canvas_d_ts",
+      "target": "types_canvas_d_textspan",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L85",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_canvas_d_ts",
+      "target": "types_canvas_d_textobject",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L89",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_canvas_d_ts",
+      "target": "types_canvas_d_shapekind",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L100",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_canvas_d_ts",
+      "target": "types_canvas_d_shapeobject",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L101",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_canvas_d_ts",
+      "target": "types_canvas_d_anchorpoint",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L111",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_canvas_d_ts",
+      "target": "types_canvas_d_pathobject",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L123",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_canvas_d_ts",
+      "target": "types_canvas_d_groupobject",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L132",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_canvas_d_ts",
+      "target": "types_canvas_d_guidelineobject",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L136",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_canvas_d_ts",
+      "target": "types_canvas_d_canvasobject",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/canvas.d.ts",
+      "source_location": "L143",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "src_types_canvas_ts",
+      "relation": "imports_from",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_canvas_canvasobjecttype",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_canvas_canvasobjectscope",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_canvas_basecanvasobject",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_canvas_imageobject",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_canvas_maskdata",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_canvas_fontstyle",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_canvas_textspanstyle",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_canvas_textspan",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_canvas_textobject",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_canvas_shapekind",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_canvas_shapeobject",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_canvas_groupobject",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_canvas_anchorpoint",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_canvas_pathobject",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_canvas_guidelineobject",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_canvas_canvasobject",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_types_project_ts",
+      "relation": "imports_from",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_project_platform",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_project_frameratio",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_project_framedimensions",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_project_frame",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_project_carouselproject",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_types_ai_ts",
+      "relation": "imports_from",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_ai_aioperationtype",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_ai_aioperationstatus",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_ai_aioperationbase",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_ai_backgroundremovaloperation",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_ai_segmentationoperation",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_ai_inpaintingoperation",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "src_types_index_ts",
+      "target": "types_ai_aioperation",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/index.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "react_konva",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "konva",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_constants_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
       "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_constants_canvas_scale",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_constants_axislock",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "src_canvas_usecanvasstore_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_usecanvasstore_usecanvasstore",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_useviewportstore_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_useviewportstore_useviewportstore",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_frameguides_tsx",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_frameguides_frameguides",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_canvasimagenode_tsx",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_canvasimagenode_canvasimagenode",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_canvastextnode_tsx",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_canvastextnode_canvastextnode",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_canvasshapenode_tsx",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_canvasshapenode_canvasshapenode",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_canvaspathnode_tsx",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_canvaspathnode_canvaspathnode",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_canvaspathnode_computepathbbox",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_canvaspathnode_anchorstopathdata",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_snapguides_tsx",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_snapguides_snapguides",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "src_canvas_usesnapguides_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_usesnapguides_usesnapguides",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "src_canvas_usesnapguides_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_usesnapguides_snapguide",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_useimagedrop_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_useimagedrop_useimagedrop",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_usevideodrop_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_usevideodrop_usevideodrop",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_canvasvideonode_tsx",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_canvasvideonode_canvasvideonode",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_useautosave_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_useautosave_useautosave",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "src_canvas_usekeyboardshortcuts_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_usekeyboardshortcuts_usekeyboardshortcuts",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_usethumbnailstore_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_usethumbnailstore_usethumbnailgenerator",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "effects",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "colorinput",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_canvasgroupnode_tsx",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_canvasgroupnode_canvasgroupnode",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_gridcelloverlay_tsx",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_gridcelloverlay_gridcelloverlay",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "src_canvas_canvasguidelinenode_tsx",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_canvasguidelinenode_canvasguidelinenode",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "src_canvas_exportframes_ts",
+      "relation": "imports_from",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_exportframes_exportframes",
+      "relation": "re_exports",
+      "context": "re-export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_carouselstage_getstageinstance",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "canvas_carouselstage_carouselstage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usesnapguides_ts",
+      "target": "react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usesnapguides_ts",
+      "target": "canvas",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usesnapguides_ts",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_constants_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usesnapguides_ts",
+      "target": "canvas_constants_snap_threshold",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usesnapguides_ts",
+      "target": "src_canvas_usecanvasstore_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usesnapguides_ts",
+      "target": "canvas_usecanvasstore_usecanvasstore",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usesnapguides_ts",
+      "target": "canvas_usesnapguides_snapguide",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usesnapguides_ts",
+      "target": "canvas_usesnapguides_dragbox",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usesnapguides_ts",
+      "target": "canvas_usesnapguides_snaptarget",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usesnapguides_ts",
+      "target": "canvas_usesnapguides_buildtargets",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usesnapguides_ts",
+      "target": "canvas_usesnapguides_computesnapfromtargets",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L70",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usesnapguides_ts",
+      "target": "canvas_usesnapguides_computesnap",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usesnapguides_ts",
+      "target": "canvas_usesnapguides_computesnapresizefromtargets",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L133",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usesnapguides_ts",
+      "target": "canvas_usesnapguides_computesnapresize",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L294",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usesnapguides_ts",
+      "target": "canvas_usesnapguides_rotation_snap_angles",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L308",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usesnapguides_ts",
+      "target": "canvas_usesnapguides_snaprotation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L311",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usesnapguides_ts",
+      "target": "canvas_usesnapguides_usesnapguides",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L318",
+      "weight": 1.0
+    },
+    {
+      "source": "canvas_usesnapguides_computesnap",
+      "target": "canvas_usesnapguides_buildtargets",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L128",
+      "weight": 1.0
+    },
+    {
+      "source": "canvas_usesnapguides_computesnap",
+      "target": "canvas_usesnapguides_computesnapfromtargets",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L129",
+      "weight": 1.0
+    },
+    {
+      "source": "canvas_usesnapguides_computesnapresize",
+      "target": "canvas_usesnapguides_buildtargets",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L304",
+      "weight": 1.0
+    },
+    {
+      "source": "canvas_usesnapguides_computesnapresize",
+      "target": "canvas_usesnapguides_computesnapresizefromtargets",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L305",
       "weight": 1.0
     },
     {
@@ -1451,7 +3570,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/exportFrames.ts",
-      "source_location": "L156",
+      "source_location": "L159",
       "weight": 1.0
     },
     {
@@ -1460,7 +3579,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/exportFrames.ts",
-      "source_location": "L180",
+      "source_location": "L183",
       "weight": 1.0
     },
     {
@@ -1469,7 +3588,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/exportFrames.ts",
-      "source_location": "L231",
+      "source_location": "L234",
       "weight": 1.0
     },
     {
@@ -1479,425 +3598,584 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/exportFrames.ts",
-      "source_location": "L376",
+      "source_location": "L381",
       "weight": 1.0
     },
     {
-      "source": "src_electron_preload_ts",
-      "target": "electron",
+      "source": "src_canvas_canvasguidelinenode_tsx",
+      "target": "react",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/electron/preload.ts",
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
       "source_location": "L1",
       "weight": 1.0
     },
     {
-      "source": "src_electron_preload_ts",
-      "target": "electron_preload_handler",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/preload.ts",
-      "source_location": "L41",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron",
+      "source": "src_canvas_canvasguidelinenode_tsx",
+      "target": "react_konva",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "path",
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
       "source_location": "L2",
       "weight": 1.0
     },
     {
-      "source": "src_electron_index_ts",
-      "target": "promises",
+      "source": "src_canvas_canvasguidelinenode_tsx",
+      "target": "konva",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
       "source_location": "L3",
       "weight": 1.0
     },
     {
-      "source": "src_electron_index_ts",
-      "target": "fs",
+      "source": "src_canvas_canvasguidelinenode_tsx",
+      "target": "canvas",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
       "source_location": "L4",
       "weight": 1.0
     },
     {
-      "source": "src_electron_index_ts",
-      "target": "os",
+      "source": "src_canvas_canvasguidelinenode_tsx",
+      "target": "src_canvas_usecanvasstore_ts",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
       "source_location": "L5",
       "weight": 1.0
     },
     {
-      "source": "src_electron_index_ts",
-      "target": "child_process",
+      "source": "src_canvas_canvasguidelinenode_tsx",
+      "target": "canvas_usecanvasstore_usecanvasstore",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_canvasguidelinenode_tsx",
+      "target": "src_canvas_usesnapguides_ts",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
       "source_location": "L6",
       "weight": 1.0
     },
     {
-      "source": "src_electron_index_ts",
-      "target": "chokidar",
-      "relation": "imports_from",
+      "source": "src_canvas_canvasguidelinenode_tsx",
+      "target": "canvas_usesnapguides_usesnapguides",
+      "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L7",
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_getzeroseamsdir",
+      "source": "src_canvas_canvasguidelinenode_tsx",
+      "target": "canvas_canvasguidelinenode_props",
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L9",
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
+      "source_location": "L8",
       "weight": 1.0
     },
     {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_getpreferencespath",
+      "source": "src_canvas_canvasguidelinenode_tsx",
+      "target": "canvas_canvasguidelinenode_innerprops",
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L13",
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_getrecentfilespath",
+      "source": "src_canvas_canvasguidelinenode_tsx",
+      "target": "canvas_canvasguidelinenode_canvasguidelinenodeinner",
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
       "source_location": "L17",
       "weight": 1.0
     },
     {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_addrecentfile",
+      "source": "src_canvas_canvasguidelinenode_tsx",
+      "target": "canvas_canvasguidelinenode_canvasguidelinenodeouter",
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L21",
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
+      "source_location": "L110",
       "weight": 1.0
     },
     {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_preferences",
+      "source": "src_canvas_canvasguidelinenode_tsx",
+      "target": "canvas_canvasguidelinenode_canvasguidelinenode",
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
+      "source_location": "L118",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usecanvasstore_ts",
+      "target": "zustand",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usecanvasstore_ts",
+      "target": "canvas",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usecanvasstore_ts",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_gridtemplates_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usecanvasstore_ts",
+      "target": "canvas_gridtemplates_gridtemplate",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usecanvasstore_ts",
+      "target": "project",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usecanvasstore_ts",
+      "target": "canvas_usecanvasstore_platform_presets",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usecanvasstore_ts",
+      "target": "canvas_usecanvasstore_historysnapshot",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usecanvasstore_ts",
+      "target": "canvas_usecanvasstore_makeframes",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usecanvasstore_ts",
+      "target": "canvas_usecanvasstore_getobjectbbox",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usecanvasstore_ts",
+      "target": "canvas_usecanvasstore_isineditmode",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usecanvasstore_ts",
+      "target": "canvas_usecanvasstore_reinjectsrc",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L69",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usecanvasstore_ts",
+      "target": "canvas_usecanvasstore_canvasstate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L87",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usecanvasstore_ts",
+      "target": "canvas_usecanvasstore_normalizeobjectsforsnapshot",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L209",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usecanvasstore_ts",
+      "target": "canvas_usecanvasstore_usecanvasstore",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useCanvasStore.ts",
+      "source_location": "L251",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usekeyboardshortcuts_ts",
+      "target": "react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usekeyboardshortcuts_ts",
+      "target": "src_canvas_usecanvasstore_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usekeyboardshortcuts_ts",
+      "target": "canvas_usecanvasstore_usecanvasstore",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usekeyboardshortcuts_ts",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_useviewportstore_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usekeyboardshortcuts_ts",
+      "target": "canvas_useviewportstore_useviewportstore",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usekeyboardshortcuts_ts",
+      "target": "usesavestatusstore",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usekeyboardshortcuts_ts",
+      "target": "project",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usekeyboardshortcuts_ts",
+      "target": "canvas",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usekeyboardshortcuts_ts",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_canvaspathnode_tsx",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usekeyboardshortcuts_ts",
+      "target": "canvas_canvaspathnode_computepathbbox",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usekeyboardshortcuts_ts",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_canvas_pathutils_ts",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usekeyboardshortcuts_ts",
+      "target": "canvas_pathutils_relativizevideoobjects",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usekeyboardshortcuts_ts",
+      "target": "canvas_usekeyboardshortcuts_buildprojectsnapshot",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "src_canvas_usekeyboardshortcuts_ts",
+      "target": "canvas_usekeyboardshortcuts_usekeyboardshortcuts",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
       "source_location": "L31",
       "weight": 1.0
     },
     {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_externaleditor",
-      "relation": "contains",
+      "source": "src_types_index_ts",
+      "target": "src_types_canvas_ts",
+      "relation": "re_exports",
+      "context": "export",
       "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L35",
+      "source_file": "src/types/index.ts",
+      "source_location": "L1",
       "weight": 1.0
     },
     {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_readpreferences",
-      "relation": "contains",
+      "source": "src_types_index_ts",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_types_project_ts",
+      "relation": "re_exports",
+      "context": "export",
       "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L40",
+      "source_file": "src/types/index.ts",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_writepreferences",
-      "relation": "contains",
+      "source": "src_types_index_ts",
+      "target": "users_alexejwaser_documents_github_zeroseams_src_types_ai_ts",
+      "relation": "re_exports",
+      "context": "export",
       "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L49",
+      "source_file": "src/types/index.ts",
+      "source_location": "L28",
       "weight": 1.0
     },
     {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_watchers",
-      "relation": "contains",
+      "source": "src_canvas_carouselstage_tsx",
+      "target": "src_canvas_exportframes_ts",
+      "relation": "re_exports",
+      "context": "export",
       "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L53",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L28",
       "weight": 1.0
     },
     {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_tempfiles",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L54",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_createwindow",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L74",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_dir",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L117",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_filepath",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L120",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_mimemap",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L168",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_buf",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L174",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_paths",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L232",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_files",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L238",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_name",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L274",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_editor",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L275",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_existing",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L292",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_editdir",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L301",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_watcher",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L324",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_newbase64",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L331",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_filepath",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L396",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_buffer",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L397",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_watcher",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L415",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_media_mime",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L430",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_pathname",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L435",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_rangeheader",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L446",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_nodestream",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L451",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_body",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L452",
-      "weight": 1.0
-    },
-    {
-      "source": "src_electron_index_ts",
-      "target": "electron_index_corpheaders",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L463",
-      "weight": 1.0
-    },
-    {
-      "source": "electron_index_addrecentfile",
-      "target": "electron_index_getrecentfilespath",
+      "source": "ui_propertiespanel_videosection",
+      "target": "canvas_usecanvasstore_usecanvasstore",
       "relation": "calls",
       "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L24",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1103",
       "weight": 1.0
     },
     {
-      "source": "electron_index_readpreferences",
-      "target": "electron_index_getpreferencespath",
+      "source": "ui_propertiespanel_propertiespanel",
+      "target": "canvas_usecanvasstore_usecanvasstore",
       "relation": "calls",
       "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L42",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/ui/PropertiesPanel.tsx",
+      "source_location": "L1610",
       "weight": 1.0
     },
     {
-      "source": "electron_index_writepreferences",
-      "target": "electron_index_getpreferencespath",
+      "source": "ui_toolbar_titlebar",
+      "target": "canvas_usecanvasstore_usecanvasstore",
       "relation": "calls",
       "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/electron/index.ts",
-      "source_location": "L50",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/ui/Toolbar.tsx",
+      "source_location": "L282",
       "weight": 1.0
     },
     {
       "source": "ui_toolbar_toolbar",
-      "target": "ui_framesettingspopover_segmentbuttonstyle",
+      "target": "canvas_usecanvasstore_usecanvasstore",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/ui/Toolbar.tsx",
+      "source_location": "L1232",
+      "weight": 1.0
+    },
+    {
+      "source": "ui_layerpanel_layerpanel",
+      "target": "canvas_usecanvasstore_usecanvasstore",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/ui/LayerPanel.tsx",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "canvas_carouselstage_carouselstage",
+      "target": "canvas_usecanvasstore_usecanvasstore",
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "src/ui/Toolbar.tsx",
-      "source_location": "L1351",
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
+      "source": "canvas_carouselstage_carouselstage",
+      "target": "canvas_usesnapguides_usesnapguides",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L116",
+      "weight": 1.0
+    },
+    {
+      "source": "canvas_carouselstage_carouselstage",
+      "target": "canvas_usekeyboardshortcuts_usekeyboardshortcuts",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/canvas/CarouselStage.tsx",
+      "source_location": "L175",
+      "weight": 1.0
+    },
+    {
+      "source": "canvas_usesnapguides_usesnapguides",
+      "target": "canvas_usecanvasstore_usecanvasstore",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/canvas/useSnapGuides.ts",
+      "source_location": "L327",
+      "weight": 1.0
+    },
+    {
+      "source": "canvas_canvasguidelinenode_canvasguidelinenodeinner",
+      "target": "canvas_usecanvasstore_usecanvasstore",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "canvas_canvasguidelinenode_canvasguidelinenodeinner",
+      "target": "canvas_usesnapguides_usesnapguides",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "canvas_canvasguidelinenode_canvasguidelinenodeouter",
+      "target": "canvas_usecanvasstore_usecanvasstore",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/canvas/CanvasGuidelineNode.tsx",
+      "source_location": "L111",
+      "weight": 1.0
+    },
+    {
+      "source": "canvas_usekeyboardshortcuts_usekeyboardshortcuts",
+      "target": "canvas_usecanvasstore_usecanvasstore",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/canvas/useKeyboardShortcuts.ts",
+      "source_location": "L32",
       "weight": 1.0
     }
   ],

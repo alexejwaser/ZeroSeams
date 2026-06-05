@@ -99,6 +99,16 @@ export function useKeyboardShortcuts(): void {
           }
         }
         if (e.key === 's') { toggleSnap(); return }
+        if (e.key === 'f') { useCanvasStore.getState().setShowFrameSettings((v) => !v); return }
+        if (e.key === 'm') {
+          const s = useCanvasStore.getState()
+          if (s.maskModeActive) {
+            s.setMaskModeActive(false)
+            s.setSelected(null)
+            s.setActiveTool('select')
+          }
+          return
+        }
         if (e.key === '\\') { setAdjustmentsBypass(true); return }
       }
 
@@ -126,6 +136,18 @@ export function useKeyboardShortcuts(): void {
         if (!selectedId) return
         e.preventDefault()
         removeObject(selectedId)
+        return
+      }
+
+      // ⌘→ / ⌘← — add / remove frame (must come before nudge handler)
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+        e.preventDefault()
+        const s = useCanvasStore.getState()
+        if (e.key === 'ArrowRight') {
+          s.setFrameCount(s.frameCount + 1)
+        } else if (s.frameCount > 1) {
+          s.setFrameCount(s.frameCount - 1)
+        }
         return
       }
 
@@ -323,6 +345,12 @@ export function useKeyboardShortcuts(): void {
           e.preventDefault()
           if (!selectedId) return
           sendBackward(selectedId)
+          return
+        }
+
+        if (e.key === 'e' && !e.shiftKey) {
+          e.preventDefault()
+          useCanvasStore.getState().setExportOpen((v) => !v)
           return
         }
 

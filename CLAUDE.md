@@ -157,6 +157,7 @@ Tokens in `src/ui/theme.css` — single source of truth. Imported once in `src/m
 - `.btn-raised` (in `theme.css`): shadow button with press-down animation — `box-shadow: 2px 4px 0 #000` at rest
 - `iconBtnStyle(active)` (`src/ui/iconBtnStyle.ts`): active = `#f94608` fill + white icon; inactive = white fill + `#555` icon + `#d4ccc2` border; always `borderRadius: 999`
 - Sliders: global `input[type="range"]` in `theme.css` handles all. Adjustments sliders override track via inline `background`. Never add `.adj-slider`
+- Tooltips: every interactive button must be wrapped in `<Tooltip label shortcut? description?>` (`src/ui/Tooltip.tsx`). Never use native `title=` on buttons — wrong font, timing, style. `label` always required; `shortcut` required if a shortcut exists; `description` for ambiguous labels. Empty `label=""` renders children unwrapped (no tooltip).
 - Color picker: `<ColorInput>` / `<MixedColorInput>` in `src/ui/ColorInput.tsx` (exported from `src/ui/index.ts`) — never use raw `input[type="color"]`. Popover uses `react-colorful` + HEX/RGB/HSL modes + eyedropper + 5 recent colors (localStorage `zeroseams:recentColors`). `fixed` prop uses `position: fixed` for popover — required when the trigger sits in a scrollable container. `MixedColorInput` renders a `—` overlay and shows `value=undefined` as mixed state.
 
 **Layout:**
@@ -170,7 +171,7 @@ Tokens in `src/ui/theme.css` — single source of truth. Imported once in `src/m
 ## Keyboard Shortcuts
 `useKeyboardShortcuts.ts`, mounted once in CarouselStage. No-op in input/textarea.
 
-`V` select · `T` text · `R` shape · `P` pen · `L` line · `S` snap toggle · `\` bypass adjustments (hold) · `Esc` deselect · `⌘A` all · `⌘D` dupe · `⌘Z/⇧Z` undo/redo · `⌘]/[` layers · `⌘L` lock · arrows nudge · `⌫` delete · `⌘⇧P` preview toggle (disabled for custom platform)
+`V` select · `T` text · `R` shape · `P` pen · `L` line · `S` snap toggle · `F` frame settings · `M` mask mode exit · `\` bypass adjustments (hold) · `Esc` deselect · `⌘A` all · `⌘D` dupe · `⌘E` export · `⌘Z/⇧Z` undo/redo · `⌘]/[` layers · `⌘L` lock · `⌘→` add frame · `⌘←` remove frame · arrows nudge · `⌫` delete · `⌘⇧P` preview toggle (disabled for custom platform)
 
 ## Upcoming
 AI background removal UI · SAM segmentation · LaMa inpainting · Font picker + Google Fonts · Templates/presets · Windows packaging + auto-update · Video: volume meter, playback rate, poster frame thumbnail in layer panel · Preview: TikTok/Facebook/Threads shells, dark-mode variant, phone bezel

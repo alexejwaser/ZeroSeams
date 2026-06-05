@@ -164,6 +164,11 @@ interface CanvasState {
   /** Transient flag — true when the selected object is an image (enables mask-draw interception). Not stored in history. */
   maskModeActive: boolean
   setMaskModeActive: (v: boolean) => void
+  /** Transient toolbar UI flags — not stored in history */
+  showFrameSettings: boolean
+  setShowFrameSettings: (v: boolean | ((prev: boolean) => boolean)) => void
+  exportOpen: boolean
+  setExportOpen: (v: boolean | ((prev: boolean) => boolean)) => void
   moveObject: (id: string, dx: number, dy: number) => void
   setContextMenu: (state: { x: number; y: number; targetId: string | null } | null) => void
   selectAll: () => void
@@ -299,6 +304,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
     captureTextSelection: null,
     maskDrawMode: null,
     maskModeActive: false,
+    showFrameSettings: false,
+    exportOpen: false,
     _dragStartObjects: null,
     videoPlayingIds: new Set<string>(),
     _srcVault: new Map(),
@@ -1017,6 +1024,9 @@ export const useCanvasStore = create<CanvasState>((set) => {
     clearMaskDrawMode: () => set({ maskDrawMode: null }),
 
     setMaskModeActive: (v) => set({ maskModeActive: v }),
+
+    setShowFrameSettings: (v) => set((state) => ({ showFrameSettings: typeof v === 'function' ? v(state.showFrameSettings) : v })),
+    setExportOpen: (v) => set((state) => ({ exportOpen: typeof v === 'function' ? v(state.exportOpen) : v })),
 
     toggleVideoPlay: (id) =>
       set((state) => {

@@ -1,6 +1,7 @@
 import React from 'react'
 import { HexColorPicker } from 'react-colorful'
 import { Pipette } from 'lucide-react'
+import Tooltip from './Tooltip'
 import './ColorInput.css'
 
 // ─── Recent colors (localStorage) ────────────────────────────────────────────
@@ -322,13 +323,14 @@ function ColorPopover({
 
       {/* Mode toggle + eyedropper */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 10px 4px' }}>
-        <button
-          className={`zs-eyedropper-btn${'EyeDropper' in window ? '' : ' unavailable'}`}
-          onMouseDown={e => { e.preventDefault(); onEyedropper() }}
-          title="Pick color from screen"
-        >
-          <Pipette size={14} />
-        </button>
+        <Tooltip label="Eyedropper" description="Pick color from screen">
+          <button
+            className={`zs-eyedropper-btn${'EyeDropper' in window ? '' : ' unavailable'}`}
+            onMouseDown={e => { e.preventDefault(); onEyedropper() }}
+          >
+            <Pipette size={14} />
+          </button>
+        </Tooltip>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           {(['hex', 'rgb', 'hsl'] as ColorMode[]).map(m => (
             <button
