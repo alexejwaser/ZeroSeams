@@ -91,6 +91,26 @@ const divider = (
   <div style={{ width: 1, height: 20, background: '#d4ccc2', margin: '0 6px' }} />
 )
 
+function ToolGroup({ label, style, children }: {
+  label: string
+  style?: React.CSSProperties
+  children: React.ReactNode
+}): React.ReactElement {
+  return (
+    <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 6, ...style }}>
+      <span style={{
+        position: 'absolute', top: -13, left: 0,
+        fontSize: 9, fontWeight: 500, color: '#b0a89e',
+        letterSpacing: '0.03em', textTransform: 'uppercase',
+        pointerEvents: 'none', userSelect: 'none', lineHeight: 1, whiteSpace: 'nowrap',
+      }}>
+        {label}
+      </span>
+      {children}
+    </div>
+  )
+}
+
 async function blobToBase64(blob: Blob): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader()
@@ -1287,6 +1307,31 @@ export function ToolBar(): React.ReactElement {
     })
   }
 
+  async function handleAddImage(): Promise<void> {
+    const result = await window.electronAPI.openImageFile()
+    if (result.canceled || !result.data) return
+    const img = new Image()
+    img.src = result.data
+    await img.decode()
+    const MAX_SIZE = 600
+    const scale = Math.min(1, MAX_SIZE / Math.max(img.naturalWidth, img.naturalHeight))
+    const contentWidth = Math.round(img.naturalWidth * scale)
+    const contentHeight = Math.round(img.naturalHeight * scale)
+    const x = frameWidth / 2 - contentWidth / 2
+    const y = frameHeight / 2 - contentHeight / 2
+    addObject({
+      id: crypto.randomUUID(), type: 'image', scope: 'global', name: 'image',
+      src: result.data, backgroundRemoved: false,
+      naturalWidth: img.naturalWidth, naturalHeight: img.naturalHeight,
+      frameX: x, frameY: y, frameWidth: contentWidth, frameHeight: contentHeight,
+      contentOffsetX: 0, contentOffsetY: 0, contentWidth, contentHeight,
+      contentEditMode: false, maskEditMode: false,
+      x, y, width: contentWidth, height: contentHeight,
+      rotation: 0, scaleX: 1, scaleY: 1, opacity: 1, visible: true, locked: false,
+      zIndex: objectOrder.length,
+    })
+  }
+
   const segmentButtonStyle = (active: boolean): React.CSSProperties => ({
     padding: '3px 10px',
     height: 24,
@@ -1305,10 +1350,10 @@ export function ToolBar(): React.ReactElement {
     <div
       style={{
         display: 'flex',
-        alignItems: 'center',
-        height: 50,
-        padding: '0 20px',
-        gap: 6,
+        alignItems: 'flex-end',
+        height: 62,
+        padding: '0 20px 10px',
+        gap: 0,
         background: 'var(--bg-base)',
         borderBottom: '1px solid var(--border)',
         boxSizing: 'border-box',
@@ -1316,135 +1361,135 @@ export function ToolBar(): React.ReactElement {
         flexShrink: 0,
       }}
     >
-      {/* Group 1 — Selection */}
-      <Tooltip label="Select" shortcut="V">
-        <button
-          onClick={() => handleToolClick('select')}
-          style={iconBtnStyle(activeTool === 'select')}
-        >
-          <MousePointer2 size={15} />
-        </button>
-      </Tooltip>
-
-      <Tooltip label="Snap" shortcut="S" description="Snap to guides and objects">
-        <button
-          onClick={toggleSnap}
-          aria-pressed={snapEnabled}
-          style={{
-            width: 30,
-            height: 30,
-            background: snapEnabled ? '#f94608' : '#ffffff',
-            color: snapEnabled ? '#ffffff' : '#555555',
-            border: snapEnabled ? 'none' : '1px solid #d4ccc2',
-            borderRadius: 999,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'background 0.15s',
-          }}
-        >
-          {SNAP_ICON}
-        </button>
-      </Tooltip>
-
-      <div style={{ display: 'flex', alignItems: 'center', background: '#ffffff', border: '1px solid #d4ccc2', borderRadius: 999, padding: 2, gap: 2 }}>
-        <Tooltip label="Crop mode" description="Frame clips content">
+      {/* ── Transform ─────────────────────────────────────────────────────────── */}
+      <ToolGroup label="Transform" style={{ marginRight: 28 }}>
+        <Tooltip label="Select" shortcut="V">
           <button
-            onClick={() => setResizeMode('advanced')}
-            style={segmentButtonStyle(resizeMode === 'advanced')}
-          >{CROP_ICON}</button>
+            onClick={() => handleToolClick('select')}
+            style={iconBtnStyle(activeTool === 'select')}
+          >
+            <MousePointer2 size={15} />
+          </button>
         </Tooltip>
-        <Tooltip label="Auto-fill mode" description="Content fills frame on resize">
+
+        <Tooltip label="Snap" shortcut="S" description="Snap to guides and objects">
           <button
-            onClick={() => setResizeMode('auto')}
-            style={segmentButtonStyle(resizeMode === 'auto')}
-          >{AUTOFILL_ICON}</button>
+            onClick={toggleSnap}
+            aria-pressed={snapEnabled}
+            style={iconBtnStyle(snapEnabled)}
+          >
+            {SNAP_ICON}
+          </button>
         </Tooltip>
-      </div>
 
-      {divider}
+        <div style={{ display: 'flex', alignItems: 'center', background: '#ffffff', border: '1px solid #d4ccc2', borderRadius: 999, padding: 2, gap: 2 }}>
+          <Tooltip label="Crop mode" description="Frame clips content">
+            <button
+              onClick={() => setResizeMode('advanced')}
+              style={segmentButtonStyle(resizeMode === 'advanced')}
+            >{CROP_ICON}</button>
+          </Tooltip>
+          <Tooltip label="Auto-fill mode" description="Content fills frame on resize">
+            <button
+              onClick={() => setResizeMode('auto')}
+              style={segmentButtonStyle(resizeMode === 'auto')}
+            >{AUTOFILL_ICON}</button>
+          </Tooltip>
+        </div>
+      </ToolGroup>
 
-      {/* Group 3 — Create */}
-      <Tooltip label="Text" shortcut="T">
-        <button
-          onClick={() => handleToolClick('text')}
-          style={iconBtnStyle(activeTool === 'text')}
-        >
-          <Type size={15} />
-        </button>
-      </Tooltip>
+      {/* ── Add ───────────────────────────────────────────────────────────────── */}
+      <ToolGroup label="Add" style={{ marginRight: 28 }}>
+        <Tooltip label="Text" shortcut="T">
+          <button
+            onClick={() => handleToolClick('text')}
+            style={iconBtnStyle(activeTool === 'text')}
+          >
+            <Type size={15} />
+          </button>
+        </Tooltip>
 
-      <Tooltip label="Shape" shortcut="R">
-        <button
-          onClick={() => handleToolClick('shape')}
-          style={iconBtnStyle(activeTool === 'shape')}
-        >
-          {activeShapeKind === 'ellipse'
-            ? <Circle size={15} />
-            : activeShapeKind === 'line'
-            ? <Minus size={15} />
-            : <Square size={15} />}
-        </button>
-      </Tooltip>
+        <Tooltip label="Shape" shortcut="R">
+          <button
+            onClick={() => handleToolClick('shape')}
+            style={iconBtnStyle(activeTool === 'shape')}
+          >
+            {activeShapeKind === 'ellipse'
+              ? <Circle size={15} />
+              : activeShapeKind === 'line'
+              ? <Minus size={15} />
+              : <Square size={15} />}
+          </button>
+        </Tooltip>
 
-      <Tooltip label="Pen" shortcut="P">
-        <button
-          onClick={() => handleToolClick('pen')}
-          style={iconBtnStyle(activeTool === 'pen')}
-        >
-          <PenTool size={15} />
-        </button>
-      </Tooltip>
+        <Tooltip label="Pen" shortcut="P">
+          <button
+            onClick={() => handleToolClick('pen')}
+            style={iconBtnStyle(activeTool === 'pen')}
+          >
+            <PenTool size={15} />
+          </button>
+        </Tooltip>
 
-      <Tooltip label="Add video">
-        <button
-          onClick={() => { void handleAddVideo() }}
-          style={iconBtnStyle(false)}
-        >
-          <Film size={15} />
-        </button>
-      </Tooltip>
+        <Tooltip label="Add image">
+          <button
+            onClick={() => { void handleAddImage() }}
+            style={iconBtnStyle(false)}
+          >
+            <ImageDown size={15} />
+          </button>
+        </Tooltip>
 
+        <Tooltip label="Add video">
+          <button
+            onClick={() => { void handleAddVideo() }}
+            style={iconBtnStyle(false)}
+          >
+            <Film size={15} />
+          </button>
+        </Tooltip>
+      </ToolGroup>
 
-      <Tooltip label="Grid">
-        <button
-          style={iconBtnStyle(activeTool === 'grid')}
-          title="Grid"
-          onClick={e => {
-            setActiveTool('grid')
-            setGridPickerAnchor(e.currentTarget)
-          }}
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <rect x="1" y="1" width="6" height="6" rx="1" fill="none" stroke="currentColor" strokeWidth="1.5"/>
-            <rect x="9" y="1" width="6" height="6" rx="1" fill="none" stroke="currentColor" strokeWidth="1.5"/>
-            <rect x="1" y="9" width="6" height="6" rx="1" fill="none" stroke="currentColor" strokeWidth="1.5"/>
-            <rect x="9" y="9" width="6" height="6" rx="1" fill="none" stroke="currentColor" strokeWidth="1.5"/>
-          </svg>
-        </button>
-      </Tooltip>
+      {/* ── Layout ────────────────────────────────────────────────────────────── */}
+      <ToolGroup label="Layout">
+        <Tooltip label="Grid">
+          <button
+            style={iconBtnStyle(activeTool === 'grid')}
+            onClick={e => {
+              setActiveTool('grid')
+              setGridPickerAnchor(e.currentTarget)
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <rect x="1" y="1" width="6" height="6" rx="1" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+              <rect x="9" y="1" width="6" height="6" rx="1" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+              <rect x="1" y="9" width="6" height="6" rx="1" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+              <rect x="9" y="9" width="6" height="6" rx="1" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+            </svg>
+          </button>
+        </Tooltip>
 
-      <Tooltip label="Guideline" shortcut="G" description="Add ruler guideline">
-        <button
-          onClick={() => handleToolClick('guideline')}
-          style={iconBtnStyle(activeTool === 'guideline')}
-        >
-          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-            <line x1="1" y1="7.5" x2="14" y2="7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/>
-            <line x1="7.5" y1="1" x2="7.5" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2" opacity="0.35"/>
-          </svg>
-        </button>
-      </Tooltip>
+        <Tooltip label="Guideline" shortcut="G" description="Add ruler guideline">
+          <button
+            onClick={() => handleToolClick('guideline')}
+            style={iconBtnStyle(activeTool === 'guideline')}
+          >
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+              <line x1="1" y1="7.5" x2="14" y2="7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/>
+              <line x1="7.5" y1="1" x2="7.5" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2" opacity="0.35"/>
+            </svg>
+          </button>
+        </Tooltip>
 
-      <Tooltip label={guidelinesVisible ? 'Hide guidelines' : 'Show guidelines'}>
-        <button
-          onClick={toggleGuidelinesVisible}
-          style={iconBtnStyle(!guidelinesVisible)}
-        >
-          {guidelinesVisible ? <Eye size={15} /> : <EyeOff size={15} />}
-        </button>
-      </Tooltip>
+        <Tooltip label={guidelinesVisible ? 'Hide guidelines' : 'Show guidelines'}>
+          <button
+            onClick={toggleGuidelinesVisible}
+            style={iconBtnStyle(!guidelinesVisible)}
+          >
+            {guidelinesVisible ? <Eye size={15} /> : <EyeOff size={15} />}
+          </button>
+        </Tooltip>
+      </ToolGroup>
 
       {activeTool === 'guideline' && (
         <div
