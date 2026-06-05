@@ -173,6 +173,7 @@ interface CanvasState {
     finalPos: { x: number; y: number } | { frameX: number; frameY: number },
   ) => void
   addGrid: (template: GridTemplate, canvasX: number, canvasY: number) => void
+  replaceGridCell: (cellId: string, replacement: CanvasObject) => void
   /** Transient — captures pre-drag object state so commitUpdate can save the correct pre-drag snapshot. Not in history. */
   _dragStartObjects: Record<string, CanvasObject> | null
   /** Call onMouseDown before any updateObject drag calls. commitUpdate will use this snapshot for the history entry. */
@@ -1336,6 +1337,45 @@ export const useCanvasStore = create<CanvasState>((set) => {
           future: [],
           objects: { ...state.objects, [groupId]: group, ...cellsById },
           objectOrder: [...state.objectOrder, groupId, ...cellIds],
+        }
+      }),
+
+    replaceGridCell: (cellId, replacement) =>
+      set((state) => {
+        // Find the parent group that owns this cell
+        const parentGroup = Object.values(state.objects).find(
+          (o) => o.type === 'group' && (o as GroupObject).childIds.includes(cellId),
+        ) as GroupObject | undefined
+
+        const updatedObjects = { ...state.objects }
+        delete updatedObjects[cellId]
+        updatedObjects[replacement.id] = replacement
+
+        // Splice the new id into the parent group's childIds at the same position
+        if (parentGroup) {
+          const idx = parentGroup.childIds.indexOf(cellId)
+          const newChildIds = [...parentGroup.childIds]
+          newChildIds[idx] = replacement.id
+          updatedObjects[parentGroup.id] = { ...parentGroup, childIds: newChildIds }
+        }
+
+        // Replace cellId with replacement.id in objectOrder
+        const newOrder = state.objectOrder.map((id) => (id === cellId ? replacement.id : id))
+
+        // Update src vault for image replacements (keeps base64 out of history snapshots)
+        let nextVault = state._srcVault
+        if (replacement.type === 'image') {
+          const img = replacement as ImageObject
+          nextVault = new Map(state._srcVault)
+          nextVault.set(replacement.id, { src: img.src, originalSrc: img.originalSrc })
+        }
+
+        return {
+          past: pushHistoryFrom(state),
+          future: [],
+          objects: updatedObjects,
+          objectOrder: newOrder,
+          _srcVault: nextVault,
         }
       }),
   }

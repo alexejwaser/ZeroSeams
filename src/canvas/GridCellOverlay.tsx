@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import { useCanvasStore } from './useCanvasStore'
 import { useViewportStore } from './useViewportStore'
 import { CANVAS_SCALE } from './constants'
-import type { ImageObject } from '../types/canvas'
+import type { ImageObject, VideoObject } from '../types/canvas'
 
 /**
  * HTML overlay that renders "+ image" / "+ video" buttons centred over every
@@ -12,7 +12,6 @@ import type { ImageObject } from '../types/canvas'
  * absolute-positioned inside the `position: relative` container div, using
  *   left = panX + cell.frameX * CANVAS_SCALE * zoom
  *   top  = panY + cell.frameY * CANVAS_SCALE * zoom
- * No `position: fixed` — the container is the reference.
  */
 export function GridCellOverlay() {
   const objects = useCanvasStore((s) => s.objects)
@@ -51,12 +50,68 @@ export function GridCellOverlay() {
     } as any)
   }, [])
 
-  // TODO: Convert the empty ImageObject cell to a VideoObject.
-  // Changing `type` via commitUpdate requires store support for type mutation
-  // (currently not implemented). For now this is a stub — implement alongside
-  // the VideoObject cell type once the store action is available.
-  const handleFillVideo = useCallback(async (_cellId: string) => {
-    console.warn('[GridCellOverlay] Video cell fill not yet implemented.')
+  const handleFillVideo = useCallback(async (cellId: string) => {
+    const result = await window.electronAPI.openVideoFile()
+    if (result.canceled || !result.filePath) return
+
+    const frame = useCanvasStore.getState().objects[cellId] as ImageObject | undefined
+    if (!frame) return
+
+    const filePath = result.filePath
+    const rawName = filePath.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'video'
+
+    await new Promise<void>((resolve) => {
+      const vid = document.createElement('video')
+      vid.preload = 'metadata'
+      const onMeta = () => {
+        if (!isFinite(vid.duration) || vid.duration <= 0) return
+        vid.removeEventListener('durationchange', onMeta)
+
+        // Cover-fit video into the cell frame
+        const s = Math.max(frame.frameWidth / vid.videoWidth, frame.frameHeight / vid.videoHeight)
+        const cw = vid.videoWidth * s
+        const ch = vid.videoHeight * s
+
+        const videoObj: VideoObject = {
+          id: crypto.randomUUID(),
+          type: 'video',
+          scope: 'global',
+          name: rawName,
+          filePath,
+          muted: false,
+          naturalWidth: vid.videoWidth,
+          naturalHeight: vid.videoHeight,
+          naturalDuration: vid.duration,
+          frameX: frame.frameX,
+          frameY: frame.frameY,
+          frameWidth: frame.frameWidth,
+          frameHeight: frame.frameHeight,
+          contentOffsetX: (frame.frameWidth - cw) / 2,
+          contentOffsetY: (frame.frameHeight - ch) / 2,
+          contentWidth: cw,
+          contentHeight: ch,
+          contentEditMode: false,
+          x: frame.frameX,
+          y: frame.frameY,
+          width: frame.frameWidth,
+          height: frame.frameHeight,
+          rotation: 0,
+          scaleX: 1,
+          scaleY: 1,
+          opacity: 1,
+          visible: true,
+          locked: false,
+          zIndex: frame.zIndex,
+        }
+
+        vid.src = ''
+        useCanvasStore.getState().replaceGridCell(cellId, videoObj)
+        resolve()
+      }
+      vid.addEventListener('durationchange', onMeta)
+      vid.onerror = () => resolve()
+      vid.src = `zeroseams-media://localhost${filePath}`
+    })
   }, [])
 
   const scale = CANVAS_SCALE * zoom
@@ -66,6 +121,20 @@ export function GridCellOverlay() {
     .filter((obj): obj is ImageObject =>
       obj?.type === 'image' && (obj as ImageObject).isEmpty === true,
     )
+
+  const btnStyle: React.CSSProperties = {
+    background: 'rgba(255,255,255,0.9)',
+    border: '1px solid #d4ccc2',
+    borderRadius: 999,
+    padding: '4px 10px',
+    fontSize: 11,
+    fontFamily: 'var(--font)',
+    color: '#111111',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 4,
+  }
 
   return (
     <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
@@ -92,40 +161,10 @@ export function GridCellOverlay() {
               pointerEvents: 'auto',
             }}
           >
-            <button
-              onClick={() => handleFillImage(cell.id)}
-              style={{
-                background: 'rgba(255,255,255,0.9)',
-                border: '1px solid #d4ccc2',
-                borderRadius: 999,
-                padding: '4px 10px',
-                fontSize: 11,
-                fontFamily: 'var(--font)',
-                color: '#111111',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-              }}
-            >
+            <button onClick={() => { void handleFillImage(cell.id) }} style={btnStyle}>
               + image
             </button>
-            <button
-              onClick={() => handleFillVideo(cell.id)}
-              style={{
-                background: 'rgba(255,255,255,0.9)',
-                border: '1px solid #d4ccc2',
-                borderRadius: 999,
-                padding: '4px 10px',
-                fontSize: 11,
-                fontFamily: 'var(--font)',
-                color: '#111111',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-              }}
-            >
+            <button onClick={() => { void handleFillVideo(cell.id) }} style={btnStyle}>
               + video
             </button>
           </div>

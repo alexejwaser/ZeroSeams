@@ -4,7 +4,7 @@ import { useThumbnailStore } from '@/canvas/useThumbnailStore'
 import type { CanvasObject, CanvasObjectType, GroupObject, ImageObject, VideoObject } from '@/types/canvas'
 import Tooltip from './Tooltip'
 import { iconBtnStyle } from './iconBtnStyle'
-import { Link2, Star, Lock, LockOpen, Eye, EyeOff, Volume2, VolumeX, ChevronDown, ChevronRight } from 'lucide-react'
+import { Link2, Star, Lock, LockOpen, Eye, EyeOff, Volume2, VolumeX, ChevronDown, ChevronRight, Layers } from 'lucide-react'
 
 function typeLabel(type: CanvasObjectType): string {
   switch (type) {
@@ -254,6 +254,17 @@ export function LayerPanel(): React.ReactElement {
                       <div style={{ width: '100%', height: '100%', background: '#e8e0d5' }} />
                     )}
                   </div>
+                </div>
+              ) : isGroupObj ? (
+                <div
+                  style={{
+                    width: 26, height: 26, flexShrink: 0, borderRadius: 4,
+                    background: '#f5ede2', border: '1px solid #e8e0d5',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#aaaaaa',
+                  }}
+                >
+                  <Layers size={14} strokeWidth={1.5} />
                 </div>
               ) : (
                 <div
