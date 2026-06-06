@@ -135,12 +135,21 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `getObjectBBox` in store guards `type === 'guideline'` → returns zero-size rect at `(obj.x, obj.y)`
 - Drag uses `startSnapSession`/`endSnapSession` + `computeSnap` in `onDragMove`; axis constraint enforced imperatively (`node.x(fixedX)` for horizontal, `node.y(0)` for vertical)
 
+**Frame Reordering** (`reorderFrames` in store, drag UI in `CarouselStage.tsx`):
+- `reorderFrames(from, to)` — single raw `set()` + `pushHistoryFrom`; can't use `commitMultipleUpdates` because it only patches objects, not `frames[]`
+- Object ownership = spatial center: `Math.floor((bbox.x + bbox.width/2) / frameWidth)` — the `scope` field is irrelevant here
+- `contentOffsetX/Y` is frame-relative — never shift it; only `frameX` + `x` shift for image/video objects
+- Guidelines: owned by `frameIndex` / `spanAllFrames`; global (`frameIndex === -1`) and span-all never move
+- Frame drag: `onPointerMove/Up` live on the container div, not the grip span — Chromium silently drops `setPointerCapture` when an ancestor receives `pointer-events: none` via React re-render
+- `useImageDrop` / `useVideoDrop`: early-return when `!e.dataTransfer?.types.includes('Files')` — without this they swallow the frame-drag pointer events
+- Canvas preview capture: deferred into `requestAnimationFrame`, saves/restores stage size + scale, hides UI layers, crops at `pixelRatio: 0.5`
+
 **Other invariants:**
 - Masking: `MaskData.kind: 'pen'|'rect'|'ellipse'`; `maskModeActive` in store (transient, not in history)
 - Save: `currentFilePath` in `useSaveStatusStore`; autosave forks on it; `recentFiles.json` tracks history
 - Export overlay: `useExportStore` — `exporting/exportStatus/cancelRequested`; status flows from `exportMixedFrames` → Toolbar label
 - Thumbnails: `useThumbnailStore`, HTML Canvas 2D, triggered on `past.length` changes + mount
-- Frame labels: HTML div strip at `top: Math.max(4, panY - 22)` in CarouselStage (not Konva Text)
+- Frame labels: HTML div strip at `top: Math.max(4, panY - 22)` in CarouselStage (not Konva Text); grip + label pill uses `transform: translateX` for animated reorder — see ColorInput portal note below
 - Multi-file drop: drop coords captured synchronously before async work; 30px stagger per file
 
 ## Visual Design System
@@ -159,7 +168,7 @@ Tokens in `src/ui/theme.css` — single source of truth. Imported once in `src/m
 - `iconBtnStyle(active)` (`src/ui/iconBtnStyle.ts`): active = `#f94608` fill + white icon; inactive = white fill + `#555` icon + `#d4ccc2` border; always `borderRadius: 999`
 - Sliders: global `input[type="range"]` in `theme.css` handles all. Adjustments sliders override track via inline `background`. Never add `.adj-slider`
 - Tooltips: every interactive button must be wrapped in `<Tooltip label shortcut? description?>` (`src/ui/Tooltip.tsx`). Never use native `title=` on buttons — wrong font, timing, style. `label` always required; `shortcut` required if a shortcut exists; `description` for ambiguous labels. Empty `label=""` renders children unwrapped (no tooltip).
-- Color picker: `<ColorInput>` / `<MixedColorInput>` in `src/ui/ColorInput.tsx` (exported from `src/ui/index.ts`) — never use raw `input[type="color"]`. Popover uses `react-colorful` + HEX/RGB/HSL modes + eyedropper + 5 recent colors (localStorage `zeroseams:recentColors`). `fixed` prop uses `position: fixed` for popover — required when the trigger sits in a scrollable container. `MixedColorInput` renders a `—` overlay and shows `value=undefined` as mixed state.
+- Color picker: `<ColorInput>` / `<MixedColorInput>` in `src/ui/ColorInput.tsx` (exported from `src/ui/index.ts`) — never use raw `input[type="color"]`. Popover uses `react-colorful` + HEX/RGB/HSL modes + eyedropper + 5 recent colors (localStorage `zeroseams:recentColors`). `fixed` prop portals the popover into `document.body` — required whenever the trigger has a CSS `transform` ancestor (even `translateX(0px)` creates a containing block that breaks `position:fixed`). `popoverAnchorFn?: () => {top,left}` overrides automatic `getBoundingClientRect` positioning when you need a fixed anchor (e.g. frame label strip). `MixedColorInput` renders a `—` overlay and shows `value=undefined` as mixed state.
 
 **Layout:**
 - `TitleBar` (full width, 52px) — logo, file ops, frame settings, frames counter, preview, export, undo/redo
