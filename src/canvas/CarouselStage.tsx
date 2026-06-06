@@ -35,6 +35,21 @@ export function getStageInstance(): Konva.Stage | null {
   return _stageInstance
 }
 
+interface FrameDragState {
+  fromIndex: number
+  startClientX: number
+  currentClientX: number
+  containerLeft: number // viewport X of the container at drag start
+}
+
+// Returns how many slots frame i should shift during a reorder preview.
+function frameSlotOffset(i: number, from: number, to: number): number {
+  if (i === from) return 0
+  if (from < to && i > from && i <= to) return -1
+  if (from > to && i >= to && i < from) return +1
+  return 0
+}
+
 export function CarouselStage(): React.ReactElement {
   const stageRef = useRef<Konva.Stage>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -94,6 +109,11 @@ export function CarouselStage(): React.ReactElement {
     positions: Map<string, { x: number; y: number }>
   } | null>(null)
   const multiSelectDragActiveRef = useRef(false)
+
+  // --- Frame reorder drag state ---
+  const frameDragRef = useRef<FrameDragState | null>(null)
+  const [frameDrag, setFrameDrag] = useState<FrameDragState | null>(null)
+  const [framePreviews, setFramePreviews] = useState<string[] | null>(null)
 
   function getOrCreateNodeRef(id: string): React.RefObject<Konva.Node> {
     const map = nodeRefMapRef.current
@@ -570,7 +590,8 @@ export function CarouselStage(): React.ReactElement {
         height: '100%',
         overflow: 'hidden',
         position: 'relative',
-        cursor: isSpacePanning ? 'grab'
+        cursor: frameDrag ? 'grabbing'
+          : isSpacePanning ? 'grab'
           : maskDrawMode ? 'crosshair'
           : activeTool === 'text' ? 'text'
           : (activeTool === 'shape' || activeTool === 'pen' || activeTool === 'guideline') ? 'crosshair'
@@ -580,55 +601,204 @@ export function CarouselStage(): React.ReactElement {
       onMouseMove={handleContainerMouseMove}
       onMouseUp={handleContainerMouseUp}
       onMouseLeave={handleContainerMouseUp}
+      onPointerMove={(e) => {
+        const cur = frameDragRef.current
+        if (!cur) return
+        const next = { ...cur, currentClientX: e.clientX }
+        frameDragRef.current = next
+        setFrameDrag(next)
+      }}
+      onPointerUp={(e) => {
+        const cur = frameDragRef.current
+        if (!cur) return
+        stageRef.current?.container().style.removeProperty('opacity')
+        const toIndex = Math.max(0, Math.min(frameCount - 1,
+          Math.round((e.clientX - cur.containerLeft - panX) / (CANVAS_SCALE * zoom) / frameWidth)
+        ))
+        if (toIndex !== cur.fromIndex) {
+          useCanvasStore.getState().reorderFrames(cur.fromIndex, toIndex)
+        }
+        frameDragRef.current = null
+        setFrameDrag(null)
+        setFramePreviews(null)
+      }}
+      onPointerLeave={() => {
+        if (!frameDragRef.current) return
+        stageRef.current?.container().style.removeProperty('opacity')
+        frameDragRef.current = null
+        setFrameDrag(null)
+        setFramePreviews(null)
+      }}
     >
       {/* Frame labels + colour swatches — follow the canvas viewport */}
-      {!previewMode && Array.from({ length: frameCount }).map((_, i) => {
-        const frameColor = frames[i]?.backgroundColor ?? null
-        const displayColor = frameColor ?? backgroundColor
-        const labelX = panX + i * frameWidth * (CANVAS_SCALE * zoom)
+      {!previewMode && (() => {
+        const previewTo = frameDrag
+          ? Math.max(0, Math.min(frameCount - 1,
+              Math.round((frameDrag.currentClientX - frameDrag.containerLeft - panX) / (CANVAS_SCALE * zoom) / frameWidth)
+            ))
+          : null
         const labelTop = Math.max(4, panY - 22)
+        const dispW = frameWidth * CANVAS_SCALE * zoom
+        const dispH = frameHeight * CANVAS_SCALE * zoom
+
         return (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              left: labelX,
-              top: labelTop,
-              zIndex: 10,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-              pointerEvents: 'auto',
-            }}
-          >
-            {/* Colour swatch */}
-            <ColorInput
-              value={displayColor}
-              onChange={c => setFrameBackground(i, c)}
-              size={14}
-              fixed
-            />
-            {/* Reset button — only visible when frame has a custom colour */}
-            {frameColor && (
-              <button
-                onClick={e => { e.stopPropagation(); setFrameBackground(i, null) }}
-                title="Reset to canvas background"
+          <>
+            {/* Dragged frame: combined label pill + full frame preview, follows cursor */}
+            {frameDrag && (
+              <div
                 style={{
-                  background: 'none', border: 'none', color: 'var(--text-muted)',
-                  cursor: 'pointer', padding: 0, fontSize: 13, lineHeight: 1,
-                  display: 'flex', alignItems: 'center',
+                  position: 'absolute',
+                  left: panX + frameDrag.fromIndex * frameWidth * (CANVAS_SCALE * zoom) + (frameDrag.currentClientX - frameDrag.startClientX),
+                  top: labelTop,
+                  zIndex: 100,
+                  pointerEvents: 'none',
+                  filter: 'drop-shadow(0 10px 28px rgba(0,0,0,0.2))',
+                  willChange: 'left',
                 }}
               >
-                ×
-              </button>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'var(--bg-panel)', borderRadius: 8, padding: '3px 8px 3px 4px', border: '1px solid var(--border)' }}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: 12, lineHeight: 1, padding: '0 2px', userSelect: 'none' }}>⣿</span>
+                  <div style={{ width: 14, height: 14, borderRadius: '50%', background: frames[frameDrag.fromIndex]?.backgroundColor ?? backgroundColor, border: '1.5px solid var(--stroke)', flexShrink: 0 }} />
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--font)', whiteSpace: 'nowrap', userSelect: 'none' }}>Frame {frameDrag.fromIndex + 1}</span>
+                </div>
+                {framePreviews && (
+                  <img src={framePreviews[frameDrag.fromIndex]} draggable={false} style={{ display: 'block', width: dispW, height: dispH, userSelect: 'none' }} />
+                )}
+              </div>
             )}
-            {/* Frame label */}
-            <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--font)', whiteSpace: 'nowrap', userSelect: 'none' }}>
-              Frame {i + 1}
-            </span>
-          </div>
+            {/* Per-frame label pills + animated preview overlays */}
+            {Array.from({ length: frameCount }).map((_, i) => {
+              const frameColor = frames[i]?.backgroundColor ?? null
+              const displayColor = frameColor ?? backgroundColor
+              const labelX = panX + i * frameWidth * (CANVAS_SCALE * zoom)
+              const isDragging = frameDrag?.fromIndex === i
+              const txPx = (frameDrag && previewTo !== null)
+                ? frameSlotOffset(i, frameDrag.fromIndex, previewTo) * frameWidth * (CANVAS_SCALE * zoom)
+                : 0
+              const animTransition = (frameDrag && !isDragging) ? 'transform 0.18s cubic-bezier(0.25,0.46,0.45,0.94)' : 'none'
+
+              return (
+                <React.Fragment key={i}>
+                  {/* Frame preview overlay (animates to make space; hidden for dragged frame) */}
+                  {framePreviews && !isDragging && (
+                    <img
+                      src={framePreviews[i]}
+                      draggable={false}
+                      style={{
+                        position: 'absolute',
+                        left: labelX,
+                        top: panY,
+                        width: dispW,
+                        height: dispH,
+                        zIndex: 30,
+                        pointerEvents: 'none',
+                        transform: `translateX(${txPx}px)`,
+                        transition: animTransition,
+                        userSelect: 'none',
+                      }}
+                    />
+                  )}
+                  {/* Label pill */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: labelX,
+                      top: labelTop,
+                      zIndex: 40,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      pointerEvents: isDragging ? 'none' : 'auto',
+                      opacity: isDragging ? 0 : 1,
+                      transform: `translateX(${txPx}px)`,
+                      transition: animTransition,
+                    }}
+                  >
+                    <span
+                      style={{ cursor: frameDrag ? 'grabbing' : 'grab', color: 'var(--text-muted)', fontSize: 12, lineHeight: 1, padding: '0 2px', userSelect: 'none' }}
+                      onPointerDown={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        const containerLeft = containerRef.current?.getBoundingClientRect().left ?? 0
+                        const state: FrameDragState = { fromIndex: i, startClientX: e.clientX, currentClientX: e.clientX, containerLeft }
+                        frameDragRef.current = state
+                        setFrameDrag(state)
+
+                        // Defer canvas capture to the next frame to avoid any
+                        // stage resize/redraw interfering with the pointer event.
+                        const captureFromIndex = i
+                        requestAnimationFrame(() => {
+                          if (frameDragRef.current?.fromIndex !== captureFromIndex) return
+                          const stage = stageRef.current
+                          if (!stage) return
+                          stage.container().style.opacity = '0'
+                          const origW = stage.width(), origH = stage.height()
+                          const origSX = stage.scaleX(), origSY = stage.scaleY()
+                          const origX = stage.x(), origY = stage.y()
+                          stage.width(frameCount * frameWidth)
+                          stage.height(frameHeight)
+                          stage.scaleX(1); stage.scaleY(1)
+                          stage.x(0); stage.y(0)
+                          const guidesLyr = stage.findOne<Konva.Layer>('.guides')
+                          const glOverlay = stage.findOne<Konva.Layer>('.guideline-overlay')
+                          const divLyr = stage.findOne<Konva.Layer>('.frame-dividers')
+                          const txfmrs = stage.find<Konva.Transformer>('Transformer')
+                          guidesLyr?.hide(); glOverlay?.hide(); divLyr?.hide()
+                          txfmrs.forEach(t => t.hide())
+                          stage.draw()
+                          const full = stage.toCanvas({ pixelRatio: 0.5 })
+                          const capW = Math.round(full.width / frameCount)
+                          const capH = full.height
+                          const previews = Array.from({ length: frameCount }, (_, idx) => {
+                            const c = document.createElement('canvas')
+                            c.width = capW; c.height = capH
+                            c.getContext('2d')!.drawImage(full, idx * capW, 0, capW, capH, 0, 0, capW, capH)
+                            return c.toDataURL()
+                          })
+                          guidesLyr?.show(); glOverlay?.show(); divLyr?.show()
+                          txfmrs.forEach(t => t.show())
+                          stage.width(origW); stage.height(origH)
+                          stage.scaleX(origSX); stage.scaleY(origSY)
+                          stage.x(origX); stage.y(origY)
+                          stage.draw()
+                          setFramePreviews(previews)
+                        })
+                      }}
+                    >
+                      ⣿
+                    </span>
+                    <ColorInput
+                      value={displayColor}
+                      onChange={c => setFrameBackground(i, c)}
+                      size={14}
+                      fixed
+                      popoverAnchorFn={() => {
+                        const cr = containerRef.current?.getBoundingClientRect()
+                        return {
+                          top: (cr?.top ?? 0) + panY,
+                          left: (cr?.left ?? 0) + panX + i * frameWidth * (CANVAS_SCALE * zoom),
+                        }
+                      }}
+                    />
+                    {frameColor && (
+                      <button
+                        onClick={e => { e.stopPropagation(); setFrameBackground(i, null) }}
+                        title="Reset to canvas background"
+                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 0, fontSize: 13, lineHeight: 1, display: 'flex', alignItems: 'center' }}
+                      >
+                        ×
+                      </button>
+                    )}
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--font)', whiteSpace: 'nowrap', userSelect: 'none' }}>
+                      Frame {i + 1}
+                    </span>
+                  </div>
+                </React.Fragment>
+              )
+            })}
+          </>
         )
-      })}
+      })()}
       <Stage
         ref={stageRef}
         width={containerSize.width}

@@ -151,6 +151,7 @@ interface CanvasState {
   setRatio: (r: FrameRatio, width: number, height: number) => void
   setPlatform: (p: Platform) => void
   setFrameBackground: (frameIndex: number, color: string | null) => void
+  reorderFrames: (fromIndex: number, toIndex: number) => void
   setCanvasBackground: (color: string) => void
   undo: () => void
   redo: () => void
@@ -864,6 +865,72 @@ export const useCanvasStore = create<CanvasState>((set) => {
           frames,
         }
       }),
+
+    reorderFrames: (fromIndex, toIndex) => {
+      if (fromIndex === toIndex) return
+      set((state) => {
+        const { objects, frames, frameWidth } = state
+
+        const newFrames = [...frames]
+        const [moved] = newFrames.splice(fromIndex, 1)
+        newFrames.splice(toIndex, 0, moved)
+        const reindexedFrames = newFrames.map((f, i) => ({ ...f, index: i }))
+
+        const slotShift = (slot: number): number => {
+          if (slot === fromIndex) return toIndex
+          if (fromIndex < toIndex && slot > fromIndex && slot <= toIndex) return slot - 1
+          if (fromIndex > toIndex && slot >= toIndex && slot < fromIndex) return slot + 1
+          return slot
+        }
+
+        const patches: Record<string, Partial<CanvasObject>> = {}
+        for (const obj of Object.values(objects)) {
+          if (obj.locked) continue
+          if (obj.type === 'guideline') {
+            const g = obj as GuidelineObject
+            if (g.frameIndex === -1 || g.spanAllFrames) continue
+            const newSlot = slotShift(g.frameIndex)
+            if (newSlot === g.frameIndex) continue
+            const delta = newSlot - g.frameIndex
+            patches[obj.id] = {
+              pinnedFrame: newSlot,
+              frameIndex: newSlot,
+              ...(g.orientation === 'vertical'
+                ? { position: g.position + delta * frameWidth, x: g.x + delta * frameWidth }
+                : {}),
+            }
+            continue
+          }
+          const bbox = getObjectBBox(obj)
+          const oldSlot = Math.floor((bbox.x + bbox.width / 2) / frameWidth)
+          if (oldSlot < 0 || oldSlot >= frames.length) continue
+          const newSlot = slotShift(oldSlot)
+          if (newSlot === oldSlot) continue
+          const delta = newSlot - oldSlot
+          if (obj.type === 'image' || obj.type === 'video') {
+            const img = obj as ImageObject | VideoObject
+            patches[obj.id] = {
+              frameX: img.frameX + delta * frameWidth,
+              x: img.x + delta * frameWidth,
+            }
+          } else {
+            patches[obj.id] = { x: obj.x + delta * frameWidth }
+          }
+        }
+
+        const newObjects = { ...objects }
+        for (const [id, patch] of Object.entries(patches)) {
+          newObjects[id] = { ...newObjects[id], ...patch } as CanvasObject
+        }
+
+        return {
+          past: pushHistoryFrom(state),
+          future: [],
+          frames: reindexedFrames,
+          objects: newObjects,
+        }
+      })
+    },
 
     setCanvasBackground: (color) =>
       set((state) => ({

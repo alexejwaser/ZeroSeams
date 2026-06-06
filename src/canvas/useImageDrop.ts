@@ -15,11 +15,13 @@ export function useImageDrop(containerRef: React.RefObject<HTMLDivElement>): voi
     if (!container) return
 
     function handleDragOver(e: DragEvent): void {
+      if (!e.dataTransfer?.types.includes('Files')) return
       e.preventDefault()
       e.stopPropagation()
     }
 
     function handleDrop(e: DragEvent): void {
+      if (!e.dataTransfer?.types.includes('Files')) return
       e.preventDefault()
       e.stopPropagation()
 

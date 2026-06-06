@@ -1,4 +1,5 @@
 import React from 'react'
+import { createPortal } from 'react-dom'
 import { HexColorPicker } from 'react-colorful'
 import { Pipette } from 'lucide-react'
 import Tooltip from './Tooltip'
@@ -87,9 +88,10 @@ interface UseColorPopoverOptions {
   value: string
   onChange: (color: string) => void
   onCommit?: () => void
+  popoverAnchorFn?: () => { top: number; left: number }
 }
 
-function useColorPopover({ value, onChange, onCommit }: UseColorPopoverOptions) {
+function useColorPopover({ value, onChange, onCommit, popoverAnchorFn }: UseColorPopoverOptions) {
   const [open, setOpen] = React.useState(false)
   const [mode, setMode] = React.useState<ColorMode>('hex')
   const [hexText, setHexText] = React.useState(value)
@@ -143,27 +145,30 @@ function useColorPopover({ value, onChange, onCommit }: UseColorPopoverOptions) 
   }
 
   function handleOpen(_fixed: boolean) {
-    if (swatchRef.current != null) {
+    const popoverW = 236
+    const popoverH = 370
+    let top: number | null = null
+    let left: number | null = null
+
+    if (popoverAnchorFn) {
+      const pos = popoverAnchorFn()
+      top = pos.top
+      left = pos.left
+    } else if (swatchRef.current != null) {
       const rect = swatchRef.current.getBoundingClientRect()
-      const popoverW = 236
-      const popoverH = 370 // generous estimate: canvas + slider + toggles + input + recent
-
-      let top = rect.bottom + 6
-      let left = rect.left
-
+      top = rect.bottom + 6
+      left = rect.left
       // Flip above swatch if not enough space below
       if (top + popoverH > window.innerHeight - 8) {
         top = rect.top - popoverH - 6
       }
-      // Clamp vertically
+    }
+
+    if (top !== null && left !== null) {
+      if (top + popoverH > window.innerHeight - 8) top = window.innerHeight - popoverH - 8
       if (top < 8) top = 8
-
-      // Clamp horizontally so it doesn't overflow right edge
-      if (left + popoverW > window.innerWidth - 8) {
-        left = window.innerWidth - popoverW - 8
-      }
+      if (left + popoverW > window.innerWidth - 8) left = window.innerWidth - popoverW - 8
       if (left < 8) left = 8
-
       setPopoverPos({ top, left })
     }
     setRecentColors(loadRecentColors())
@@ -286,6 +291,11 @@ function ColorPopover({
     ? { position: 'fixed', top: popoverPos.top, left: popoverPos.left }
     : { position: 'absolute', top: '100%', left: 0, marginTop: 6 }
 
+  // When fixed=true, portal into document.body so ancestor CSS transforms
+  // (e.g. translateX on label pills) don't create a new containing block
+  // that breaks position:fixed coordinates.
+  const wrap = (el: React.ReactElement) => fixed ? createPortal(el, document.body) : el
+
   const inputBase: React.CSSProperties = {
     width: '100%',
     boxSizing: 'border-box',
@@ -299,7 +309,7 @@ function ColorPopover({
     outline: 'none',
   }
 
-  return (
+  return wrap(
     <div
       ref={popoverRef}
       style={{
@@ -450,10 +460,11 @@ export interface ColorInputProps {
   onCommit?: () => void
   size?: number
   fixed?: boolean
+  popoverAnchorFn?: () => { top: number; left: number }
 }
 
-export function ColorInput({ value, onChange, onCommit, size = 20, fixed = false }: ColorInputProps) {
-  const popover = useColorPopover({ value, onChange, onCommit })
+export function ColorInput({ value, onChange, onCommit, size = 20, fixed = false, popoverAnchorFn }: ColorInputProps) {
+  const popover = useColorPopover({ value, onChange, onCommit, popoverAnchorFn })
 
   function handleRecentClick(color: string) {
     onChange(color)
