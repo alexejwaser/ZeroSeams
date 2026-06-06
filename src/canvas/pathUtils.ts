@@ -50,9 +50,11 @@ export function resolveVideoObjects(
   for (const [id, obj] of Object.entries(objects)) {
     if (obj.type === 'video') {
       const vid = obj as VideoObject
-      const filePath = vid.relativeFilePath
-        ? posixResolve(dir, vid.relativeFilePath)
-        : vid.filePath
+      const resolved = vid.relativeFilePath ? posixResolve(dir, vid.relativeFilePath) : vid.filePath
+      // Fall back to the stored absolute path when the relative resolution escapes the
+      // project directory — this handles projects that were moved after saving (e.g.
+      // copied to a repo while videos remain on an external volume).
+      const filePath = resolved.startsWith(dir + '/') ? resolved : vid.filePath
       result[id] = { ...vid, filePath }
     } else {
       result[id] = obj

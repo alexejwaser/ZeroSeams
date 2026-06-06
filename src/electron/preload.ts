@@ -63,4 +63,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('show-folder-dialog'),
   writeFileToFolder: (folderPath: string, filename: string, base64: string): Promise<{ success: boolean; error?: string }> =>
     ipcRenderer.invoke('write-file-to-folder', folderPath, filename, base64),
+  loadFileAtPath: (filePath: string): Promise<{ success: boolean; json?: string; filePath?: string }> =>
+    ipcRenderer.invoke('load-file-at-path', filePath),
 })

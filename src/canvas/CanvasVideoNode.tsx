@@ -109,6 +109,15 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     vid.addEventListener('error', () => {
       console.error('[CanvasVideoNode] video load error', vid.error?.message, 'src:', vid.src)
     }, { once: true })
+    vid.addEventListener('durationchange', () => {
+      if (isFinite(vid.duration) && vid.videoWidth > 0) {
+        useCanvasStore.getState().updateObject(id, {
+          naturalWidth: vid.videoWidth,
+          naturalHeight: vid.videoHeight,
+          naturalDuration: vid.duration,
+        })
+      }
+    }, { once: true })
     // Use localhost as an explicit host — Chromium with standard: true normalizes
     // triple-slash URLs (zeroseams-media:///path) by treating the first path segment
     // as hostname, which drops and lowercases it. localhost avoids that.
@@ -148,7 +157,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
       }
       lastTickTimeRef.current = now
 
-      const end = obj.trimEnd ?? obj.naturalDuration
+      const end = obj.trimEnd ?? obj.naturalDuration ?? Infinity
       const start = obj.trimStart ?? 0
       if (videoEl!.currentTime >= end) {
         videoEl!.currentTime = start
@@ -239,7 +248,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     [obj.adjustments, adjustmentsBypass],
   )
   const effectFilters = useMemo(
-    () => buildEffectFilters(obj.effects),
+    () => buildEffectFilters(obj.effects ?? []),
     [obj.effects],
   )
   const allFilters = useMemo(

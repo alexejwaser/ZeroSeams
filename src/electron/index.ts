@@ -146,6 +146,17 @@ ipcMain.handle('open-project', async () => {
   }
 })
 
+ipcMain.handle('load-file-at-path', async (_event, filePath: string) => {
+  try {
+    const json = await readFile(filePath, 'utf-8')
+    void addRecentFile(filePath)
+    return { success: true, json, filePath }
+  } catch (error) {
+    console.error(`[main] load-file-at-path error:`, error)
+    return { success: false }
+  }
+})
+
 ipcMain.handle('open-video-file', async () => {
   const win = BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0]
   const { canceled, filePaths } = await dialog.showOpenDialog(win, {

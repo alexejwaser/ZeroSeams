@@ -349,6 +349,27 @@ export function TitleBar(): React.ReactElement {
     return () => document.removeEventListener('mousedown', handler)
   }, [saveMenuOpen])
 
+  // Restore the last open file after a renderer reload (e.g. Vite HMR after sleep/wake).
+  useEffect(() => {
+    const lastFile = localStorage.getItem('zeroseams:lastFile')
+    if (!lastFile) return
+    void window.electronAPI.loadFileAtPath(lastFile).then((result) => {
+      if (!result.success || result.json == null) {
+        localStorage.removeItem('zeroseams:lastFile')
+        return
+      }
+      const project = JSON.parse(result.json) as CarouselProject
+      if (result.filePath) {
+        project.objects = resolveVideoObjects(project.objects, result.filePath)
+      }
+      loadProject(project)
+      const fname = project.name.toLowerCase().replace(/\s+/g, '-')
+      setProjectMeta(project.id, project.name, fname, project.createdAt)
+      setCurrentFilePath(result.filePath ?? null)
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // Keep exportTo in sync when frameCount changes
   useEffect(() => {
     setExportTo(frameCount)
@@ -473,21 +494,39 @@ export function TitleBar(): React.ReactElement {
     whiteSpace: 'nowrap' as const,
   })
 
+  function loadProjectFromResult(result: { success: boolean; json?: string; filePath?: string }): void {
+    if (!result.success || result.json == null) return
+    const project = JSON.parse(result.json) as CarouselProject
+    if (result.filePath) {
+      project.objects = resolveVideoObjects(project.objects, result.filePath)
+      localStorage.setItem('zeroseams:lastFile', result.filePath)
+    }
+    loadProject(project)
+    const filename = project.name.toLowerCase().replace(/\s+/g, '-')
+    setProjectMeta(project.id, project.name, filename, project.createdAt)
+    setCurrentFilePath(result.filePath ?? null)
+  }
+
   async function handleOpen(): Promise<void> {
     setLoadingProject(true)
     try {
       const result = await window.electronAPI.openProject()
-      if (!result.success || result.json == null) return
-      const project = JSON.parse(result.json) as CarouselProject
-      if (result.filePath) {
-        project.objects = resolveVideoObjects(project.objects, result.filePath)
-      }
-      loadProject(project)
-      const filename = project.name.toLowerCase().replace(/\s+/g, '-')
-      setProjectMeta(project.id, project.name, filename, project.createdAt)
-      setCurrentFilePath(result.filePath ?? null)
+      loadProjectFromResult(result)
     } catch (err) {
       console.error('[open]', err)
+    } finally {
+      setLoadingProject(false)
+      setRecentOpen(false)
+    }
+  }
+
+  async function handleOpenFromPath(filePath: string): Promise<void> {
+    setLoadingProject(true)
+    try {
+      const result = await window.electronAPI.loadFileAtPath(filePath)
+      loadProjectFromResult(result)
+    } catch (err) {
+      console.error('[open-path]', err)
     } finally {
       setLoadingProject(false)
       setRecentOpen(false)
@@ -599,7 +638,7 @@ export function TitleBar(): React.ReactElement {
                 <div
                   key={file.path}
                   title={file.path}
-                  onClick={() => { void handleOpen() }}
+                  onClick={() => { void handleOpenFromPath(file.path) }}
                   style={{
                     padding: '7px 14px',
                     cursor: 'pointer',

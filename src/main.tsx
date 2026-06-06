@@ -7,6 +7,38 @@ import { useExportStore } from '@/ui/useExportStore'
 import { PreviewShell } from '@/ui/preview/PreviewShell'
 import { AIProvider } from '@/ai'
 
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props)
+    this.state = { error: null }
+  }
+  static getDerivedStateFromError(error: Error) { return { error } }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: 40, fontFamily: 'system-ui', color: '#111' }}>
+          <h2 style={{ marginTop: 0 }}>Something went wrong</h2>
+          <pre style={{ fontSize: 12, color: '#666', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+            {this.state.error.message}
+            {'\n'}
+            {this.state.error.stack}
+          </pre>
+          <button
+            onClick={() => { window.location.reload() }}
+            style={{ marginTop: 16, padding: '8px 20px', cursor: 'pointer', borderRadius: 6, border: '1px solid #ccc' }}
+          >
+            Reload
+          </button>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
 function App(): React.ReactElement {
   const exporting = useExportStore((s) => s.exporting)
   const exportStatus = useExportStore((s) => s.exportStatus)
@@ -123,8 +155,10 @@ const rootEl = document.getElementById('root')
 if (!rootEl) throw new Error('Root element not found')
 ReactDOM.createRoot(rootEl).render(
   <React.StrictMode>
-    <AIProvider>
-      <App />
-    </AIProvider>
+    <ErrorBoundary>
+      <AIProvider>
+        <App />
+      </AIProvider>
+    </ErrorBoundary>
   </React.StrictMode>,
 )

@@ -49,5 +49,6 @@ interface Window {
     getFileSize(filePath: string): Promise<{ size: number }>
     showFolderDialog(): Promise<{ folderPath?: string; cancelled: boolean }>
     writeFileToFolder(folderPath: string, filename: string, base64: string): Promise<{ success: boolean; error?: string }>
+    loadFileAtPath(filePath: string): Promise<{ success: boolean; json?: string; filePath?: string }>
   }
 }
