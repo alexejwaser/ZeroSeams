@@ -114,6 +114,7 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `FrameSlide` = static JPEG background + `<VideoOverlayItem>` overlays for any video whose x-span overlaps the frame
 - Shell registry: `registerShell(platform, Component)` — adding a platform = one file + one call
 - Frame labels in `CarouselStage` hidden when `previewMode` is true
+- `PreviewShell` must be rendered at the root `App` level (sibling of `TitleBar`), NOT inside the canvas area div — the canvas area has `position:relative; zIndex:0` which creates a stacking context that causes the overlay to paint beneath the panels/toolbar
 
 **Grid/Collage System** (`src/canvas/gridTemplates.ts`, `CanvasGroupNode.tsx`, `GridCellOverlay.tsx`):
 - `GroupObject` with `isGrid: true` owns N `ImageObject`/`VideoObject` cells via `childIds`; `gridTemplateId` references the template used

@@ -68,7 +68,6 @@ function App(): React.ReactElement {
             }}
           >
             <CarouselStage />
-            <PreviewShell />
 
             {exporting && (
               <div
@@ -107,6 +106,8 @@ function App(): React.ReactElement {
         </div>
       </div>
 
+      {/* Full-screen overlays at root level so they paint above panels/toolbar */}
+      <PreviewShell />
       {/* Portal-based context menu — renders to document.body */}
       <ContextMenu />
     </div>

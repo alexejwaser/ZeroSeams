@@ -181,7 +181,7 @@ function VideoExportSettingsPanel({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       {/* Tab strip */}
-      <div style={{ display: 'flex', gap: 2, background: '#f5ede2', borderRadius: 6, padding: 2 }}>
+      <div style={{ display: 'flex', gap: 2, background: 'var(--bg-canvas)', borderRadius: 6, padding: 2 }}>
         <button style={tabBtnStyle(tab === 'simple')} onClick={() => onTabChange('simple')}>Simple</button>
         <button style={tabBtnStyle(tab === 'advanced')} onClick={() => onTabChange('advanced')}>Advanced</button>
       </div>
@@ -872,7 +872,7 @@ export function TitleBar(): React.ReactElement {
               right: 0,
               zIndex: 1000,
               marginTop: 6,
-              background: 'var(--bg-panel)',
+              background: '#ffffff',
               border: '1px solid var(--border)',
               borderRadius: 16,
               boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
@@ -890,7 +890,7 @@ export function TitleBar(): React.ReactElement {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 2,
-                background: 'var(--bg-panel)',
+                background: 'var(--bg-canvas)',
                 borderRadius: 999,
                 padding: '2px',
                 border: '1px solid var(--border)',
