@@ -102,8 +102,10 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 
 **Video Layer** (`CanvasVideoNode.tsx`):
 - Frame/content model identical to ImageObject; extra fields: `trimStart/trimEnd`, `loop`, `startOffset`, `volume`, `posterFrame`, `mask`
-- Use `durationchange` event (not `loadedmetadata`) to read duration — ensures finite value
+- Use `durationchange` event (not `loadedmetadata`) to read duration — ensures finite value; listener also persists `naturalWidth/Height/Duration` to store (older saves have these as `0`/`null`)
 - Always seek to `trimStart ?? 0` after `canplay` to force first-frame decode in Chromium
+- RAF trim end: `obj.trimEnd ?? obj.naturalDuration ?? Infinity` — `Infinity` guards against `naturalDuration: null` on older saves; `null` coerces to `0` and makes the trim check always-true, causing constant seek-to-frame-0
+- `obj.effects ?? []` when calling `buildEffectFilters` — video objects saved before the effects field was introduced omit it entirely
 - RAF cache throttle: skip `.cache()` + `batchDraw()` when `currentTime` unchanged; reset throttle ref to `-1` on `allFilters` change — otherwise paused-video adjustment changes never apply
 - `zeroseams-media://` scheme with Range support + CORP/COEP headers enables `SharedArrayBuffer` for FFmpeg WASM
 - Store `platform` must be subscribed as a hook in Toolbar components — `getState()` inside handlers only leaves it undefined during render
@@ -147,6 +149,9 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 **Other invariants:**
 - Masking: `MaskData.kind: 'pen'|'rect'|'ellipse'`; `maskModeActive` in store (transient, not in history)
 - Save: `currentFilePath` in `useSaveStatusStore`; autosave forks on it; `recentFiles.json` tracks history
+- Session restore: `localStorage['zeroseams:lastFile']` is written on every open and read on `TitleBar` mount — survives renderer reloads (Vite HMR after sleep/wake, renderer crashes) without IPC round-trips
+- `resolveVideoObjects` prefers `relativeFilePath` but falls back to stored absolute `filePath` when the resolved path escapes the project directory — handles projects copied to a new location while assets remain on an external volume
+- `ErrorBoundary` wraps the root render in `main.tsx` — render crashes show a message + Reload button instead of a white screen
 - Export overlay: `useExportStore` — `exporting/exportStatus/cancelRequested`; status flows from `exportMixedFrames` → Toolbar label
 - Thumbnails: `useThumbnailStore`, HTML Canvas 2D, triggered on `past.length` changes + mount
 - Frame labels: HTML div strip at `top: Math.max(4, panY - 22)` in CarouselStage (not Konva Text); grip + label pill uses `transform: translateX` for animated reorder — see ColorInput portal note below
