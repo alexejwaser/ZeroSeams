@@ -120,6 +120,11 @@ export function useKeyboardShortcuts(): void {
           clearMaskDrawMode()
           return
         }
+        // Cancel guideline placement without touching selection
+        if (useCanvasStore.getState().activeTool === 'guideline') {
+          setActiveTool('select')
+          return
+        }
         setSelected(null)
         clearContentEditMode()
         clearPathEditMode()

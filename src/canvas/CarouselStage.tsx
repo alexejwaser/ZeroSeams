@@ -814,6 +814,7 @@ export function CarouselStage(): React.ReactElement {
 
           // --- Guideline placement ---
           if (activeTool === 'guideline') {
+            if (e.evt.button !== 0) return  // right-click cancels via onContextMenu, don't place
             const stage = e.target.getStage()
             if (!stage) return
             const pos = stage.getRelativePointerPosition()
@@ -1344,6 +1345,10 @@ export function CarouselStage(): React.ReactElement {
         }}
         onContextMenu={(e) => {
           e.evt.preventDefault()
+          if (activeTool === 'guideline') {
+            setActiveTool('select')
+            return
+          }
           setContextMenu({ x: e.evt.clientX, y: e.evt.clientY, targetId: null })
         }}
       >

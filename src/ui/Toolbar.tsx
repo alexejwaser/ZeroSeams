@@ -1435,7 +1435,7 @@ export function ToolBar(): React.ReactElement {
 
         <Tooltip label="Guideline" shortcut="G" description="Add ruler guideline">
           <button
-            onClick={() => handleToolClick('guideline')}
+            onClick={() => activeTool === 'guideline' ? setActiveTool('select') : handleToolClick('guideline')}
             style={iconBtnStyle(activeTool === 'guideline')}
           >
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
