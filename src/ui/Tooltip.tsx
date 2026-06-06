@@ -117,7 +117,10 @@ function TooltipInner({
     ref: triggerRef,
     onMouseEnter: handleMouseEnter,
     onMouseLeave: handleMouseLeave,
-    onMouseDown: handleMouseDown,
+    onMouseDown: (e: React.MouseEvent) => {
+      handleMouseDown()
+      children.props.onMouseDown?.(e)
+    },
   })
 
   if (!visible || anchorPos == null) {

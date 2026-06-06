@@ -570,6 +570,7 @@ function TextSection({
           <MixedColorInput
             value={currentFill}
             onChange={(color) => applySpanField({ fill: color })}
+            fixed
           />
         </div>
       </div>
@@ -799,6 +800,7 @@ function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): R
                           value={val as string}
                           onChange={v => updateParam(effect.id, ctrl.key, v, false)}
                           onCommit={() => updateParam(effect.id, ctrl.key, ctrl.value as string, true)}
+                          fixed
                         />
                       </div>
                     )
@@ -1791,9 +1793,9 @@ export function PropertiesPanel(): React.ReactElement {
                 />
               </div>
               <div style={sectionLabelStyle}>Fill</div>
-              <ColorInput value={shapeObj.fill || '#000000'} onChange={(color) => { commitUpdate(shapeObj.id, { fill: color }) }} />
+              <ColorInput value={shapeObj.fill || '#000000'} onChange={(color) => { commitUpdate(shapeObj.id, { fill: color }) }} fixed />
               <div style={sectionLabelStyle}>Stroke</div>
-              <ColorInput value={shapeObj.stroke || '#000000'} onChange={(color) => { commitUpdate(shapeObj.id, { stroke: color }) }} />
+              <ColorInput value={shapeObj.stroke || '#000000'} onChange={(color) => { commitUpdate(shapeObj.id, { stroke: color }) }} fixed />
               <NumberField label="Stroke W." value={shapeObj.strokeWidth} min={0} step={0.5} onChange={(val) => { commitUpdate(shapeObj.id, { strokeWidth: val }) }} />
               {shapeObj.kind === 'rect' && (
                 <NumberField label="Corner R." value={shapeObj.cornerRadius ?? 0} min={0} onChange={(val) => { commitUpdate(shapeObj.id, { cornerRadius: val }) }} />
@@ -1843,11 +1845,13 @@ export function PropertiesPanel(): React.ReactElement {
               <ColorInput
                 value={pathObj.fill || '#000000'}
                 onChange={(color) => { commitUpdate(pathObj.id, { fill: color }) }}
+                fixed
               />
               <div style={sectionLabelStyle}>Stroke</div>
               <ColorInput
                 value={pathObj.stroke || '#000000'}
                 onChange={(color) => { commitUpdate(pathObj.id, { stroke: color }) }}
+                fixed
               />
               <NumberField
                 label="Stroke W."

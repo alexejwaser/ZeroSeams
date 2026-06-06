@@ -772,13 +772,6 @@ export function CarouselStage(): React.ReactElement {
                       onChange={c => setFrameBackground(i, c)}
                       size={14}
                       fixed
-                      popoverAnchorFn={() => {
-                        const cr = containerRef.current?.getBoundingClientRect()
-                        return {
-                          top: (cr?.top ?? 0) + panY,
-                          left: (cr?.left ?? 0) + panX + i * frameWidth * (CANVAS_SCALE * zoom),
-                        }
-                      }}
                     />
                     {frameColor && (
                       <button

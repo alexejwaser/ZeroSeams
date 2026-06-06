@@ -180,7 +180,7 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
 
       <div style={{ ...labelStyle, marginTop: 12 }}>Background</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <ColorInput value={backgroundColor} onChange={setCanvasBackground} />
+        <ColorInput value={backgroundColor} onChange={setCanvasBackground} fixed />
       </div>
     </div>
   )
