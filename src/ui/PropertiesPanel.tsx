@@ -22,23 +22,9 @@ import { PenTool, Square, Circle, Trash2, Pencil, Eye, EyeOff, AlignLeft, AlignC
 import './adjustments.css'
 import { videoElementRegistry } from '@/canvas/videoElementRegistry'
 import { ColorInput, MixedColorInput } from './ColorInput'
+import { NumericInput } from './NumericInput'
 
 import { rotateAroundCenter } from '@/canvas/geometry'
-
-// ---------------------------------------------------------------------------
-// Shared inline style for the small numeric inputs next to sliders
-// ---------------------------------------------------------------------------
-
-const numInputStyle = (width: number): React.CSSProperties => ({
-  width,
-  fontSize: 11,
-  background: '#ffffff',
-  color: '#111111',
-  border: '1px solid #d4ccc2',
-  borderRadius: 6,
-  padding: '0 4px',
-  textAlign: 'right',
-})
 
 // ---------------------------------------------------------------------------
 // NumberField — normal (always has a value)
@@ -56,55 +42,22 @@ interface NumberFieldProps {
 function NumberField({
   label,
   value,
-  step = 1,
   min,
   max,
   onChange,
 }: NumberFieldProps): React.ReactElement {
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
-    const parsed = parseFloat(e.target.value)
-    if (!isNaN(parsed)) {
-      onChange(parsed)
-    }
-  }
-
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        marginBottom: 8,
-        gap: 8,
-      }}
-    >
-      <label
-        style={{
-          color: '#555555',
-          fontSize: 12,
-          width: 64,
-          flexShrink: 0,
-        }}
-      >
+    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: 8 }}>
+      <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>
         {label}
       </label>
-      <input
-        type="number"
+      <NumericInput
         value={value}
-        step={step}
         min={min}
         max={max}
-        onChange={handleChange}
-        style={{
-          flex: 1,
-          background: '#ffffff',
-          border: '1px solid #d4ccc2',
-          borderRadius: 6,
-          color: '#111111',
-          fontSize: 13,
-          padding: '3px 6px',
-          boxSizing: 'border-box',
-          outline: 'none',
-        }}
+        align="left"
+        style={{ flex: 1 }}
+        onCommit={onChange}
       />
     </div>
   )
@@ -126,58 +79,22 @@ interface MixedNumberFieldProps {
 function MixedNumberField({
   label,
   value,
-  step = 1,
   min,
   max,
   onChange,
 }: MixedNumberFieldProps): React.ReactElement {
-  const isMixed = value === undefined
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
-    const parsed = parseFloat(e.target.value)
-    if (!isNaN(parsed)) {
-      onChange(parsed)
-    }
-  }
-
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        marginBottom: 8,
-        gap: 8,
-      }}
-    >
-      <label
-        style={{
-          color: '#555555',
-          fontSize: 12,
-          width: 64,
-          flexShrink: 0,
-        }}
-      >
+    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: 8 }}>
+      <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>
         {label}
       </label>
-      <input
-        type="number"
-        value={isMixed ? '' : value}
-        placeholder={isMixed ? '—' : undefined}
-        step={step}
+      <NumericInput
+        value={value}
         min={min}
         max={max}
-        onChange={handleChange}
-        style={{
-          flex: 1,
-          background: '#ffffff',
-          border: '1px solid #d4ccc2',
-          borderRadius: 6,
-          color: isMixed ? '#aaaaaa' : '#111111',
-          fontSize: 13,
-          padding: '3px 6px',
-          boxSizing: 'border-box',
-          outline: 'none',
-        }}
+        align="left"
+        style={{ flex: 1 }}
+        onCommit={onChange}
       />
     </div>
   )
@@ -501,18 +418,17 @@ function TextSection({
           }}
           style={{ flex: 1 }}
         />
-        <input
-          type="number" min={-360} max={360} step={1}
+        <NumericInput
           value={Math.round(textObj.rotation ?? 0)}
-          onChange={e => {
-            const newRot = Math.max(-360, Math.min(360, Number(e.target.value)))
+          min={-360} max={360}
+          width={48}
+          onCommit={newRot => {
             const { x, y, rotation } = rotateAroundCenter(
               textObj.x, textObj.y, textObj.width, textObj.height,
               textObj.rotation ?? 0, newRot,
             )
             onCommit(selectedId, { rotation, x, y } as Partial<TextObject>)
           }}
-          style={numInputStyle(48)}
         />
       </div>
 
@@ -527,14 +443,11 @@ function TextSection({
           onMouseUp={e => onCommit(selectedId, { opacity: Number((e.target as HTMLInputElement).value) / 100 } as Partial<TextObject>)}
           style={{ flex: 1 }}
         />
-        <input
-          type="number" min={0} max={100} step={1}
+        <NumericInput
           value={Math.round((textObj.opacity ?? 1) * 100)}
-          onChange={e => {
-            const v = Math.max(0, Math.min(100, Number(e.target.value)))
-            onCommit(selectedId, { opacity: v / 100 } as Partial<TextObject>)
-          }}
-          style={numInputStyle(44)}
+          min={0} max={100}
+          width={44}
+          onCommit={v => onCommit(selectedId, { opacity: v / 100 } as Partial<TextObject>)}
         />
       </div>
 
@@ -855,15 +768,13 @@ function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): R
                           onMouseUp={e => updateParam(effect.id, ctrl.key, Number((e.target as HTMLInputElement).value), true)}
                           style={{ flex: 1 }}
                         />
-                        <input
-                          type="number"
+                        <NumericInput
+                          value={numVal}
+                          decimals={decimals}
                           min={ctrl.min ?? 0}
                           max={ctrl.max ?? 1}
-                          step={ctrl.step ?? 0.01}
-                          value={numVal.toFixed(decimals)}
-                          onChange={e => updateParam(effect.id, ctrl.key, Number(e.target.value), false)}
-                          onBlur={e => updateParam(effect.id, ctrl.key, Number(e.target.value), true)}
-                          style={numInputStyle(44)}
+                          width={44}
+                          onCommit={v => updateParam(effect.id, ctrl.key, v, true)}
                         />
                       </div>
                     )
@@ -975,16 +886,13 @@ function AdjustmentsSection({ imgObj, selectedId: _selectedId, bypass, onToggleB
           onDoubleClick={() => onCommit({ ...adj, [key]: 0 })}
           style={{ flex: 1, background: TRACK_GRADIENT[key] }}
         />
-        <input
-          type="number"
-          min={min}
-          max={max}
-          step={step}
-          value={value.toFixed(decimals)}
-          onChange={(e) => onUpdate({ ...adj, [key]: Number(e.target.value) })}
-          onBlur={(e) => onCommit({ ...adj, [key]: Number(e.target.value) })}
+        <NumericInput
+          value={value}
+          decimals={decimals}
+          min={min} max={max}
+          width={44}
+          onCommit={v => onCommit({ ...adj, [key]: v })}
           onDoubleClick={() => onCommit({ ...adj, [key]: 0 })}
-          style={numInputStyle(44)}
         />
       </div>
     )
@@ -1149,16 +1057,14 @@ function VideoSection({
           onMouseUp={e => onCommit(selectedId, { volume: Number((e.target as HTMLInputElement).value) / 100 })}
           style={{ flex: 1, opacity: videoObj.muted ? 0.35 : 1, pointerEvents: videoObj.muted ? 'none' : 'auto' }}
         />
-        <input
-          type="number" min={0} max={100} step={1}
+        <NumericInput
           value={Math.round((videoObj.volume ?? 1) * 100)}
+          min={0} max={100}
+          width={44}
           disabled={videoObj.muted}
-          onChange={e => {
-            const v = Math.max(0, Math.min(100, Number(e.target.value)))
-            onCommit(selectedId, { volume: v / 100 })
-          }}
+          onCommit={v => onCommit(selectedId, { volume: v / 100 })}
           onDoubleClick={() => onCommit(selectedId, { volume: 1 })}
-          style={{ ...numInputStyle(44), opacity: videoObj.muted ? 0.35 : 1 }}
+          style={videoObj.muted ? { opacity: 0.35 } : undefined}
         />
       </div>
 
@@ -1245,16 +1151,12 @@ function VideoSection({
       {/* In point */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
         <span style={trimLabelStyle}>In</span>
-        <input
-          type="number"
-          min={0}
-          max={videoObj.naturalDuration}
-          step={0.01}
-          value={(videoObj.trimStart ?? 0).toFixed(2)}
-          onMouseDown={onStartDrag}
-          onChange={(e) => onUpdate(selectedId, { trimStart: Number(e.target.value) })}
-          onBlur={(e) => onCommit(selectedId, { trimStart: Number(e.target.value) })}
-          style={numInputStyle(60)}
+        <NumericInput
+          value={videoObj.trimStart ?? 0}
+          decimals={2}
+          min={0} max={videoObj.naturalDuration}
+          width={60}
+          onCommit={v => onCommit(selectedId, { trimStart: v })}
         />
         <Tooltip label="Set In to current time">
           <button
@@ -1268,16 +1170,12 @@ function VideoSection({
       {/* Out point */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
         <span style={trimLabelStyle}>Out</span>
-        <input
-          type="number"
-          min={0}
-          max={videoObj.naturalDuration}
-          step={0.01}
-          value={(videoObj.trimEnd ?? videoObj.naturalDuration).toFixed(2)}
-          onMouseDown={onStartDrag}
-          onChange={(e) => onUpdate(selectedId, { trimEnd: Number(e.target.value) })}
-          onBlur={(e) => onCommit(selectedId, { trimEnd: Number(e.target.value) })}
-          style={numInputStyle(60)}
+        <NumericInput
+          value={videoObj.trimEnd ?? videoObj.naturalDuration}
+          decimals={2}
+          min={0} max={videoObj.naturalDuration}
+          width={60}
+          onCommit={v => onCommit(selectedId, { trimEnd: v })}
         />
         <Tooltip label="Set Out to current time">
           <button
@@ -1300,13 +1198,12 @@ function VideoSection({
       {/* Start delay */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
         <span style={trimLabelStyle}>Delay</span>
-        <input
-          type="number" min={0} max={30} step={0.1}
-          value={(videoObj.startOffset ?? 0).toFixed(1)}
-          onMouseDown={onStartDrag}
-          onChange={e => onUpdate(selectedId, { startOffset: Math.max(0, Number(e.target.value)) })}
-          onBlur={e => onCommit(selectedId, { startOffset: Math.max(0, Number(e.target.value)) })}
-          style={numInputStyle(60)}
+        <NumericInput
+          value={videoObj.startOffset ?? 0}
+          decimals={1}
+          min={0} max={30}
+          width={60}
+          onCommit={v => onCommit(selectedId, { startOffset: v })}
         />
         <span style={{ color: '#666', fontSize: 11 }}>s before play</span>
       </div>
@@ -1337,18 +1234,17 @@ function VideoSection({
           }}
           style={{ flex: 1 }}
         />
-        <input
-          type="number" min={-360} max={360} step={1}
+        <NumericInput
           value={Math.round(videoObj.rotation ?? 0)}
-          onChange={e => {
-            const newRot = Math.max(-360, Math.min(360, Number(e.target.value)))
+          min={-360} max={360}
+          width={48}
+          onCommit={newRot => {
             const { x: fx, y: fy, rotation } = rotateAroundCenter(
               videoObj.frameX, videoObj.frameY, videoObj.frameWidth, videoObj.frameHeight,
               videoObj.rotation ?? 0, newRot,
             )
             onCommit(selectedId, { rotation, frameX: fx, frameY: fy, x: fx, y: fy })
           }}
-          style={numInputStyle(48)}
         />
       </div>
 
@@ -1363,14 +1259,11 @@ function VideoSection({
           onMouseUp={e => onCommit(selectedId, { opacity: Number((e.target as HTMLInputElement).value) / 100 })}
           style={{ flex: 1 }}
         />
-        <input
-          type="number" min={0} max={100} step={1}
+        <NumericInput
           value={Math.round((videoObj.opacity ?? 1) * 100)}
-          onChange={e => {
-            const v = Math.max(0, Math.min(100, Number(e.target.value)))
-            onCommit(selectedId, { opacity: v / 100 })
-          }}
-          style={numInputStyle(44)}
+          min={0} max={100}
+          width={44}
+          onCommit={v => onCommit(selectedId, { opacity: v / 100 })}
         />
       </div>
 
@@ -1863,11 +1756,11 @@ export function PropertiesPanel(): React.ReactElement {
                   }}
                   style={{ flex: 1 }}
                 />
-                <input
-                  type="number" min={-360} max={360} step={1}
+                <NumericInput
                   value={Math.round(shapeObj.rotation ?? 0)}
-                  onChange={e => {
-                    const newRot = Math.max(-360, Math.min(360, Number(e.target.value)))
+                  min={-360} max={360}
+                  width={48}
+                  onCommit={newRot => {
                     if (shapeObj.kind === 'ellipse') {
                       commitUpdate(shapeObj.id, { rotation: newRot })
                     } else {
@@ -1877,7 +1770,6 @@ export function PropertiesPanel(): React.ReactElement {
                       ))
                     }
                   }}
-                  style={numInputStyle(48)}
                 />
               </div>
               {/* Opacity slider + numeric input */}
@@ -1891,14 +1783,11 @@ export function PropertiesPanel(): React.ReactElement {
                   onMouseUp={e => commitUpdate(shapeObj.id, { opacity: Number((e.target as HTMLInputElement).value) / 100 })}
                   style={{ flex: 1 }}
                 />
-                <input
-                  type="number" min={0} max={100} step={1}
+                <NumericInput
                   value={Math.round((shapeObj.opacity ?? 1) * 100)}
-                  onChange={e => {
-                    const v = Math.max(0, Math.min(100, Number(e.target.value)))
-                    commitUpdate(shapeObj.id, { opacity: v / 100 })
-                  }}
-                  style={numInputStyle(44)}
+                  min={0} max={100}
+                  width={44}
+                  onCommit={v => commitUpdate(shapeObj.id, { opacity: v / 100 })}
                 />
               </div>
               <div style={sectionLabelStyle}>Fill</div>
@@ -2110,18 +1999,17 @@ export function PropertiesPanel(): React.ReactElement {
                     }}
                     style={{ flex: 1 }}
                   />
-                  <input
-                    type="number" min={-360} max={360} step={1}
+                  <NumericInput
                     value={Math.round(imgObj.rotation ?? 0)}
-                    onChange={e => {
-                      const newRot = Math.max(-360, Math.min(360, Number(e.target.value)))
+                    min={-360} max={360}
+                    width={48}
+                    onCommit={newRot => {
                       const { x: fx, y: fy, rotation } = rotateAroundCenter(
                         imgObj.frameX, imgObj.frameY, imgObj.frameWidth, imgObj.frameHeight,
                         imgObj.rotation ?? 0, newRot,
                       )
                       commitUpdate(imgObj.id, { rotation, frameX: fx, frameY: fy, x: fx, y: fy })
                     }}
-                    style={numInputStyle(48)}
                   />
                 </div>
                 {/* Opacity slider + numeric input */}
@@ -2135,14 +2023,11 @@ export function PropertiesPanel(): React.ReactElement {
                     onMouseUp={e => commitUpdate(imgObj.id, { opacity: Number((e.target as HTMLInputElement).value) / 100 })}
                     style={{ flex: 1 }}
                   />
-                  <input
-                    type="number" min={0} max={100} step={1}
+                  <NumericInput
                     value={Math.round((imgObj.opacity ?? 1) * 100)}
-                    onChange={e => {
-                      const v = Math.max(0, Math.min(100, Number(e.target.value)))
-                      commitUpdate(imgObj.id, { opacity: v / 100 })
-                    }}
-                    style={numInputStyle(44)}
+                    min={0} max={100}
+                    width={44}
+                    onCommit={v => commitUpdate(imgObj.id, { opacity: v / 100 })}
                   />
                 </div>
                 {(imgObj as ImageObject).isEmpty && (

@@ -32,6 +32,7 @@ const PLATFORM_RECOMMENDED: Partial<Record<Platform, 'draft' | 'balanced' | 'hig
 type PresetKey = 'draft' | 'balanced' | 'high'
 import { iconBtnStyle } from './iconBtnStyle'
 import { FrameSettingsPopover } from './FrameSettingsPopover'
+import { NumericInput } from './NumericInput'
 import { useExportStore } from './useExportStore'
 import { GridPicker } from './GridPicker'
 import type { GridTemplate } from '../canvas/gridTemplates'
@@ -177,12 +178,6 @@ function VideoExportSettingsPanel({
     letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap',
   }
 
-  const numFieldStyle: React.CSSProperties = {
-    width: 52, height: 24, background: '#ffffff', color: '#333333',
-    border: '1px solid #d4ccc2', borderRadius: 6, fontSize: 12,
-    textAlign: 'center', padding: '0 4px',
-  }
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       {/* Tab strip */}
@@ -253,9 +248,12 @@ function VideoExportSettingsPanel({
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
             <span style={rowLabelStyle}>Audio</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <input type="number" min={32} max={320} value={settings.audioBitrate}
-                onChange={(e) => onSettingsChange((s) => ({ ...s, audioBitrate: Number(e.target.value) }))}
-                style={numFieldStyle}
+              <NumericInput
+                value={settings.audioBitrate}
+                min={32} max={320}
+                width={52} align="center"
+                onChange={v => onSettingsChange(s => ({ ...s, audioBitrate: v }))}
+                onCommit={v => onSettingsChange(s => ({ ...s, audioBitrate: v }))}
               />
               <span style={{ color: '#aaaaaa', fontSize: 11 }}>kbps</span>
             </div>
@@ -912,24 +910,12 @@ export function TitleBar(): React.ReactElement {
             {exportMode === 'single' && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <label style={{ color: 'var(--text-secondary)', fontSize: 12, fontFamily: 'var(--font)' }}>Frame</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={frameCount}
+                <NumericInput
                   value={exportSingle}
-                  onChange={(e) => setExportSingle(Number(e.target.value))}
-                  style={{
-                    width: 48,
-                    height: 24,
-                    background: 'var(--bg-surface)',
-                    color: 'var(--text-primary)',
-                    border: '1px solid var(--stroke)',
-                    borderRadius: 6,
-                    fontSize: 12,
-                    fontFamily: 'var(--font)',
-                    textAlign: 'center',
-                    padding: '0 4px',
-                  }}
+                  min={1} max={frameCount}
+                  width={48} align="center"
+                  onChange={setExportSingle}
+                  onCommit={setExportSingle}
                 />
               </div>
             )}
@@ -937,44 +923,20 @@ export function TitleBar(): React.ReactElement {
             {exportMode === 'range' && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <label style={{ color: 'var(--text-secondary)', fontSize: 12, fontFamily: 'var(--font)' }}>From</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={frameCount}
+                <NumericInput
                   value={exportFrom}
-                  onChange={(e) => setExportFrom(Number(e.target.value))}
-                  style={{
-                    width: 48,
-                    height: 24,
-                    background: 'var(--bg-surface)',
-                    color: 'var(--text-primary)',
-                    border: '1px solid var(--stroke)',
-                    borderRadius: 6,
-                    fontSize: 12,
-                    fontFamily: 'var(--font)',
-                    textAlign: 'center',
-                    padding: '0 4px',
-                  }}
+                  min={1} max={frameCount}
+                  width={48} align="center"
+                  onChange={setExportFrom}
+                  onCommit={setExportFrom}
                 />
                 <label style={{ color: 'var(--text-secondary)', fontSize: 12, fontFamily: 'var(--font)' }}>To</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={frameCount}
+                <NumericInput
                   value={exportTo}
-                  onChange={(e) => setExportTo(Number(e.target.value))}
-                  style={{
-                    width: 48,
-                    height: 24,
-                    background: 'var(--bg-surface)',
-                    color: 'var(--text-primary)',
-                    border: '1px solid var(--stroke)',
-                    borderRadius: 6,
-                    fontSize: 12,
-                    fontFamily: 'var(--font)',
-                    textAlign: 'center',
-                    padding: '0 4px',
-                  }}
+                  min={1} max={frameCount}
+                  width={48} align="center"
+                  onChange={setExportTo}
+                  onCommit={setExportTo}
                 />
               </div>
             )}
@@ -1055,26 +1017,21 @@ export function TitleBar(): React.ReactElement {
                   Max file size <span style={{ color: 'var(--text-muted)' }}>(optional)</span>
                 </label>
                 <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                  <input
-                    type="number"
+                  <NumericInput
+                    value={imageSettings.maxFileSizeKB !== undefined
+                      ? maxFileSizeUnit === 'MB'
+                        ? Math.round(imageSettings.maxFileSizeKB / 1024 * 10) / 10
+                        : imageSettings.maxFileSizeKB
+                      : undefined}
                     min={1}
-                    placeholder="—"
-                    value={imageSettings.maxFileSizeKB ?? ''}
-                    onChange={e => {
-                      const v = e.target.value === '' ? undefined : Number(e.target.value)
-                      const kb = v === undefined ? undefined : maxFileSizeUnit === 'MB' ? v * 1024 : v
+                    width={70} align="left"
+                    onChange={v => {
+                      const kb = maxFileSizeUnit === 'MB' ? v * 1024 : v
                       setImageSettings(s => ({ ...s, maxFileSizeKB: kb }))
                     }}
-                    style={{
-                      fontFamily: 'var(--font)',
-                      fontSize: 12,
-                      borderRadius: 6,
-                      border: '1px solid var(--border)',
-                      padding: '4px 8px',
-                      background: 'var(--bg-surface)',
-                      color: 'var(--text-primary)',
-                      width: 70,
-                      outline: 'none',
+                    onCommit={v => {
+                      const kb = maxFileSizeUnit === 'MB' ? v * 1024 : v
+                      setImageSettings(s => ({ ...s, maxFileSizeKB: kb }))
                     }}
                   />
                   <select

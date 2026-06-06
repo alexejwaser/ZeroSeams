@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useCanvasStore, PLATFORM_PRESETS } from '@/canvas/useCanvasStore'
 import type { FrameRatio, Platform } from '@/types/project'
 import { ColorInput } from './ColorInput'
+import { NumericInput } from './NumericInput'
 
 interface FrameSettingsPopoverProps {
   onClose: () => void
@@ -34,18 +35,6 @@ function segmentButtonStyle(active: boolean): React.CSSProperties {
   }
 }
 
-const numberInputStyle: React.CSSProperties = {
-  width: 56,
-  height: 24,
-  background: '#ffffff',
-  color: '#111111',
-  border: '1px solid #d4ccc2',
-  borderRadius: 6,
-  fontSize: 12,
-  textAlign: 'center',
-  padding: '0 4px',
-  boxSizing: 'border-box',
-}
 
 const labelStyle: React.CSSProperties = {
   color: '#555555',
@@ -87,20 +76,6 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
     document.addEventListener('mousedown', handleMouseDown)
     return () => { document.removeEventListener('mousedown', handleMouseDown) }
   }, [onClose])
-
-  function commitCustomDimensions(): void {
-    const w = Math.max(100, Math.min(8000, customW))
-    const h = Math.max(100, Math.min(8000, customH))
-    setCustomW(w)
-    setCustomH(h)
-    setRatio('custom', w, h)
-  }
-
-  function handleCustomKeyDown(e: React.KeyboardEvent<HTMLInputElement>): void {
-    if (e.key === 'Enter') {
-      commitCustomDimensions()
-    }
-  }
 
   const presets = PLATFORM_PRESETS[platform]
 
@@ -176,28 +151,26 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
         <>
           <div style={labelStyle}>Dimensions</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <input
-              type="number"
-              min={100}
-              max={8000}
+            <NumericInput
               value={customW}
-              onChange={(e) => { setCustomW(Number(e.target.value)) }}
-              onBlur={commitCustomDimensions}
-              onKeyDown={handleCustomKeyDown}
-              style={numberInputStyle}
-              title="Width"
+              min={100} max={8000}
+              width={56} align="center"
+              onChange={setCustomW}
+              onCommit={w => {
+                setCustomW(w)
+                setRatio('custom', w, customH)
+              }}
             />
             <span style={{ color: '#aaaaaa', fontSize: 12 }}>×</span>
-            <input
-              type="number"
-              min={100}
-              max={8000}
+            <NumericInput
               value={customH}
-              onChange={(e) => { setCustomH(Number(e.target.value)) }}
-              onBlur={commitCustomDimensions}
-              onKeyDown={handleCustomKeyDown}
-              style={numberInputStyle}
-              title="Height"
+              min={100} max={8000}
+              width={56} align="center"
+              onChange={setCustomH}
+              onCommit={h => {
+                setCustomH(h)
+                setRatio('custom', customW, h)
+              }}
             />
           </div>
         </>
