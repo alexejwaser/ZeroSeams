@@ -38,6 +38,8 @@ export function LayerPanel(): React.ReactElement {
   const dragId = useRef<string | null>(null)
   const [dropPos, setDropPos] = useState<{ id: string; side: 'before' | 'after' } | null>(null)
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
+  const [renamingId, setRenamingId] = useState<string | null>(null)
+  const [renameDraft, setRenameDraft] = useState('')
 
   const [panelHeight, setPanelHeight] = useState<number | 'auto'>('auto')
   const innerRef = useRef<HTMLDivElement>(null)
@@ -89,6 +91,18 @@ export function LayerPanel(): React.ReactElement {
     return `${typeLabel(obj.type)} ${originalIndex + 1}`
   }
 
+  function beginRename(id: string, originalIndex: number): void {
+    setRenamingId(id)
+    setRenameDraft(objects[id]?.name ?? getDisplayName(id, originalIndex))
+  }
+
+  function commitRename(id: string): void {
+    const trimmed = renameDraft.trim()
+    // Empty input clears the custom name → falls back to "Type N".
+    commitUpdate(id, { name: trimmed === '' ? undefined : trimmed })
+    setRenamingId(null)
+  }
+
   return (
     <div
       style={{
@@ -130,6 +144,24 @@ export function LayerPanel(): React.ReactElement {
           }}
         >
           Layers
+          {selectedIds.length > 1 && (
+            <span
+              style={{
+                marginLeft: 8,
+                fontSize: 10,
+                fontWeight: 600,
+                letterSpacing: 0,
+                textTransform: 'none',
+                color: 'var(--bg-surface)',
+                background: 'var(--accent)',
+                borderRadius: 999,
+                padding: '2px 8px',
+                verticalAlign: 'middle',
+              }}
+            >
+              {selectedIds.length} selected
+            </span>
+          )}
         </div>
 
         {/* Scrollable list */}
@@ -176,8 +208,9 @@ export function LayerPanel(): React.ReactElement {
             const mainRow = (
               <div
                 key={id}
-                draggable={true}
+                draggable={renamingId !== id}
                 onClick={(e) => handleRowClick(e, id)}
+                onDoubleClick={() => beginRename(id, originalIndex)}
                 onDragStart={(e) => {
                   dragId.current = id
                   e.dataTransfer.setData('text/plain', id)
@@ -208,7 +241,9 @@ export function LayerPanel(): React.ReactElement {
                   alignItems: 'center',
                   padding: '0 8px',
                   background: isSelected ? '#ffffff' : 'transparent',
-                  border: isSelected ? '1px solid #e8e0d5' : '1px solid transparent',
+                  border: isSelected
+                    ? (selectedIds.length > 1 && selectedIds.includes(id) ? '1px solid #f7b9a3' : '1px solid #e8e0d5')
+                    : '1px solid transparent',
                   borderRadius: 12,
                   cursor: 'pointer',
                   userSelect: 'none',
@@ -326,21 +361,49 @@ export function LayerPanel(): React.ReactElement {
                   </div>
                 )}
 
-                {/* Name */}
-                <span
-                  style={{
-                    flex: 1,
-                    color: obj.visible ? 'var(--text-primary)' : 'var(--text-muted)',
-                    fontSize: 13,
-                    fontFamily: 'var(--font)',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    pointerEvents: 'none',
-                  }}
-                >
-                  {getDisplayName(id, originalIndex)}
-                </span>
+                {/* Name — double-click row to rename */}
+                {renamingId === id ? (
+                  <input
+                    autoFocus
+                    value={renameDraft}
+                    onChange={(e) => setRenameDraft(e.target.value)}
+                    onFocus={(e) => e.target.select()}
+                    onClick={(e) => e.stopPropagation()}
+                    onBlur={() => commitRename(id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') { e.preventDefault(); commitRename(id) }
+                      if (e.key === 'Escape') { e.preventDefault(); setRenamingId(null) }
+                    }}
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      height: 22,
+                      fontSize: 13,
+                      fontFamily: 'var(--font)',
+                      color: 'var(--text-primary)',
+                      background: 'var(--bg-surface)',
+                      border: '1px solid var(--accent)',
+                      borderRadius: 6,
+                      padding: '0 5px',
+                      outline: 'none',
+                    }}
+                  />
+                ) : (
+                  <span
+                    style={{
+                      flex: 1,
+                      color: obj.visible ? 'var(--text-primary)' : 'var(--text-muted)',
+                      fontSize: 13,
+                      fontFamily: 'var(--font)',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {getDisplayName(id, originalIndex)}
+                  </span>
+                )}
 
                 {/* Anchor button — visible only in multi-select mode */}
                 {canBeAnchor && (

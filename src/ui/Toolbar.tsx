@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
 import { getStageInstance } from '@/canvas/CarouselStage'
 import { exportMixedFrames } from '@/canvas/exportFrames'
-import { useSaveStatusStore, type SaveStatus } from '@/store'
+import { useSaveStatusStore, trackSave, type SaveStatus } from '@/store'
 import type { CarouselProject } from '@/types/project'
 import type { ShapeKind, VideoExportSettings, ImageExportSettings, ImageFormat } from '@/types/canvas'
 import { DEFAULT_VIDEO_EXPORT_SETTINGS, DEFAULT_IMAGE_EXPORT_SETTINGS } from '@/types/canvas'
@@ -64,7 +64,7 @@ function SaveStatusPill({ status }: { status: SaveStatus }): React.ReactElement 
   if (status === 'idle') return null
 
   const config: Record<Exclude<SaveStatus, 'idle'>, { icon: React.ReactElement; text: string; color: string }> = {
-    saving: { icon: <span/>, text: 'Saving…', color: '#aaaaaa' },
+    saving: { icon: <span className="save-spinner" />, text: 'Saving…', color: '#aaaaaa' },
     saved: { icon: <Check size={12} strokeWidth={1.5}/>, text: ' Saved', color: '#4c4' },
     error: { icon: <AlertTriangle size={12} strokeWidth={1.5}/>, text: ' Save failed', color: '#f55' },
   }
@@ -306,6 +306,7 @@ export function TitleBar(): React.ReactElement {
   const saveStatus = useSaveStatusStore((s) => s.status)
   const setProjectMeta = useSaveStatusStore((s) => s.setProjectMeta)
   const projectName = useSaveStatusStore((s) => s.projectName)
+  const isDirty = useSaveStatusStore((s) => s.dirty)
   const setCurrentFilePath = useSaveStatusStore((s) => s.setCurrentFilePath)
 
   const [loadingProject, setLoadingProject] = useState(false)
@@ -624,6 +625,21 @@ export function TitleBar(): React.ReactElement {
         }}
       >
         {`Zero Seams${projectName !== 'Untitled Project' ? ` — ${projectName}` : ''}`}
+        {isDirty && (
+          <Tooltip label="Unsaved changes" description="Autosave runs a moment after you stop editing">
+            <span
+              style={{
+                display: 'inline-block',
+                width: 7,
+                height: 7,
+                borderRadius: '50%',
+                background: 'var(--accent)',
+                marginLeft: 7,
+                verticalAlign: 'middle',
+              }}
+            />
+          </Tooltip>
+        )}
       </div>
 
       {/* Open button + recent projects */}
@@ -721,10 +737,11 @@ export function TitleBar(): React.ReactElement {
               const saveStore = useSaveStatusStore.getState()
               const json = buildProjectJson()
               if (saveStore.currentFilePath) {
-                window.electronAPI.saveProject(saveStore.currentFilePath, json)
+                const path = saveStore.currentFilePath
+                trackSave(() => window.electronAPI.saveProject(path, json))
                   .catch((err: unknown) => console.error('[ZeroSeams] Save failed:', err))
               } else {
-                window.electronAPI.saveProjectAs(json)
+                trackSave(() => window.electronAPI.saveProjectAs(json))
                   .then((result: { success: boolean; filePath?: string; error?: string }) => {
                     if (result.success && result.filePath) {
                       useSaveStatusStore.getState().setCurrentFilePath(result.filePath)
@@ -790,7 +807,7 @@ export function TitleBar(): React.ReactElement {
               onClick={() => {
                 setSaveMenuOpen(false)
                 const json = buildProjectJson()
-                window.electronAPI.saveProjectAs(json)
+                trackSave(() => window.electronAPI.saveProjectAs(json))
                   .then((result: { success: boolean; filePath?: string; error?: string }) => {
                     if (result.success && result.filePath) {
                       useSaveStatusStore.getState().setCurrentFilePath(result.filePath)
@@ -813,7 +830,7 @@ export function TitleBar(): React.ReactElement {
               onClick={() => {
                 setSaveMenuOpen(false)
                 const json = buildProjectJson()
-                window.electronAPI.saveProjectCopy(json)
+                trackSave(() => window.electronAPI.saveProjectCopy(json))
                   .catch((err: unknown) => console.error('[ZeroSeams] Save a Copy failed:', err))
               }}
               style={{

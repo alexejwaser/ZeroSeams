@@ -110,3 +110,18 @@ input[type="color"]::-webkit-color-swatch {
 ::-webkit-scrollbar-thumb { background: var(--stroke); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 * { scrollbar-width: thin; scrollbar-color: var(--stroke) var(--bg-panel); }
+
+/* Rotating ring for the Saving… status pill */
+.save-spinner {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid #aaaaaa;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: save-spin 0.8s linear infinite;
+}
+
+@keyframes save-spin {
+  to { transform: rotate(360deg); }
+}

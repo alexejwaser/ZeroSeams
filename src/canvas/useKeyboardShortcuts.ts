@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useCanvasStore } from './useCanvasStore'
 import { useViewportStore } from './useViewportStore'
-import { useSaveStatusStore } from '@/store'
+import { useSaveStatusStore, trackSave } from '@/store'
 import type { CarouselProject } from '@/types/project'
 import type { ImageObject, PathObject, ShapeObject } from '@/types/canvas'
 import { computePathBBox } from './CanvasPathNode'
@@ -269,11 +269,11 @@ export function useKeyboardShortcuts(): void {
           const currentState = useCanvasStore.getState()
           const project = buildProjectSnapshot(currentState, saveStore)
           if (saveStore.currentFilePath) {
-            window.electronAPI.saveProject(saveStore.currentFilePath, JSON.stringify(project))
-              .then(() => { /* status handled by autosave */ })
+            const path = saveStore.currentFilePath
+            trackSave(() => window.electronAPI.saveProject(path, JSON.stringify(project)))
               .catch(() => {})
           } else {
-            window.electronAPI.saveProjectAs(JSON.stringify(project))
+            trackSave(() => window.electronAPI.saveProjectAs(JSON.stringify(project)))
               .then((result: { success: boolean; filePath?: string; error?: string }) => {
                 if (result.success && result.filePath) {
                   saveStore.setCurrentFilePath(result.filePath)
@@ -289,7 +289,7 @@ export function useKeyboardShortcuts(): void {
           const saveStore = useSaveStatusStore.getState()
           const currentState = useCanvasStore.getState()
           const project = buildProjectSnapshot(currentState, saveStore)
-          window.electronAPI.saveProjectAs(JSON.stringify(project))
+          trackSave(() => window.electronAPI.saveProjectAs(JSON.stringify(project)))
             .then((result: { success: boolean; filePath?: string; error?: string }) => {
               if (result.success && result.filePath) {
                 saveStore.setCurrentFilePath(result.filePath)

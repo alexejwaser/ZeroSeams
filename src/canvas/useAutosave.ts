@@ -30,6 +30,8 @@ export function useAutosave(): { status: SaveStatus; lastSavedAt: string | null 
 
   useEffect(() => {
     const unsubscribe = useCanvasStore.subscribe(() => {
+      const save = useSaveStatusStore.getState()
+      if (!save.dirty) save.setDirty(true)
       if (debounceRef.current !== null) {
         clearTimeout(debounceRef.current)
       }
@@ -73,6 +75,7 @@ export function useAutosave(): { status: SaveStatus; lastSavedAt: string | null 
               useSaveStatusStore.getState().setAutosaveFilePath(result.filePath)
             }
             applyStatus('saved')
+            useSaveStatusStore.getState().setDirty(false)
             const savedAt = new Date().toISOString()
             applyLastSavedAt(savedAt)
 
