@@ -115,11 +115,26 @@ function TooltipInner({
 
   const child = React.cloneElement(children, {
     ref: triggerRef,
-    onMouseEnter: handleMouseEnter,
-    onMouseLeave: handleMouseLeave,
+    onMouseEnter: (e: React.MouseEvent) => {
+      handleMouseEnter()
+      children.props.onMouseEnter?.(e)
+    },
+    onMouseLeave: (e: React.MouseEvent) => {
+      handleMouseLeave()
+      children.props.onMouseLeave?.(e)
+    },
     onMouseDown: (e: React.MouseEvent) => {
       handleMouseDown()
       children.props.onMouseDown?.(e)
+    },
+    // Keyboard access: focused controls reveal their tooltip (and shortcut)
+    onFocus: (e: React.FocusEvent) => {
+      show()
+      children.props.onFocus?.(e)
+    },
+    onBlur: (e: React.FocusEvent) => {
+      hide()
+      children.props.onBlur?.(e)
     },
   })
 

@@ -1631,22 +1631,6 @@ export function CarouselStage(): React.ReactElement {
       {/* Empty grid cell +image/+video buttons — rendered after Stage so they sit above the canvas */}
       <GridCellOverlay />
 
-      {/* Zoom indicator badge */}
-      <div style={{
-        position: 'absolute',
-        bottom: 12,
-        left: 12,
-        background: 'rgba(0,0,0,0.5)',
-        color: '#aaa',
-        fontSize: 11,
-        padding: '2px 8px',
-        borderRadius: 4,
-        pointerEvents: 'none',
-        userSelect: 'none',
-        zIndex: 10,
-      }}>
-        {Math.round(scale * 100)}%
-      </div>
     </div>
   )
 }

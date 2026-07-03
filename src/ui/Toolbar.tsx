@@ -64,7 +64,7 @@ function SaveStatusPill({ status }: { status: SaveStatus }): React.ReactElement 
   if (status === 'idle') return null
 
   const config: Record<Exclude<SaveStatus, 'idle'>, { icon: React.ReactElement; text: string; color: string }> = {
-    saving: { icon: <span className="save-spinner" />, text: 'Saving…', color: '#aaaaaa' },
+    saving: { icon: <span className="save-spinner" />, text: 'Saving…', color: 'var(--text-muted)' },
     saved: { icon: <Check size={12} strokeWidth={1.5}/>, text: ' Saved', color: '#4c4' },
     error: { icon: <AlertTriangle size={12} strokeWidth={1.5}/>, text: ' Save failed', color: '#f55' },
   }
@@ -89,7 +89,7 @@ function SaveStatusPill({ status }: { status: SaveStatus }): React.ReactElement 
 }
 
 const divider = (
-  <div style={{ width: 1, height: 20, background: '#d4ccc2', margin: '0 6px' }} />
+  <div style={{ width: 1, height: 20, background: 'var(--stroke)', margin: '0 6px' }} />
 )
 
 function ToolGroup({ label, style, children }: {
@@ -167,14 +167,14 @@ function VideoExportSettingsPanel({
 
   const tabBtnStyle = (active: boolean): React.CSSProperties => ({
     flex: 1, height: 24,
-    background: active ? '#f94608' : 'none',
-    color: active ? '#fff' : '#555555',
+    background: active ? 'var(--accent)' : 'none',
+    color: active ? '#fff' : 'var(--text-secondary)',
     border: 'none', borderRadius: 3, cursor: 'pointer',
     fontSize: 11, fontWeight: active ? 'bold' : 'normal',
   })
 
   const rowLabelStyle: React.CSSProperties = {
-    color: '#555555', fontSize: 11, fontWeight: 'bold',
+    color: 'var(--text-secondary)', fontSize: 11, fontWeight: 'bold',
     letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap',
   }
 
@@ -199,19 +199,19 @@ function VideoExportSettingsPanel({
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   padding: '6px 10px',
-                  background: isActive ? '#fff4f0' : '#ffffff',
-                  border: `1px solid ${isActive ? '#f94608' : '#d4ccc2'}`,
+                  background: isActive ? '#fff4f0' : 'var(--bg-surface)',
+                  border: `1px solid ${isActive ? 'var(--accent)' : 'var(--stroke)'}`,
                   borderRadius: 6, cursor: 'pointer', textAlign: 'left',
                 }}
               >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <span style={{ color: isActive ? '#f94608' : '#333333', fontSize: 12, fontWeight: 'bold' }}>{p.label}</span>
-                  <span style={{ color: '#aaaaaa', fontSize: 10 }}>{p.hint}</span>
+                  <span style={{ color: isActive ? 'var(--accent)' : '#333333', fontSize: 12, fontWeight: 'bold' }}>{p.label}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: 10 }}>{p.hint}</span>
                 </div>
                 {isRecommended && (
                   <span style={{
-                    fontSize: 9, color: isActive ? '#f94608' : '#555555',
-                    border: `1px solid ${isActive ? '#f94608' : '#d4ccc2'}`,
+                    fontSize: 9, color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
+                    border: `1px solid ${isActive ? 'var(--accent)' : 'var(--stroke)'}`,
                     borderRadius: 3, padding: '1px 4px', whiteSpace: 'nowrap',
                   }}>
                     {platformLabel}
@@ -239,9 +239,9 @@ function VideoExportSettingsPanel({
                 type="range" min={0} max={51} step={1}
                 value={51 - settings.crf}
                 onChange={(e) => onSettingsChange((s) => ({ ...s, crf: 51 - Number(e.target.value) }))}
-                style={{ flex: 1, accentColor: '#f94608', cursor: 'pointer' }}
+                style={{ flex: 1, accentColor: 'var(--accent)', cursor: 'pointer' }}
               />
-              <span style={{ color: '#555555', fontSize: 11, minWidth: 36, textAlign: 'right' }}>CRF {settings.crf}</span>
+              <span style={{ color: 'var(--text-secondary)', fontSize: 11, minWidth: 36, textAlign: 'right' }}>CRF {settings.crf}</span>
             </div>
           </div>
           {/* Audio */}
@@ -255,7 +255,7 @@ function VideoExportSettingsPanel({
                 onChange={v => onSettingsChange(s => ({ ...s, audioBitrate: v }))}
                 onCommit={v => onSettingsChange(s => ({ ...s, audioBitrate: v }))}
               />
-              <span style={{ color: '#aaaaaa', fontSize: 11 }}>kbps</span>
+              <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>kbps</span>
             </div>
           </div>
           {/* Frame rate */}
@@ -525,9 +525,9 @@ export function TitleBar(): React.ReactElement {
   const videoSettingsBtnStyle = (active: boolean): React.CSSProperties => ({
     padding: '0 8px',
     height: 24,
-    background: active ? '#f94608' : '#ffffff',
-    color: active ? '#fff' : '#555555',
-    border: `1px solid ${active ? '#f94608' : '#d4ccc2'}`,
+    background: active ? 'var(--accent)' : 'var(--bg-surface)',
+    color: active ? '#fff' : 'var(--text-secondary)',
+    border: `1px solid ${active ? 'var(--accent)' : 'var(--stroke)'}`,
     borderRadius: 999,
     cursor: 'pointer',
     fontSize: 12,
@@ -539,8 +539,8 @@ export function TitleBar(): React.ReactElement {
   const titleBarSegmentButtonStyle = (active: boolean): React.CSSProperties => ({
     padding: '3px 10px',
     height: 24,
-    background: active ? '#f94608' : 'transparent',
-    color: active ? '#fff' : '#555555',
+    background: active ? 'var(--accent)' : 'transparent',
+    color: active ? '#fff' : 'var(--text-secondary)',
     border: 'none',
     borderRadius: 999,
     cursor: 'pointer',
@@ -616,7 +616,7 @@ export function TitleBar(): React.ReactElement {
       <div
         style={{
           paddingLeft: 0,
-          color: '#111111',
+          color: 'var(--text-primary)',
           fontSize: 16,
           fontWeight: 'bold',
           whiteSpace: 'nowrap',
@@ -651,9 +651,9 @@ export function TitleBar(): React.ReactElement {
             style={{
               width: 30,
               height: 30,
-              background: '#ffffff',
-              color: loadingProject ? '#aaaaaa' : '#555555',
-              border: '1px solid #d4ccc2',
+              background: 'var(--bg-surface)',
+              color: loadingProject ? 'var(--text-muted)' : 'var(--text-secondary)',
+              border: '1px solid var(--stroke)',
               borderRight: 'none',
               borderRadius: '999px 0 0 999px',
               cursor: loadingProject ? 'default' : 'pointer',
@@ -672,9 +672,9 @@ export function TitleBar(): React.ReactElement {
             style={{
               padding: '4px 6px',
               height: 30,
-              background: recentOpen ? '#f5ede2' : '#ffffff',
-              color: '#555555',
-              border: '1px solid #d4ccc2',
+              background: recentOpen ? 'var(--bg-panel)' : 'var(--bg-surface)',
+              color: 'var(--text-secondary)',
+              border: '1px solid var(--stroke)',
               borderRadius: '0 999px 999px 0',
               cursor: 'pointer',
               fontSize: 11,
@@ -694,8 +694,8 @@ export function TitleBar(): React.ReactElement {
               left: 0,
               zIndex: 1001,
               marginTop: 6,
-              background: '#ffffff',
-              border: '1px solid #e8e0d5',
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--border)',
               borderRadius: 12,
               boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
               padding: '4px 0',
@@ -703,26 +703,26 @@ export function TitleBar(): React.ReactElement {
             }}
           >
             {recentFiles.length === 0 ? (
-              <div style={{ padding: '8px 14px', color: '#aaaaaa', fontSize: 12 }}>No recent projects</div>
+              <div style={{ padding: '8px 14px', color: 'var(--text-muted)', fontSize: 12 }}>No recent projects</div>
             ) : (
               recentFiles.map((file) => (
+                <Tooltip key={file.path} label={file.path}>
                 <div
-                  key={file.path}
-                  title={file.path}
                   onClick={() => { void handleOpenFromPath(file.path) }}
                   style={{
                     padding: '7px 14px',
                     cursor: 'pointer',
-                    borderBottom: '1px solid #e8e0d5',
+                    borderBottom: '1px solid var(--border)',
                   }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#f5ede2' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-panel)' }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = 'transparent' }}
                 >
-                  <div style={{ color: '#111111', fontSize: 13, fontWeight: 'bold' }}>{file.name}</div>
-                  <div style={{ color: '#aaaaaa', fontSize: 11 }}>
+                  <div style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 'bold' }}>{file.name}</div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>
                     {new Date(file.modifiedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                   </div>
                 </div>
+                </Tooltip>
               ))
             )}
           </div>
@@ -753,9 +753,9 @@ export function TitleBar(): React.ReactElement {
             style={{
               padding: '4px 10px',
               height: 30,
-              background: '#ffffff',
+              background: 'var(--bg-surface)',
               color: '#333333',
-              border: '1px solid #d4ccc2',
+              border: '1px solid var(--stroke)',
               borderRight: 'none',
               borderRadius: '999px 0 0 999px',
               cursor: 'pointer',
@@ -776,9 +776,9 @@ export function TitleBar(): React.ReactElement {
             style={{
               padding: '4px 6px',
               height: 30,
-              background: saveMenuOpen ? '#f5ede2' : '#ffffff',
-              color: '#555555',
-              border: '1px solid #d4ccc2',
+              background: saveMenuOpen ? 'var(--bg-panel)' : 'var(--bg-surface)',
+              color: 'var(--text-secondary)',
+              border: '1px solid var(--stroke)',
               borderRadius: '0 999px 999px 0',
               cursor: 'pointer',
               fontSize: 11,
@@ -795,8 +795,8 @@ export function TitleBar(): React.ReactElement {
             top: '100%',
             left: 0,
             marginTop: 6,
-            background: '#ffffff',
-            border: '1px solid #e8e0d5',
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border)',
             borderRadius: 12,
             boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
             zIndex: 1000,
@@ -821,7 +821,7 @@ export function TitleBar(): React.ReactElement {
                 fontSize: 13, padding: '7px 14px', cursor: 'pointer',
                 fontFamily: 'var(--font)',
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = '#f5ede2')}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-panel)')}
               onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
               Save As…
@@ -839,7 +839,7 @@ export function TitleBar(): React.ReactElement {
                 fontSize: 13, padding: '7px 14px', cursor: 'pointer',
                 fontFamily: 'var(--font)',
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = '#f5ede2')}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-panel)')}
               onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
               Save a Copy…
@@ -876,8 +876,8 @@ export function TitleBar(): React.ReactElement {
       {divider}
 
       {/* Frame count */}
-      <span style={{ color: '#555555', fontSize: 13, fontFamily: 'var(--font)' }}>Frames:</span>
-      <div style={{ display: 'flex', alignItems: 'center', background: '#ffffff', border: '1px solid #d4ccc2', borderRadius: 999, padding: '2px 6px', gap: 4 }}>
+      <span style={{ color: 'var(--text-secondary)', fontSize: 13, fontFamily: 'var(--font)' }}>Frames:</span>
+      <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-surface)', border: '1px solid var(--stroke)', borderRadius: 999, padding: '2px 6px', gap: 4 }}>
         <Tooltip label="Remove frame" shortcut="⌘←">
           <button
             onClick={handleMinus}
@@ -886,7 +886,7 @@ export function TitleBar(): React.ReactElement {
               width: 20,
               height: 20,
               background: 'none',
-              color: frameCount <= 1 ? '#aaaaaa' : '#555555',
+              color: frameCount <= 1 ? 'var(--text-muted)' : 'var(--text-secondary)',
               border: 'none',
               borderRadius: 999,
               cursor: frameCount <= 1 ? 'default' : 'pointer',
@@ -901,7 +901,7 @@ export function TitleBar(): React.ReactElement {
         </Tooltip>
         <span
           style={{
-            color: '#111111',
+            color: 'var(--text-primary)',
             fontSize: 14,
             fontWeight: 'bold',
             minWidth: 16,
@@ -919,7 +919,7 @@ export function TitleBar(): React.ReactElement {
               width: 20,
               height: 20,
               background: 'none',
-              color: frameCount >= 10 ? '#aaaaaa' : '#555555',
+              color: frameCount >= 10 ? 'var(--text-muted)' : 'var(--text-secondary)',
               border: 'none',
               borderRadius: 999,
               cursor: frameCount >= 10 ? 'default' : 'pointer',
@@ -956,7 +956,7 @@ export function TitleBar(): React.ReactElement {
             onClick={() => { setExportOpen((v) => !v) }}
             style={{
               padding: '5px 14px',
-              background: '#f94608',
+              background: 'var(--accent)',
               color: '#fff',
               border: '1px solid #000000',
               borderRadius: 999,
@@ -983,7 +983,7 @@ export function TitleBar(): React.ReactElement {
               right: 0,
               zIndex: 1000,
               marginTop: 6,
-              background: '#ffffff',
+              background: 'var(--bg-surface)',
               border: '1px solid var(--border)',
               borderRadius: 16,
               boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
@@ -1308,7 +1308,7 @@ export function TitleBar(): React.ReactElement {
       {divider}
 
       {/* Undo/Redo pill */}
-      <div style={{ display: 'flex', alignItems: 'center', background: '#ffffff', border: '1px solid #d4ccc2', borderRadius: 999, padding: 3, gap: 2 }}>
+      <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-surface)', border: '1px solid var(--stroke)', borderRadius: 999, padding: 3, gap: 2 }}>
         <Tooltip label="Undo" shortcut="⌘Z">
           <button onClick={undo} disabled={undoDisabled} style={{ ...iconBtnStyle(false, undoDisabled), border: 'none' }}>
             <Undo2 size={15} />
@@ -1431,8 +1431,8 @@ export function ToolBar(): React.ReactElement {
   const segmentButtonStyle = (active: boolean): React.CSSProperties => ({
     padding: '3px 10px',
     height: 24,
-    background: active ? '#f94608' : 'transparent',
-    color: active ? '#fff' : '#555555',
+    background: active ? 'var(--accent)' : 'transparent',
+    color: active ? '#fff' : 'var(--text-secondary)',
     border: 'none',
     borderRadius: 999,
     cursor: 'pointer',
@@ -1481,7 +1481,7 @@ export function ToolBar(): React.ReactElement {
           </button>
         </Tooltip>
 
-        <div style={{ display: 'flex', alignItems: 'center', background: '#ffffff', border: '1px solid #d4ccc2', borderRadius: 999, padding: 2, gap: 2 }}>
+        <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-surface)', border: '1px solid var(--stroke)', borderRadius: 999, padding: 2, gap: 2 }}>
           <Tooltip label="Crop mode" description="Frame clips content">
             <button
               onClick={() => setResizeMode('advanced')}
@@ -1596,10 +1596,10 @@ export function ToolBar(): React.ReactElement {
             display: 'flex',
             alignItems: 'center',
             gap: 2,
-            background: '#ffffff',
+            background: 'var(--bg-surface)',
             borderRadius: 999,
             padding: '2px',
-            border: '1px solid #d4ccc2',
+            border: '1px solid var(--stroke)',
             marginLeft: 4,
           }}
         >
@@ -1669,10 +1669,10 @@ export function ToolBar(): React.ReactElement {
             display: 'flex',
             alignItems: 'center',
             gap: 2,
-            background: '#ffffff',
+            background: 'var(--bg-surface)',
             borderRadius: 999,
             padding: '2px',
-            border: '1px solid #d4ccc2',
+            border: '1px solid var(--stroke)',
             marginLeft: 4,
           }}
         >
