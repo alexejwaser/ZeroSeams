@@ -1325,7 +1325,6 @@ export function ToolBar(): React.ReactElement {
   const setActiveShapeKind = useCanvasStore((s) => s.setActiveShapeKind)
   const selectedId = useCanvasStore((s) => s.selectedId)
   const objects = useCanvasStore((s) => s.objects)
-  const setSelected = useCanvasStore((s) => s.setSelected)
   const maskModeActive = useCanvasStore((s) => s.maskModeActive)
   const setMaskModeActive = useCanvasStore((s) => s.setMaskModeActive)
   const addObject = useCanvasStore((s) => s.addObject)
@@ -1619,14 +1618,14 @@ export function ToolBar(): React.ReactElement {
       )}
 
       {selectedObj?.type === 'image' && (
-        <Tooltip label="Mask mode" shortcut="M" description="Next stroke becomes a mask">
+        <Tooltip
+          label={maskModeActive ? 'Mask strokes: on' : 'Mask strokes: off'}
+          shortcut="M"
+          description={maskModeActive ? 'Strokes over this image become its mask — click to draw normal strokes' : 'Click so the next stroke becomes a mask'}
+        >
           <button
             style={iconBtnStyle(maskModeActive)}
-            onClick={() => {
-              setMaskModeActive(false)
-              setSelected(null)
-              setActiveTool('select')
-            }}
+            onClick={() => { setMaskModeActive(!maskModeActive) }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>

@@ -5,6 +5,8 @@ import { CarouselStage } from '@/canvas'
 import { TitleBar, ToolBar, LayerPanel, PropertiesPanel, ContextMenu } from '@/ui'
 import { useExportStore } from '@/store'
 import { PreviewShell } from '@/ui/preview/PreviewShell'
+import { ShortcutOverlay } from '@/ui/ShortcutOverlay'
+import { CanvasHud } from '@/ui/CanvasHud'
 import { AIProvider } from '@/ai'
 
 class ErrorBoundary extends React.Component<
@@ -100,6 +102,7 @@ function App(): React.ReactElement {
             }}
           >
             <CarouselStage />
+            <CanvasHud />
 
             {exporting && (
               <div
@@ -140,6 +143,7 @@ function App(): React.ReactElement {
 
       {/* Full-screen overlays at root level so they paint above panels/toolbar */}
       <PreviewShell />
+      <ShortcutOverlay />
       {/* Portal-based context menu — renders to document.body */}
       <ContextMenu />
     </div>

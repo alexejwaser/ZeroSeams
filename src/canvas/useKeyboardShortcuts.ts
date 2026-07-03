@@ -68,6 +68,14 @@ export function useKeyboardShortcuts(): void {
       const state = useCanvasStore.getState()
       const { selectedId, selectedIds, objects } = state
 
+      // '?' toggles the shortcut cheatsheet (Shift+/ on most layouts)
+      if (e.key === '?' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        e.preventDefault()
+        const s = useCanvasStore.getState()
+        s.setShortcutOverlayOpen(!s.shortcutOverlayOpen)
+        return
+      }
+
       // Tool shortcuts (no modifier)
       if (!e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey) {
         if (e.key === 'v') {
@@ -101,11 +109,14 @@ export function useKeyboardShortcuts(): void {
         if (e.key === 's') { toggleSnap(); return }
         if (e.key === 'f') { useCanvasStore.getState().setShowFrameSettings((v) => !v); return }
         if (e.key === 'm') {
+          // Toggle mask strokes for the selected image: selecting an image
+          // auto-arms maskModeActive (see setSelected); M disarms so pen
+          // strokes draw normally, and re-arms without reselecting.
           const s = useCanvasStore.getState()
           if (s.maskModeActive) {
             s.setMaskModeActive(false)
-            s.setSelected(null)
-            s.setActiveTool('select')
+          } else if (s.selectedId && s.objects[s.selectedId]?.type === 'image') {
+            s.setMaskModeActive(true)
           }
           return
         }
@@ -113,6 +124,11 @@ export function useKeyboardShortcuts(): void {
       }
 
       if (e.key === 'Escape') {
+        // Shortcut cheatsheet swallows Escape when open
+        if (useCanvasStore.getState().shortcutOverlayOpen) {
+          useCanvasStore.getState().setShortcutOverlayOpen(false)
+          return
+        }
         // If context menu is open, let it handle its own Escape — don't clear selection
         if (useCanvasStore.getState().contextMenu !== null) return
         // If mask draw is active, cancel draw without deselecting the image
@@ -233,14 +249,12 @@ export function useKeyboardShortcuts(): void {
         // Zoom shortcuts
         if (e.key === '=' || e.key === '+') {
           e.preventDefault()
-          const { zoom, setZoom } = useViewportStore.getState()
-          setZoom(Math.min(8, zoom * 1.25))
+          useViewportStore.getState().zoomIn()
           return
         }
         if (e.key === '-') {
           e.preventDefault()
-          const { zoom, setZoom } = useViewportStore.getState()
-          setZoom(Math.max(0.1, zoom * 0.8))
+          useViewportStore.getState().zoomOut()
           return
         }
         if (e.key === '0') {

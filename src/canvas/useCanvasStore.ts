@@ -127,8 +127,11 @@ interface CanvasState {
   setAdjustmentsBypass: (v: boolean) => void
   toggleAdjustmentsBypass: () => void
   previewMode: boolean
+  /** Transient: keyboard-shortcut cheatsheet overlay (not persisted). */
+  shortcutOverlayOpen: boolean
   previewFrame: number        // 0-based index of frame shown in preview
   togglePreviewMode: () => void
+  setShortcutOverlayOpen: (v: boolean) => void
   setPreviewFrame: (n: number) => void
   past: HistorySnapshot[]
   future: HistorySnapshot[]
@@ -331,6 +334,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
     snapEnabled: true,
     adjustmentsBypass: false,
     previewMode: false,
+    shortcutOverlayOpen: false,
     previewFrame: 0,
     past: [],
     future: [],
@@ -680,6 +684,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
     setAdjustmentsBypass: (v) => set({ adjustmentsBypass: v }),
     toggleAdjustmentsBypass: () => set((s) => ({ adjustmentsBypass: !s.adjustmentsBypass })),
     togglePreviewMode: () => set((s) => ({ previewMode: !s.previewMode, previewFrame: 0 })),
+    setShortcutOverlayOpen: (v) => set({ shortcutOverlayOpen: v }),
     setPreviewFrame: (n) => set({ previewFrame: n }),
 
     reorderObjects: (fromId, toId, side) =>
