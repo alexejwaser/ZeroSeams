@@ -9,6 +9,8 @@ graphify update ./src              # after any code change (AST-only, no API cos
 ```
 Only fall back to reading source files when the graph answer is incomplete or you need exact line-level detail.
 
+`npm run typecheck` checks both tsconfig projects (web + node) — the root tsconfig is references-only (`files: []`), so never run bare `tsc -p tsconfig.json`; it validates nothing. Keep both projects at zero errors.
+
 **God nodes — touch carefully:**
 - `useCanvasStore` (45+ edges) — owns all canvas state
 - `buildFilterPipeline` (18 edges) — called on every image render; LUT-cached
@@ -28,7 +30,9 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 
 ## File Ownership
 - `src/canvas/` — canvas-agent · `src/ui/` — ui-agent · `src/ai/` — ai-agent
-- `src/electron/` — electron-agent · `src/store/` — shared, coordinate before editing
+- `src/electron/` — electron-agent · `src/store/` — shared stores (useSaveStatusStore, useExportStore, trackSave), coordinate before editing
+- `src/utils/` — domain-neutral helpers (color conversions, clamp); must never import from canvas/, ui/, or ai/
+- Layering: ui may import canvas; canvas must not import ui stores/logic. Exception: `CarouselStage` composes the prop-driven `<FrameLabelStrip>` overlay (drag state machine + Konva preview capture stay canvas-side).
 
 ## Core Concepts — never break these
 - Canvas = one long surface, N frames wide
@@ -147,14 +151,28 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `useImageDrop` / `useVideoDrop`: early-return when `!e.dataTransfer?.types.includes('Files')` — without this they swallow the frame-drag pointer events
 - Canvas preview capture: deferred into `requestAnimationFrame`, saves/restores stage size + scale, hides UI layers, crops at `pixelRatio: 0.5`
 
+**Properties Panel** (`src/ui/PropertiesPanel.tsx` + `src/ui/properties/`):
+- Section components live one-per-file in `src/ui/properties/` (AlignDistribute, Text, Effects, Adjustments, Video) with shared field helpers/styles in `properties/shared.tsx`; PropertiesPanel keeps layout, selection routing, and the mask section
+- `VideoSection` composes `AdjustmentsSection` + `EffectsSection` — video and image share the adjustment UI
+
+**Shortcuts & discoverability:**
+- `src/ui/shortcuts.ts` is the single source of truth for the shortcut list; `ShortcutOverlay` (toggled by `?`) renders it — when adding a shortcut, update the table AND the handler in `useKeyboardShortcuts.ts`, and quote the same string in the button's `<Tooltip shortcut=>`
+- Zoom: `zoomIn()`/`zoomOut()` (clamped `setZoom`, MIN/MAX_ZOOM) live in `useViewportStore` and are shared by ⌘± and the bottom-right `CanvasHud` (zoom −/%/+, fit-all-frames, ? help)
+- Mask strokes: `setSelected(imageId)` auto-arms `maskModeActive`; the toolbar button and `M` toggle it without touching the selection — never make them deselect
+
+**Save feedback:**
+- Every manual save path (⌘S, ⌘⇧S, Save menu, Save a Copy) must go through `trackSave()` from `@/store` — it drives the SaveStatusPill (saving spinner → saved/error), clears `dirty`, and treats Electron's `{success:false}` dialog-cancel as idle, not saved
+- `dirty` in useSaveStatusStore: armed on any canvas-store change (useAutosave subscription), cleared on save success; rendered as the accent dot next to the title
+
 **Other invariants:**
 - Display scale: subscribe via `useViewportStore(selectScale)` (= `CANVAS_SCALE × zoom`); in handlers use `getCanvasScale()`, for a hypothetical zoom use `scaleForZoom(z)`. Never import `CANVAS_SCALE` outside `useViewportStore.ts` — it's an implementation detail of the store.
 - Masking: `MaskData.kind: 'pen'|'rect'|'ellipse'`; `maskModeActive` in store (transient, not in history)
-- Save: `currentFilePath` in `useSaveStatusStore`; autosave forks on it; `recentFiles.json` tracks history
+- Save: `currentFilePath` in `useSaveStatusStore` (`src/store/`); autosave forks on it; `recentFiles.json` tracks history
 - Session restore: `localStorage['zeroseams:lastFile']` is written on every open and read on `TitleBar` mount — survives renderer reloads (Vite HMR after sleep/wake, renderer crashes) without IPC round-trips
 - `resolveVideoObjects` prefers `relativeFilePath` but falls back to stored absolute `filePath` when the resolved path escapes the project directory — handles projects copied to a new location while assets remain on an external volume
 - `ErrorBoundary` wraps the root render in `main.tsx` — render crashes show a message + Reload button instead of a white screen
-- Export overlay: `useExportStore` — `exporting/exportStatus/cancelRequested`; status flows from `exportMixedFrames` → Toolbar label
+- Export overlay: `useExportStore` (`src/store/`) — `exporting/exportStatus/cancelRequested`; status flows from `exportMixedFrames` → Toolbar label; mid-export Cancel button lives in the main.tsx canvas overlay
+- Export dialog settings persist in `localStorage['zeroseams:exportSettings']`; failures render an inline banner in the popover (panel stays open) — never `alert()`
 - Thumbnails: `useThumbnailStore`, HTML Canvas 2D, triggered on `past.length` changes + mount
 - Frame labels: HTML div strip at `top: Math.max(4, panY - 22)` in CarouselStage (not Konva Text); grip + label pill uses `transform: translateX` for animated reorder — see ColorInput portal note below
 - Multi-file drop: drop coords captured synchronously before async work; 30px stagger per file
@@ -167,6 +185,8 @@ Tokens in `src/ui/theme.css` — single source of truth. Imported once in `src/m
 - `--border` `#e8e0d5` · `--stroke` `#d4ccc2`
 - `--text-primary` `#111111` · `--text-secondary` `#555555` · `--text-muted` `#aaaaaa`
 - `--accent` `#f94608` — active states, Konva handles, primary CTA
+- `--accent-gold` `#f5a623` — multi-select anchor star/outline
+- Use `var(--…)` tokens in components — Toolbar/LayerPanel are fully tokenized; don't reintroduce raw hex for token values
 - `--font` — always use `var(--font)`, never hardcode `'Uncut Sans Variable'`
 
 **Components:**
@@ -174,7 +194,7 @@ Tokens in `src/ui/theme.css` — single source of truth. Imported once in `src/m
 - `.btn-raised` (in `theme.css`): shadow button with press-down animation — `box-shadow: 2px 4px 0 #000` at rest
 - `iconBtnStyle(active)` (`src/ui/iconBtnStyle.ts`): active = `#f94608` fill + white icon; inactive = white fill + `#555` icon + `#d4ccc2` border; always `borderRadius: 999`
 - Sliders: global `input[type="range"]` in `theme.css` handles all. Adjustments sliders override track via inline `background`. Never add `.adj-slider`
-- Tooltips: every interactive button must be wrapped in `<Tooltip label shortcut? description?>` (`src/ui/Tooltip.tsx`). Never use native `title=` on buttons — wrong font, timing, style. `label` always required; `shortcut` required if a shortcut exists; `description` for ambiguous labels. Empty `label=""` renders children unwrapped (no tooltip).
+- Tooltips: every interactive button must be wrapped in `<Tooltip label shortcut? description?>` (`src/ui/Tooltip.tsx`). Never use native `title=` on buttons — wrong font, timing, style. Tooltip chains the child's mouse/focus handlers and shows on keyboard focus. `label` always required; `shortcut` required if a shortcut exists; `description` for ambiguous labels. Empty `label=""` renders children unwrapped (no tooltip).
 - Color picker: `<ColorInput>` / `<MixedColorInput>` in `src/ui/ColorInput.tsx` (exported from `src/ui/index.ts`) — never use raw `input[type="color"]`. Popover uses `react-colorful` + HEX/RGB/HSL modes + eyedropper + 5 recent colors (localStorage `zeroseams:recentColors`). `fixed` prop portals the popover into `document.body` — required whenever the trigger has a CSS `transform` ancestor (even `translateX(0px)` creates a containing block that breaks `position:fixed`). `popoverAnchorFn?: () => {top,left}` overrides automatic `getBoundingClientRect` positioning when you need a fixed anchor (e.g. frame label strip). `MixedColorInput` renders a `—` overlay and shows `value=undefined` as mixed state.
 
 **Layout:**
@@ -188,7 +208,9 @@ Tokens in `src/ui/theme.css` — single source of truth. Imported once in `src/m
 ## Keyboard Shortcuts
 `useKeyboardShortcuts.ts`, mounted once in CarouselStage. No-op in input/textarea.
 
-`V` select · `T` text · `R` shape · `P` pen · `L` line · `S` snap toggle · `F` frame settings · `M` mask mode exit · `\` bypass adjustments (hold) · `Esc` deselect · `⌘A` all · `⌘D` dupe · `⌘E` export · `⌘Z/⇧Z` undo/redo · `⌘]/[` layers · `⌘L` lock · `⌘→` add frame · `⌘←` remove frame · arrows nudge · `⌫` delete · `⌘⇧P` preview toggle (disabled for custom platform)
+`V` select · `T` text · `R` shape · `P` pen · `G` guideline · `S` snap toggle · `F` frame settings · `M` toggle mask strokes · `?` shortcut cheatsheet · `\` bypass adjustments (hold) · `Esc` deselect · `⌘A` all · `⌘D` dupe · `⌘E` export · `⌘Z/⇧Z` undo/redo · `⌘]/[` layers · `⌘L` lock · `⌘±/0` zoom · `⌘→` add frame · `⌘←` remove frame · arrows nudge · `⌫` delete · `⌘⇧P` preview toggle (disabled for custom platform)
+
+Full list: `src/ui/shortcuts.ts` (renders the `?` overlay).
 
 ## Upcoming
 AI background removal UI · SAM segmentation · LaMa inpainting · Font picker + Google Fonts · Templates/presets · Windows packaging + auto-update · Video: volume meter, playback rate, poster frame thumbnail in layer panel · Preview: TikTok/Facebook/Threads shells, dark-mode variant, phone bezel
