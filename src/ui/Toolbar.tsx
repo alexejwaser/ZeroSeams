@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
 import { getStageInstance } from '@/canvas/CarouselStage'
 import { exportMixedFrames } from '@/canvas/exportFrames'
-import { useSaveStatusStore, type SaveStatus } from './useSaveStatusStore'
+import { useSaveStatusStore, type SaveStatus } from '@/store'
 import type { CarouselProject } from '@/types/project'
 import type { ShapeKind, VideoExportSettings, ImageExportSettings, ImageFormat } from '@/types/canvas'
 import { DEFAULT_VIDEO_EXPORT_SETTINGS, DEFAULT_IMAGE_EXPORT_SETTINGS } from '@/types/canvas'
@@ -33,11 +33,11 @@ type PresetKey = 'draft' | 'balanced' | 'high'
 import { iconBtnStyle } from './iconBtnStyle'
 import { FrameSettingsPopover } from './FrameSettingsPopover'
 import { NumericInput } from './NumericInput'
-import { useExportStore } from './useExportStore'
+import { useExportStore } from '@/store'
 import { GridPicker } from './GridPicker'
-import type { GridTemplate } from '../canvas/gridTemplates'
+import type { GridTemplate } from '@/canvas/gridTemplates'
+import type { ActiveTool } from '@/canvas/useCanvasStore'
 
-type ActiveTool = 'select' | 'text' | 'shape' | 'pen' | 'grid' | 'guideline'
 
 const CROP_ICON = (
   <svg width="12" height="12" viewBox="0 0 12 12" fill="none">

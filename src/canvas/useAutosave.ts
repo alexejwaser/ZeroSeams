@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useCanvasStore } from './useCanvasStore'
 import type { CarouselProject } from '@/types/project'
-import { useSaveStatusStore, type SaveStatus } from '@/ui/useSaveStatusStore'
+import { useSaveStatusStore, type SaveStatus } from '@/store'
 import { relativizeVideoObjects } from './pathUtils'
 
 export function useAutosave(): { status: SaveStatus; lastSavedAt: string | null } {
@@ -69,7 +69,7 @@ export function useAutosave(): { status: SaveStatus; lastSavedAt: string | null 
 
         savePromise
           .then((result) => {
-            if (!currentFilePath && 'filePath' in result && result.filePath) {
+            if (!currentFilePath && 'filePath' in result && typeof result.filePath === 'string' && result.filePath) {
               useSaveStatusStore.getState().setAutosaveFilePath(result.filePath)
             }
             applyStatus('saved')

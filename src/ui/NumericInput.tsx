@@ -1,4 +1,5 @@
 import React from 'react'
+import { clamp as clampVal } from '@/utils/color'
 
 export interface NumericInputProps {
   value: number | undefined
@@ -43,12 +44,6 @@ function parseExpr(input: string, current: number): number | null {
   }
 
   return null
-}
-
-function clampVal(v: number, min?: number, max?: number): number {
-  if (min !== undefined && v < min) return min
-  if (max !== undefined && v > max) return max
-  return v
 }
 
 function formatVal(value: number, decimals?: number): string {

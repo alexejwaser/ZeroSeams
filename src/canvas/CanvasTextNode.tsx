@@ -292,7 +292,7 @@ function CanvasTextNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasTextNod
     // Reposition on window resize (stage bounding rect changes)
     function onResize(): void {
       const stage2 = textRef.current?.getStage()
-      if (!stage2) return
+      if (!stage2 || !div) return
       const stageBox2 = stage2.container().getBoundingClientRect()
       const { panX: px, panY: py } = useViewportStore.getState()
       const sc = getCanvasScale()

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { GridTemplate, GRID_TEMPLATES } from '../canvas/gridTemplates'
+import { GridTemplate, GRID_TEMPLATES } from '@/canvas/gridTemplates'
 
 interface GridPickerProps {
   anchorEl: HTMLElement | null
@@ -44,12 +44,13 @@ export function GridPicker({ anchorEl, onClose, onSelect }: GridPickerProps): Re
   // Outside-click to close
   useEffect(() => {
     if (!anchorEl) return
+    const anchor = anchorEl
     function handleMouseDown(e: MouseEvent): void {
       if (
         popoverRef.current != null &&
         !popoverRef.current.contains(e.target as Node) &&
-        e.target !== anchorEl &&
-        !anchorEl.contains(e.target as Node)
+        e.target !== anchor &&
+        !anchor.contains(e.target as Node)
       ) {
         onClose()
       }

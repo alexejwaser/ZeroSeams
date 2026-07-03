@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain, dialog, shell, protocol, session } from 'electron'
 import { join, dirname, basename, extname, relative } from 'path'
-import { writeFile, readFile, readdir, stat, mkdir } from 'fs/promises'
+import { writeFile, readFile, stat, mkdir } from 'fs/promises'
 import { createReadStream } from 'fs'
 import { homedir, tmpdir } from 'os'
 import { spawn } from 'child_process'
@@ -236,7 +236,9 @@ ipcMain.handle(
 )
 
 ipcMain.handle('get-system-fonts', async () => {
-  return app.getSystemFonts()
+  // Not part of Electron's stable App API — present only in some builds.
+  // The renderer FontPicker falls back to MAC_SYSTEM_FONTS on empty.
+  return (app as unknown as { getSystemFonts?: () => string[] }).getSystemFonts?.() ?? []
 })
 
 ipcMain.handle('list-recent-projects', async () => {

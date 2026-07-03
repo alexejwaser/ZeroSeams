@@ -1,6 +1,6 @@
 import type Konva from 'konva'
 import UTIF from 'utif'
-import type { CanvasObject, VideoObject, VideoExportSettings, ImageExportSettings, ExportResult } from '../types/canvas'
+import type { CanvasObject, VideoObject, VideoExportSettings, ImageExportSettings, ExportResult } from '@/types/canvas'
 import { getVideoElement } from './videoElementRegistry'
 import { encodeVideoFrames, encodeVideoWithAudio } from './videoExport'
 

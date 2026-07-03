@@ -1,6 +1,6 @@
 import React from 'react'
 import { useCanvasStore } from './useCanvasStore'
-import type { CanvasObject } from '../types/canvas'
+import type { CanvasObject } from '@/types/canvas'
 
 /**
  * Factory for the per-object subscription pattern shared by all canvas node

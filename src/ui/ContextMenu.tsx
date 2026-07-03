@@ -4,8 +4,8 @@ import { useCanvasStore } from '@/canvas/useCanvasStore'
 import { useBackgroundRemoval } from '../ai/useBackgroundRemoval'
 import { useAIStore } from '../ai/useAIStore'
 import { useExternalEdit } from '../canvas/useExternalEdit'
-import { useSaveStatusStore } from './useSaveStatusStore'
-import type { ImageObject } from '../types/canvas'
+import { useSaveStatusStore } from '@/store'
+import type { ImageObject } from '@/types/canvas'
 
 interface MenuItemProps {
   label: string

@@ -3,7 +3,7 @@ import Konva from 'konva'
 import { Rect, Transformer } from 'react-konva'
 import { useCanvasStore } from './useCanvasStore'
 import { useViewportStore, selectScale } from './useViewportStore'
-import type { GroupObject, ImageObject } from '../types/canvas'
+import type { GroupObject, ImageObject, VideoObject } from '@/types/canvas'
 import type { SnapGuide } from './useSnapGuides'
 import { useSnapGuides } from './useSnapGuides'
 import { GRID_TEMPLATES } from './gridTemplates'
@@ -41,7 +41,6 @@ export function CanvasGroupNode({ id, onGuidesChange }: CanvasGroupNodeProps) {
 
 const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGuidesChange }: CanvasGroupNodeProps) {
   const obj = useCanvasStore((s) => s.objects[id] as GroupObject)
-  const commitUpdate = useCanvasStore((s) => s.commitUpdate)
   const commitMultipleUpdates = useCanvasStore((s) => s.commitMultipleUpdates)
   const updateObjects = useCanvasStore((s) => s.updateObjects)
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
@@ -97,7 +96,7 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
     obj.childIds.forEach((childId, i) => {
       const cell = cells[i]
       if (!cell) return
-      const child = useCanvasStore.getState().objects[childId] as (ImageObject & VideoObject) | undefined
+      const child = useCanvasStore.getState().objects[childId] as (ImageObject | VideoObject) | undefined
       if (!child) return
       const patch: Partial<ImageObject> = {
         frameX: newX + cell.x,

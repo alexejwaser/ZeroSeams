@@ -90,7 +90,7 @@ export async function encodeVideoFrames(
   }
   await ffmpeg.deleteFile('output.mp4')
   log('encodeVideoFrames done, blob size:', (data as Uint8Array).byteLength)
-  return new Blob([data as Uint8Array], { type: 'video/mp4' })
+  return new Blob([data as Uint8Array<ArrayBuffer>], { type: 'video/mp4' })
 }
 
 export async function encodeVideoWithAudio(
@@ -161,5 +161,5 @@ export async function encodeVideoWithAudio(
   await ffmpeg.deleteFile('audio_source.mp4')
   await ffmpeg.deleteFile('output.mp4')
   log('encodeVideoWithAudio done, blob size:', (data as Uint8Array).byteLength)
-  return new Blob([data as Uint8Array], { type: 'video/mp4' })
+  return new Blob([data as Uint8Array<ArrayBuffer>], { type: 'video/mp4' })
 }

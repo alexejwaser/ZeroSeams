@@ -1,7 +1,11 @@
 import { create } from 'zustand'
-import type { CanvasObject, ImageObject, GroupObject, ShapeObject, PathObject, ShapeKind, TextObject, MaskData, VideoObject, GuidelineObject } from '@/types/canvas'
+import type { CanvasObject, ImageObject, GroupObject, ShapeObject, PathObject, ShapeKind, TextObject, VideoObject, GuidelineObject } from '@/types/canvas'
 import type { GridTemplate } from './gridTemplates'
 import type { Frame, FrameRatio, Platform, CarouselProject } from '@/types/project'
+
+// 'grid' arms the grid-template picker in the toolbar; the canvas itself
+// treats it like 'select' until a template is placed.
+export type ActiveTool = 'select' | 'text' | 'shape' | 'pen' | 'grid' | 'guideline'
 
 export const PLATFORM_PRESETS: Record<Platform, Array<{ ratio: FrameRatio; label: string; width: number; height: number }>> = {
   instagram: [
@@ -112,7 +116,7 @@ interface CanvasState {
   frameHeight: number
   frames: Frame[]
   backgroundColor: string
-  activeTool: 'select' | 'text' | 'shape' | 'pen' | 'guideline'
+  activeTool: ActiveTool
   guidelineOrientation: 'horizontal' | 'vertical'
   guidelinesVisible: boolean
   resizeMode: 'advanced' | 'auto'
@@ -156,7 +160,7 @@ interface CanvasState {
   commitMultipleUpdates: (patches: Record<string, Partial<CanvasObject>>) => void
   removeMultipleObjects: (ids: string[]) => void
   setFrameCount: (n: number) => void
-  setActiveTool: (tool: 'select' | 'text' | 'shape' | 'pen' | 'guideline') => void
+  setActiveTool: (tool: ActiveTool) => void
   setGuidelineOrientation: (orientation: 'horizontal' | 'vertical') => void
   toggleGuidelinesVisible: () => void
   reorderObjects: (fromId: string, toId: string, side: 'before' | 'after') => void

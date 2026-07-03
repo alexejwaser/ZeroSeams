@@ -1,10 +1,6 @@
 import { registerEffect } from './registry'
 import type { EffectParams } from './registry'
-
-function hexToRgb(hex: string): [number, number, number] {
-  const n = parseInt(hex.replace('#', ''), 16)
-  return [(n >> 16) & 0xff, (n >> 8) & 0xff, n & 0xff]
-}
+import { hexToRgb } from '@/utils/color'
 
 // Proper sliding-window box blur (handles edges correctly)
 function boxBlurH(src: Float32Array, dst: Float32Array, width: number, height: number, r: number): void {

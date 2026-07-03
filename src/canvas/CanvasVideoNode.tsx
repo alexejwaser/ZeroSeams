@@ -27,7 +27,6 @@ interface CanvasVideoNodeInnerProps extends CanvasVideoNodeProps {
 function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoNodeInnerProps): React.ReactElement | null {
   const isSelected = useCanvasStore((s) => s.selectedId === id)
   const isPlaying = useCanvasStore((s) => s.videoPlayingIds.has(id))
-  const toggleVideoPlay = useCanvasStore((s) => s.toggleVideoPlay)
   const commitUpdate = useCanvasStore((s) => s.commitUpdate)
   const updateObject = useCanvasStore((s) => s.updateObject)
   const selectedIds = useCanvasStore((s) => s.selectedIds)
@@ -140,6 +139,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   // RAF loop — keeps Konva repainting, enforces trim boundaries, and handles start offset.
   useEffect(() => {
     if (!videoEl) return
+    const vid = videoEl
 
     function tick(now: number): void {
       // Start-offset countdown: hold poster frame until delay elapses, then play.
@@ -149,7 +149,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
         lastTickTimeRef.current = now
         startOffsetRemainingRef.current = Math.max(0, startOffsetRemainingRef.current - delta)
         if (startOffsetRemainingRef.current <= 0) {
-          videoEl.play().catch((e: unknown) => {
+          vid.play().catch((e: unknown) => {
             console.warn('[CanvasVideoNode] play() after offset rejected:', e)
           })
         }
@@ -162,12 +162,12 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
 
       const end = obj.trimEnd ?? obj.naturalDuration ?? Infinity
       const start = obj.trimStart ?? 0
-      if (videoEl!.currentTime >= end) {
-        videoEl!.currentTime = start
+      if (vid.currentTime >= end) {
+        vid.currentTime = start
         if (!(obj.loop ?? true)) {
-          videoEl!.pause()
+          vid.pause()
           // Seek to poster frame when stopped
-          videoEl!.currentTime = obj.posterFrame ?? start
+          vid.currentTime = obj.posterFrame ?? start
           // Sync store so the play button reflects paused state
           const store = useCanvasStore.getState()
           if (store.videoPlayingIds.has(id)) store.toggleVideoPlay(id)
@@ -175,7 +175,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
       }
       // Re-cache only when a new video frame has been decoded — skips redundant
       // cache() calls at 60fps when the video is paused or running below 60fps.
-      const currentTime = videoEl.currentTime
+      const currentTime = vid.currentTime
       const frameChanged = currentTime !== lastCachedTimeRef.current
       if (frameChanged) {
         lastCachedTimeRef.current = currentTime

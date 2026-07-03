@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useCanvasStore } from './useCanvasStore'
 import { useViewportStore } from './useViewportStore'
-import { useSaveStatusStore } from '@/ui/useSaveStatusStore'
+import { useSaveStatusStore } from '@/store'
 import type { CarouselProject } from '@/types/project'
 import type { ImageObject, PathObject, ShapeObject } from '@/types/canvas'
 import { computePathBBox } from './CanvasPathNode'

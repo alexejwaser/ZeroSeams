@@ -84,7 +84,7 @@ export function getSelectionStyle(obj: TextObject, start: number, end: number): 
       }
     } else {
       // Use a local const so TypeScript narrowing stays non-null across the reassignment.
-      const prev = result
+      const prev: SelectionStyle = result
       result = {
         fontFamily: prev.fontFamily !== resolved.fontFamily ? undefined : prev.fontFamily,
         fontSize: prev.fontSize !== resolved.fontSize ? undefined : prev.fontSize,

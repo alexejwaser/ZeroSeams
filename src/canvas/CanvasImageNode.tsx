@@ -11,7 +11,7 @@ import { anchorsToPathData } from './CanvasPathNode'
 import { axisLock } from './constants'
 import { useViewportStore, selectScale } from './useViewportStore'
 import { buildFilterPipeline } from './adjustments/pipeline'
-import { DEFAULT_ADJUSTMENTS } from '../types/canvas'
+import { DEFAULT_ADJUSTMENTS } from '@/types/canvas'
 import { buildEffectFilters } from './effects/buildEffectFilters'
 
 interface CanvasImageNodeProps {

@@ -3,7 +3,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { CarouselStage } from '@/canvas'
 import { TitleBar, ToolBar, LayerPanel, PropertiesPanel, ContextMenu } from '@/ui'
-import { useExportStore } from '@/ui/useExportStore'
+import { useExportStore } from '@/store'
 import { PreviewShell } from '@/ui/preview/PreviewShell'
 import { AIProvider } from '@/ai'
 
@@ -149,7 +149,7 @@ function App(): React.ReactElement {
 // Expose stores for Playwright tests (Electron is always a trusted desktop env)
 import('./canvas/useCanvasStore').then(m => { (window as any).__canvasStore__ = m.useCanvasStore })
 import('./canvas/useViewportStore').then(m => { (window as any).__viewportStore__ = m.useViewportStore })
-import('./ui/useSaveStatusStore').then(m => { (window as any).__saveStatusStore__ = m.useSaveStatusStore })
+import('./store/useSaveStatusStore').then(m => { (window as any).__saveStatusStore__ = m.useSaveStatusStore })
 
 const rootEl = document.getElementById('root')
 if (!rootEl) throw new Error('Root element not found')

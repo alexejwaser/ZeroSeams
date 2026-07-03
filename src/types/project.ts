@@ -22,6 +22,15 @@ export interface Frame {
   backgroundColor: string | null
 }
 
+/** Transient state of a frame-reorder drag (owned by CarouselStage,
+ *  rendered by FrameLabelStrip). */
+export interface FrameDragState {
+  fromIndex: number
+  startClientX: number
+  currentClientX: number
+  containerLeft: number // viewport X of the container at drag start
+}
+
 export interface CarouselProject {
   id: string
   name: string

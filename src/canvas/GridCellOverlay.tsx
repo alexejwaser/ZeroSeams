@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { useCanvasStore } from './useCanvasStore'
 import { useViewportStore, selectScale } from './useViewportStore'
-import type { ImageObject, VideoObject } from '../types/canvas'
+import type { ImageObject, VideoObject } from '@/types/canvas'
 
 /**
  * HTML overlay that renders "+ image" / "+ video" buttons centred over every

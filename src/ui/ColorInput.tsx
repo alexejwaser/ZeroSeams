@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { HexColorPicker } from 'react-colorful'
 import { Pipette } from 'lucide-react'
 import Tooltip from './Tooltip'
+import { clamp, hexToRgb, rgbToHex, hexToHsl, hslToHex } from '@/utils/color'
 import './ColorInput.css'
 
 // ─── Recent colors (localStorage) ────────────────────────────────────────────
@@ -33,51 +34,8 @@ function normalizeHex(input: string): string | null {
   return /^[0-9a-f]{6}$/.test(clean) ? `#${clean}` : null
 }
 
-function hexToRgb(hex: string): { r: number; g: number; b: number } {
-  const n = parseInt(hex.replace('#', ''), 16)
-  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 }
-}
-
-function clamp(v: number, lo = 0, hi = 255): number {
-  return Math.max(lo, Math.min(hi, Math.round(v)))
-}
-
-function rgbToHex(r: number, g: number, b: number): string {
-  return '#' + [r, g, b].map(v => clamp(v).toString(16).padStart(2, '0')).join('')
-}
-
-function hexToHsl(hex: string): { h: number; s: number; l: number } {
-  const { r, g, b } = hexToRgb(hex)
-  const rn = r / 255, gn = g / 255, bn = b / 255
-  const max = Math.max(rn, gn, bn), min = Math.min(rn, gn, bn)
-  const l = (max + min) / 2
-  if (max === min) return { h: 0, s: 0, l: Math.round(l * 100) }
-  const d = max - min
-  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
-  let h = 0
-  if (max === rn) h = ((gn - bn) / d + (gn < bn ? 6 : 0)) / 6
-  else if (max === gn) h = ((bn - rn) / d + 2) / 6
-  else h = ((rn - gn) / d + 4) / 6
-  return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) }
-}
-
-function hslToHex(h: number, s: number, l: number): string {
-  const hn = h / 360, sn = s / 100, ln = l / 100
-  if (sn === 0) { const v = Math.round(ln * 255); return rgbToHex(v, v, v) }
-  const q = ln < 0.5 ? ln * (1 + sn) : ln + sn - ln * sn
-  const p = 2 * ln - q
-  function hue2rgb(p2: number, q2: number, t: number): number {
-    const tt = ((t % 1) + 1) % 1
-    if (tt < 1 / 6) return p2 + (q2 - p2) * 6 * tt
-    if (tt < 1 / 2) return q2
-    if (tt < 2 / 3) return p2 + (q2 - p2) * (2 / 3 - tt) * 6
-    return p2
-  }
-  return rgbToHex(
-    hue2rgb(p, q, hn + 1 / 3) * 255,
-    hue2rgb(p, q, hn) * 255,
-    hue2rgb(p, q, hn - 1 / 3) * 255,
-  )
+function clampInt(v: number, lo = 0, hi = 255): number {
+  return clamp(Math.round(v), lo, hi)
 }
 
 // ─── Shared popover hook ──────────────────────────────────────────────────────
@@ -106,8 +64,8 @@ function useColorPopover({ value, onChange, onCommit, popoverAnchorFn }: UseColo
   // sync draft fields when value changes externally
   React.useEffect(() => {
     setHexText(value)
-    const rgb = hexToRgb(value)
-    setRgbDraft({ r: String(rgb.r), g: String(rgb.g), b: String(rgb.b) })
+    const [r, g, b] = hexToRgb(value)
+    setRgbDraft({ r: String(r), g: String(g), b: String(b) })
     const hsl = hexToHsl(value)
     setHslDraft({ h: String(hsl.h), s: String(hsl.s), l: String(hsl.l) })
   }, [value])
@@ -192,9 +150,9 @@ function useColorPopover({ value, onChange, onCommit, popoverAnchorFn }: UseColo
   }
 
   function commitRgb() {
-    const r = clamp(Number(rgbDraft.r))
-    const g = clamp(Number(rgbDraft.g))
-    const b = clamp(Number(rgbDraft.b))
+    const r = clampInt(Number(rgbDraft.r))
+    const g = clampInt(Number(rgbDraft.g))
+    const b = clampInt(Number(rgbDraft.b))
     const hex = rgbToHex(r, g, b)
     setRgbDraft({ r: String(r), g: String(g), b: String(b) })
     onChange(hex)
@@ -204,9 +162,9 @@ function useColorPopover({ value, onChange, onCommit, popoverAnchorFn }: UseColo
   }
 
   function commitHsl() {
-    const h = clamp(Number(hslDraft.h), 0, 360)
-    const s = clamp(Number(hslDraft.s), 0, 100)
-    const l = clamp(Number(hslDraft.l), 0, 100)
+    const h = clampInt(Number(hslDraft.h), 0, 360)
+    const s = clampInt(Number(hslDraft.s), 0, 100)
+    const l = clampInt(Number(hslDraft.l), 0, 100)
     const hex = hslToHex(h, s, l)
     setHslDraft({ h: String(h), s: String(s), l: String(l) })
     onChange(hex)

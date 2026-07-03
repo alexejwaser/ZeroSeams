@@ -3,6 +3,7 @@ import { Stage, Layer, Rect as KonvaRect, Line as KonvaLine, Circle as KonvaCirc
 import type Konva from 'konva'
 import type { ImageObject, TextObject, ShapeObject, PathObject, AnchorPoint, CanvasObject } from '@/types/canvas'
 import type { ShapeKind } from '@/types/canvas'
+import type { FrameDragState } from '@/types/project'
 import { axisLock } from './constants'
 import { useCanvasStore } from './useCanvasStore'
 import { useViewportStore, selectScale, scaleForZoom } from './useViewportStore'
@@ -21,7 +22,7 @@ import { useAutosave } from './useAutosave'
 import { useKeyboardShortcuts } from './useKeyboardShortcuts'
 import { useThumbnailGenerator } from './useThumbnailStore'
 import '@/canvas/effects'
-import { ColorInput } from '@/ui/ColorInput'
+import { FrameLabelStrip } from '@/ui/FrameLabelStrip'
 import { CanvasGroupNode } from './CanvasGroupNode'
 import { GridCellOverlay } from './GridCellOverlay'
 import { CanvasGuidelineNode } from './CanvasGuidelineNode'
@@ -35,20 +36,6 @@ export function getStageInstance(): Konva.Stage | null {
   return _stageInstance
 }
 
-interface FrameDragState {
-  fromIndex: number
-  startClientX: number
-  currentClientX: number
-  containerLeft: number // viewport X of the container at drag start
-}
-
-// Returns how many slots frame i should shift during a reorder preview.
-function frameSlotOffset(i: number, from: number, to: number): number {
-  if (i === from) return 0
-  if (from < to && i > from && i <= to) return -1
-  if (from > to && i >= to && i < from) return +1
-  return 0
-}
 
 export function CarouselStage(): React.ReactElement {
   const stageRef = useRef<Konva.Stage>(null)
@@ -83,13 +70,11 @@ export function CarouselStage(): React.ReactElement {
   const setFrameBackground = useCanvasStore((s) => s.setFrameBackground)
   const previewMode = useCanvasStore((s) => s.previewMode)
   const guidelineOrientation = useCanvasStore((s) => s.guidelineOrientation)
-  const setGuidelineOrientation = useCanvasStore((s) => s.setGuidelineOrientation)
 
   // Viewport store
   const scale = useViewportStore(selectScale)
   const panX = useViewportStore((s) => s.panX)
   const panY = useViewportStore((s) => s.panY)
-  const setZoom = useViewportStore((s) => s.setZoom)
   const setPan = useViewportStore((s) => s.setPan)
 
   // --- Group transformer + marquee ---
@@ -582,6 +567,59 @@ export function CarouselStage(): React.ReactElement {
     isPanningRef.current = false
   }
 
+  // --- Frame reorder: grip pointer-down starts the drag; move/up live on the
+  // container div (Chromium drops setPointerCapture when an ancestor receives
+  // pointer-events: none via React re-render). Rendering lives in
+  // <FrameLabelStrip>; the drag state machine + canvas capture stay here.
+  function handleGripPointerDown(i: number, e: React.PointerEvent<HTMLSpanElement>): void {
+    e.preventDefault()
+    e.stopPropagation()
+    const containerLeft = containerRef.current?.getBoundingClientRect().left ?? 0
+    const state: FrameDragState = { fromIndex: i, startClientX: e.clientX, currentClientX: e.clientX, containerLeft }
+    frameDragRef.current = state
+    setFrameDrag(state)
+
+    // Defer canvas capture to the next frame to avoid any
+    // stage resize/redraw interfering with the pointer event.
+    const captureFromIndex = i
+    requestAnimationFrame(() => {
+      if (frameDragRef.current?.fromIndex !== captureFromIndex) return
+      const stage = stageRef.current
+      if (!stage) return
+      stage.container().style.opacity = '0'
+      const origW = stage.width(), origH = stage.height()
+      const origSX = stage.scaleX(), origSY = stage.scaleY()
+      const origX = stage.x(), origY = stage.y()
+      stage.width(frameCount * frameWidth)
+      stage.height(frameHeight)
+      stage.scaleX(1); stage.scaleY(1)
+      stage.x(0); stage.y(0)
+      const guidesLyr = stage.findOne<Konva.Layer>('.guides')
+      const glOverlay = stage.findOne<Konva.Layer>('.guideline-overlay')
+      const divLyr = stage.findOne<Konva.Layer>('.frame-dividers')
+      const txfmrs = stage.find<Konva.Transformer>('Transformer')
+      guidesLyr?.hide(); glOverlay?.hide(); divLyr?.hide()
+      txfmrs.forEach(t => t.hide())
+      stage.draw()
+      const full = stage.toCanvas({ pixelRatio: 0.5 })
+      const capW = Math.round(full.width / frameCount)
+      const capH = full.height
+      const previews = Array.from({ length: frameCount }, (_, idx) => {
+        const c = document.createElement('canvas')
+        c.width = capW; c.height = capH
+        c.getContext('2d')!.drawImage(full, idx * capW, 0, capW, capH, 0, 0, capW, capH)
+        return c.toDataURL()
+      })
+      guidesLyr?.show(); glOverlay?.show(); divLyr?.show()
+      txfmrs.forEach(t => t.show())
+      stage.width(origW); stage.height(origH)
+      stage.scaleX(origSX); stage.scaleY(origSY)
+      stage.x(origX); stage.y(origY)
+      stage.draw()
+      setFramePreviews(previews)
+    })
+  }
+
   return (
     <div
       ref={containerRef}
@@ -631,167 +669,22 @@ export function CarouselStage(): React.ReactElement {
       }}
     >
       {/* Frame labels + colour swatches — follow the canvas viewport */}
-      {!previewMode && (() => {
-        const previewTo = frameDrag
-          ? Math.max(0, Math.min(frameCount - 1,
-              Math.round((frameDrag.currentClientX - frameDrag.containerLeft - panX) / scale / frameWidth)
-            ))
-          : null
-        const labelTop = Math.max(4, panY - 22)
-        const dispW = frameWidth * scale
-        const dispH = frameHeight * scale
-
-        return (
-          <>
-            {/* Dragged frame: combined label pill + full frame preview, follows cursor */}
-            {frameDrag && (
-              <div
-                style={{
-                  position: 'absolute',
-                  left: panX + frameDrag.fromIndex * frameWidth * scale + (frameDrag.currentClientX - frameDrag.startClientX),
-                  top: labelTop,
-                  zIndex: 100,
-                  pointerEvents: 'none',
-                  filter: 'drop-shadow(0 10px 28px rgba(0,0,0,0.2))',
-                  willChange: 'left',
-                }}
-              >
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'var(--bg-panel)', borderRadius: 8, padding: '3px 8px 3px 4px', border: '1px solid var(--border)' }}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: 12, lineHeight: 1, padding: '0 2px', userSelect: 'none' }}>⣿</span>
-                  <div style={{ width: 14, height: 14, borderRadius: '50%', background: frames[frameDrag.fromIndex]?.backgroundColor ?? backgroundColor, border: '1.5px solid var(--stroke)', flexShrink: 0 }} />
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--font)', whiteSpace: 'nowrap', userSelect: 'none' }}>Frame {frameDrag.fromIndex + 1}</span>
-                </div>
-                {framePreviews && (
-                  <img src={framePreviews[frameDrag.fromIndex]} draggable={false} style={{ display: 'block', width: dispW, height: dispH, userSelect: 'none' }} />
-                )}
-              </div>
-            )}
-            {/* Per-frame label pills + animated preview overlays */}
-            {Array.from({ length: frameCount }).map((_, i) => {
-              const frameColor = frames[i]?.backgroundColor ?? null
-              const displayColor = frameColor ?? backgroundColor
-              const labelX = panX + i * frameWidth * scale
-              const isDragging = frameDrag?.fromIndex === i
-              const txPx = (frameDrag && previewTo !== null)
-                ? frameSlotOffset(i, frameDrag.fromIndex, previewTo) * frameWidth * scale
-                : 0
-              const animTransition = (frameDrag && !isDragging) ? 'transform 0.18s cubic-bezier(0.25,0.46,0.45,0.94)' : 'none'
-
-              return (
-                <React.Fragment key={i}>
-                  {/* Frame preview overlay (animates to make space; hidden for dragged frame) */}
-                  {framePreviews && !isDragging && (
-                    <img
-                      src={framePreviews[i]}
-                      draggable={false}
-                      style={{
-                        position: 'absolute',
-                        left: labelX,
-                        top: panY,
-                        width: dispW,
-                        height: dispH,
-                        zIndex: 30,
-                        pointerEvents: 'none',
-                        transform: `translateX(${txPx}px)`,
-                        transition: animTransition,
-                        userSelect: 'none',
-                      }}
-                    />
-                  )}
-                  {/* Label pill */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: labelX,
-                      top: labelTop,
-                      zIndex: 40,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      pointerEvents: isDragging ? 'none' : 'auto',
-                      opacity: isDragging ? 0 : 1,
-                      transform: `translateX(${txPx}px)`,
-                      transition: animTransition,
-                    }}
-                  >
-                    <span
-                      style={{ cursor: frameDrag ? 'grabbing' : 'grab', color: 'var(--text-muted)', fontSize: 12, lineHeight: 1, padding: '0 2px', userSelect: 'none' }}
-                      onPointerDown={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        const containerLeft = containerRef.current?.getBoundingClientRect().left ?? 0
-                        const state: FrameDragState = { fromIndex: i, startClientX: e.clientX, currentClientX: e.clientX, containerLeft }
-                        frameDragRef.current = state
-                        setFrameDrag(state)
-
-                        // Defer canvas capture to the next frame to avoid any
-                        // stage resize/redraw interfering with the pointer event.
-                        const captureFromIndex = i
-                        requestAnimationFrame(() => {
-                          if (frameDragRef.current?.fromIndex !== captureFromIndex) return
-                          const stage = stageRef.current
-                          if (!stage) return
-                          stage.container().style.opacity = '0'
-                          const origW = stage.width(), origH = stage.height()
-                          const origSX = stage.scaleX(), origSY = stage.scaleY()
-                          const origX = stage.x(), origY = stage.y()
-                          stage.width(frameCount * frameWidth)
-                          stage.height(frameHeight)
-                          stage.scaleX(1); stage.scaleY(1)
-                          stage.x(0); stage.y(0)
-                          const guidesLyr = stage.findOne<Konva.Layer>('.guides')
-                          const glOverlay = stage.findOne<Konva.Layer>('.guideline-overlay')
-                          const divLyr = stage.findOne<Konva.Layer>('.frame-dividers')
-                          const txfmrs = stage.find<Konva.Transformer>('Transformer')
-                          guidesLyr?.hide(); glOverlay?.hide(); divLyr?.hide()
-                          txfmrs.forEach(t => t.hide())
-                          stage.draw()
-                          const full = stage.toCanvas({ pixelRatio: 0.5 })
-                          const capW = Math.round(full.width / frameCount)
-                          const capH = full.height
-                          const previews = Array.from({ length: frameCount }, (_, idx) => {
-                            const c = document.createElement('canvas')
-                            c.width = capW; c.height = capH
-                            c.getContext('2d')!.drawImage(full, idx * capW, 0, capW, capH, 0, 0, capW, capH)
-                            return c.toDataURL()
-                          })
-                          guidesLyr?.show(); glOverlay?.show(); divLyr?.show()
-                          txfmrs.forEach(t => t.show())
-                          stage.width(origW); stage.height(origH)
-                          stage.scaleX(origSX); stage.scaleY(origSY)
-                          stage.x(origX); stage.y(origY)
-                          stage.draw()
-                          setFramePreviews(previews)
-                        })
-                      }}
-                    >
-                      ⣿
-                    </span>
-                    <ColorInput
-                      value={displayColor}
-                      onChange={c => setFrameBackground(i, c)}
-                      size={14}
-                      fixed
-                    />
-                    {frameColor && (
-                      <button
-                        onClick={e => { e.stopPropagation(); setFrameBackground(i, null) }}
-                        title="Reset to canvas background"
-                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 0, fontSize: 13, lineHeight: 1, display: 'flex', alignItems: 'center' }}
-                      >
-                        ×
-                      </button>
-                    )}
-                    <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--font)', whiteSpace: 'nowrap', userSelect: 'none' }}>
-                      Frame {i + 1}
-                    </span>
-                  </div>
-                </React.Fragment>
-              )
-            })}
-          </>
-        )
-      })()}
+      {!previewMode && (
+        <FrameLabelStrip
+          frames={frames}
+          frameCount={frameCount}
+          frameWidth={frameWidth}
+          frameHeight={frameHeight}
+          backgroundColor={backgroundColor}
+          panX={panX}
+          panY={panY}
+          scale={scale}
+          frameDrag={frameDrag}
+          framePreviews={framePreviews}
+          setFrameBackground={setFrameBackground}
+          onGripPointerDown={handleGripPointerDown}
+        />
+      )}
       <Stage
         ref={stageRef}
         width={containerSize.width}
