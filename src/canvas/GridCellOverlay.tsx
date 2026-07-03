@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react'
 import { useCanvasStore } from './useCanvasStore'
-import { useViewportStore } from './useViewportStore'
-import { CANVAS_SCALE } from './constants'
+import { useViewportStore, selectScale } from './useViewportStore'
 import type { ImageObject, VideoObject } from '../types/canvas'
 
 /**
@@ -10,15 +9,15 @@ import type { ImageObject, VideoObject } from '../types/canvas'
  *
  * Coordinate system: identical to the frame-labels strip in CarouselStage —
  * absolute-positioned inside the `position: relative` container div, using
- *   left = panX + cell.frameX * CANVAS_SCALE * zoom
- *   top  = panY + cell.frameY * CANVAS_SCALE * zoom
+ *   left = panX + cell.frameX * scale
+ *   top  = panY + cell.frameY * scale
  */
 export function GridCellOverlay() {
   const objects = useCanvasStore((s) => s.objects)
   const objectOrder = useCanvasStore((s) => s.objectOrder)
   const panX = useViewportStore((s) => s.panX)
   const panY = useViewportStore((s) => s.panY)
-  const zoom = useViewportStore((s) => s.zoom)
+  const scale = useViewportStore(selectScale)
 
   const handleFillImage = useCallback(async (cellId: string) => {
     const result = await window.electronAPI.openImageFile()
@@ -113,8 +112,6 @@ export function GridCellOverlay() {
       vid.src = `zeroseams-media://localhost${filePath}`
     })
   }, [])
-
-  const scale = CANVAS_SCALE * zoom
 
   const emptyCells = objectOrder
     .map((id) => objects[id])

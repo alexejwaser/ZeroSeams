@@ -1,8 +1,7 @@
 import { useEffect } from 'react'
 import type React from 'react'
 import { useCanvasStore } from './useCanvasStore'
-import { useViewportStore } from './useViewportStore'
-import { CANVAS_SCALE } from './constants'
+import { useViewportStore, getCanvasScale } from './useViewportStore'
 
 export function useImageDrop(containerRef: React.RefObject<HTMLDivElement>): void {
   const addObject = useCanvasStore((s) => s.addObject)
@@ -27,9 +26,10 @@ export function useImageDrop(containerRef: React.RefObject<HTMLDivElement>): voi
 
       // Capture drop coordinates synchronously before any async work
       const rect = containerRef.current!.getBoundingClientRect()
-      const { panX, panY, zoom } = useViewportStore.getState()
-      const canvasX = (e.clientX - rect.left - panX) / (CANVAS_SCALE * zoom)
-      const canvasY = (e.clientY - rect.top - panY) / (CANVAS_SCALE * zoom)
+      const { panX, panY } = useViewportStore.getState()
+      const scale = getCanvasScale()
+      const canvasX = (e.clientX - rect.left - panX) / scale
+      const canvasY = (e.clientY - rect.top - panY) / scale
 
       const files = Array.from(e.dataTransfer?.files ?? [])
 

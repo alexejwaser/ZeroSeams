@@ -308,13 +308,15 @@ export function useKeyboardShortcuts(): void {
           return
         }
 
-        if (e.key === 'z' && !e.shiftKey) {
+        // toLowerCase: with Shift held the browser reports 'Z', so ⌘⇧Z
+        // would never match a lowercase comparison (also covers Caps Lock)
+        if (e.key.toLowerCase() === 'z' && !e.shiftKey) {
           e.preventDefault()
           undo()
           return
         }
 
-        if (e.key === 'z' && e.shiftKey) {
+        if (e.key.toLowerCase() === 'z' && e.shiftKey) {
           e.preventDefault()
           redo()
           return

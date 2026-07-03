@@ -8,10 +8,11 @@ import {
 import type Konva from 'konva'
 import type { PathObject, AnchorPoint, CanvasObject } from '@/types/canvas'
 import { useCanvasStore } from './useCanvasStore'
+import { makeCanvasNode } from './makeCanvasNode'
 import { useSnapGuides } from './useSnapGuides'
 import type { SnapGuide } from './useSnapGuides'
-import { CANVAS_SCALE, axisLock } from './constants'
-import { useViewportStore } from './useViewportStore'
+import { axisLock } from './constants'
+import { useViewportStore, selectScale } from './useViewportStore'
 import { buildEffectFilters } from './effects/buildEffectFilters'
 
 // ---------------------------------------------------------------------------
@@ -129,7 +130,9 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
   const setContextMenu = useCanvasStore((s) => s.setContextMenu)
   const { computeSnapResize, startSnapSession, endSnapSession } = useSnapGuides()
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
-  const { zoom, panX, panY } = useViewportStore((s) => ({ zoom: s.zoom, panX: s.panX, panY: s.panY }))
+  const scale = useViewportStore(selectScale)
+  const panX = useViewportStore((s) => s.panX)
+  const panY = useViewportStore((s) => s.panY)
   const pendingGuidesRef = useRef<SnapGuide[]>([])
 
   const altHeldRef = useRef(false)
@@ -452,7 +455,6 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
             const anchor = transformerRef.current?.getActiveAnchor() ?? ''
             if (anchor === 'rotater') return newBox
             if (Math.abs(newBox.rotation ?? 0) > 0.01 || !anchor) return newBox
-            const scale = CANVAS_SCALE * zoom
             const logicalBox = {
               x: (newBox.x - panX) / scale,
               y: (newBox.y - panY) / scale,
@@ -551,10 +553,4 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
   )
 }
 
-function CanvasPathNodeOuter(props: CanvasPathNodeProps): React.ReactElement | null {
-  const obj = useCanvasStore((s) => s.objects[props.id] as PathObject | undefined)
-  if (!obj || !obj.visible) return null
-  return <CanvasPathNodeInner {...props} obj={obj} />
-}
-
-export const CanvasPathNode = React.memo(CanvasPathNodeOuter)
+export const CanvasPathNode = makeCanvasNode<PathObject, CanvasPathNodeProps>(CanvasPathNodeInner)

@@ -3,9 +3,9 @@ import { Stage, Layer, Rect as KonvaRect, Line as KonvaLine, Circle as KonvaCirc
 import type Konva from 'konva'
 import type { ImageObject, TextObject, ShapeObject, PathObject, AnchorPoint, CanvasObject } from '@/types/canvas'
 import type { ShapeKind } from '@/types/canvas'
-import { CANVAS_SCALE, axisLock } from './constants'
+import { axisLock } from './constants'
 import { useCanvasStore } from './useCanvasStore'
-import { useViewportStore } from './useViewportStore'
+import { useViewportStore, selectScale, scaleForZoom } from './useViewportStore'
 import { FrameGuides } from './FrameGuides'
 import { CanvasImageNode } from './CanvasImageNode'
 import { CanvasTextNode } from './CanvasTextNode'
@@ -86,7 +86,7 @@ export function CarouselStage(): React.ReactElement {
   const setGuidelineOrientation = useCanvasStore((s) => s.setGuidelineOrientation)
 
   // Viewport store
-  const zoom = useViewportStore((s) => s.zoom)
+  const scale = useViewportStore(selectScale)
   const panX = useViewportStore((s) => s.panX)
   const panY = useViewportStore((s) => s.panY)
   const setZoom = useViewportStore((s) => s.setZoom)
@@ -546,12 +546,12 @@ export function CarouselStage(): React.ReactElement {
         const newZoom = Math.max(0.1, Math.min(8, zoom * factor))
         const mouseX = e.clientX - rect.left
         const mouseY = e.clientY - rect.top
-        const canvasX = (mouseX - panX) / (CANVAS_SCALE * zoom)
-        const canvasY = (mouseY - panY) / (CANVAS_SCALE * zoom)
+        const canvasX = (mouseX - panX) / scaleForZoom(zoom)
+        const canvasY = (mouseY - panY) / scaleForZoom(zoom)
         useViewportStore.getState().setZoom(newZoom)
         useViewportStore.getState().setPan(
-          mouseX - canvasX * CANVAS_SCALE * newZoom,
-          mouseY - canvasY * CANVAS_SCALE * newZoom,
+          mouseX - canvasX * scaleForZoom(newZoom),
+          mouseY - canvasY * scaleForZoom(newZoom),
         )
       } else {
         // Two-finger scroll (trackpad) or plain mouse wheel → pan
@@ -613,7 +613,7 @@ export function CarouselStage(): React.ReactElement {
         if (!cur) return
         stageRef.current?.container().style.removeProperty('opacity')
         const toIndex = Math.max(0, Math.min(frameCount - 1,
-          Math.round((e.clientX - cur.containerLeft - panX) / (CANVAS_SCALE * zoom) / frameWidth)
+          Math.round((e.clientX - cur.containerLeft - panX) / scale / frameWidth)
         ))
         if (toIndex !== cur.fromIndex) {
           useCanvasStore.getState().reorderFrames(cur.fromIndex, toIndex)
@@ -634,12 +634,12 @@ export function CarouselStage(): React.ReactElement {
       {!previewMode && (() => {
         const previewTo = frameDrag
           ? Math.max(0, Math.min(frameCount - 1,
-              Math.round((frameDrag.currentClientX - frameDrag.containerLeft - panX) / (CANVAS_SCALE * zoom) / frameWidth)
+              Math.round((frameDrag.currentClientX - frameDrag.containerLeft - panX) / scale / frameWidth)
             ))
           : null
         const labelTop = Math.max(4, panY - 22)
-        const dispW = frameWidth * CANVAS_SCALE * zoom
-        const dispH = frameHeight * CANVAS_SCALE * zoom
+        const dispW = frameWidth * scale
+        const dispH = frameHeight * scale
 
         return (
           <>
@@ -648,7 +648,7 @@ export function CarouselStage(): React.ReactElement {
               <div
                 style={{
                   position: 'absolute',
-                  left: panX + frameDrag.fromIndex * frameWidth * (CANVAS_SCALE * zoom) + (frameDrag.currentClientX - frameDrag.startClientX),
+                  left: panX + frameDrag.fromIndex * frameWidth * scale + (frameDrag.currentClientX - frameDrag.startClientX),
                   top: labelTop,
                   zIndex: 100,
                   pointerEvents: 'none',
@@ -670,10 +670,10 @@ export function CarouselStage(): React.ReactElement {
             {Array.from({ length: frameCount }).map((_, i) => {
               const frameColor = frames[i]?.backgroundColor ?? null
               const displayColor = frameColor ?? backgroundColor
-              const labelX = panX + i * frameWidth * (CANVAS_SCALE * zoom)
+              const labelX = panX + i * frameWidth * scale
               const isDragging = frameDrag?.fromIndex === i
               const txPx = (frameDrag && previewTo !== null)
-                ? frameSlotOffset(i, frameDrag.fromIndex, previewTo) * frameWidth * (CANVAS_SCALE * zoom)
+                ? frameSlotOffset(i, frameDrag.fromIndex, previewTo) * frameWidth * scale
                 : 0
               const animTransition = (frameDrag && !isDragging) ? 'transform 0.18s cubic-bezier(0.25,0.46,0.45,0.94)' : 'none'
 
@@ -798,8 +798,8 @@ export function CarouselStage(): React.ReactElement {
         height={containerSize.height}
         x={panX}
         y={panY}
-        scaleX={CANVAS_SCALE * zoom}
-        scaleY={CANVAS_SCALE * zoom}
+        scaleX={scale}
+        scaleY={scale}
         onMouseDown={(e) => {
           // Block Stage events when panning
           if (isPanningRef.current) return
@@ -1473,7 +1473,6 @@ export function CarouselStage(): React.ReactElement {
                 return newBox
               }
               const ids = useCanvasStore.getState().selectedIds
-              const scale = CANVAS_SCALE * zoom
               const screenThreshold = 8
               const logicalThreshold = screenThreshold / scale
               const logicalBox = {
@@ -1753,7 +1752,7 @@ export function CarouselStage(): React.ReactElement {
         userSelect: 'none',
         zIndex: 10,
       }}>
-        {Math.round(CANVAS_SCALE * zoom * 100)}%
+        {Math.round(scale * 100)}%
       </div>
     </div>
   )

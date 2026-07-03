@@ -66,6 +66,14 @@ function isInEditMode(obj: CanvasObject): boolean {
 // level — the vault always holds the current (newest) src. Acceptable because
 // background removal is not yet wired to the history system.
 // ---------------------------------------------------------------------------
+// Reinjected copies are cached by snapshot-object identity, revalidated against
+// the current vault src — snapshot objects in past[]/future[] are frozen, so
+// repeated undo/redo over the same snapshot reuses the same live copy.
+const reinjectedCache = new WeakMap<
+  CanvasObject,
+  { src: string; originalSrc?: string; result: CanvasObject }
+>()
+
 function reinjectSrc(
   objects: Record<string, CanvasObject>,
   vault: Map<string, { src: string; originalSrc?: string }>
@@ -75,7 +83,14 @@ function reinjectSrc(
     if (obj.type === 'image') {
       const v = vault.get(id)
       if (v) {
-        result[id] = { ...obj, src: v.src, originalSrc: v.originalSrc } as CanvasObject
+        const cached = reinjectedCache.get(obj)
+        if (cached && cached.src === v.src && cached.originalSrc === v.originalSrc) {
+          result[id] = cached.result
+        } else {
+          const reinjected = { ...obj, src: v.src, originalSrc: v.originalSrc } as CanvasObject
+          reinjectedCache.set(obj, { src: v.src, originalSrc: v.originalSrc, result: reinjected })
+          result[id] = reinjected
+        }
         continue
       }
     }
@@ -211,7 +226,13 @@ interface CanvasState {
 // ---------------------------------------------------------------------------
 // Opt #2: normalizeObjectsForSnapshot with fast path when no edit modes open.
 // Also strips src/originalSrc from ImageObjects (Opt #1).
+// Opt #3: normalized image copies are cached by live-object identity — objects
+// are replaced immutably on update, so an unchanged image reuses the same
+// stripped copy across every history push instead of re-allocating per commit.
+// Consecutive snapshots then share object references (less GC + memory).
 // ---------------------------------------------------------------------------
+const normalizedImageCache = new WeakMap<CanvasObject, CanvasObject>()
+
 function normalizeObjectsForSnapshot(
   objects: Record<string, CanvasObject>,
   hasOpenEditModes: boolean
@@ -222,14 +243,25 @@ function normalizeObjectsForSnapshot(
     if (obj.type === 'image') {
       const img = obj as ImageObject
       const clearModes = hasOpenEditModes && (img.contentEditMode || img.maskEditMode)
-      // src is always non-empty on live objects, so this branch always fires for images
-      result[id] = {
-        ...img,
-        contentEditMode: clearModes ? false : img.contentEditMode,
-        maskEditMode: clearModes ? false : img.maskEditMode,
-        src: '',
-        originalSrc: undefined,
-      } as CanvasObject
+      // src is always non-empty on live objects, so images always need a stripped copy
+      if (clearModes) {
+        // Rare path (edit mode open during commit) — don't pollute the cache,
+        // the object will be replaced when the mode closes anyway.
+        result[id] = {
+          ...img,
+          contentEditMode: false,
+          maskEditMode: false,
+          src: '',
+          originalSrc: undefined,
+        } as CanvasObject
+      } else {
+        let norm = normalizedImageCache.get(obj)
+        if (!norm) {
+          norm = { ...img, src: '', originalSrc: undefined } as CanvasObject
+          normalizedImageCache.set(obj, norm)
+        }
+        result[id] = norm
+      }
       changed = true
     } else if (obj.type === 'video') {
       const vid = obj as VideoObject

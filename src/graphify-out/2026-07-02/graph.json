@@ -9,61 +9,25 @@
       "source_file": "main.tsx",
       "source_location": "L1",
       "id": "main_tsx",
-      "community": 35,
+      "community": 39,
       "norm_label": "main.tsx"
-    },
-    {
-      "label": "ErrorBoundary",
-      "file_type": "code",
-      "source_file": "main.tsx",
-      "source_location": "L10",
-      "id": "src_main_errorboundary",
-      "community": 35,
-      "norm_label": "errorboundary"
-    },
-    {
-      "label": ".constructor()",
-      "file_type": "code",
-      "source_file": "main.tsx",
-      "source_location": "L14",
-      "id": "src_main_errorboundary_constructor",
-      "community": 35,
-      "norm_label": ".constructor()"
-    },
-    {
-      "label": ".getDerivedStateFromError()",
-      "file_type": "code",
-      "source_file": "main.tsx",
-      "source_location": "L18",
-      "id": "src_main_errorboundary_getderivedstatefromerror",
-      "community": 35,
-      "norm_label": ".getderivedstatefromerror()"
-    },
-    {
-      "label": ".render()",
-      "file_type": "code",
-      "source_file": "main.tsx",
-      "source_location": "L19",
-      "id": "src_main_errorboundary_render",
-      "community": 35,
-      "norm_label": ".render()"
     },
     {
       "label": "App()",
       "file_type": "code",
       "source_file": "main.tsx",
-      "source_location": "L42",
+      "source_location": "L10",
       "id": "src_main_app",
-      "community": 27,
+      "community": 39,
       "norm_label": "app()"
     },
     {
       "label": "rootEl",
       "file_type": "code",
       "source_file": "main.tsx",
-      "source_location": "L154",
+      "source_location": "L122",
       "id": "src_main_rootel",
-      "community": 35,
+      "community": 39,
       "norm_label": "rootel"
     },
     {
@@ -250,7 +214,7 @@
       "label": "EffectsSectionProps",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L604",
+      "source_location": "L603",
       "id": "ui_propertiespanel_effectssectionprops",
       "community": 10,
       "norm_label": "effectssectionprops"
@@ -259,16 +223,16 @@
       "label": "EffectsSection()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L610",
+      "source_location": "L609",
       "id": "ui_propertiespanel_effectssection",
-      "community": 18,
+      "community": 10,
       "norm_label": "effectssection()"
     },
     {
       "label": "AdjustmentsSectionProps",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L823",
+      "source_location": "L821",
       "id": "ui_propertiespanel_adjustmentssectionprops",
       "community": 10,
       "norm_label": "adjustmentssectionprops"
@@ -277,7 +241,7 @@
       "label": "subGroupLabelStyle",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L833",
+      "source_location": "L831",
       "id": "ui_propertiespanel_subgrouplabelstyle",
       "community": 10,
       "norm_label": "subgrouplabelstyle"
@@ -286,7 +250,7 @@
       "label": "TRACK_GRADIENT",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L843",
+      "source_location": "L841",
       "id": "ui_propertiespanel_track_gradient",
       "community": 10,
       "norm_label": "track_gradient"
@@ -295,7 +259,7 @@
       "label": "AdjustmentsSection()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L858",
+      "source_location": "L856",
       "id": "ui_propertiespanel_adjustmentssection",
       "community": 10,
       "norm_label": "adjustmentssection()"
@@ -304,7 +268,7 @@
       "label": "VideoSectionProps",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L961",
+      "source_location": "L959",
       "id": "ui_propertiespanel_videosectionprops",
       "community": 10,
       "norm_label": "videosectionprops"
@@ -313,7 +277,7 @@
       "label": "formatDuration()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L969",
+      "source_location": "L967",
       "id": "ui_propertiespanel_formatduration",
       "community": 10,
       "norm_label": "formatduration()"
@@ -322,7 +286,7 @@
       "label": "trimLabelStyle",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L976",
+      "source_location": "L974",
       "id": "ui_propertiespanel_trimlabelstyle",
       "community": 10,
       "norm_label": "trimlabelstyle"
@@ -331,7 +295,7 @@
       "label": "VideoSection()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L986",
+      "source_location": "L984",
       "id": "ui_propertiespanel_videosection",
       "community": 10,
       "norm_label": "videosection()"
@@ -340,7 +304,7 @@
       "label": "PropertiesPanel()",
       "file_type": "code",
       "source_file": "ui/PropertiesPanel.tsx",
-      "source_location": "L1478",
+      "source_location": "L1476",
       "id": "ui_propertiespanel_propertiespanel",
       "community": 17,
       "norm_label": "propertiespanel()"
@@ -450,7 +414,7 @@
       "source_file": "ui/useExportStore.ts",
       "source_location": "L3",
       "id": "ui_useexportstore_exportstate",
-      "community": 27,
+      "community": 39,
       "norm_label": "exportstate"
     },
     {
@@ -574,9 +538,9 @@
       "label": "ToolBar()",
       "file_type": "code",
       "source_file": "ui/Toolbar.tsx",
-      "source_location": "L1231",
+      "source_location": "L1192",
       "id": "ui_toolbar_toolbar",
-      "community": 27,
+      "community": 39,
       "norm_label": "toolbar()"
     },
     {
@@ -585,7 +549,7 @@
       "source_file": "ui/iconBtnStyle.ts",
       "source_location": "L1",
       "id": "ui_iconbtnstyle_ts",
-      "community": 27,
+      "community": 35,
       "norm_label": "iconbtnstyle.ts"
     },
     {
@@ -594,7 +558,7 @@
       "source_file": "ui/iconBtnStyle.ts",
       "source_location": "L3",
       "id": "ui_iconbtnstyle_iconbtnstyle",
-      "community": 27,
+      "community": 35,
       "norm_label": "iconbtnstyle()"
     },
     {
@@ -621,7 +585,7 @@
       "source_file": "ui/GridPicker.tsx",
       "source_location": "L10",
       "id": "ui_gridpicker_gridpicker",
-      "community": 66,
+      "community": 27,
       "norm_label": "gridpicker()"
     },
     {
@@ -630,7 +594,7 @@
       "source_file": "ui/LayerPanel.tsx",
       "source_location": "L1",
       "id": "ui_layerpanel_tsx",
-      "community": 27,
+      "community": 35,
       "norm_label": "layerpanel.tsx"
     },
     {
@@ -639,7 +603,7 @@
       "source_file": "ui/LayerPanel.tsx",
       "source_location": "L9",
       "id": "ui_layerpanel_typelabel",
-      "community": 27,
+      "community": 39,
       "norm_label": "typelabel()"
     },
     {
@@ -648,7 +612,7 @@
       "source_file": "ui/LayerPanel.tsx",
       "source_location": "L21",
       "id": "ui_layerpanel_layerpanel",
-      "community": 13,
+      "community": 35,
       "norm_label": "layerpanel()"
     },
     {
@@ -657,7 +621,7 @@
       "source_file": "ui/Tooltip.tsx",
       "source_location": "L1",
       "id": "ui_tooltip_tsx",
-      "community": 27,
+      "community": 39,
       "norm_label": "tooltip.tsx"
     },
     {
@@ -666,7 +630,7 @@
       "source_file": "ui/Tooltip.tsx",
       "source_location": "L4",
       "id": "ui_tooltip_tooltipprops",
-      "community": 27,
+      "community": 39,
       "norm_label": "tooltipprops"
     },
     {
@@ -675,7 +639,7 @@
       "source_file": "ui/Tooltip.tsx",
       "source_location": "L16",
       "id": "ui_tooltip_tooltip",
-      "community": 27,
+      "community": 39,
       "norm_label": "tooltip()"
     },
     {
@@ -684,7 +648,7 @@
       "source_file": "ui/Tooltip.tsx",
       "source_location": "L40",
       "id": "ui_tooltip_tooltipinner",
-      "community": 27,
+      "community": 39,
       "norm_label": "tooltipinner()"
     },
     {
@@ -765,7 +729,7 @@
       "source_file": "ui/useSaveStatusStore.ts",
       "source_location": "L21",
       "id": "ui_usesavestatusstore_usesavestatusstore",
-      "community": 17,
+      "community": 27,
       "norm_label": "usesavestatusstore"
     },
     {
@@ -801,7 +765,7 @@
       "source_file": "ui/index.ts",
       "source_location": "L1",
       "id": "ui_index_ts",
-      "community": 25,
+      "community": 21,
       "norm_label": "index.ts"
     },
     {
@@ -936,7 +900,7 @@
       "source_file": "ui/ColorInput.tsx",
       "source_location": "L457",
       "id": "ui_colorinput_colorinputprops",
-      "community": 25,
+      "community": 21,
       "norm_label": "colorinputprops"
     },
     {
@@ -954,7 +918,7 @@
       "source_file": "ui/ColorInput.tsx",
       "source_location": "L520",
       "id": "ui_colorinput_mixedcolorinputprops",
-      "community": 25,
+      "community": 21,
       "norm_label": "mixedcolorinputprops"
     },
     {
@@ -1260,7 +1224,7 @@
       "source_file": "types/canvas.ts",
       "source_location": "L102",
       "id": "types_canvas_photoadjustments",
-      "community": 6,
+      "community": 4,
       "norm_label": "photoadjustments"
     },
     {
@@ -1269,7 +1233,7 @@
       "source_file": "types/canvas.ts",
       "source_location": "L120",
       "id": "types_canvas_default_adjustments",
-      "community": 6,
+      "community": 4,
       "norm_label": "default_adjustments"
     },
     {
@@ -1789,7 +1753,7 @@
       "label": "CanvasShapeNodeProps",
       "file_type": "code",
       "source_file": "canvas/CanvasShapeNode.tsx",
-      "source_location": "L20",
+      "source_location": "L19",
       "id": "canvas_canvasshapenode_canvasshapenodeprops",
       "community": 0,
       "norm_label": "canvasshapenodeprops"
@@ -1798,7 +1762,7 @@
       "label": "CanvasShapeNodeInnerProps",
       "file_type": "code",
       "source_file": "canvas/CanvasShapeNode.tsx",
-      "source_location": "L26",
+      "source_location": "L25",
       "id": "canvas_canvasshapenode_canvasshapenodeinnerprops",
       "community": 0,
       "norm_label": "canvasshapenodeinnerprops"
@@ -1807,16 +1771,25 @@
       "label": "CanvasShapeNodeInner()",
       "file_type": "code",
       "source_file": "canvas/CanvasShapeNode.tsx",
-      "source_location": "L30",
+      "source_location": "L29",
       "id": "canvas_canvasshapenode_canvasshapenodeinner",
       "community": 0,
       "norm_label": "canvasshapenodeinner()"
     },
     {
+      "label": "CanvasShapeNodeOuter()",
+      "file_type": "code",
+      "source_file": "canvas/CanvasShapeNode.tsx",
+      "source_location": "L560",
+      "id": "canvas_canvasshapenode_canvasshapenodeouter",
+      "community": 0,
+      "norm_label": "canvasshapenodeouter()"
+    },
+    {
       "label": "CanvasShapeNode",
       "file_type": "code",
       "source_file": "canvas/CanvasShapeNode.tsx",
-      "source_location": "L562",
+      "source_location": "L566",
       "id": "canvas_canvasshapenode_canvasshapenode",
       "community": 0,
       "norm_label": "canvasshapenode"
@@ -1834,7 +1807,7 @@
       "label": "CanvasVideoNodeProps",
       "file_type": "code",
       "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L17",
+      "source_location": "L16",
       "id": "canvas_canvasvideonode_canvasvideonodeprops",
       "community": 0,
       "norm_label": "canvasvideonodeprops"
@@ -1843,7 +1816,7 @@
       "label": "CanvasVideoNodeInnerProps",
       "file_type": "code",
       "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L23",
+      "source_location": "L22",
       "id": "canvas_canvasvideonode_canvasvideonodeinnerprops",
       "community": 0,
       "norm_label": "canvasvideonodeinnerprops"
@@ -1852,16 +1825,25 @@
       "label": "CanvasVideoNodeInner()",
       "file_type": "code",
       "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L27",
+      "source_location": "L26",
       "id": "canvas_canvasvideonode_canvasvideonodeinner",
       "community": 0,
       "norm_label": "canvasvideonodeinner()"
     },
     {
+      "label": "CanvasVideoNodeOuter()",
+      "file_type": "code",
+      "source_file": "canvas/CanvasVideoNode.tsx",
+      "source_location": "L997",
+      "id": "canvas_canvasvideonode_canvasvideonodeouter",
+      "community": 0,
+      "norm_label": "canvasvideonodeouter()"
+    },
+    {
       "label": "CanvasVideoNode",
       "file_type": "code",
       "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L1008",
+      "source_location": "L1003",
       "id": "canvas_canvasvideonode_canvasvideonode",
       "community": 0,
       "norm_label": "canvasvideonode"
@@ -1897,7 +1879,7 @@
       "label": "GridCellOverlay()",
       "file_type": "code",
       "source_file": "canvas/GridCellOverlay.tsx",
-      "source_location": "L15",
+      "source_location": "L16",
       "id": "canvas_gridcelloverlay_gridcelloverlay",
       "community": 0,
       "norm_label": "gridcelloverlay()"
@@ -1933,7 +1915,7 @@
       "label": "useImageDrop()",
       "file_type": "code",
       "source_file": "canvas/useImageDrop.ts",
-      "source_location": "L6",
+      "source_location": "L7",
       "id": "canvas_useimagedrop_useimagedrop",
       "community": 0,
       "norm_label": "useimagedrop()"
@@ -1951,7 +1933,7 @@
       "label": "hitTestCell()",
       "file_type": "code",
       "source_file": "canvas/CanvasGroupNode.tsx",
-      "source_location": "L12",
+      "source_location": "L13",
       "id": "canvas_canvasgroupnode_hittestcell",
       "community": 0,
       "norm_label": "hittestcell()"
@@ -1960,7 +1942,7 @@
       "label": "CanvasGroupNodeProps",
       "file_type": "code",
       "source_file": "canvas/CanvasGroupNode.tsx",
-      "source_location": "L30",
+      "source_location": "L31",
       "id": "canvas_canvasgroupnode_canvasgroupnodeprops",
       "community": 0,
       "norm_label": "canvasgroupnodeprops"
@@ -1969,7 +1951,7 @@
       "label": "CanvasGroupNode()",
       "file_type": "code",
       "source_file": "canvas/CanvasGroupNode.tsx",
-      "source_location": "L36",
+      "source_location": "L37",
       "id": "canvas_canvasgroupnode_canvasgroupnode",
       "community": 0,
       "norm_label": "canvasgroupnode()"
@@ -1978,7 +1960,7 @@
       "label": "CanvasGroupNodeInner",
       "file_type": "code",
       "source_file": "canvas/CanvasGroupNode.tsx",
-      "source_location": "L42",
+      "source_location": "L43",
       "id": "canvas_canvasgroupnode_canvasgroupnodeinner",
       "community": 0,
       "norm_label": "canvasgroupnodeinner"
@@ -2212,7 +2194,7 @@
       "label": "ViewportState",
       "file_type": "code",
       "source_file": "canvas/useViewportStore.ts",
-      "source_location": "L4",
+      "source_location": "L3",
       "id": "canvas_useviewportstore_viewportstate",
       "community": 0,
       "norm_label": "viewportstate"
@@ -2221,37 +2203,10 @@
       "label": "useViewportStore",
       "file_type": "code",
       "source_file": "canvas/useViewportStore.ts",
-      "source_location": "L13",
+      "source_location": "L12",
       "id": "canvas_useviewportstore_useviewportstore",
       "community": 0,
       "norm_label": "useviewportstore"
-    },
-    {
-      "label": "scaleForZoom()",
-      "file_type": "code",
-      "source_file": "canvas/useViewportStore.ts",
-      "source_location": "L23",
-      "id": "canvas_useviewportstore_scaleforzoom",
-      "community": 0,
-      "norm_label": "scaleforzoom()"
-    },
-    {
-      "label": "selectScale()",
-      "file_type": "code",
-      "source_file": "canvas/useViewportStore.ts",
-      "source_location": "L26",
-      "id": "canvas_useviewportstore_selectscale",
-      "community": 0,
-      "norm_label": "selectscale()"
-    },
-    {
-      "label": "getCanvasScale()",
-      "file_type": "code",
-      "source_file": "canvas/useViewportStore.ts",
-      "source_location": "L29",
-      "id": "canvas_useviewportstore_getcanvasscale",
-      "community": 0,
-      "norm_label": "getcanvasscale()"
     },
     {
       "label": "videoExport.ts",
@@ -2407,24 +2362,6 @@
       "norm_label": "usesnapguides()"
     },
     {
-      "label": "makeCanvasNode.tsx",
-      "file_type": "code",
-      "source_file": "canvas/makeCanvasNode.tsx",
-      "source_location": "L1",
-      "id": "canvas_makecanvasnode_tsx",
-      "community": 0,
-      "norm_label": "makecanvasnode.tsx"
-    },
-    {
-      "label": "makeCanvasNode()",
-      "file_type": "code",
-      "source_file": "canvas/makeCanvasNode.tsx",
-      "source_location": "L15",
-      "id": "canvas_makecanvasnode_makecanvasnode",
-      "community": 0,
-      "norm_label": "makecanvasnode()"
-    },
-    {
       "label": "useExternalEdit.ts",
       "file_type": "code",
       "source_file": "canvas/useExternalEdit.ts",
@@ -2545,7 +2482,7 @@
       "label": "CanvasImageNodeProps",
       "file_type": "code",
       "source_file": "canvas/CanvasImageNode.tsx",
-      "source_location": "L17",
+      "source_location": "L16",
       "id": "canvas_canvasimagenode_canvasimagenodeprops",
       "community": 0,
       "norm_label": "canvasimagenodeprops"
@@ -2554,7 +2491,7 @@
       "label": "CanvasImageNodeInnerProps",
       "file_type": "code",
       "source_file": "canvas/CanvasImageNode.tsx",
-      "source_location": "L25",
+      "source_location": "L24",
       "id": "canvas_canvasimagenode_canvasimagenodeinnerprops",
       "community": 0,
       "norm_label": "canvasimagenodeinnerprops"
@@ -2563,16 +2500,25 @@
       "label": "CanvasImageNodeInner()",
       "file_type": "code",
       "source_file": "canvas/CanvasImageNode.tsx",
-      "source_location": "L29",
+      "source_location": "L28",
       "id": "canvas_canvasimagenode_canvasimagenodeinner",
       "community": 0,
       "norm_label": "canvasimagenodeinner()"
     },
     {
+      "label": "CanvasImageNodeOuter()",
+      "file_type": "code",
+      "source_file": "canvas/CanvasImageNode.tsx",
+      "source_location": "L924",
+      "id": "canvas_canvasimagenode_canvasimagenodeouter",
+      "community": 0,
+      "norm_label": "canvasimagenodeouter()"
+    },
+    {
       "label": "CanvasImageNode",
       "file_type": "code",
       "source_file": "canvas/CanvasImageNode.tsx",
-      "source_location": "L926",
+      "source_location": "L930",
       "id": "canvas_canvasimagenode_canvasimagenode",
       "community": 0,
       "norm_label": "canvasimagenode"
@@ -2608,7 +2554,7 @@
       "label": "ElectronFile",
       "file_type": "code",
       "source_file": "canvas/useVideoDrop.ts",
-      "source_location": "L6",
+      "source_location": "L7",
       "id": "canvas_usevideodrop_electronfile",
       "community": 0,
       "norm_label": "electronfile"
@@ -2617,7 +2563,7 @@
       "label": "useVideoDrop()",
       "file_type": "code",
       "source_file": "canvas/useVideoDrop.ts",
-      "source_location": "L10",
+      "source_location": "L11",
       "id": "canvas_usevideodrop_usevideodrop",
       "community": 0,
       "norm_label": "usevideodrop()"
@@ -2731,19 +2677,10 @@
       "norm_label": "isineditmode()"
     },
     {
-      "label": "reinjectedCache",
-      "file_type": "code",
-      "source_file": "canvas/useCanvasStore.ts",
-      "source_location": "L72",
-      "id": "canvas_usecanvasstore_reinjectedcache",
-      "community": 0,
-      "norm_label": "reinjectedcache"
-    },
-    {
       "label": "reinjectSrc()",
       "file_type": "code",
       "source_file": "canvas/useCanvasStore.ts",
-      "source_location": "L77",
+      "source_location": "L69",
       "id": "canvas_usecanvasstore_reinjectsrc",
       "community": 0,
       "norm_label": "reinjectsrc()"
@@ -2752,25 +2689,16 @@
       "label": "CanvasState",
       "file_type": "code",
       "source_file": "canvas/useCanvasStore.ts",
-      "source_location": "L102",
+      "source_location": "L87",
       "id": "canvas_usecanvasstore_canvasstate",
       "community": 0,
       "norm_label": "canvasstate"
     },
     {
-      "label": "normalizedImageCache",
-      "file_type": "code",
-      "source_file": "canvas/useCanvasStore.ts",
-      "source_location": "L234",
-      "id": "canvas_usecanvasstore_normalizedimagecache",
-      "community": 0,
-      "norm_label": "normalizedimagecache"
-    },
-    {
       "label": "normalizeObjectsForSnapshot()",
       "file_type": "code",
       "source_file": "canvas/useCanvasStore.ts",
-      "source_location": "L236",
+      "source_location": "L215",
       "id": "canvas_usecanvasstore_normalizeobjectsforsnapshot",
       "community": 0,
       "norm_label": "normalizeobjectsforsnapshot()"
@@ -2779,7 +2707,7 @@
       "label": "useCanvasStore",
       "file_type": "code",
       "source_file": "canvas/useCanvasStore.ts",
-      "source_location": "L289",
+      "source_location": "L257",
       "id": "canvas_usecanvasstore_usecanvasstore",
       "community": 0,
       "norm_label": "usecanvasstore"
@@ -2797,7 +2725,7 @@
       "label": "CanvasTextNodeProps",
       "file_type": "code",
       "source_file": "canvas/CanvasTextNode.tsx",
-      "source_location": "L14",
+      "source_location": "L13",
       "id": "canvas_canvastextnode_canvastextnodeprops",
       "community": 0,
       "norm_label": "canvastextnodeprops"
@@ -2806,7 +2734,7 @@
       "label": "CanvasTextNodeInnerProps",
       "file_type": "code",
       "source_file": "canvas/CanvasTextNode.tsx",
-      "source_location": "L20",
+      "source_location": "L19",
       "id": "canvas_canvastextnode_canvastextnodeinnerprops",
       "community": 0,
       "norm_label": "canvastextnodeinnerprops"
@@ -2815,7 +2743,7 @@
       "label": "domOffsetToCharIndex()",
       "file_type": "code",
       "source_file": "canvas/CanvasTextNode.tsx",
-      "source_location": "L28",
+      "source_location": "L27",
       "id": "canvas_canvastextnode_domoffsettocharindex",
       "community": 0,
       "norm_label": "domoffsettocharindex()"
@@ -2824,7 +2752,7 @@
       "label": "charIndexToDomOffset()",
       "file_type": "code",
       "source_file": "canvas/CanvasTextNode.tsx",
-      "source_location": "L53",
+      "source_location": "L52",
       "id": "canvas_canvastextnode_charindextodomoffset",
       "community": 0,
       "norm_label": "charindextodomoffset()"
@@ -2833,16 +2761,25 @@
       "label": "CanvasTextNodeInner()",
       "file_type": "code",
       "source_file": "canvas/CanvasTextNode.tsx",
-      "source_location": "L66",
+      "source_location": "L65",
       "id": "canvas_canvastextnode_canvastextnodeinner",
       "community": 0,
       "norm_label": "canvastextnodeinner()"
     },
     {
+      "label": "CanvasTextNodeOuter()",
+      "file_type": "code",
+      "source_file": "canvas/CanvasTextNode.tsx",
+      "source_location": "L731",
+      "id": "canvas_canvastextnode_canvastextnodeouter",
+      "community": 0,
+      "norm_label": "canvastextnodeouter()"
+    },
+    {
       "label": "CanvasTextNode",
       "file_type": "code",
       "source_file": "canvas/CanvasTextNode.tsx",
-      "source_location": "L729",
+      "source_location": "L737",
       "id": "canvas_canvastextnode_canvastextnode",
       "community": 0,
       "norm_label": "canvastextnode"
@@ -3184,7 +3121,7 @@
       "label": "anchorsToPathData()",
       "file_type": "code",
       "source_file": "canvas/CanvasPathNode.tsx",
-      "source_location": "L22",
+      "source_location": "L21",
       "id": "canvas_canvaspathnode_anchorstopathdata",
       "community": 0,
       "norm_label": "anchorstopathdata()"
@@ -3193,7 +3130,7 @@
       "label": "computePathBBox()",
       "file_type": "code",
       "source_file": "canvas/CanvasPathNode.tsx",
-      "source_location": "L54",
+      "source_location": "L53",
       "id": "canvas_canvaspathnode_computepathbbox",
       "community": 0,
       "norm_label": "computepathbbox()"
@@ -3202,7 +3139,7 @@
       "label": "CanvasPathNodeProps",
       "file_type": "code",
       "source_file": "canvas/CanvasPathNode.tsx",
-      "source_location": "L106",
+      "source_location": "L105",
       "id": "canvas_canvaspathnode_canvaspathnodeprops",
       "community": 0,
       "norm_label": "canvaspathnodeprops"
@@ -3211,7 +3148,7 @@
       "label": "CanvasPathNodeInnerProps",
       "file_type": "code",
       "source_file": "canvas/CanvasPathNode.tsx",
-      "source_location": "L112",
+      "source_location": "L111",
       "id": "canvas_canvaspathnode_canvaspathnodeinnerprops",
       "community": 0,
       "norm_label": "canvaspathnodeinnerprops"
@@ -3220,16 +3157,25 @@
       "label": "CanvasPathNodeInner()",
       "file_type": "code",
       "source_file": "canvas/CanvasPathNode.tsx",
-      "source_location": "L116",
+      "source_location": "L115",
       "id": "canvas_canvaspathnode_canvaspathnodeinner",
       "community": 0,
       "norm_label": "canvaspathnodeinner()"
     },
     {
+      "label": "CanvasPathNodeOuter()",
+      "file_type": "code",
+      "source_file": "canvas/CanvasPathNode.tsx",
+      "source_location": "L554",
+      "id": "canvas_canvaspathnode_canvaspathnodeouter",
+      "community": 0,
+      "norm_label": "canvaspathnodeouter()"
+    },
+    {
       "label": "CanvasPathNode",
       "file_type": "code",
       "source_file": "canvas/CanvasPathNode.tsx",
-      "source_location": "L556",
+      "source_location": "L560",
       "id": "canvas_canvaspathnode_canvaspathnode",
       "community": 0,
       "norm_label": "canvaspathnode"
@@ -3940,7 +3886,7 @@
       "label": "mimeMap",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L179",
+      "source_location": "L168",
       "id": "electron_index_mimemap",
       "community": 3,
       "norm_label": "mimemap"
@@ -3949,7 +3895,7 @@
       "label": "buf",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L185",
+      "source_location": "L174",
       "id": "electron_index_buf",
       "community": 3,
       "norm_label": "buf"
@@ -3958,7 +3904,7 @@
       "label": "paths",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L243",
+      "source_location": "L232",
       "id": "electron_index_paths",
       "community": 3,
       "norm_label": "paths"
@@ -3967,7 +3913,7 @@
       "label": "files",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L249",
+      "source_location": "L238",
       "id": "electron_index_files",
       "community": 3,
       "norm_label": "files"
@@ -3976,7 +3922,7 @@
       "label": "name",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L285",
+      "source_location": "L274",
       "id": "electron_index_name",
       "community": 3,
       "norm_label": "name"
@@ -3985,7 +3931,7 @@
       "label": "editor",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L286",
+      "source_location": "L275",
       "id": "electron_index_editor",
       "community": 3,
       "norm_label": "editor"
@@ -3994,7 +3940,7 @@
       "label": "existing",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L303",
+      "source_location": "L292",
       "id": "electron_index_existing",
       "community": 3,
       "norm_label": "existing"
@@ -4003,7 +3949,7 @@
       "label": "editDir",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L312",
+      "source_location": "L301",
       "id": "electron_index_editdir",
       "community": 3,
       "norm_label": "editdir"
@@ -4012,7 +3958,7 @@
       "label": "watcher",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L335",
+      "source_location": "L324",
       "id": "electron_index_watcher",
       "community": 3,
       "norm_label": "watcher"
@@ -4021,7 +3967,7 @@
       "label": "newBase64",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L342",
+      "source_location": "L331",
       "id": "electron_index_newbase64",
       "community": 3,
       "norm_label": "newbase64"
@@ -4030,7 +3976,7 @@
       "label": "buffer",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L408",
+      "source_location": "L397",
       "id": "electron_index_buffer",
       "community": 3,
       "norm_label": "buffer"
@@ -4039,7 +3985,7 @@
       "label": "MEDIA_MIME",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L441",
+      "source_location": "L430",
       "id": "electron_index_media_mime",
       "community": 3,
       "norm_label": "media_mime"
@@ -4048,7 +3994,7 @@
       "label": "pathname",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L446",
+      "source_location": "L435",
       "id": "electron_index_pathname",
       "community": 3,
       "norm_label": "pathname"
@@ -4057,7 +4003,7 @@
       "label": "rangeHeader",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L457",
+      "source_location": "L446",
       "id": "electron_index_rangeheader",
       "community": 3,
       "norm_label": "rangeheader"
@@ -4066,7 +4012,7 @@
       "label": "nodeStream",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L462",
+      "source_location": "L451",
       "id": "electron_index_nodestream",
       "community": 3,
       "norm_label": "nodestream"
@@ -4075,7 +4021,7 @@
       "label": "body",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L463",
+      "source_location": "L452",
       "id": "electron_index_body",
       "community": 3,
       "norm_label": "body"
@@ -4084,7 +4030,7 @@
       "label": "corpHeaders",
       "file_type": "code",
       "source_file": "electron/index.ts",
-      "source_location": "L474",
+      "source_location": "L463",
       "id": "electron_index_corpheaders",
       "community": 3,
       "norm_label": "corpheaders"
@@ -4097,51 +4043,6 @@
       "id": "store_index_ts",
       "community": 68,
       "norm_label": "index.ts"
-    },
-    {
-      "label": "CanvasShapeNodeOuter()",
-      "file_type": "code",
-      "source_file": "canvas/CanvasShapeNode.tsx",
-      "source_location": "L560",
-      "community": 0,
-      "norm_label": "canvasshapenodeouter()",
-      "id": "canvas_canvasshapenode_canvasshapenodeouter"
-    },
-    {
-      "label": "CanvasVideoNodeOuter()",
-      "file_type": "code",
-      "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L997",
-      "community": 0,
-      "norm_label": "canvasvideonodeouter()",
-      "id": "canvas_canvasvideonode_canvasvideonodeouter"
-    },
-    {
-      "label": "CanvasImageNodeOuter()",
-      "file_type": "code",
-      "source_file": "canvas/CanvasImageNode.tsx",
-      "source_location": "L924",
-      "community": 0,
-      "norm_label": "canvasimagenodeouter()",
-      "id": "canvas_canvasimagenode_canvasimagenodeouter"
-    },
-    {
-      "label": "CanvasTextNodeOuter()",
-      "file_type": "code",
-      "source_file": "canvas/CanvasTextNode.tsx",
-      "source_location": "L731",
-      "community": 0,
-      "norm_label": "canvastextnodeouter()",
-      "id": "canvas_canvastextnode_canvastextnodeouter"
-    },
-    {
-      "label": "CanvasPathNodeOuter()",
-      "file_type": "code",
-      "source_file": "canvas/CanvasPathNode.tsx",
-      "source_location": "L554",
-      "community": 0,
-      "norm_label": "canvaspathnodeouter()",
-      "id": "canvas_canvaspathnode_canvaspathnodeouter"
     },
     {
       "label": "numberInputStyle",
@@ -4454,7 +4355,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L1",
-      "community": 70,
+      "community": 7,
       "norm_label": "package.json",
       "id": "package_json"
     },
@@ -4463,7 +4364,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L2",
-      "community": 70,
+      "community": 7,
       "norm_label": "name",
       "id": "zeroseams_package_name"
     },
@@ -4472,7 +4373,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L3",
-      "community": 70,
+      "community": 7,
       "norm_label": "version",
       "id": "zeroseams_package_version"
     },
@@ -4481,7 +4382,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L4",
-      "community": 70,
+      "community": 7,
       "norm_label": "description",
       "id": "zeroseams_package_description"
     },
@@ -4490,7 +4391,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L5",
-      "community": 70,
+      "community": 7,
       "norm_label": "main",
       "id": "zeroseams_package_main"
     },
@@ -4499,7 +4400,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L6",
-      "community": 70,
+      "community": 7,
       "norm_label": "author",
       "id": "zeroseams_package_author"
     },
@@ -4508,7 +4409,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L7",
-      "community": 70,
+      "community": 7,
       "norm_label": "license",
       "id": "zeroseams_package_license"
     },
@@ -4517,7 +4418,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L8",
-      "community": 71,
+      "community": 7,
       "norm_label": "scripts",
       "id": "zeroseams_package_scripts"
     },
@@ -4526,7 +4427,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L9",
-      "community": 71,
+      "community": 7,
       "norm_label": "dev",
       "id": "zeroseams_package_scripts_dev"
     },
@@ -4535,7 +4436,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L10",
-      "community": 71,
+      "community": 7,
       "norm_label": "build",
       "id": "zeroseams_package_scripts_build"
     },
@@ -4544,7 +4445,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L11",
-      "community": 71,
+      "community": 7,
       "norm_label": "preview",
       "id": "zeroseams_package_scripts_preview"
     },
@@ -4553,7 +4454,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L12",
-      "community": 71,
+      "community": 7,
       "norm_label": "typecheck",
       "id": "zeroseams_package_scripts_typecheck"
     },
@@ -4562,7 +4463,7 @@
       "file_type": "code",
       "source_file": "package.json",
       "source_location": "L13",
-      "community": 71,
+      "community": 7,
       "norm_label": "lint",
       "id": "zeroseams_package_scripts_lint"
     },
@@ -7910,7 +7811,7 @@
       "file_type": "code",
       "source_file": "src/main.tsx",
       "source_location": "L1",
-      "community": 35,
+      "community": 39,
       "norm_label": "main.tsx",
       "id": "src_main_tsx"
     },
@@ -7946,7 +7847,7 @@
       "file_type": "code",
       "source_file": "src/ui/useExportStore.ts",
       "source_location": "L1",
-      "community": 27,
+      "community": 39,
       "norm_label": "useexportstore.ts",
       "id": "src_ui_useexportstore_ts"
     },
@@ -7964,7 +7865,7 @@
       "file_type": "code",
       "source_file": "src/ui/iconBtnStyle.ts",
       "source_location": "L1",
-      "community": 27,
+      "community": 10,
       "norm_label": "iconbtnstyle.ts",
       "id": "src_ui_iconbtnstyle_ts"
     },
@@ -7973,7 +7874,7 @@
       "file_type": "code",
       "source_file": "src/ui/LayerPanel.tsx",
       "source_location": "L1",
-      "community": 27,
+      "community": 39,
       "norm_label": "layerpanel.tsx",
       "id": "src_ui_layerpanel_tsx"
     },
@@ -7982,7 +7883,7 @@
       "file_type": "code",
       "source_file": "src/ui/Tooltip.tsx",
       "source_location": "L1",
-      "community": 27,
+      "community": 39,
       "norm_label": "tooltip.tsx",
       "id": "src_ui_tooltip_tsx"
     },
@@ -8751,7 +8652,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 72,
+      "community": 37,
       "norm_label": "electron vite config",
       "id": "electron_vite_config"
     },
@@ -8764,7 +8665,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 72,
+      "community": 37,
       "norm_label": "typescript node config",
       "id": "tsconfig_node"
     },
@@ -8777,7 +8678,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 72,
+      "community": 37,
       "norm_label": "typescript web config",
       "id": "tsconfig_web"
     },
@@ -8790,7 +8691,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 72,
+      "community": 37,
       "norm_label": "typescript root config",
       "id": "tsconfig_root"
     },
@@ -8881,7 +8782,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 72,
+      "community": 37,
       "norm_label": "electron-vite three-target build (main/preload/renderer)",
       "id": "concept_electron_vite_build"
     },
@@ -8894,7 +8795,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 27,
+      "community": 39,
       "norm_label": "save split-button pattern (save / save as / save a copy)",
       "id": "concept_save_split_button"
     },
@@ -8907,7 +8808,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 27,
+      "community": 39,
       "norm_label": "module-level activetooltipcount (instant tooltip on hover when any tooltip is visible)",
       "id": "concept_tooltip_active_count"
     },
@@ -9024,7 +8925,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 4,
       "norm_label": "non-destructive photo adjustments pipeline",
       "id": "concept_nondestructive_adjustments"
     },
@@ -9102,7 +9003,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 11,
+      "community": 0,
       "norm_label": "canvas/index exports",
       "id": "canvas_index_exports"
     },
@@ -9879,7 +9780,7 @@
       "file_type": "code",
       "source_file": "src/ui/GridPicker.tsx",
       "source_location": "L1",
-      "community": 66,
+      "community": 27,
       "norm_label": "gridpicker.tsx",
       "id": "src_ui_gridpicker_tsx"
     },
@@ -9927,16 +9828,6 @@
       "source_file": "main.tsx",
       "source_location": "L10",
       "weight": 1.0,
-      "source": "main_tsx",
-      "target": "src_main_errorboundary",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "main.tsx",
-      "source_location": "L10",
-      "weight": 1.0,
       "confidence_score": 1.0,
       "source": "main_tsx",
       "target": "src_main_app"
@@ -9950,36 +9841,6 @@
       "confidence_score": 1.0,
       "source": "main_tsx",
       "target": "src_main_rootel"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "main.tsx",
-      "source_location": "L14",
-      "weight": 1.0,
-      "source": "src_main_errorboundary",
-      "target": "src_main_errorboundary_constructor",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "main.tsx",
-      "source_location": "L18",
-      "weight": 1.0,
-      "source": "src_main_errorboundary",
-      "target": "src_main_errorboundary_getderivedstatefromerror",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "main.tsx",
-      "source_location": "L19",
-      "weight": 1.0,
-      "source": "src_main_errorboundary",
-      "target": "src_main_errorboundary_render",
-      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -10092,9 +9953,9 @@
       "source_file": "ui/FrameSettingsPopover.tsx",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ui_framesettingspopover_tsx",
-      "target": "ui_numericinput_tsx"
+      "target": "ui_numericinput_tsx",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -10103,9 +9964,9 @@
       "source_file": "ui/FrameSettingsPopover.tsx",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ui_framesettingspopover_tsx",
-      "target": "ui_numericinput_numericinput"
+      "target": "ui_numericinput_numericinput",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -10410,9 +10271,9 @@
       "source_file": "ui/PropertiesPanel.tsx",
       "source_location": "L25",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ui_propertiespanel_tsx",
-      "target": "ui_numericinput_tsx"
+      "target": "ui_numericinput_tsx",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -10421,9 +10282,9 @@
       "source_file": "ui/PropertiesPanel.tsx",
       "source_location": "L25",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ui_propertiespanel_tsx",
-      "target": "ui_numericinput_numericinput"
+      "target": "ui_numericinput_numericinput",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -11237,9 +11098,9 @@
       "source_file": "ui/NumericInput.tsx",
       "source_location": "L3",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ui_numericinput_tsx",
-      "target": "ui_numericinput_numericinputprops"
+      "target": "ui_numericinput_numericinputprops",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -11247,9 +11108,9 @@
       "source_file": "ui/NumericInput.tsx",
       "source_location": "L17",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ui_numericinput_tsx",
-      "target": "ui_numericinput_parseexpr"
+      "target": "ui_numericinput_parseexpr",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -11257,9 +11118,9 @@
       "source_file": "ui/NumericInput.tsx",
       "source_location": "L48",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ui_numericinput_tsx",
-      "target": "ui_numericinput_clampval"
+      "target": "ui_numericinput_clampval",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -11267,9 +11128,9 @@
       "source_file": "ui/NumericInput.tsx",
       "source_location": "L54",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ui_numericinput_tsx",
-      "target": "ui_numericinput_formatval"
+      "target": "ui_numericinput_formatval",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -11277,9 +11138,9 @@
       "source_file": "ui/NumericInput.tsx",
       "source_location": "L59",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ui_numericinput_tsx",
-      "target": "ui_numericinput_numericinput"
+      "target": "ui_numericinput_numericinput",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -11288,9 +11149,9 @@
       "source_file": "ui/Toolbar.tsx",
       "source_location": "L35",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ui_toolbar_tsx",
-      "target": "ui_numericinput_tsx"
+      "target": "ui_numericinput_tsx",
+      "confidence_score": 1.0
     },
     {
       "relation": "re_exports",
@@ -11299,9 +11160,9 @@
       "source_file": "ui/index.ts",
       "source_location": "L9",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ui_index_ts",
-      "target": "ui_numericinput_tsx"
+      "target": "ui_numericinput_tsx",
+      "confidence_score": 1.0
     },
     {
       "relation": "re_exports",
@@ -11310,9 +11171,9 @@
       "source_file": "ui/index.ts",
       "source_location": "L10",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ui_index_ts",
-      "target": "ui_numericinput_numericinputprops"
+      "target": "ui_numericinput_numericinputprops",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -11321,9 +11182,9 @@
       "source_file": "ui/NumericInput.tsx",
       "source_location": "L87",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ui_numericinput_numericinput",
-      "target": "ui_numericinput_formatval"
+      "target": "ui_numericinput_formatval",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -11332,9 +11193,9 @@
       "source_file": "ui/Toolbar.tsx",
       "source_location": "L35",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ui_toolbar_tsx",
-      "target": "ui_numericinput_numericinput"
+      "target": "ui_numericinput_numericinput",
+      "confidence_score": 1.0
     },
     {
       "relation": "re_exports",
@@ -11343,9 +11204,9 @@
       "source_file": "ui/index.ts",
       "source_location": "L9",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ui_index_ts",
-      "target": "ui_numericinput_numericinput"
+      "target": "ui_numericinput_numericinput",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -14568,17 +14429,6 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "canvas/makeCanvasNode.tsx",
-      "source_location": "L3",
-      "weight": 1.0,
-      "source": "canvas_makecanvasnode_tsx",
-      "target": "types_canvas_ts",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "canvas/exportFrames.ts",
       "source_location": "L3",
       "weight": 1.0,
@@ -16012,17 +15862,6 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "canvas/makeCanvasNode.tsx",
-      "source_location": "L3",
-      "weight": 1.0,
-      "source": "canvas_makecanvasnode_tsx",
-      "target": "types_canvas_canvasobject",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "canvas/exportFrames.ts",
       "source_location": "L3",
       "weight": 1.0,
@@ -17131,28 +16970,6 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "canvas/CanvasShapeNode.tsx",
-      "source_location": "L13",
-      "weight": 1.0,
-      "source": "canvas_canvasshapenode_tsx",
-      "target": "canvas_makecanvasnode_tsx",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasShapeNode.tsx",
-      "source_location": "L13",
-      "weight": 1.0,
-      "source": "canvas_canvasshapenode_tsx",
-      "target": "canvas_makecanvasnode_makecanvasnode",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasShapeNode.tsx",
       "source_location": "L14",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -17201,6 +17018,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "canvas_canvasshapenode_tsx",
+      "target": "canvas_constants_canvas_scale"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasShapeNode.tsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_canvasshapenode_tsx",
       "target": "canvas_constants_axislock"
     },
     {
@@ -17224,17 +17052,6 @@
       "confidence_score": 1.0,
       "source": "canvas_canvasshapenode_tsx",
       "target": "canvas_useviewportstore_useviewportstore"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasShapeNode.tsx",
-      "source_location": "L17",
-      "weight": 1.0,
-      "source": "canvas_canvasshapenode_tsx",
-      "target": "canvas_useviewportstore_selectscale",
-      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -17292,6 +17109,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "canvas/CanvasShapeNode.tsx",
+      "source_location": "L560",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_canvasshapenode_tsx",
+      "target": "canvas_canvasshapenode_canvasshapenodeouter"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasShapeNode.tsx",
       "source_location": "L566",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -17308,27 +17135,6 @@
       "confidence_score": 1.0,
       "source": "canvas_carouselstage_tsx",
       "target": "canvas_canvasshapenode_tsx"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasShapeNode.tsx",
-      "source_location": "L15",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_canvasshapenode_tsx",
-      "target": "canvas_constants_canvas_scale"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasShapeNode.tsx",
-      "source_location": "L560",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_canvasshapenode_tsx",
-      "target": "canvas_canvasshapenode_canvasshapenodeouter"
     },
     {
       "relation": "references",
@@ -17426,6 +17232,17 @@
       "weight": 1.0,
       "source": "canvas_canvasshapenode_canvasshapenodeinner",
       "target": "src_canvas_useviewportstore_ts"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "canvas/CanvasShapeNode.tsx",
+      "source_location": "L561",
+      "weight": 1.0,
+      "source": "canvas_canvasshapenode_canvasshapenodeouter",
+      "target": "canvas_usecanvasstore_usecanvasstore"
     },
     {
       "relation": "imports",
@@ -17529,28 +17346,6 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_makecanvasnode_tsx",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_makecanvasnode_makecanvasnode",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L8",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -17599,6 +17394,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
+      "target": "canvas_constants_canvas_scale"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasVideoNode.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_canvasvideonode_tsx",
       "target": "canvas_constants_axislock"
     },
     {
@@ -17622,17 +17428,6 @@
       "confidence_score": 1.0,
       "source": "canvas_canvasvideonode_tsx",
       "target": "canvas_useviewportstore_useviewportstore"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L11",
-      "weight": 1.0,
-      "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_useviewportstore_selectscale",
-      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -17767,6 +17562,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "canvas/CanvasVideoNode.tsx",
+      "source_location": "L997",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_canvasvideonode_tsx",
+      "target": "canvas_canvasvideonode_canvasvideonodeouter"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasVideoNode.tsx",
       "source_location": "L1003",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -17783,27 +17588,6 @@
       "confidence_score": 1.0,
       "source": "canvas_carouselstage_tsx",
       "target": "canvas_canvasvideonode_tsx"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L9",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_constants_canvas_scale"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L997",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_canvasvideonode_tsx",
-      "target": "canvas_canvasvideonode_canvasvideonodeouter"
     },
     {
       "relation": "references",
@@ -17858,6 +17642,38 @@
       "weight": 1.0,
       "source": "canvas_canvasvideonode_canvasvideonodeinner",
       "target": "canvas_usesnapguides_usesnapguides"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "canvas/CanvasVideoNode.tsx",
+      "source_location": "L998",
+      "weight": 1.0,
+      "source": "canvas_canvasvideonode_canvasvideonodeouter",
+      "target": "canvas_usecanvasstore_usecanvasstore"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CanvasVideoNode.tsx",
+      "source_location": "L997",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_canvas_canvasvideonode_tsx",
+      "target": "canvas_canvasvideonode_canvasvideonodeouter"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/canvas/CanvasVideoNode.tsx",
+      "source_location": "L998",
+      "weight": 1.0,
+      "source": "canvas_canvasvideonode_canvasvideonodeouter",
+      "target": "src_canvas_usecanvasstore_ts"
     },
     {
       "relation": "imports",
@@ -18002,15 +17818,26 @@
       "target": "canvas_useviewportstore_useviewportstore"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/GridCellOverlay.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_gridcelloverlay_tsx",
+      "target": "canvas_constants_ts"
+    },
+    {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "canvas/GridCellOverlay.tsx",
-      "source_location": "L3",
+      "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_gridcelloverlay_tsx",
-      "target": "canvas_useviewportstore_selectscale",
-      "confidence_score": 1.0
+      "target": "canvas_constants_canvas_scale"
     },
     {
       "relation": "contains",
@@ -18032,28 +17859,6 @@
       "confidence_score": 1.0,
       "source": "canvas_carouselstage_tsx",
       "target": "canvas_gridcelloverlay_tsx"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/GridCellOverlay.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_gridcelloverlay_tsx",
-      "target": "canvas_constants_ts"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/GridCellOverlay.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_gridcelloverlay_tsx",
-      "target": "canvas_constants_canvas_scale"
     },
     {
       "relation": "imports",
@@ -18176,15 +17981,26 @@
       "target": "canvas_useviewportstore_useviewportstore"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/useImageDrop.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_useimagedrop_ts",
+      "target": "canvas_constants_ts"
+    },
+    {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "canvas/useImageDrop.ts",
-      "source_location": "L4",
+      "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "canvas_useimagedrop_ts",
-      "target": "canvas_useviewportstore_getcanvasscale",
-      "confidence_score": 1.0
+      "target": "canvas_constants_canvas_scale"
     },
     {
       "relation": "contains",
@@ -18206,28 +18022,6 @@
       "confidence_score": 1.0,
       "source": "canvas_carouselstage_tsx",
       "target": "canvas_useimagedrop_ts"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/useImageDrop.ts",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_useimagedrop_ts",
-      "target": "canvas_constants_ts"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/useImageDrop.ts",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_useimagedrop_ts",
-      "target": "canvas_constants_canvas_scale"
     },
     {
       "relation": "imports",
@@ -18307,17 +18101,6 @@
       "target": "canvas_useviewportstore_useviewportstore"
     },
     {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasGroupNode.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "source": "canvas_canvasgroupnode_tsx",
-      "target": "canvas_useviewportstore_selectscale",
-      "confidence_score": 1.0
-    },
-    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -18373,6 +18156,28 @@
       "target": "canvas_gridtemplates_grid_templates"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasGroupNode.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_canvasgroupnode_tsx",
+      "target": "canvas_constants_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasGroupNode.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_canvasgroupnode_tsx",
+      "target": "canvas_constants_canvas_scale"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "canvas/CanvasGroupNode.tsx",
@@ -18422,28 +18227,6 @@
       "confidence_score": 1.0,
       "source": "canvas_carouselstage_tsx",
       "target": "canvas_canvasgroupnode_tsx"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasGroupNode.tsx",
-      "source_location": "L10",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_canvasgroupnode_tsx",
-      "target": "canvas_constants_ts"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasGroupNode.tsx",
-      "source_location": "L10",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_canvasgroupnode_tsx",
-      "target": "canvas_constants_canvas_scale"
     },
     {
       "relation": "contains",
@@ -18534,9 +18317,9 @@
       "source_file": "canvas/geometry.ts",
       "source_location": "L11",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "canvas_geometry_ts",
-      "target": "canvas_geometry_rotatearoundcenter"
+      "target": "canvas_geometry_rotatearoundcenter",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -18944,6 +18727,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "canvas_carouselstage_tsx",
+      "target": "canvas_constants_canvas_scale"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CarouselStage.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_carouselstage_tsx",
       "target": "canvas_constants_axislock"
     },
     {
@@ -18989,28 +18783,6 @@
       "confidence_score": 1.0,
       "source": "canvas_carouselstage_tsx",
       "target": "canvas_useviewportstore_useviewportstore"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CarouselStage.tsx",
-      "source_location": "L8",
-      "weight": 1.0,
-      "source": "canvas_carouselstage_tsx",
-      "target": "canvas_useviewportstore_selectscale",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CarouselStage.tsx",
-      "source_location": "L8",
-      "weight": 1.0,
-      "source": "canvas_carouselstage_tsx",
-      "target": "canvas_useviewportstore_scaleforzoom",
-      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -19303,9 +19075,9 @@
       "source_file": "canvas/CarouselStage.tsx",
       "source_location": "L38",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "canvas_carouselstage_tsx",
-      "target": "canvas_carouselstage_framedragstate"
+      "target": "canvas_carouselstage_framedragstate",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -19313,9 +19085,9 @@
       "source_file": "canvas/CarouselStage.tsx",
       "source_location": "L46",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "canvas_carouselstage_tsx",
-      "target": "canvas_carouselstage_frameslotoffset"
+      "target": "canvas_carouselstage_frameslotoffset",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -19337,17 +19109,6 @@
       "confidence_score": 1.0,
       "source": "canvas_index_ts",
       "target": "canvas_carouselstage_tsx"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CarouselStage.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_carouselstage_tsx",
-      "target": "canvas_constants_canvas_scale"
     },
     {
       "relation": "re_exports",
@@ -19522,28 +19283,6 @@
       "target": "canvas_snapguides_snapguidesprops"
     },
     {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/useViewportStore.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "canvas_useviewportstore_ts",
-      "target": "canvas_constants_ts",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/useViewportStore.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "canvas_useviewportstore_ts",
-      "target": "canvas_constants_canvas_scale",
-      "confidence_score": 1.0
-    },
-    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "canvas/useViewportStore.ts",
@@ -19562,36 +19301,6 @@
       "confidence_score": 1.0,
       "source": "canvas_useviewportstore_ts",
       "target": "canvas_useviewportstore_useviewportstore"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/useViewportStore.ts",
-      "source_location": "L23",
-      "weight": 1.0,
-      "source": "canvas_useviewportstore_ts",
-      "target": "canvas_useviewportstore_scaleforzoom",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/useViewportStore.ts",
-      "source_location": "L26",
-      "weight": 1.0,
-      "source": "canvas_useviewportstore_ts",
-      "target": "canvas_useviewportstore_selectscale",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/useViewportStore.ts",
-      "source_location": "L29",
-      "weight": 1.0,
-      "source": "canvas_useviewportstore_ts",
-      "target": "canvas_useviewportstore_getcanvasscale",
-      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -19745,83 +19454,6 @@
       "weight": 1.0,
       "source": "canvas_canvaspathnode_canvaspathnodeinner",
       "target": "canvas_useviewportstore_useviewportstore"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/useViewportStore.ts",
-      "source_location": "L26",
-      "weight": 1.0,
-      "source": "canvas_useviewportstore_selectscale",
-      "target": "canvas_useviewportstore_scaleforzoom",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/useViewportStore.ts",
-      "source_location": "L29",
-      "weight": 1.0,
-      "source": "canvas_useviewportstore_getcanvasscale",
-      "target": "canvas_useviewportstore_scaleforzoom",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasImageNode.tsx",
-      "source_location": "L12",
-      "weight": 1.0,
-      "source": "canvas_canvasimagenode_tsx",
-      "target": "canvas_useviewportstore_selectscale",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasTextNode.tsx",
-      "source_location": "L8",
-      "weight": 1.0,
-      "source": "canvas_canvastextnode_tsx",
-      "target": "canvas_useviewportstore_selectscale",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasPathNode.tsx",
-      "source_location": "L15",
-      "weight": 1.0,
-      "source": "canvas_canvaspathnode_tsx",
-      "target": "canvas_useviewportstore_selectscale",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/useVideoDrop.ts",
-      "source_location": "L4",
-      "weight": 1.0,
-      "source": "canvas_usevideodrop_ts",
-      "target": "canvas_useviewportstore_getcanvasscale",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasTextNode.tsx",
-      "source_location": "L8",
-      "weight": 1.0,
-      "source": "canvas_canvastextnode_tsx",
-      "target": "canvas_useviewportstore_getcanvasscale",
-      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -20634,104 +20266,6 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "canvas/makeCanvasNode.tsx",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "canvas_makecanvasnode_tsx",
-      "target": "canvas_usecanvasstore_ts",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/makeCanvasNode.tsx",
-      "source_location": "L2",
-      "weight": 1.0,
-      "source": "canvas_makecanvasnode_tsx",
-      "target": "canvas_usecanvasstore_usecanvasstore",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/makeCanvasNode.tsx",
-      "source_location": "L15",
-      "weight": 1.0,
-      "source": "canvas_makecanvasnode_tsx",
-      "target": "canvas_makecanvasnode_makecanvasnode",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasImageNode.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "source": "canvas_canvasimagenode_tsx",
-      "target": "canvas_makecanvasnode_tsx",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasTextNode.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "source": "canvas_canvastextnode_tsx",
-      "target": "canvas_makecanvasnode_tsx",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasPathNode.tsx",
-      "source_location": "L11",
-      "weight": 1.0,
-      "source": "canvas_canvaspathnode_tsx",
-      "target": "canvas_makecanvasnode_tsx",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasImageNode.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "source": "canvas_canvasimagenode_tsx",
-      "target": "canvas_makecanvasnode_makecanvasnode",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasTextNode.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "source": "canvas_canvastextnode_tsx",
-      "target": "canvas_makecanvasnode_makecanvasnode",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasPathNode.tsx",
-      "source_location": "L11",
-      "weight": 1.0,
-      "source": "canvas_canvaspathnode_tsx",
-      "target": "canvas_makecanvasnode_makecanvasnode",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "canvas/useExternalEdit.ts",
       "source_location": "L2",
       "weight": 1.0,
@@ -21085,6 +20619,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "canvas_canvasimagenode_tsx",
+      "target": "canvas_constants_canvas_scale"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasImageNode.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_canvasimagenode_tsx",
       "target": "canvas_constants_axislock"
     },
     {
@@ -21165,32 +20710,21 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "canvas/CanvasImageNode.tsx",
-      "source_location": "L930",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_canvasimagenode_tsx",
-      "target": "canvas_canvasimagenode_canvasimagenode"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasImageNode.tsx",
-      "source_location": "L10",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_canvasimagenode_tsx",
-      "target": "canvas_constants_canvas_scale"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasImageNode.tsx",
       "source_location": "L924",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "canvas_canvasimagenode_tsx",
       "target": "canvas_canvasimagenode_canvasimagenodeouter"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasImageNode.tsx",
+      "source_location": "L930",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_canvasimagenode_tsx",
+      "target": "canvas_canvasimagenode_canvasimagenode"
     },
     {
       "relation": "contains",
@@ -21301,6 +20835,17 @@
       "target": "src_canvas_usecanvasstore_ts"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "canvas/CanvasImageNode.tsx",
+      "source_location": "L925",
+      "weight": 1.0,
+      "source": "canvas_canvasimagenode_canvasimagenodeouter",
+      "target": "canvas_usecanvasstore_usecanvasstore"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "canvas/constants.ts",
@@ -21309,6 +20854,17 @@
       "confidence_score": 1.0,
       "source": "canvas_constants_ts",
       "target": "canvas_constants_axislock"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/useVideoDrop.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_usevideodrop_ts",
+      "target": "canvas_constants_ts"
     },
     {
       "relation": "imports_from",
@@ -21341,17 +20897,6 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "canvas_canvaspathnode_tsx",
-      "target": "canvas_constants_ts"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/useVideoDrop.ts",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_usevideodrop_ts",
       "target": "canvas_constants_ts"
     },
     {
@@ -21475,6 +21020,17 @@
       "target": "canvas_usecanvasstore_usecanvasstore"
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/useVideoDrop.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_usevideodrop_ts",
+      "target": "canvas_constants_canvas_scale"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "canvas/useVideoDrop.ts",
@@ -21493,17 +21049,6 @@
       "confidence_score": 1.0,
       "source": "canvas_usevideodrop_ts",
       "target": "canvas_usevideodrop_usevideodrop"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/useVideoDrop.ts",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_usevideodrop_ts",
-      "target": "canvas_constants_canvas_scale"
     },
     {
       "relation": "contains",
@@ -21674,16 +21219,6 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "canvas/useCanvasStore.ts",
-      "source_location": "L72",
-      "weight": 1.0,
-      "source": "canvas_usecanvasstore_ts",
-      "target": "canvas_usecanvasstore_reinjectedcache",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/useCanvasStore.ts",
       "source_location": "L69",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -21699,16 +21234,6 @@
       "confidence_score": 1.0,
       "source": "canvas_usecanvasstore_ts",
       "target": "canvas_usecanvasstore_canvasstate"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/useCanvasStore.ts",
-      "source_location": "L234",
-      "weight": 1.0,
-      "source": "canvas_usecanvasstore_ts",
-      "target": "canvas_usecanvasstore_normalizedimagecache",
-      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -22001,6 +21526,17 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
+      "source_file": "canvas/CanvasTextNode.tsx",
+      "source_location": "L732",
+      "weight": 1.0,
+      "source": "canvas_canvastextnode_canvastextnodeouter",
+      "target": "canvas_usecanvasstore_usecanvasstore"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
       "source_file": "canvas/FrameGuides.tsx",
       "source_location": "L11",
       "weight": 1.0,
@@ -22045,55 +21581,22 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "canvas/CanvasShapeNode.tsx",
-      "source_location": "L561",
-      "weight": 1.0,
-      "source": "canvas_canvasshapenode_canvasshapenodeouter",
-      "target": "canvas_usecanvasstore_usecanvasstore"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "canvas/CanvasVideoNode.tsx",
-      "source_location": "L998",
-      "weight": 1.0,
-      "source": "canvas_canvasvideonode_canvasvideonodeouter",
-      "target": "canvas_usecanvasstore_usecanvasstore"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "canvas/CanvasImageNode.tsx",
-      "source_location": "L925",
-      "weight": 1.0,
-      "source": "canvas_canvasimagenode_canvasimagenodeouter",
-      "target": "canvas_usecanvasstore_usecanvasstore"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "canvas/CanvasTextNode.tsx",
-      "source_location": "L732",
-      "weight": 1.0,
-      "source": "canvas_canvastextnode_canvastextnodeouter",
-      "target": "canvas_usecanvasstore_usecanvasstore"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
       "source_file": "canvas/CanvasPathNode.tsx",
       "source_location": "L553",
       "weight": 1.0,
       "source": "canvas_canvaspathnode_canvaspathnodeouter",
       "target": "canvas_usecanvasstore_usecanvasstore"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasTextNode.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_canvastextnode_tsx",
+      "target": "canvas_constants_canvas_scale"
     },
     {
       "relation": "imports_from",
@@ -22171,32 +21674,21 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "canvas/CanvasTextNode.tsx",
-      "source_location": "L737",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_canvastextnode_tsx",
-      "target": "canvas_canvastextnode_canvastextnode"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasTextNode.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_canvastextnode_tsx",
-      "target": "canvas_constants_canvas_scale"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasTextNode.tsx",
       "source_location": "L731",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "canvas_canvastextnode_tsx",
       "target": "canvas_canvastextnode_canvastextnodeouter"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasTextNode.tsx",
+      "source_location": "L737",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_canvastextnode_tsx",
+      "target": "canvas_canvastextnode_canvastextnode"
     },
     {
       "relation": "contains",
@@ -22217,6 +21709,27 @@
       "confidence_score": 1.0,
       "source": "src_canvas_canvastextnode_tsx",
       "target": "canvas_canvastextnode_charindextodomoffset"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/canvas/CanvasTextNode.tsx",
+      "source_location": "L732",
+      "weight": 1.0,
+      "source": "canvas_canvastextnode_canvastextnodeouter",
+      "target": "src_canvas_usecanvasstore_ts"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CanvasTextNode.tsx",
+      "source_location": "L731",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_canvas_canvastextnode_tsx",
+      "target": "canvas_canvastextnode_canvastextnodeouter"
     },
     {
       "relation": "contains",
@@ -22918,6 +22431,17 @@
       "target": "canvas_pathutils_resolvevideoobjects"
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasPathNode.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_canvaspathnode_tsx",
+      "target": "canvas_constants_canvas_scale"
+    },
+    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -22993,32 +22517,21 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "canvas/CanvasPathNode.tsx",
-      "source_location": "L558",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_canvaspathnode_tsx",
-      "target": "canvas_canvaspathnode_canvaspathnode"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasPathNode.tsx",
-      "source_location": "L13",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "canvas_canvaspathnode_tsx",
-      "target": "canvas_constants_canvas_scale"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "canvas/CanvasPathNode.tsx",
       "source_location": "L552",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "canvas_canvaspathnode_tsx",
       "target": "canvas_canvaspathnode_canvaspathnodeouter"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "canvas/CanvasPathNode.tsx",
+      "source_location": "L558",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "canvas_canvaspathnode_tsx",
+      "target": "canvas_canvaspathnode_canvaspathnode"
     },
     {
       "relation": "calls",
@@ -23108,14 +22621,35 @@
       "target": "canvas_canvaspathnode_computepathbbox"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/canvas/CanvasPathNode.tsx",
+      "source_location": "L553",
+      "weight": 1.0,
+      "source": "canvas_canvaspathnode_canvaspathnodeouter",
+      "target": "src_canvas_usecanvasstore_ts"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/canvas/CanvasPathNode.tsx",
+      "source_location": "L552",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_canvas_canvaspathnode_tsx",
+      "target": "canvas_canvaspathnode_canvaspathnodeouter"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "canvas/adjustments/pipeline.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "canvas_adjustments_pipeline_ts",
-      "target": "adjustments_pipeline_evict"
+      "target": "adjustments_pipeline_evict",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -23374,9 +22908,9 @@
       "source_file": "canvas/adjustments/pipeline.ts",
       "source_location": "L19",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "adjustments_pipeline_buildlut",
-      "target": "adjustments_pipeline_evict"
+      "target": "adjustments_pipeline_evict",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -23385,9 +22919,9 @@
       "source_file": "canvas/adjustments/pipeline.ts",
       "source_location": "L53",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "adjustments_pipeline_build3dlut",
-      "target": "adjustments_pipeline_evict"
+      "target": "adjustments_pipeline_evict",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -23396,9 +22930,9 @@
       "source_file": "canvas/adjustments/pipeline.ts",
       "source_location": "L94",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "adjustments_pipeline_buildfloatlut",
-      "target": "adjustments_pipeline_evict"
+      "target": "adjustments_pipeline_evict",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -23407,9 +22941,9 @@
       "source_file": "canvas/adjustments/pipeline.ts",
       "source_location": "L384",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "adjustments_pipeline_buildfilterpipeline",
-      "target": "adjustments_pipeline_evict"
+      "target": "adjustments_pipeline_evict",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -24685,9 +24219,9 @@
       "source_file": "canvas/effects/buildEffectFilters.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "canvas_effects_buildeffectfilters_ts",
-      "target": "effects_buildeffectfilters_effectspipelinecache"
+      "target": "effects_buildeffectfilters_effectspipelinecache",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -24695,9 +24229,9 @@
       "source_file": "canvas/effects/buildEffectFilters.ts",
       "source_location": "L6",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "canvas_effects_buildeffectfilters_ts",
-      "target": "effects_buildeffectfilters_effectsfingerprint"
+      "target": "effects_buildeffectfilters_effectsfingerprint",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -24716,9 +24250,9 @@
       "source_file": "canvas/effects/buildEffectFilters.ts",
       "source_location": "L14",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "effects_buildeffectfilters_buildeffectfilters",
-      "target": "effects_buildeffectfilters_effectsfingerprint"
+      "target": "effects_buildeffectfilters_effectsfingerprint",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -25939,69 +25473,6 @@
       "confidence_score": 1.0,
       "source": "src_electron_index_ts",
       "target": "electron_index_corpheaders"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/canvas/CanvasVideoNode.tsx",
-      "source_location": "L997",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_canvas_canvasvideonode_tsx",
-      "target": "canvas_canvasvideonode_canvasvideonodeouter"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/canvas/CanvasVideoNode.tsx",
-      "source_location": "L998",
-      "weight": 1.0,
-      "source": "canvas_canvasvideonode_canvasvideonodeouter",
-      "target": "src_canvas_usecanvasstore_ts"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/canvas/CanvasTextNode.tsx",
-      "source_location": "L732",
-      "weight": 1.0,
-      "source": "canvas_canvastextnode_canvastextnodeouter",
-      "target": "src_canvas_usecanvasstore_ts"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/canvas/CanvasTextNode.tsx",
-      "source_location": "L731",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_canvas_canvastextnode_tsx",
-      "target": "canvas_canvastextnode_canvastextnodeouter"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/canvas/CanvasPathNode.tsx",
-      "source_location": "L553",
-      "weight": 1.0,
-      "source": "canvas_canvaspathnode_canvaspathnodeouter",
-      "target": "src_canvas_usecanvasstore_ts"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/canvas/CanvasPathNode.tsx",
-      "source_location": "L552",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_canvas_canvaspathnode_tsx",
-      "target": "canvas_canvaspathnode_canvaspathnodeouter"
     },
     {
       "relation": "contains",
@@ -34672,5 +34143,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "a30e75730b229f5fe79e49ee7c82b30b53dd7f5f"
+  "built_at_commit": "4590cf72e26587829841870919b486d9cc9ce985"
 }

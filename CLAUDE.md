@@ -66,10 +66,11 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `reorderObjects` pushes history — undoable via Cmd+Z
 - `_srcVault: Map<id, {src, originalSrc?}>` lives outside history — `normalizeObjectsForSnapshot` strips base64 `src` from snapshots; `reinjectSrc` restores on undo/redo. Background-removal `src` changes are therefore not undoable at pixel level (acceptable — feature not yet wired to history).
 - `_openEditModeCount: number` tracks objects in any edit mode — `normalizeObjectsForSnapshot` skips the edit-mode clearing loop when 0 (common case). Kept in sync by `updateObject`, `commitUpdate`, and all direct mode-set actions.
+- Normalized/reinjected image copies are WeakMap-cached by object identity (`normalizedImageCache`/`reinjectedCache`) — valid because objects are replaced immutably on update; unchanged images cost zero allocations per history push. Never mutate a `CanvasObject` in place or the caches serve stale copies.
 
 **Per-Object Subscription Pattern:**
-- Each canvas node: outer subscribes to `s.objects[id]` + returns null if missing/hidden; inner subscribes to `s.selectedId === id`; both `React.memo`-wrapped
-- Prevents CarouselStage re-renders from cascading to nodes during drag
+- `makeCanvasNode(Inner)` (`src/canvas/makeCanvasNode.tsx`) generates the memoized Outer for all five node types: subscribes to `s.objects[id]`, returns null if missing/hidden, passes typed `obj` to Inner. Contract changes go there, not in the node files.
+- Inner subscribes to `s.selectedId === id`; prevents CarouselStage re-renders from cascading to nodes during drag
 - Handlers call `useCanvasStore.getState().setSelected(id)` directly — no `onSelect` prop
 
 **Shape/Text/Pen invariants:**
@@ -147,6 +148,7 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - Canvas preview capture: deferred into `requestAnimationFrame`, saves/restores stage size + scale, hides UI layers, crops at `pixelRatio: 0.5`
 
 **Other invariants:**
+- Display scale: subscribe via `useViewportStore(selectScale)` (= `CANVAS_SCALE × zoom`); in handlers use `getCanvasScale()`, for a hypothetical zoom use `scaleForZoom(z)`. Never import `CANVAS_SCALE` outside `useViewportStore.ts` — it's an implementation detail of the store.
 - Masking: `MaskData.kind: 'pen'|'rect'|'ellipse'`; `maskModeActive` in store (transient, not in history)
 - Save: `currentFilePath` in `useSaveStatusStore`; autosave forks on it; `recentFiles.json` tracks history
 - Session restore: `localStorage['zeroseams:lastFile']` is written on every open and read on `TitleBar` mount — survives renderer reloads (Vite HMR after sleep/wake, renderer crashes) without IPC round-trips

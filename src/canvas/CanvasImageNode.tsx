@@ -4,11 +4,12 @@ import useImage from 'use-image'
 import type Konva from 'konva'
 import type { ImageObject, AnchorPoint } from '@/types/canvas'
 import { useCanvasStore } from './useCanvasStore'
+import { makeCanvasNode } from './makeCanvasNode'
 import { useSnapGuides } from './useSnapGuides'
 import type { SnapGuide } from './useSnapGuides'
 import { anchorsToPathData } from './CanvasPathNode'
-import { CANVAS_SCALE, axisLock } from './constants'
-import { useViewportStore } from './useViewportStore'
+import { axisLock } from './constants'
+import { useViewportStore, selectScale } from './useViewportStore'
 import { buildFilterPipeline } from './adjustments/pipeline'
 import { DEFAULT_ADJUSTMENTS } from '../types/canvas'
 import { buildEffectFilters } from './effects/buildEffectFilters'
@@ -77,7 +78,9 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
   const duplicateObjectAtOrigin = useCanvasStore((s) => s.duplicateObjectAtOrigin)
   const setContextMenu = useCanvasStore((s) => s.setContextMenu)
   const resizeMode = useCanvasStore((s) => s.resizeMode)
-  const { zoom, panX, panY } = useViewportStore((s) => ({ zoom: s.zoom, panX: s.panX, panY: s.panY }))
+  const scale = useViewportStore(selectScale)
+  const panX = useViewportStore((s) => s.panX)
+  const panY = useViewportStore((s) => s.panY)
 
   const isInMultiSelectMode = selectedIds.length > 1
   const isAnchor = anchorId === id
@@ -892,7 +895,6 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
             return newBox
           }
 
-          const scale = CANVAS_SCALE * zoom
           const screenThreshold = 8
           const logicalThreshold = screenThreshold / scale
           const logicalBox = {
@@ -921,10 +923,4 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
   )
 }
 
-function CanvasImageNodeOuter(props: CanvasImageNodeProps): React.ReactElement | null {
-  const obj = useCanvasStore((s) => s.objects[props.id] as ImageObject | undefined)
-  if (!obj || !obj.visible) return null
-  return <CanvasImageNodeInner {...props} obj={obj} />
-}
-
-export const CanvasImageNode = React.memo(CanvasImageNodeOuter)
+export const CanvasImageNode = makeCanvasNode<ImageObject, CanvasImageNodeProps>(CanvasImageNodeInner)

@@ -1,16 +1,16 @@
-# Graph Report - src  (2026-07-02)
+# Graph Report - src  (2026-06-05)
 
 ## Corpus Check
-- 82 files · ~79,427 words
+- 79 files · ~77,433 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1064 nodes · 2365 edges · 73 communities (56 shown, 17 thin omitted)
+- 1040 nodes · 2299 edges · 70 communities (54 shown, 16 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 67 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a30e7573`
+- Built from commit: `09e24297`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -58,6 +58,7 @@
 - [[_COMMUNITY_Mask Draw Verify Script|Mask Draw Verify Script]]
 - [[_COMMUNITY_FFmpeg Heap Management|FFmpeg Heap Management]]
 - [[_COMMUNITY_FFmpeg Environ Helpers|FFmpeg Environ Helpers]]
+- [[_COMMUNITY_Electron-Vite Build Config|Electron-Vite Build Config]]
 - [[_COMMUNITY_Adjustment Bypass & Icon Style|Adjustment Bypass & Icon Style]]
 - [[_COMMUNITY_FFmpeg Exec & Probe|FFmpeg Exec & Probe]]
 - [[_COMMUNITY_Claude Settings Hooks|Claude Settings Hooks]]
@@ -77,16 +78,13 @@
 - [[_COMMUNITY_README Root|README Root]]
 - [[_COMMUNITY_Carousel File Concept|Carousel File Concept]]
 - [[_COMMUNITY_Community 66|Community 66]]
-- [[_COMMUNITY_Community 70|Community 70]]
-- [[_COMMUNITY_Community 71|Community 71]]
-- [[_COMMUNITY_Community 72|Community 72]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `useCanvasStore` - 53 edges
+1. `useCanvasStore` - 52 edges
 2. `SnapGuide` - 26 edges
-3. `CanvasObject` - 25 edges
-4. `buildFilterPipeline()` - 24 edges
-5. `CANVAS_SCALE` - 21 edges
+3. `CanvasObject` - 24 edges
+4. `buildFilterPipeline()` - 23 edges
+5. `CANVAS_SCALE` - 20 edges
 6. `ImageObject` - 19 edges
 7. `useViewportStore` - 19 edges
 8. `useSnapGuides()` - 17 edges
@@ -105,11 +103,11 @@
 - `Zustand Store (src/store/index.ts)` --shares_data_with--> `History (past/future snapshots)`  [INFERRED]
   src/store/index.ts → CLAUDE.md
 
-## Communities (73 total, 17 thin omitted)
+## Communities (70 total, 16 thin omitted)
 
 ### Community 0 - "Canvas Node Rendering"
 Cohesion: 0.05
-Nodes (95): removeBg, CanvasGroupNode(), CanvasGroupNodeInner, CanvasGroupNodeProps, hitTestCell(), CanvasGuidelineNode, CanvasGuidelineNodeInner(), CanvasGuidelineNodeOuter() (+87 more)
+Nodes (87): removeBg, CanvasGroupNode(), CanvasGroupNodeInner, CanvasGroupNodeProps, hitTestCell(), CanvasGuidelineNode, CanvasGuidelineNodeInner(), CanvasGuidelineNodeOuter() (+79 more)
 
 ### Community 1 - "FFmpeg Core Runtime"
 Cohesion: 0.04
@@ -124,20 +122,20 @@ Cohesion: 0.09
 Nodes (45): currentFilePath in useSaveStatusStore, addRecentFile(), IPC: autosave-project, body, buf, buffer, corpHeaders, createWindow() (+37 more)
 
 ### Community 4 - "Canvas Types & Grid Overlay"
-Cohesion: 0.17
-Nodes (39): AIOperation, AIOperationBase, AIOperationStatus, AIOperationType, BackgroundRemovalOperation, InpaintingOperation, SegmentationOperation, AnchorPoint (+31 more)
+Cohesion: 0.16
+Nodes (42): Non-Destructive Photo Adjustments Pipeline, AIOperation, AIOperationBase, AIOperationStatus, AIOperationType, BackgroundRemovalOperation, InpaintingOperation, SegmentationOperation (+34 more)
 
 ### Community 5 - "FFmpeg Class API"
 Cohesion: 0.09
 Nodes (10): FFmpeg, id, ids, trans, ERROR_IMPORT_FAILURE, ERROR_NOT_LOADED, ERROR_TERMINATED, ERROR_UNKNOWN_MESSAGE_TYPE (+2 more)
 
 ### Community 6 - "Adjustment Pipeline & LUTs"
-Cohesion: 0.19
-Nodes (29): adjFingerprint(), build3DLUT(), buildFilterPipeline(), buildFloatLUT(), buildLUT(), evict(), floatLutCache, hslToRgb() (+21 more)
+Cohesion: 0.22
+Nodes (25): adjFingerprint(), build3DLUT(), buildFilterPipeline(), buildFloatLUT(), buildLUT(), floatLutCache, hslToRgb(), isAllDefault() (+17 more)
 
 ### Community 7 - "Package Dependencies"
-Cohesion: 0.15
-Nodes (13): dependencies, chokidar, @ffmpeg/ffmpeg, @ffmpeg/util, @imgly/background-removal, konva, lucide-react, onnxruntime-web (+5 more)
+Cohesion: 0.08
+Nodes (25): author, dependencies, chokidar, @ffmpeg/ffmpeg, @ffmpeg/util, @imgly/background-removal, konva, lucide-react (+17 more)
 
 ### Community 8 - "Video Test Suite"
 Cohesion: 0.09
@@ -148,12 +146,12 @@ Cohesion: 0.10
 Nodes (25): Agent Domain Isolation (no cross-domain edits), Rationale: Agents must not cross domain boundaries (ui/canvas/ai separation), Agent: ai-engineer, src/ai/ (ai-engineer domain), Agent: canvas-engineer, src/canvas/ (canvas-engineer domain), Agent: qa-reviewer, Agent: ui-engineer (+17 more)
 
 ### Community 10 - "Properties Panel UI"
-Cohesion: 0.13
-Nodes (27): Photo Adjustments Bypass Toggle (hold-to-compare \ key + persistent Power button), rotateAroundCenter: Konva Rect/Text rotate around top-left not center; ellipse exempt, FontPicker(), MAC_SYSTEM_FONTS, AdjustmentsSection(), AdjustmentsSectionProps, alignButtonStyle(), AlignDistributeSection() (+19 more)
+Cohesion: 0.14
+Nodes (25): rotateAroundCenter: Konva Rect/Text rotate around top-left not center; ellipse exempt, FontPicker(), MAC_SYSTEM_FONTS, AdjustmentsSectionProps, alignButtonStyle(), AlignDistributeSection(), AlignDistributeSectionProps, CanvasSection() (+17 more)
 
 ### Community 11 - "Export & Path Utilities"
-Cohesion: 0.16
-Nodes (18): captureVideoFrameSequence(), downloadFrames(), exportMixedFrames(), ExportResult, canvas/index exports, buildProjectSnapshot(), getVideoElement(), registerVideoElement() (+10 more)
+Cohesion: 0.20
+Nodes (16): captureVideoFrameSequence(), downloadFrames(), exportMixedFrames(), ExportResult, getVideoElement(), registerVideoElement(), registry, unregisterVideoElement() (+8 more)
 
 ### Community 12 - "Undo/Redo Test Suite"
 Cohesion: 0.09
@@ -176,12 +174,12 @@ Cohesion: 0.12
 Nodes (14): allInputs, dblLogs, div, firstText, inp, labels, lbl, logs (+6 more)
 
 ### Community 17 - "AI Store & Context"
-Cohesion: 0.16
-Nodes (17): AIContext, AIContextValue, useAI(), AIProvider(), AIStoreState, useAIStore, useBackgroundRemoval(), UseBackgroundRemovalReturn (+9 more)
+Cohesion: 0.13
+Nodes (20): AIContext, AIContextValue, useAI(), AIProvider(), AIStoreState, useAIStore, useBackgroundRemoval(), UseBackgroundRemovalReturn (+12 more)
 
 ### Community 18 - "Visual Effects Pipeline"
-Cohesion: 0.24
-Nodes (14): buildFilter(), boxBlurH(), boxBlurV(), buildFilter(), hexToRgb(), EffectControlDescriptor, EffectDefinition, EffectParams (+6 more)
+Cohesion: 0.26
+Nodes (13): buildFilter(), boxBlurH(), boxBlurV(), buildFilter(), hexToRgb(), EffectControlDescriptor, EffectDefinition, EffectParams (+5 more)
 
 ### Community 19 - "Preview & Platform Shells"
 Cohesion: 0.24
@@ -208,16 +206,16 @@ Cohesion: 0.18
 Nodes (8): clickAt(), drag(), ELECTRON_BIN, failures, getStageInfo(), k2p(), ROOT, wait()
 
 ### Community 25 - "App Root & Frame Settings"
-Cohesion: 0.31
-Nodes (5): ColorInputProps, MixedColorInputProps, formatVal(), NumericInput(), NumericInputProps
+Cohesion: 0.36
+Nodes (7): FrameSettingsPopover(), FrameSettingsPopoverProps, labelStyle, numberInputStyle, PLATFORM_LABELS, PLATFORMS, segmentButtonStyle()
 
 ### Community 26 - "FFmpeg Wasm Invoke Helpers"
 Cohesion: 0.14
 Nodes (14): getWasmTableEntry(), invoke_i(), invoke_ii(), invoke_iii(), invoke_iiii(), invoke_iiiii(), invoke_iiiiii(), invoke_iiiiiiiii() (+6 more)
 
 ### Community 27 - "Grid Templates & Picker"
-Cohesion: 0.10
-Nodes (24): Save Split-Button Pattern (Save / Save As / Save a Copy), Module-level activeTooltipCount (instant tooltip on hover when any tooltip is visible), App(), iconBtnStyle(), typeLabel(), ActiveTool, blobToBase64(), buildProjectJson() (+16 more)
+Cohesion: 0.14
+Nodes (17): Save Split-Button Pattern (Save / Save As / Save a Copy), GridPicker(), ActiveTool, blobToBase64(), buildProjectJson(), PLATFORM_RECOMMENDED, PresetKey, SaveStatusPill() (+9 more)
 
 ### Community 28 - "TSConfig Node"
 Cohesion: 0.15
@@ -247,6 +245,10 @@ Nodes (9): addRunDependency(), asyncLoad(), createWasm(), FS_createPreloadedFile
 Cohesion: 0.25
 Nodes (8): addOnPostRun(), addOnPreRun(), callRuntimeCallbacks(), initRuntime(), postRun(), preRun(), run(), setTimeout()
 
+### Community 35 - "Autosave & Save Status"
+Cohesion: 0.40
+Nodes (4): Photo Adjustments Bypass Toggle (hold-to-compare \ key + persistent Power button), iconBtnStyle(), AdjustmentsSection(), EffectsSection()
+
 ### Community 36 - "FFmpeg String Utilities"
 Cohesion: 0.29
 Nodes (7): ___assert_fail(), _getaddrinfo(), inetPton4(), inetPton6(), jstoi_q(), UTF8ArrayToString(), UTF8ToString()
@@ -260,8 +262,8 @@ Cohesion: 0.43
 Nodes (7): Playwright Electron Integration Testing Pattern, Window Store Exposure for E2E Tests (__canvasStore__, __viewportStore__, __saveStatusStore__), debug-selection Playwright Script, test-axis-lock Playwright Script, test-multiselect-transform Playwright Script, test-save-path Playwright Script, verify-mask-draw Playwright Script
 
 ### Community 39 - "Layer Panel & Tooltip"
-Cohesion: 0.36
-Nodes (7): FrameSettingsPopover(), FrameSettingsPopoverProps, labelStyle, numberInputStyle, PLATFORM_LABELS, PLATFORMS, segmentButtonStyle()
+Cohesion: 0.23
+Nodes (7): Module-level activeTooltipCount (instant tooltip on hover when any tooltip is visible), App(), rootEl, typeLabel(), Tooltip(), TooltipInner(), TooltipProps
 
 ### Community 40 - "Mask Draw Verify Script"
 Cohesion: 0.40
@@ -275,49 +277,41 @@ Nodes (5): _emscripten_get_heap_max(), emscripten_realloc_buffer(), _emscripten_
 Cohesion: 0.40
 Nodes (5): _environ_get(), _environ_sizes_get(), getEnvStrings(), getExecutableName(), stringToAscii()
 
-### Community 44 - "Adjustment Bypass & Icon Style"
+### Community 43 - "Electron-Vite Build Config"
 Cohesion: 0.40
-Nodes (7): posixDirname(), posixRelative(), posixResolve(), relativizeVideoObjects(), resolveVideoObjects(), Autosave Pipeline, electronAPI
+Nodes (5): Electron-Vite Three-Target Build (main/preload/renderer), Electron Vite Config, TypeScript Node Config, TypeScript Root Config, TypeScript Web Config
+
+### Community 44 - "Adjustment Bypass & Icon Style"
+Cohesion: 0.35
+Nodes (8): posixDirname(), posixRelative(), posixResolve(), relativizeVideoObjects(), resolveVideoObjects(), buildProjectSnapshot(), Autosave Pipeline, electronAPI
 
 ### Community 45 - "FFmpeg Exec & Probe"
 Cohesion: 0.50
 Nodes (4): exec(), ffprobe(), stringsToPtr(), stringToPtr()
 
 ### Community 66 - "Community 66"
-Cohesion: 0.36
-Nodes (6): CellRect, GRID_TEMPLATES, GridTemplate, uniformGrid(), GridPicker(), GridPickerProps
-
-### Community 70 - "Community 70"
-Cohesion: 0.29
-Nodes (6): author, description, license, main, name, version
-
-### Community 71 - "Community 71"
-Cohesion: 0.33
-Nodes (6): scripts, build, dev, lint, preview, typecheck
-
-### Community 72 - "Community 72"
-Cohesion: 0.40
-Nodes (5): Electron-Vite Three-Target Build (main/preload/renderer), Electron Vite Config, TypeScript Node Config, TypeScript Root Config, TypeScript Web Config
+Cohesion: 0.43
+Nodes (5): CellRect, GRID_TEMPLATES, GridTemplate, uniformGrid(), GridPickerProps
 
 ## Knowledge Gaps
-- **212 isolated node(s):** `AlignDistributeSectionProps`, `VideoExportSettingsPanelProps`, `UseColorPopoverOptions`, `ImageFormat`, `DEFAULT_IMAGE_EXPORT_SETTINGS` (+207 more)
+- **208 isolated node(s):** `AlignDistributeSectionProps`, `VideoExportSettingsPanelProps`, `UseColorPopoverOptions`, `ImageFormat`, `DEFAULT_IMAGE_EXPORT_SETTINGS` (+203 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **17 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **16 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `useCanvasStore` connect `Canvas Node Rendering` to `Layer Panel & Tooltip`, `Properties Panel UI`, `Text Span Editing`, `AI Store & Context`, `Preview & Platform Shells`, `Grid Templates & Picker`?**
-  _High betweenness centrality (0.037) - this node is a cross-community bridge._
-- **Why does `dependencies` connect `Package Dependencies` to `FFmpeg Core Runtime`, `Community 70`?**
-  _High betweenness centrality (0.025) - this node is a cross-community bridge._
 - **Why does `CanvasObject` connect `Canvas Types & Grid Overlay` to `Canvas Node Rendering`, `Export & Path Utilities`, `Canvas Type Definitions`?**
-  _High betweenness centrality (0.024) - this node is a cross-community bridge._
+  _High betweenness centrality (0.034) - this node is a cross-community bridge._
+- **Why does `useCanvasStore` connect `Canvas Node Rendering` to `Properties Panel UI`, `Text Span Editing`, `AI Store & Context`, `Preview & Platform Shells`, `App Root & Frame Settings`, `Grid Templates & Picker`?**
+  _High betweenness centrality (0.034) - this node is a cross-community bridge._
+- **Why does `Snap Guide System` connect `Canvas Node Rendering` to `Agent Definitions`?**
+  _High betweenness centrality (0.029) - this node is a cross-community bridge._
 - **Are the 8 inferred relationships involving `useCanvasStore` (e.g. with `FrameSettingsPopover()` and `VideoSection()`) actually correct?**
   _`useCanvasStore` has 8 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `AlignDistributeSectionProps`, `VideoExportSettingsPanelProps`, `UseColorPopoverOptions` to the rest of the system?**
-  _222 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _218 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Canvas Node Rendering` be split into smaller, more focused modules?**
-  _Cohesion score 0.05005065856129686 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.053552554315913097 - nodes in this community are weakly interconnected._
 - **Should `FFmpeg Core Runtime` be split into smaller, more focused modules?**
   _Cohesion score 0.03825136612021858 - nodes in this community are weakly interconnected._

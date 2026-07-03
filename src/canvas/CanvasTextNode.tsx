@@ -2,9 +2,10 @@ import React, { useRef, useEffect, useMemo } from 'react'
 import { Text as KonvaText, Rect, Transformer } from 'react-konva'
 import type Konva from 'konva'
 import type { TextObject, TextSpan, CanvasObject } from '@/types/canvas'
-import { CANVAS_SCALE, axisLock } from './constants'
+import { axisLock } from './constants'
 import { useCanvasStore } from './useCanvasStore'
-import { useViewportStore } from './useViewportStore'
+import { makeCanvasNode } from './makeCanvasNode'
+import { useViewportStore, selectScale, getCanvasScale } from './useViewportStore'
 import { useSnapGuides } from './useSnapGuides'
 import type { SnapGuide } from './useSnapGuides'
 import { spanText, resolveSpanStyle, fontStyleToCSS } from './textSpans'
@@ -83,7 +84,7 @@ function CanvasTextNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasTextNod
   const setTextSelection = useCanvasStore((s) => s.setTextSelection)
   const setCaptureTextSelection = useCanvasStore((s) => s.setCaptureTextSelection)
   const textEditingId = useCanvasStore((s) => s.textEditingId)
-  const zoom = useViewportStore((s) => s.zoom)
+  const scale = useViewportStore(selectScale)
   const panX = useViewportStore((s) => s.panX)
   const panY = useViewportStore((s) => s.panY)
   const { computeSnap, computeSnapResize, snapRotation } = useSnapGuides()
@@ -188,7 +189,7 @@ function CanvasTextNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasTextNod
       const spanEl = document.createElement('span')
       spanEl.dataset.spanIdx = String(i)
       spanEl.textContent = span.text
-      const editScale = CANVAS_SCALE * zoom
+      const editScale = scale
       spanEl.style.fontFamily = resolved.fontFamily
       spanEl.style.fontSize = `${resolved.fontSize * editScale}px`
       spanEl.style.fontWeight = cssFont.fontWeight
@@ -257,7 +258,6 @@ function CanvasTextNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasTextNod
     if (!stage) return
 
     const stageBox = stage.container().getBoundingClientRect()
-    const scale = CANVAS_SCALE * zoom
     const screenX = stageBox.left + panX + obj.x * scale
     const screenY = stageBox.top + panY + obj.y * scale
 
@@ -294,8 +294,8 @@ function CanvasTextNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasTextNod
       const stage2 = textRef.current?.getStage()
       if (!stage2) return
       const stageBox2 = stage2.container().getBoundingClientRect()
-      const { zoom: z, panX: px, panY: py } = useViewportStore.getState()
-      const sc = CANVAS_SCALE * z
+      const { panX: px, panY: py } = useViewportStore.getState()
+      const sc = getCanvasScale()
       div.style.left = `${stageBox2.left + px + obj.x * sc}px`
       div.style.top = `${stageBox2.top + py + obj.y * sc}px`
     }
@@ -303,7 +303,7 @@ function CanvasTextNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasTextNod
     return () => window.removeEventListener('resize', onResize)
   // panX/panY are included so pan changes trigger a reposition even when obj hasn't changed
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [obj, textEditingId, zoom, panX, panY])
+  }, [obj, textEditingId, scale, panX, panY])
 
   // Inline editing on double-click — contenteditable div overlay
   function handleDblClick(): void {
@@ -318,7 +318,6 @@ function CanvasTextNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasTextNod
 
     // Get position using explicit formula — avoids getAbsolutePosition() inaccuracies
     const stageBox = stage.container().getBoundingClientRect()
-    const scale = CANVAS_SCALE * zoom
     const screenX = stageBox.left + panX + obj.x * scale
     const screenY = stageBox.top + panY + obj.y * scale
 
@@ -329,7 +328,7 @@ function CanvasTextNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasTextNod
     // Snapshot original spans for Escape-cancel
     const originalSpans: TextSpan[] = obj.spans.map((s) => ({ ...s }))
 
-    const editScale = CANVAS_SCALE * zoom
+    const editScale = scale
 
     // Build contenteditable div
     const div = document.createElement('div')
@@ -698,7 +697,6 @@ function CanvasTextNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasTextNod
             pendingGuidesRef.current = []
             return newBox
           }
-          const scale = CANVAS_SCALE * zoom
           const screenThreshold = 8
           const logicalThreshold = screenThreshold / scale
           const logicalBox = {
@@ -728,10 +726,4 @@ function CanvasTextNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasTextNod
   )
 }
 
-function CanvasTextNodeOuter(props: CanvasTextNodeProps): React.ReactElement | null {
-  const obj = useCanvasStore((s) => s.objects[props.id] as TextObject | undefined)
-  if (!obj || !obj.visible) return null
-  return <CanvasTextNodeInner {...props} obj={obj} />
-}
-
-export const CanvasTextNode = React.memo(CanvasTextNodeOuter)
+export const CanvasTextNode = makeCanvasNode<TextObject, CanvasTextNodeProps>(CanvasTextNodeInner)

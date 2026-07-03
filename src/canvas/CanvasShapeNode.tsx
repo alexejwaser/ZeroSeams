@@ -10,10 +10,11 @@ import {
 import type Konva from 'konva'
 import type { ShapeObject } from '@/types/canvas'
 import { useCanvasStore } from './useCanvasStore'
+import { makeCanvasNode } from './makeCanvasNode'
 import { useSnapGuides } from './useSnapGuides'
 import type { SnapGuide } from './useSnapGuides'
-import { CANVAS_SCALE, axisLock } from './constants'
-import { useViewportStore } from './useViewportStore'
+import { axisLock } from './constants'
+import { useViewportStore, selectScale } from './useViewportStore'
 import { buildEffectFilters } from './effects/buildEffectFilters'
 
 interface CanvasShapeNodeProps {
@@ -40,7 +41,9 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
   const setContextMenu = useCanvasStore((s) => s.setContextMenu)
   const { computeSnap, computeSnapResize, snapRotation, startSnapSession, endSnapSession } = useSnapGuides()
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
-  const { zoom, panX, panY } = useViewportStore((s) => ({ zoom: s.zoom, panX: s.panX, panY: s.panY }))
+  const scale = useViewportStore(selectScale)
+  const panX = useViewportStore((s) => s.panX)
+  const panY = useViewportStore((s) => s.panY)
 
   const isInMultiSelectMode = selectedIds.length > 1
   const isAnchor = anchorId === id
@@ -527,7 +530,6 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
             pendingGuidesRef.current = []
             return newBox
           }
-          const scale = CANVAS_SCALE * zoom
           const screenThreshold = 8
           const logicalThreshold = screenThreshold / scale
           const logicalBox = {
@@ -557,10 +559,4 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
   )
 }
 
-function CanvasShapeNodeOuter(props: CanvasShapeNodeProps): React.ReactElement | null {
-  const obj = useCanvasStore((s) => s.objects[props.id] as ShapeObject | undefined)
-  if (!obj || !obj.visible) return null
-  return <CanvasShapeNodeInner {...props} obj={obj} />
-}
-
-export const CanvasShapeNode = React.memo(CanvasShapeNodeOuter)
+export const CanvasShapeNode = makeCanvasNode<ShapeObject, CanvasShapeNodeProps>(CanvasShapeNodeInner)

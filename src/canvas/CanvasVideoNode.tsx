@@ -4,10 +4,11 @@ import type Konva from 'konva'
 import type { VideoObject, AnchorPoint } from '@/types/canvas'
 import { DEFAULT_ADJUSTMENTS } from '@/types/canvas'
 import { useCanvasStore } from './useCanvasStore'
+import { makeCanvasNode } from './makeCanvasNode'
 import { useSnapGuides } from './useSnapGuides'
 import type { SnapGuide } from './useSnapGuides'
-import { CANVAS_SCALE, axisLock } from './constants'
-import { useViewportStore } from './useViewportStore'
+import { axisLock } from './constants'
+import { useViewportStore, selectScale } from './useViewportStore'
 import { registerVideoElement, unregisterVideoElement } from './videoElementRegistry'
 import { anchorsToPathData } from './CanvasPathNode'
 import { buildFilterPipeline } from './adjustments/pipeline'
@@ -41,7 +42,9 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   const maskModeActive = useCanvasStore((s) => s.maskModeActive)
   const adjustmentsBypass = useCanvasStore((s) => s.adjustmentsBypass)
   const activeTool = useCanvasStore((s) => s.activeTool)
-  const { zoom, panX, panY } = useViewportStore((s) => ({ zoom: s.zoom, panX: s.panX, panY: s.panY }))
+  const scale = useViewportStore(selectScale)
+  const panX = useViewportStore((s) => s.panX)
+  const panY = useViewportStore((s) => s.panY)
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
 
   const isInMultiSelectMode = selectedIds.length > 1
@@ -975,7 +978,6 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
             return newBox
           }
 
-          const scale = CANVAS_SCALE * zoom
           const logicalThreshold = 8 / scale
           const logicalBox = {
             x: (newBox.x - panX) / scale,
@@ -1003,10 +1005,4 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   )
 }
 
-function CanvasVideoNodeOuter(props: CanvasVideoNodeProps): React.ReactElement | null {
-  const obj = useCanvasStore((s) => s.objects[props.id] as VideoObject | undefined)
-  if (!obj || !obj.visible) return null
-  return <CanvasVideoNodeInner {...props} obj={obj} />
-}
-
-export const CanvasVideoNode = React.memo(CanvasVideoNodeOuter)
+export const CanvasVideoNode = makeCanvasNode<VideoObject, CanvasVideoNodeProps>(CanvasVideoNodeInner)

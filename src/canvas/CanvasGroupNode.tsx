@@ -2,12 +2,11 @@ import React, { useRef, useCallback } from 'react'
 import Konva from 'konva'
 import { Rect, Transformer } from 'react-konva'
 import { useCanvasStore } from './useCanvasStore'
-import { useViewportStore } from './useViewportStore'
+import { useViewportStore, selectScale } from './useViewportStore'
 import type { GroupObject, ImageObject } from '../types/canvas'
 import type { SnapGuide } from './useSnapGuides'
 import { useSnapGuides } from './useSnapGuides'
 import { GRID_TEMPLATES } from './gridTemplates'
-import { CANVAS_SCALE } from './constants'
 
 // Returns the childId whose frame bounds contain the given logical canvas point.
 function hitTestCell(
@@ -50,7 +49,7 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
   const setSelected = useCanvasStore((s) => s.setSelected)
   const panX = useViewportStore((s) => s.panX)
   const panY = useViewportStore((s) => s.panY)
-  const zoom = useViewportStore((s) => s.zoom)
+  const viewScale = useViewportStore(selectScale)
 
   // True when any child cell is individually selected (user has "entered" the grid).
   // In that state the group rect steps back (listening=false) so the cell's own
@@ -226,7 +225,7 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
           if (!stage) return
           const pos = stage.getPointerPosition()
           if (!pos) return
-          const scale = CANVAS_SCALE * zoom
+          const scale = viewScale
           const logicalX = (pos.x - panX) / scale
           const logicalY = (pos.y - panY) / scale
           const hitCell = hitTestCell(obj, logicalX, logicalY)
@@ -259,7 +258,7 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
               return newBox
             }
 
-            const scale = CANVAS_SCALE * zoom
+            const scale = viewScale
             const logicalThreshold = 8 / scale
             const logicalBox = {
               x: (newBox.x - panX) / scale,
