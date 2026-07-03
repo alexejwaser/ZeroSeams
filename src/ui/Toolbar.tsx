@@ -276,6 +276,27 @@ function VideoExportSettingsPanel({
 }
 
 // ── TitleBar ────────────────────────────────────────────────────────────────
+// Export dialog settings survive app restarts (format, resolution, filename…).
+const EXPORT_SETTINGS_KEY = 'zeroseams:exportSettings'
+
+interface PersistedExportSettings {
+  exportMode: 'all' | 'single' | 'range'
+  filenameTemplate: string
+  imageSettings: ImageExportSettings
+  exportPixelRatio: 1 | 2 | 3
+  videoSettings: VideoExportSettings
+  selectedPreset: 'draft' | 'balanced' | 'high'
+  maxFileSizeUnit: 'KB' | 'MB'
+}
+
+function loadExportSettings(): Partial<PersistedExportSettings> {
+  try {
+    return JSON.parse(localStorage.getItem(EXPORT_SETTINGS_KEY) ?? '{}') as Partial<PersistedExportSettings>
+  } catch {
+    return {}
+  }
+}
+
 export function TitleBar(): React.ReactElement {
   const past = useCanvasStore((s) => s.past)
   const future = useCanvasStore((s) => s.future)
@@ -305,18 +326,20 @@ export function TitleBar(): React.ReactElement {
   const setShowFrameSettings = useCanvasStore((s) => s.setShowFrameSettings)
   const exportOpen = useCanvasStore((s) => s.exportOpen)
   const setExportOpen = useCanvasStore((s) => s.setExportOpen)
-  const [exportMode, setExportMode] = useState<'all' | 'single' | 'range'>('all')
+  const [persisted] = useState(loadExportSettings)
+  const [exportMode, setExportMode] = useState<'all' | 'single' | 'range'>(persisted.exportMode ?? 'all')
   const [exportSingle, setExportSingle] = useState(1)
   const [exportFrom, setExportFrom] = useState(1)
   const [exportTo, setExportTo] = useState(frameCount)
-  const [exportSettings, setExportSettings] = useState<VideoExportSettings>({ ...DEFAULT_VIDEO_EXPORT_SETTINGS })
+  const [exportSettings, setExportSettings] = useState<VideoExportSettings>({ ...DEFAULT_VIDEO_EXPORT_SETTINGS, ...persisted.videoSettings })
   const [showVideoSettings, setShowVideoSettings] = useState(false)
   const [videoSettingsTab, setVideoSettingsTab] = useState<'simple' | 'advanced'>('simple')
-  const [selectedPreset, setSelectedPreset] = useState<'draft' | 'balanced' | 'high'>('balanced')
-  const [filenameTemplate, setFilenameTemplate] = useState('frame_{frame}')
-  const [imageSettings, setImageSettings] = useState<ImageExportSettings>({ ...DEFAULT_IMAGE_EXPORT_SETTINGS })
-  const [exportPixelRatio, setExportPixelRatio] = useState<1 | 2 | 3>(2)
-  const [maxFileSizeUnit, setMaxFileSizeUnit] = useState<'KB' | 'MB'>('KB')
+  const [selectedPreset, setSelectedPreset] = useState<'draft' | 'balanced' | 'high'>(persisted.selectedPreset ?? 'balanced')
+  const [filenameTemplate, setFilenameTemplate] = useState(persisted.filenameTemplate ?? 'frame_{frame}')
+  const [imageSettings, setImageSettings] = useState<ImageExportSettings>({ ...DEFAULT_IMAGE_EXPORT_SETTINGS, ...persisted.imageSettings })
+  const [exportPixelRatio, setExportPixelRatio] = useState<1 | 2 | 3>(persisted.exportPixelRatio ?? 2)
+  const [maxFileSizeUnit, setMaxFileSizeUnit] = useState<'KB' | 'MB'>(persisted.maxFileSizeUnit ?? 'KB')
+  const [exportError, setExportError] = useState<string | null>(null)
   const exporting = useExportStore((s) => s.exporting)
   const exportStatus = useExportStore((s) => s.exportStatus)
 
@@ -387,6 +410,25 @@ export function TitleBar(): React.ReactElement {
     return () => { document.removeEventListener('mousedown', handleMouseDown) }
   }, [exportOpen])
 
+  // Escape dismisses the export panel (matches color popover / preview shell)
+  useEffect(() => {
+    if (!exportOpen) return
+    function handleKeyDown(e: KeyboardEvent): void {
+      if (e.key === 'Escape' && !useExportStore.getState().exporting) setExportOpen(false)
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => { document.removeEventListener('keydown', handleKeyDown) }
+  }, [exportOpen, setExportOpen])
+
+  // Persist export settings so the dialog opens the way the user left it
+  useEffect(() => {
+    const snapshot: PersistedExportSettings = {
+      exportMode, filenameTemplate, imageSettings, exportPixelRatio,
+      videoSettings: exportSettings, selectedPreset, maxFileSizeUnit,
+    }
+    localStorage.setItem(EXPORT_SETTINGS_KEY, JSON.stringify(snapshot))
+  }, [exportMode, filenameTemplate, imageSettings, exportPixelRatio, exportSettings, selectedPreset, maxFileSizeUnit])
+
   const hasVideoInRange = useMemo(() => {
     const start = exportMode === 'single' ? exportSingle - 1 : exportMode === 'range' ? exportFrom - 1 : 0
     const end = exportMode === 'single' ? exportSingle - 1 : exportMode === 'range' ? exportTo - 1 : frameCount - 1
@@ -419,12 +461,15 @@ export function TitleBar(): React.ReactElement {
     const { setExporting, setExportStatus, reset: resetExport } = useExportStore.getState()
     setExporting(true)
     setExportStatus('Exporting…')
+    setExportError(null)
     useExportStore.setState({ cancelRequested: false })
     void window.electronAPI.clearExportLog()
+    let succeeded = false
     try {
       // Pick a folder once — replaces per-frame save dialogs
       const { folderPath, cancelled } = await window.electronAPI.showFolderDialog()
       if (cancelled || !folderPath) {
+        succeeded = true // user cancelled the dialog — not an error, just close
         return
       }
 
@@ -439,22 +484,32 @@ export function TitleBar(): React.ReactElement {
       )
 
       // Write each result to the selected folder
+      const writeFailures: string[] = []
       for (const result of results) {
         const frameNum = result.frameIndex + 1
         const filename = filenameTemplate.replace('{frame}', String(frameNum)) + '.' + result.extension
         const base64 = await blobToBase64(result.blob)
         const writeResult = await window.electronAPI.writeFileToFolder(folderPath, filename, base64)
         console.log(`[export] ${filename}: ${writeResult.success ? 'saved' : 'ERROR: ' + writeResult.error}`)
+        if (!writeResult.success) writeFailures.push(filename)
+      }
+      if (writeFailures.length > 0) {
+        setExportError(`${writeFailures.length} of ${results.length} frames failed to write: ${writeFailures.slice(0, 3).join(', ')}${writeFailures.length > 3 ? '…' : ''}`)
+      } else {
+        succeeded = true
       }
     } catch (err) {
       const msg = String(err)
       if (!msg.includes('cancelled')) {
         console.error('[export] failed:', err)
-        alert(`Export failed: ${msg}`)
+        setExportError(`Export failed: ${msg}`)
+      } else {
+        succeeded = true // user-initiated cancel — close quietly
       }
     } finally {
       resetExport()
-      setExportOpen(false)
+      // Keep the panel open on failure so the error banner is visible.
+      if (succeeded) setExportOpen(false)
     }
   }
 
@@ -1186,6 +1241,31 @@ export function TitleBar(): React.ReactElement {
               </div>
             )}
 
+            {exportError != null && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 8,
+                  padding: '8px 10px',
+                  borderRadius: 8,
+                  background: '#fdecea',
+                  border: '1px solid #f5b5ac',
+                  color: '#a4262c',
+                  fontSize: 12,
+                  fontFamily: 'var(--font)',
+                }}
+              >
+                <span style={{ flex: 1, wordBreak: 'break-word' }}>{exportError}</span>
+                <button
+                  onClick={() => { setExportError(null) }}
+                  style={{ background: 'none', border: 'none', color: '#a4262c', cursor: 'pointer', padding: 0, fontSize: 14, lineHeight: 1 }}
+                  aria-label="Dismiss error"
+                >
+                  ×
+                </button>
+              </div>
+            )}
             <button
               className={exporting ? '' : 'btn-raised'}
               onClick={() => { void handleExportAction() }}
