@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react'
-import { Stage, Layer, Rect as KonvaRect, Line as KonvaLine, Circle as KonvaCircle, Path as KonvaPath, Ellipse as KonvaEllipse, Transformer } from 'react-konva'
+import { Stage, Layer, Rect as KonvaRect, Line as KonvaLine, Circle as KonvaCircle, Path as KonvaPath, Transformer } from 'react-konva'
 import type Konva from 'konva'
 import type { ImageObject, TextObject, ShapeObject, PathObject, AnchorPoint, CanvasObject } from '@/types/canvas'
 import type { ShapeKind } from '@/types/canvas'
@@ -24,7 +24,7 @@ import { useThumbnailGenerator } from './useThumbnailStore'
 import '@/canvas/effects'
 import { FrameLabelStrip } from '@/ui/FrameLabelStrip'
 import { CanvasGroupNode } from './CanvasGroupNode'
-import { GridCellOverlay } from './GridCellOverlay'
+import { EmptyFrameOverlay } from './EmptyFrameOverlay'
 import { CanvasGuidelineNode } from './CanvasGuidelineNode'
 export { exportFrames } from './exportFrames'
 
@@ -41,7 +41,6 @@ export function CarouselStage(): React.ReactElement {
   const stageRef = useRef<Konva.Stage>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const objectOrder = useCanvasStore((s) => s.objectOrder)
-  const selectedId = useCanvasStore((s) => s.selectedId)
   const selectedIds = useCanvasStore((s) => s.selectedIds)
   const setSelected = useCanvasStore((s) => s.setSelected)
   const setSelectedIds = useCanvasStore((s) => s.setSelectedIds)
@@ -59,14 +58,10 @@ export function CarouselStage(): React.ReactElement {
   const setActiveTool = useCanvasStore((s) => s.setActiveTool)
   const clearContentEditMode = useCanvasStore((s) => s.clearContentEditMode)
   const clearPathEditMode = useCanvasStore((s) => s.clearPathEditMode)
-  const clearMaskEditMode = useCanvasStore((s) => s.clearMaskEditMode)
-  const maskDrawMode = useCanvasStore((s) => s.maskDrawMode)
-  const clearMaskDrawMode = useCanvasStore((s) => s.clearMaskDrawMode)
+  const clearClipEditMode = useCanvasStore((s) => s.clearClipEditMode)
   const setContextMenu = useCanvasStore((s) => s.setContextMenu)
   const activeShapeKind = useCanvasStore((s) => s.activeShapeKind)
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
-  const maskModeActive = useCanvasStore((s) => s.maskModeActive)
-  const enterMaskDrawMode = useCanvasStore((s) => s.enterMaskDrawMode)
   const setFrameBackground = useCanvasStore((s) => s.setFrameBackground)
   const previewMode = useCanvasStore((s) => s.previewMode)
   const guidelineOrientation = useCanvasStore((s) => s.guidelineOrientation)
@@ -156,12 +151,6 @@ export function CarouselStage(): React.ReactElement {
   const penMouseDownPosRef = useRef<{ x: number; y: number } | null>(null)
   const penDragRef = useRef<{ dx: number; dy: number } | null>(null)
 
-  // Mask draw state — all positions in canvas coords
-  const maskDrawStartRef = useRef<{ x: number; y: number } | null>(null)
-  const [maskPenAnchors, setMaskPenAnchors] = useState<AnchorPoint[]>([])
-  const maskPenDownRef = useRef<{ x: number; y: number } | null>(null)
-  const maskPenDragRef = useRef<{ dx: number; dy: number } | null>(null)
-  const [maskCursorPos, setMaskCursorPos] = useState<{ x: number; y: number } | null>(null)
   const [guidelinePreview, setGuidelinePreview] = useState<number | null>(null)
 
   // Container size (for Stage width/height)
@@ -239,17 +228,6 @@ export function CarouselStage(): React.ReactElement {
     }
   }, [])
 
-  // Mask draw mode: reset local state when mode is cleared
-  useEffect(() => {
-    if (maskDrawMode === null) {
-      setMaskPenAnchors([])
-      setMaskCursorPos(null)
-      maskDrawStartRef.current = null
-      maskPenDownRef.current = null
-      maskPenDragRef.current = null
-    }
-  }, [maskDrawMode])
-
   // Clear guideline placement preview when tool changes away
   useEffect(() => {
     if (activeTool !== 'guideline') setGuidelinePreview(null)
@@ -313,19 +291,6 @@ export function CarouselStage(): React.ReactElement {
     } as Partial<PathObject> as Partial<CanvasObject>)
 
     setActiveTool('select')
-  }
-
-  function toContentSpace(cx: number, cy: number, imgId: string): { x: number; y: number } {
-    const img = useCanvasStore.getState().objects[imgId] as ImageObject | undefined
-    if (!img) return { x: cx, y: cy }
-    return { x: cx - img.frameX - img.contentOffsetX, y: cy - img.frameY - img.contentOffsetY }
-  }
-
-  function commitMaskDraw(anchors: AnchorPoint[]): void {
-    if (!maskDrawMode) return
-    const kind = maskDrawMode.tool
-    commitUpdate(maskDrawMode.id, { mask: { anchors, feather: 0, inverted: false, visible: true, kind } } as Partial<CanvasObject>)
-    clearMaskDrawMode()
   }
 
   // --- Group transformer wiring ---
@@ -630,7 +595,6 @@ export function CarouselStage(): React.ReactElement {
         position: 'relative',
         cursor: frameDrag ? 'grabbing'
           : isSpacePanning ? 'grab'
-          : maskDrawMode ? 'crosshair'
           : activeTool === 'text' ? 'text'
           : (activeTool === 'shape' || activeTool === 'pen' || activeTool === 'guideline') ? 'crosshair'
           : 'default',
@@ -734,27 +698,8 @@ export function CarouselStage(): React.ReactElement {
             return
           }
 
-          // --- Mask draw mode ---
-          if (maskDrawMode !== null) {
-            const stage = e.target.getStage()
-            if (!stage) return
-            const pos = stage.getRelativePointerPosition()
-            if (!pos) return
-            const cx = pos.x; const cy = pos.y
-            if (maskDrawMode.tool === 'rect' || maskDrawMode.tool === 'ellipse') {
-              maskDrawStartRef.current = { x: cx, y: cy }
-            } else {
-              maskPenDownRef.current = { x: cx, y: cy }; maskPenDragRef.current = null
-            }
-            return
-          }
-
           // --- Pen tool ---
           if (activeTool === 'pen') {
-            if (maskModeActive && selectedId && useCanvasStore.getState().objects[selectedId]?.type === 'image') {
-              enterMaskDrawMode(selectedId, 'pen')
-              return
-            }
             if (e.target !== e.target.getStage()) return
             const stage = e.target.getStage()
             if (!stage) return
@@ -787,19 +732,6 @@ export function CarouselStage(): React.ReactElement {
                 multiSelectDragActiveRef.current = false
               }
             }
-          }
-
-          // Shape tool mask interception — must be before the stage-click gate so clicks
-          // on the selected image are captured even though e.target !== stage.
-          if (activeTool === 'shape' && maskModeActive && selectedId && useCanvasStore.getState().objects[selectedId]?.type === 'image' &&
-              (activeShapeKind === 'rect' || activeShapeKind === 'ellipse')) {
-            const stage = e.target.getStage()
-            const pos = stage?.getRelativePointerPosition()
-            if (pos) {
-              enterMaskDrawMode(selectedId, activeShapeKind as 'rect' | 'ellipse')
-              maskDrawStartRef.current = { x: pos.x, y: pos.y }
-            }
-            return
           }
 
           if (e.target !== e.target.getStage()) return
@@ -861,7 +793,7 @@ export function CarouselStage(): React.ReactElement {
                 setMarquee({ x: pos.x, y: pos.y, width: 0, height: 0 })
                 clearContentEditMode()
                 clearPathEditMode()
-                clearMaskEditMode()
+                clearClipEditMode()
                 setActiveGuides([])
               }
             }
@@ -935,20 +867,6 @@ export function CarouselStage(): React.ReactElement {
                 marqueeCurrentRef.current = { x, y, width, height }
                 setMarquee({ x, y, width, height })
               }
-            }
-            return
-          }
-
-          // --- Mask draw mode cursor tracking ---
-          if (maskDrawMode !== null) {
-            const stage = e.target.getStage()
-            if (!stage) return
-            const pos = stage.getRelativePointerPosition()
-            if (!pos) return
-            const cx = pos.x; const cy = pos.y
-            setMaskCursorPos({ x: cx, y: cy })
-            if (maskDrawMode.tool === 'pen' && maskPenDownRef.current) {
-              maskPenDragRef.current = { dx: cx - maskPenDownRef.current.x, dy: cy - maskPenDownRef.current.y }
             }
             return
           }
@@ -1078,61 +996,6 @@ export function CarouselStage(): React.ReactElement {
               setSelected(null)
               setSelectedIds([])
             }
-            return
-          }
-
-          // --- Mask draw mode: place shape or anchor ---
-          if (maskDrawMode !== null) {
-            const stage = stageRef.current
-            if (!stage) return
-            const pos = stage.getRelativePointerPosition()
-            if (!pos) return
-            const cx = pos.x; const cy = pos.y
-            const { id, tool } = maskDrawMode
-
-            if (tool === 'rect' || tool === 'ellipse') {
-              const start = maskDrawStartRef.current; maskDrawStartRef.current = null
-              if (!start) return
-              const x1 = Math.min(start.x, cx); const y1 = Math.min(start.y, cy)
-              const x2 = Math.max(start.x, cx); const y2 = Math.max(start.y, cy)
-              if (x2 - x1 < 5 || y2 - y1 < 5) return
-
-              if (tool === 'rect') {
-                const corners = [{ x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }, { x: x1, y: y2 }]
-                commitMaskDraw(corners.map(c => ({ ...toContentSpace(c.x, c.y, id), handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } })))
-              } else {
-                const K = 0.5523
-                const ecx = (x1 + x2) / 2; const ecy = (y1 + y2) / 2
-                const rx = (x2 - x1) / 2; const ry = (y2 - y1) / 2
-                const ellipseAnchors: AnchorPoint[] = [
-                  { x: ecx,      y: ecy - ry, handleIn: { dx: -K * rx, dy: 0 },  handleOut: { dx: K * rx, dy: 0 } },
-                  { x: ecx + rx, y: ecy,      handleIn: { dx: 0, dy: -K * ry },  handleOut: { dx: 0, dy: K * ry } },
-                  { x: ecx,      y: ecy + ry, handleIn: { dx: K * rx, dy: 0 },   handleOut: { dx: -K * rx, dy: 0 } },
-                  { x: ecx - rx, y: ecy,      handleIn: { dx: 0, dy: K * ry },   handleOut: { dx: 0, dy: -K * ry } },
-                ]
-                commitMaskDraw(ellipseAnchors.map(a => { const cs = toContentSpace(a.x, a.y, id); return { ...a, x: cs.x, y: cs.y } }))
-              }
-              return
-            }
-
-            // Pen tool
-            const downPos = maskPenDownRef.current; maskPenDownRef.current = null
-            if (!downPos) return
-            const drag = maskPenDragRef.current; maskPenDragRef.current = null
-            const isDrag = drag !== null && Math.hypot(drag.dx, drag.dy) > 3
-            const newAnchor: AnchorPoint = isDrag
-              ? { x: downPos.x, y: downPos.y, handleIn: { dx: -drag!.dx, dy: -drag!.dy }, handleOut: { dx: drag!.dx, dy: drag!.dy } }
-              : { x: downPos.x, y: downPos.y, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } }
-
-            if (maskPenAnchors.length >= 3) {
-              const first = maskPenAnchors[0]
-              if (Math.hypot(cx - first.x, cy - first.y) < 12) {
-                commitMaskDraw(maskPenAnchors.map(a => { const cs = toContentSpace(a.x, a.y, id); return { ...a, x: cs.x, y: cs.y } }))
-                setMaskPenAnchors([])
-                return
-              }
-            }
-            setMaskPenAnchors(prev => [...prev, newAnchor])
             return
           }
 
@@ -1441,67 +1304,6 @@ export function CarouselStage(): React.ReactElement {
             />
           )}
 
-          {/* Mask draw preview overlay */}
-          {maskDrawMode && maskCursorPos && (() => {
-            const { tool } = maskDrawMode
-            const start = maskDrawStartRef.current
-
-            if (tool === 'rect' && start) {
-              const x = Math.min(start.x, maskCursorPos.x); const y = Math.min(start.y, maskCursorPos.y)
-              const w = Math.abs(maskCursorPos.x - start.x); const h = Math.abs(maskCursorPos.y - start.y)
-              return <KonvaRect x={x} y={y} width={w} height={h}
-                stroke="#f94608" strokeWidth={1} strokeScaleEnabled={false}
-                dash={[4, 3]} fill="rgba(0,170,255,0.08)" listening={false} />
-            }
-
-            if (tool === 'ellipse' && start) {
-              const x = Math.min(start.x, maskCursorPos.x); const y = Math.min(start.y, maskCursorPos.y)
-              const w = Math.abs(maskCursorPos.x - start.x); const h = Math.abs(maskCursorPos.y - start.y)
-              return <KonvaEllipse x={x + w / 2} y={y + h / 2} radiusX={w / 2} radiusY={h / 2}
-                stroke="#f94608" strokeWidth={1} strokeScaleEnabled={false}
-                dash={[4, 3]} fill="rgba(0,170,255,0.08)" listening={false} />
-            }
-
-            if (tool === 'pen' && maskPenAnchors.length > 0) {
-              const lastAnchor = maskPenAnchors[maskPenAnchors.length - 1]
-              const drag = maskPenDragRef.current
-              const downPos = maskPenDownRef.current
-              const isDragging = downPos !== null && drag !== null && Math.hypot(drag.dx, drag.dy) > 3
-              const ghostX = isDragging ? downPos!.x : maskCursorPos.x
-              const ghostY = isDragging ? downPos!.y : maskCursorPos.y
-              const ghostAnchor: AnchorPoint = {
-                x: ghostX, y: ghostY,
-                handleIn: isDragging ? { dx: -drag!.dx, dy: -drag!.dy } : { dx: 0, dy: 0 },
-                handleOut: isDragging ? { dx: drag!.dx, dy: drag!.dy } : { dx: 0, dy: 0 },
-              }
-              const previewData = anchorsToPathData([lastAnchor, ghostAnchor], false)
-              const placedData = maskPenAnchors.length >= 2 ? anchorsToPathData(maskPenAnchors, false) : null
-              const isNearFirst = maskPenAnchors.length >= 3 &&
-                Math.hypot(maskCursorPos.x - maskPenAnchors[0].x, maskCursorPos.y - maskPenAnchors[0].y) < 12
-              return (
-                <>
-                  {placedData && <KonvaPath data={placedData} fill="transparent" stroke="#f94608"
-                    strokeWidth={1} strokeScaleEnabled={false} listening={false} perfectDrawEnabled={false} />}
-                  {previewData && <KonvaPath data={previewData} fill="transparent" stroke="#f94608"
-                    strokeWidth={1} strokeScaleEnabled={false} dash={[4, 3]} listening={false} perfectDrawEnabled={false} />}
-                  {isDragging && <>
-                    <KonvaLine points={[ghostX - drag!.dx, ghostY - drag!.dy, ghostX + drag!.dx, ghostY + drag!.dy]}
-                      stroke="#f94608" strokeWidth={1} strokeScaleEnabled={false} dash={[3, 2]} listening={false} />
-                    <KonvaCircle x={ghostX - drag!.dx} y={ghostY - drag!.dy} radius={6} fill="#fff" stroke="#f94608" strokeWidth={1.5} listening={false} />
-                    <KonvaCircle x={ghostX + drag!.dx} y={ghostY + drag!.dy} radius={6} fill="#fff" stroke="#f94608" strokeWidth={1.5} listening={false} />
-                  </>}
-                  {maskPenAnchors.map((a, i) => (
-                    <KonvaCircle key={i} x={a.x} y={a.y}
-                      radius={7}
-                      fill={i === 0 && isNearFirst ? '#ff4488' : '#f94608'}
-                      stroke="#fff" strokeWidth={1.5} listening={false} />
-                  ))}
-                </>
-              )
-            }
-            return null
-          })()}
-
           {/* Pen tool preview overlay */}
           {activeTool === 'pen' && penCursorPos && (() => {
             const pathId = currentPenPathIdRef.current
@@ -1629,7 +1431,7 @@ export function CarouselStage(): React.ReactElement {
       </Stage>
 
       {/* Empty grid cell +image/+video buttons — rendered after Stage so they sit above the canvas */}
-      <GridCellOverlay />
+      <EmptyFrameOverlay />
 
     </div>
   )

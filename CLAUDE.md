@@ -52,6 +52,15 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `resizeMode` (`'advanced'|'auto'`): advanced = frame resize crops; auto = cover-fits content to new frame
 - Image Transformer always `keepRatio={false}`; Group transformer always `keepRatio={true}`
 
+**Media Frames** (`src/canvas/frameClip.ts`, `src/canvas/geometry.ts`):
+- `clipShape?` on `ImageObject`/`VideoObject`: `{kind:'rect', cornerRadius?}|{kind:'ellipse'}|{kind:'path', anchors}` — absent = plain rect; `path` anchors are NORMALIZED 0–1 in frame units, never display px (storing display px was the bug that killed the old mask system — it doesn't survive frame resize)
+- `fill?` is a union (`{type:'solid', color}` today, gradient lands later) — always switch on `fill.type`, never assume solid
+- An empty frame is just `ImageObject` with `isEmpty: true` — grid cells and standalone shape-frames are the same representation, both rendered by `EmptyFrameOverlay` (ex-`GridCellOverlay`)
+- `convertShapeToFrame`/`convertFrameToShape`/`insertMediaIntoFrame`/`removeMediaFromFrame` all go through `swapObjectPreservingId` — id-preserving, single history entry, `objectOrder` index untouched
+- `_srcVault` entries are KEPT (not deleted) on `removeMediaFromFrame` — undo needs the src back without a save round-trip
+- `clipFunc` is only set when `clipShape` is non-plain-rect; the frame `Rect`'s `hitFunc` follows the same clip geometry so hit-testing matches the visible shape
+- `computePathBBox` takes a `closed` boolean param — pass `true` for closed paths, or the bbox undercounts the closing segment
+
 **Multi-Select:**
 - `selectedId` — Properties Panel; `selectedIds[]` — group transformer + align/distribute; `anchorId` — alignment reference (gold `#f5a623` border)
 - `setSelected(id)` sets both; `addToSelection(id)` shift+click appends; clicking already-selected → promotes to `anchorId`
@@ -106,7 +115,7 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `ImageExportSettings` (`src/types/canvas.ts`) controls format (png/jpeg/tiff), quality (0–100), and optional `maxFileSizeKB` cap (JPEG only — quality iterated down in steps of 5)
 
 **Video Layer** (`CanvasVideoNode.tsx`):
-- Frame/content model identical to ImageObject; extra fields: `trimStart/trimEnd`, `loop`, `startOffset`, `volume`, `posterFrame`, `mask`
+- Frame/content model identical to ImageObject; extra fields: `trimStart/trimEnd`, `loop`, `startOffset`, `volume`, `posterFrame`
 - Use `durationchange` event (not `loadedmetadata`) to read duration — ensures finite value; listener also persists `naturalWidth/Height/Duration` to store (older saves have these as `0`/`null`)
 - Always seek to `trimStart ?? 0` after `canplay` to force first-frame decode in Chromium
 - RAF trim end: `obj.trimEnd ?? obj.naturalDuration ?? Infinity` — `Infinity` guards against `naturalDuration: null` on older saves; `null` coerces to `0` and makes the trim check always-true, causing constant seek-to-frame-0
@@ -123,13 +132,13 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - Frame labels in `CarouselStage` hidden when `previewMode` is true
 - `PreviewShell` must be rendered at the root `App` level (sibling of `TitleBar`), NOT inside the canvas area div — the canvas area has `position:relative; zIndex:0` which creates a stacking context that causes the overlay to paint beneath the panels/toolbar
 
-**Grid/Collage System** (`src/canvas/gridTemplates.ts`, `CanvasGroupNode.tsx`, `GridCellOverlay.tsx`):
+**Grid/Collage System** (`src/canvas/gridTemplates.ts`, `CanvasGroupNode.tsx`, `EmptyFrameOverlay.tsx`):
 - `GroupObject` with `isGrid: true` owns N `ImageObject`/`VideoObject` cells via `childIds`; `gridTemplateId` references the template used
 - `gridTemplates.ts` `cells(groupW, groupH, gap)` is pure — zero hardcoded pixels; always proportional to group dimensions
 - `parentGroupId` on `BaseCanvasObject` drives click routing: single click → select group; `listening={false}` on cells when group selected + cell not entered (passes events through to group hit rect)
-- Delete on a cell with `parentGroupId` restores an empty placeholder (`isEmpty: true`) — never removes the cell slot from the grid
+- Delete on a cell with `parentGroupId` restores an empty frame (`isEmpty: true` via `removeMediaFromFrame`) — never removes the cell slot from the grid
 - `disconnectGridCell(id)` removes the cell from `childIds` and clears `parentGroupId`, making it a standalone object
-- `GridCellOverlay` container must be `pointerEvents: none`; only the `+image`/`+video` buttons set `pointerEvents: auto` — otherwise the div captures clicks before Konva hit-tests the group rect
+- `EmptyFrameOverlay` container must be `pointerEvents: none`; only the `+image`/`+video` buttons set `pointerEvents: auto` — otherwise the div captures clicks before Konva hit-tests the group rect
 - `replaceGridCell(cellId, newObj)` atomically swaps a cell (e.g. ImageObject → VideoObject), updating parent `childIds` and `objectOrder`
 - Gap slider and group transform must update ALL child types (image + video) — filtering by `child.type === 'image'` breaks video cells
 
@@ -152,13 +161,12 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - Canvas preview capture: deferred into `requestAnimationFrame`, saves/restores stage size + scale, hides UI layers, crops at `pixelRatio: 0.5`
 
 **Properties Panel** (`src/ui/PropertiesPanel.tsx` + `src/ui/properties/`):
-- Section components live one-per-file in `src/ui/properties/` (AlignDistribute, Text, Effects, Adjustments, Video) with shared field helpers/styles in `properties/shared.tsx`; PropertiesPanel keeps layout, selection routing, and the mask section
+- Section components live one-per-file in `src/ui/properties/` (AlignDistribute, Text, Effects, Adjustments, Video, FrameSection) with shared field helpers/styles in `properties/shared.tsx`; PropertiesPanel keeps layout and selection routing
 - `VideoSection` composes `AdjustmentsSection` + `EffectsSection` — video and image share the adjustment UI
 
 **Shortcuts & discoverability:**
 - `src/ui/shortcuts.ts` is the single source of truth for the shortcut list; `ShortcutOverlay` (toggled by `?`) renders it — when adding a shortcut, update the table AND the handler in `useKeyboardShortcuts.ts`, and quote the same string in the button's `<Tooltip shortcut=>`
 - Zoom: `zoomIn()`/`zoomOut()` (clamped `setZoom`, MIN/MAX_ZOOM) live in `useViewportStore` and are shared by ⌘± and the bottom-right `CanvasHud` (zoom −/%/+, fit-all-frames, ? help)
-- Mask strokes: `setSelected(imageId)` auto-arms `maskModeActive`; the toolbar button and `M` toggle it without touching the selection — never make them deselect
 
 **Save feedback:**
 - Every manual save path (⌘S, ⌘⇧S, Save menu, Save a Copy) must go through `trackSave()` from `@/store` — it drives the SaveStatusPill (saving spinner → saved/error), clears `dirty`, and treats Electron's `{success:false}` dialog-cancel as idle, not saved
@@ -166,7 +174,6 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 
 **Other invariants:**
 - Display scale: subscribe via `useViewportStore(selectScale)` (= `CANVAS_SCALE × zoom`); in handlers use `getCanvasScale()`, for a hypothetical zoom use `scaleForZoom(z)`. Never import `CANVAS_SCALE` outside `useViewportStore.ts` — it's an implementation detail of the store.
-- Masking: `MaskData.kind: 'pen'|'rect'|'ellipse'`; `maskModeActive` in store (transient, not in history)
 - Save: `currentFilePath` in `useSaveStatusStore` (`src/store/`); autosave forks on it; `recentFiles.json` tracks history
 - Session restore: `localStorage['zeroseams:lastFile']` is written on every open and read on `TitleBar` mount — survives renderer reloads (Vite HMR after sleep/wake, renderer crashes) without IPC round-trips
 - `resolveVideoObjects` prefers `relativeFilePath` but falls back to stored absolute `filePath` when the resolved path escapes the project directory — handles projects copied to a new location while assets remain on an external volume
@@ -208,7 +215,7 @@ Tokens in `src/ui/theme.css` — single source of truth. Imported once in `src/m
 ## Keyboard Shortcuts
 `useKeyboardShortcuts.ts`, mounted once in CarouselStage. No-op in input/textarea.
 
-`V` select · `T` text · `R` shape · `P` pen · `G` guideline · `S` snap toggle · `F` frame settings · `M` toggle mask strokes · `?` shortcut cheatsheet · `\` bypass adjustments (hold) · `Esc` deselect · `⌘A` all · `⌘D` dupe · `⌘E` export · `⌘Z/⇧Z` undo/redo · `⌘]/[` layers · `⌘L` lock · `⌘±/0` zoom · `⌘→` add frame · `⌘←` remove frame · arrows nudge · `⌫` delete · `⌘⇧P` preview toggle (disabled for custom platform)
+`V` select · `T` text · `R` shape · `P` pen · `G` guideline · `S` snap toggle · `F` frame settings · `?` shortcut cheatsheet · `\` bypass adjustments (hold) · `Esc` deselect · `⌘A` all · `⌘D` dupe · `⌘E` export · `⌘Z/⇧Z` undo/redo · `⌘]/[` layers · `⌘L` lock · `⌘±/0` zoom · `⌘→` add frame · `⌘←` remove frame · arrows nudge · `⌫` delete · `⌘⇧P` preview toggle (disabled for custom platform)
 
 Full list: `src/ui/shortcuts.ts` (renders the `?` overlay).
 

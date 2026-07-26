@@ -100,48 +100,6 @@ function anchorsToPathData(anchors: AnchorPoint[], closed: boolean): string {
 }
 
 // ---------------------------------------------------------------------------
-// generateMaskThumbnail — black/white mask preview (white=visible, black=hidden)
-// ---------------------------------------------------------------------------
-
-function generateMaskThumbnail(img: ImageObject): string {
-  const SIZE = 44
-  const canvas = document.createElement('canvas')
-  canvas.width = SIZE
-  canvas.height = SIZE
-  const ctx = canvas.getContext('2d')
-  if (!ctx || !img.mask || img.mask.anchors.length < 3) {
-    if (ctx) { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, SIZE, SIZE) }
-    return canvas.toDataURL()
-  }
-  const { anchors, inverted } = img.mask
-  const scaleX = SIZE / Math.max(img.contentWidth, 1)
-  const scaleY = SIZE / Math.max(img.contentHeight, 1)
-  const scaled = anchors.map((a) => ({
-    x: a.x * scaleX,
-    y: a.y * scaleY,
-    handleIn: { dx: a.handleIn.dx * scaleX, dy: a.handleIn.dy * scaleY },
-    handleOut: { dx: a.handleOut.dx * scaleX, dy: a.handleOut.dy * scaleY },
-  }))
-  const pathData = anchorsToPathData(scaled, true)
-  if (inverted) {
-    ctx.fillStyle = '#fff'
-    ctx.fillRect(0, 0, SIZE, SIZE)
-    if (pathData) {
-      ctx.fillStyle = '#000'
-      ctx.fill(new Path2D(pathData))
-    }
-  } else {
-    ctx.fillStyle = '#000'
-    ctx.fillRect(0, 0, SIZE, SIZE)
-    if (pathData) {
-      ctx.fillStyle = '#fff'
-      ctx.fill(new Path2D(pathData))
-    }
-  }
-  return canvas.toDataURL()
-}
-
-// ---------------------------------------------------------------------------
 // generateThumbnail — pure HTML Canvas 2D, no Konva dependency
 // ---------------------------------------------------------------------------
 
@@ -319,14 +277,6 @@ export function useThumbnailGenerator(): void {
             const url = await generateThumbnail(obj)
             if (url) setThumbnail(id, url)
             clearDirty(id)
-            if (obj.type === 'image') {
-              const imgObj = obj as ImageObject
-              if (imgObj.mask) {
-                setThumbnail(`${id}__mask`, generateMaskThumbnail(imgObj))
-              } else {
-                removeThumbnail(`${id}__mask`)
-              }
-            }
           } catch {
             clearDirty(id)
           }

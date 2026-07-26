@@ -1,18 +1,23 @@
 import React, { useCallback } from 'react'
 import { useCanvasStore } from './useCanvasStore'
 import { useViewportStore, selectScale } from './useViewportStore'
-import type { ImageObject, VideoObject } from '@/types/canvas'
+import type { ImageObject } from '@/types/canvas'
 
 /**
  * HTML overlay that renders "+ image" / "+ video" buttons centred over every
- * empty grid cell (ImageObject with isEmpty === true).
+ * empty media frame (ImageObject with isEmpty === true) — grid cells and
+ * standalone shape-derived frames alike. Filling routes through the frozen
+ * `insertMediaIntoFrame` store action so behaviour is identical everywhere.
  *
  * Coordinate system: identical to the frame-labels strip in CarouselStage —
  * absolute-positioned inside the `position: relative` container div, using
  *   left = panX + cell.frameX * scale
  *   top  = panY + cell.frameY * scale
+ *
+ * pointerEvents: the container is transparent (none) so single-clicks on empty
+ * cell space pass through to the Konva group hit rect; only the buttons capture.
  */
-export function GridCellOverlay() {
+export function EmptyFrameOverlay() {
   const objects = useCanvasStore((s) => s.objects)
   const objectOrder = useCanvasStore((s) => s.objectOrder)
   const panX = useViewportStore((s) => s.panX)
@@ -22,39 +27,24 @@ export function GridCellOverlay() {
   const handleFillImage = useCallback(async (cellId: string) => {
     const result = await window.electronAPI.openImageFile()
     if (result.canceled || !result.data) return
-
-    const frame = useCanvasStore.getState().objects[cellId] as ImageObject | undefined
-    if (!frame) return
+    if (!useCanvasStore.getState().objects[cellId]) return
 
     const img = new Image()
     img.src = result.data
     await img.decode()
 
-    const scale = Math.max(
-      frame.frameWidth / img.naturalWidth,
-      frame.frameHeight / img.naturalHeight,
-    )
-    const cw = img.naturalWidth * scale
-    const ch = img.naturalHeight * scale
-
-    useCanvasStore.getState().commitUpdate(cellId, {
-      isEmpty: false,
+    useCanvasStore.getState().insertMediaIntoFrame(cellId, {
+      kind: 'image',
       src: result.data,
       naturalWidth: img.naturalWidth,
       naturalHeight: img.naturalHeight,
-      contentWidth: cw,
-      contentHeight: ch,
-      contentOffsetX: (frame.frameWidth - cw) / 2,
-      contentOffsetY: (frame.frameHeight - ch) / 2,
-    } as any)
+    })
   }, [])
 
   const handleFillVideo = useCallback(async (cellId: string) => {
     const result = await window.electronAPI.openVideoFile()
     if (result.canceled || !result.filePath) return
-
-    const frame = useCanvasStore.getState().objects[cellId] as ImageObject | undefined
-    if (!frame) return
+    if (!useCanvasStore.getState().objects[cellId]) return
 
     const filePath = result.filePath
     const rawName = filePath.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'video'
@@ -65,46 +55,15 @@ export function GridCellOverlay() {
       const onMeta = () => {
         if (!isFinite(vid.duration) || vid.duration <= 0) return
         vid.removeEventListener('durationchange', onMeta)
-
-        // Cover-fit video into the cell frame
-        const s = Math.max(frame.frameWidth / vid.videoWidth, frame.frameHeight / vid.videoHeight)
-        const cw = vid.videoWidth * s
-        const ch = vid.videoHeight * s
-
-        const videoObj: VideoObject = {
-          id: crypto.randomUUID(),
-          type: 'video',
-          scope: 'global',
-          name: rawName,
+        useCanvasStore.getState().insertMediaIntoFrame(cellId, {
+          kind: 'video',
           filePath,
-          muted: false,
           naturalWidth: vid.videoWidth,
           naturalHeight: vid.videoHeight,
           naturalDuration: vid.duration,
-          frameX: frame.frameX,
-          frameY: frame.frameY,
-          frameWidth: frame.frameWidth,
-          frameHeight: frame.frameHeight,
-          contentOffsetX: (frame.frameWidth - cw) / 2,
-          contentOffsetY: (frame.frameHeight - ch) / 2,
-          contentWidth: cw,
-          contentHeight: ch,
-          contentEditMode: false,
-          x: frame.frameX,
-          y: frame.frameY,
-          width: frame.frameWidth,
-          height: frame.frameHeight,
-          rotation: 0,
-          scaleX: 1,
-          scaleY: 1,
-          opacity: 1,
-          visible: true,
-          locked: false,
-          zIndex: frame.zIndex,
-        }
-
+          name: rawName,
+        })
         vid.src = ''
-        useCanvasStore.getState().replaceGridCell(cellId, videoObj)
         resolve()
       }
       vid.addEventListener('durationchange', onMeta)
@@ -116,7 +75,14 @@ export function GridCellOverlay() {
   const emptyCells = objectOrder
     .map((id) => objects[id])
     .filter((obj): obj is ImageObject =>
-      obj?.type === 'image' && (obj as ImageObject).isEmpty === true,
+      obj?.type === 'image' &&
+      (obj as ImageObject).isEmpty === true &&
+      // Hidden frames must not show floating +image/+video buttons.
+      obj.visible !== false &&
+      // The overlay is an axis-aligned HTML box; it can't track a rotated frame's
+      // corners, so hide the buttons for any rotated frame (simplest v1 — the frame
+      // stays fillable via drag-drop and the Properties panel).
+      !obj.rotation,
     )
 
   const btnStyle: React.CSSProperties = {
@@ -156,8 +122,6 @@ export function GridCellOverlay() {
               alignItems: 'center',
               justifyContent: 'center',
               gap: 6,
-              // Container is transparent to pointer events — only the buttons intercept.
-              // This lets single-clicks on empty cell space pass through to the Konva group hit rect.
               pointerEvents: 'none',
             }}
           >

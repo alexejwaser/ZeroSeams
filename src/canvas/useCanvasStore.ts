@@ -1,7 +1,85 @@
 import { create } from 'zustand'
-import type { CanvasObject, ImageObject, GroupObject, ShapeObject, PathObject, ShapeKind, TextObject, VideoObject, GuidelineObject } from '@/types/canvas'
+import type { CanvasObject, ImageObject, GroupObject, ShapeObject, PathObject, ShapeKind, TextObject, VideoObject, GuidelineObject, ClipShape } from '@/types/canvas'
 import type { GridTemplate } from './gridTemplates'
 import type { Frame, FrameRatio, Platform, CarouselProject } from '@/types/project'
+import { fitCover } from './geometry'
+import { normalizeAnchors, denormalizeAnchors } from './frameClip'
+import { computePathBBox } from './CanvasPathNode'
+
+/** Media payload accepted by insertMediaIntoFrame. */
+export type InsertMedia =
+  | { kind: 'image'; src: string; naturalWidth: number; naturalHeight: number }
+  | {
+      kind: 'video'
+      filePath: string
+      naturalWidth: number
+      naturalHeight: number
+      naturalDuration: number
+      name?: string
+    }
+
+/** Build an empty media-frame ImageObject that inherits `f`'s geometry, clip,
+ *  fill and stroke. Used when clearing media back to an empty frame. */
+function frameToEmptyImage(f: ImageObject | VideoObject, id: string): ImageObject {
+  return {
+    id,
+    type: 'image',
+    scope: f.scope,
+    pinnedFrame: f.pinnedFrame,
+    parentGroupId: f.parentGroupId,
+    name: f.name,
+    isEmpty: true,
+    src: '',
+    backgroundRemoved: false,
+    frameX: f.frameX, frameY: f.frameY,
+    frameWidth: f.frameWidth, frameHeight: f.frameHeight,
+    x: f.x, y: f.y, width: f.width, height: f.height,
+    contentOffsetX: 0, contentOffsetY: 0,
+    contentWidth: 0, contentHeight: 0,
+    naturalWidth: 0, naturalHeight: 0,
+    contentEditMode: false,
+    clipEditMode: false,
+    clipShape: f.clipShape,
+    fill: f.fill,
+    frameStroke: f.frameStroke,
+    frameStrokeWidth: f.frameStrokeWidth,
+    rotation: f.rotation,
+    scaleX: 1, scaleY: 1,
+    opacity: f.opacity,
+    visible: f.visible,
+    locked: f.locked,
+    zIndex: f.zIndex,
+    effects: f.effects,
+  }
+}
+
+/** Clear clipEditMode on any image/video EXCEPT `keepId` (the object the
+ *  selection is moving to). Returns a partial state patch to merge inside an
+ *  existing set() — never a standalone set / history push — or null when nothing
+ *  changed. Only touches clipEditMode; contentEditMode is left untouched. */
+function clearClipEditExcept(
+  state: { objects: Record<string, CanvasObject>; _openEditModeCount: number },
+  keepId: string | null,
+): { objects: Record<string, CanvasObject>; _openEditModeCount: number } | null {
+  let changed = false
+  let cleared = 0
+  const updated: Record<string, CanvasObject> = {}
+  for (const [oid, obj] of Object.entries(state.objects)) {
+    if (
+      oid !== keepId &&
+      (obj.type === 'image' || obj.type === 'video') &&
+      (obj as ImageObject | VideoObject).clipEditMode
+    ) {
+      updated[oid] = { ...obj, clipEditMode: false } as CanvasObject
+      changed = true
+      cleared++
+    } else {
+      updated[oid] = obj
+    }
+  }
+  if (!changed) return null
+  return { objects: updated, _openEditModeCount: Math.max(0, state._openEditModeCount - cleared) }
+}
 
 // 'grid' arms the grid-template picker in the toolbar; the canvas itself
 // treats it like 'select' until a template is placed.
@@ -58,8 +136,8 @@ function getObjectBBox(obj: CanvasObject): { x: number; y: number; width: number
 // Opt #2 helper — edit-mode detection for a single object
 // ---------------------------------------------------------------------------
 function isInEditMode(obj: CanvasObject): boolean {
-  if (obj.type === 'image') return !!(obj as ImageObject).contentEditMode || !!(obj as ImageObject).maskEditMode
-  if (obj.type === 'video') return !!(obj as VideoObject).contentEditMode || !!(obj as VideoObject).maskEditMode
+  if (obj.type === 'image') return !!(obj as ImageObject).contentEditMode || !!(obj as ImageObject).clipEditMode
+  if (obj.type === 'video') return !!(obj as VideoObject).contentEditMode || !!(obj as VideoObject).clipEditMode
   if (obj.type === 'path') return !!(obj as PathObject).pathEditMode
   return false
 }
@@ -84,7 +162,9 @@ function reinjectSrc(
 ): Record<string, CanvasObject> {
   const result: Record<string, CanvasObject> = {}
   for (const [id, obj] of Object.entries(objects)) {
-    if (obj.type === 'image') {
+    // Empty frames had src === '' for real at this point in history — the vault
+    // entry belongs to a later/earlier filled state, not to this snapshot.
+    if (obj.type === 'image' && !(obj as ImageObject).isEmpty) {
       const v = vault.get(id)
       if (v) {
         const cached = reinjectedCache.get(obj)
@@ -179,14 +259,21 @@ interface CanvasState {
   redo: () => void
   clearContentEditMode: () => void
   clearPathEditMode: () => void
-  clearMaskEditMode: () => void
-  enterMaskEditMode: (id: string) => void
-  maskDrawMode: { id: string; tool: 'pen' | 'rect' | 'ellipse' } | null
-  enterMaskDrawMode: (id: string, tool: 'pen' | 'rect' | 'ellipse') => void
-  clearMaskDrawMode: () => void
-  /** Transient flag — true when the selected object is an image (enables mask-draw interception). Not stored in history. */
-  maskModeActive: boolean
-  setMaskModeActive: (v: boolean) => void
+  /** Clear clip-shape edit mode on all media frames. */
+  clearClipEditMode: () => void
+  /** Enter clip-shape edit mode on one frame; clears contentEditMode everywhere. */
+  enterClipEditMode: (id: string) => void
+  // --- Media-frame conversions (all id-preserving, one history entry each) ---
+  /** Same-id object swap; preserves objectOrder position, parentGroupId, srcVault. */
+  swapObjectPreservingId: (id: string, replacement: CanvasObject) => void
+  /** rect/ellipse shape or closed path → empty media frame (same id). No-op otherwise. */
+  convertShapeToFrame: (id: string) => void
+  /** Media/empty frame → ShapeObject or PathObject (same id). Drops media. */
+  convertFrameToShape: (id: string) => void
+  /** Drop image/video media into an empty (or existing) frame. */
+  insertMediaIntoFrame: (id: string, media: InsertMedia) => void
+  /** Clear a frame's media back to an empty ImageObject, keeping frame geometry/clip/fill. */
+  removeMediaFromFrame: (id: string) => void
   /** Transient toolbar UI flags — not stored in history */
   showFrameSettings: boolean
   setShowFrameSettings: (v: boolean | ((prev: boolean) => boolean)) => void
@@ -249,7 +336,7 @@ function normalizeObjectsForSnapshot(
   for (const [id, obj] of Object.entries(objects)) {
     if (obj.type === 'image') {
       const img = obj as ImageObject
-      const clearModes = hasOpenEditModes && (img.contentEditMode || img.maskEditMode)
+      const clearModes = hasOpenEditModes && (img.contentEditMode || img.clipEditMode)
       // src is always non-empty on live objects, so images always need a stripped copy
       if (clearModes) {
         // Rare path (edit mode open during commit) — don't pollute the cache,
@@ -257,7 +344,7 @@ function normalizeObjectsForSnapshot(
         result[id] = {
           ...img,
           contentEditMode: false,
-          maskEditMode: false,
+          clipEditMode: false,
           src: '',
           originalSrc: undefined,
         } as CanvasObject
@@ -272,8 +359,8 @@ function normalizeObjectsForSnapshot(
       changed = true
     } else if (obj.type === 'video') {
       const vid = obj as VideoObject
-      if (hasOpenEditModes && (vid.contentEditMode || vid.maskEditMode)) {
-        result[id] = { ...vid, contentEditMode: false, maskEditMode: false } as CanvasObject
+      if (hasOpenEditModes && (vid.contentEditMode || vid.clipEditMode)) {
+        result[id] = { ...vid, contentEditMode: false, clipEditMode: false } as CanvasObject
         changed = true
         continue
       }
@@ -314,6 +401,46 @@ export const useCanvasStore = create<CanvasState>((set) => {
     return [...trimmed, snapshot]
   }
 
+  // Id-preserving object swap: replaces state.objects[id] with `replacement`
+  // (forced to the same id), keeping the object's objectOrder position and
+  // parentGroupId, updating _srcVault and _openEditModeCount. Returns a state
+  // patch, or null when the id is absent. One history entry.
+  function idPreservingSwapState(
+    state: CanvasState,
+    id: string,
+    replacement: CanvasObject,
+  ): Partial<CanvasState> | null {
+    const old = state.objects[id]
+    if (!old) return null
+    const next = {
+      ...replacement,
+      id,
+      ...(old.parentGroupId ? { parentGroupId: old.parentGroupId } : {}),
+    } as CanvasObject
+
+    // srcVault: register src for image replacements. When the replacement has
+    // no src (empty frame, shape conversion), KEEP the old entry — undo restores
+    // the pre-swap snapshot and reinjectSrc needs the vault to repopulate src.
+    let nextVault = state._srcVault
+    if (next.type === 'image' && (next as ImageObject).src) {
+      const img = next as ImageObject
+      nextVault = new Map(state._srcVault)
+      nextVault.set(id, { src: img.src, originalSrc: img.originalSrc })
+    }
+
+    const wasOpen = isInEditMode(old)
+    const isOpen = isInEditMode(next)
+    const countDelta = (!wasOpen && isOpen) ? 1 : (wasOpen && !isOpen) ? -1 : 0
+
+    return {
+      past: pushHistoryFrom(state),
+      future: [],
+      objects: { ...state.objects, [id]: next },
+      _srcVault: nextVault,
+      _openEditModeCount: state._openEditModeCount + countDelta,
+    }
+  }
+
   return {
     objects: {},
     objectOrder: [],
@@ -343,8 +470,6 @@ export const useCanvasStore = create<CanvasState>((set) => {
     textEditingId: null,
     textSelection: null,
     captureTextSelection: null,
-    maskDrawMode: null,
-    maskModeActive: false,
     showFrameSettings: false,
     exportOpen: false,
     _dragStartObjects: null,
@@ -477,9 +602,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
             contentWidth: 0, contentHeight: 0,
             contentOffsetX: 0, contentOffsetY: 0,
             contentEditMode: false,
-            maskEditMode: false,
+            clipEditMode: false,
             adjustments: undefined,
-            mask: undefined,
           }
           let nextVault = state._srcVault
           if (state._srcVault.has(id)) {
@@ -511,8 +635,12 @@ export const useCanvasStore = create<CanvasState>((set) => {
             naturalWidth: 0, naturalHeight: 0,
             contentWidth: 0, contentHeight: 0,
             contentOffsetX: 0, contentOffsetY: 0,
-            contentEditMode: false, maskEditMode: false,
+            contentEditMode: false, clipEditMode: false,
             backgroundRemoved: false,
+            clipShape: cell.clipShape,
+            fill: cell.fill,
+            frameStroke: cell.frameStroke,
+            frameStrokeWidth: cell.frameStrokeWidth,
             rotation: cell.rotation, scaleX: cell.scaleX, scaleY: cell.scaleY,
             opacity: cell.opacity, visible: cell.visible, locked: cell.locked,
             scope: cell.scope, zIndex: cell.zIndex,
@@ -550,10 +678,11 @@ export const useCanvasStore = create<CanvasState>((set) => {
 
     setSelected: (id) =>
       set((state) => ({
+        // Moving selection to a different object ends any lingering clip-edit session.
+        ...(clearClipEditExcept(state, id) ?? {}),
         selectedId: id,
         selectedIds: id !== null ? [id] : [],
         anchorId: null,
-        maskModeActive: id !== null && state.objects[id]?.type === 'image',
       })),
 
     addToSelection: (id) =>
@@ -562,12 +691,14 @@ export const useCanvasStore = create<CanvasState>((set) => {
         if (already) {
           const newIds = state.selectedIds.filter((sid) => sid !== id)
           return {
+            ...(clearClipEditExcept(state, id) ?? {}),
             selectedIds: newIds,
             selectedId: newIds.length > 0 ? newIds[newIds.length - 1] : null,
             anchorId: state.anchorId === id ? null : state.anchorId,
           }
         }
         return {
+          ...(clearClipEditExcept(state, id) ?? {}),
           selectedIds: [...state.selectedIds, id],
           // Set selectedId when coming from empty selection so properties panel shows something
           selectedId: state.selectedId ?? id,
@@ -575,11 +706,12 @@ export const useCanvasStore = create<CanvasState>((set) => {
       }),
 
     setSelectedIds: (ids) =>
-      set({
+      set((state) => ({
+        ...(clearClipEditExcept(state, ids.length > 0 ? ids[ids.length - 1] : null) ?? {}),
         selectedIds: ids,
         selectedId: ids.length > 0 ? ids[ids.length - 1] : null,
         anchorId: null,
-      }),
+      })),
 
     setAnchor: (id) =>
       set((state) => {
@@ -1060,8 +1192,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
             updated[id] = obj
           }
         }
-        if (!changed) return { maskDrawMode: null }
-        return { objects: updated, maskDrawMode: null, _openEditModeCount: 0 }
+        if (!changed) return {}
+        return { objects: updated, _openEditModeCount: 0 }
       }),
 
     clearPathEditMode: () =>
@@ -1076,27 +1208,27 @@ export const useCanvasStore = create<CanvasState>((set) => {
             updated[id] = obj
           }
         }
-        if (!changed) return { maskDrawMode: null }
-        return { objects: updated, maskDrawMode: null, _openEditModeCount: 0 }
+        if (!changed) return {}
+        return { objects: updated, _openEditModeCount: 0 }
       }),
 
-    clearMaskEditMode: () =>
+    clearClipEditMode: () =>
       set((state) => {
         const updated: Record<string, CanvasObject> = {}
         let changed = false
         for (const [id, obj] of Object.entries(state.objects)) {
-          if ((obj.type === 'image' || obj.type === 'video') && (obj as ImageObject | VideoObject).maskEditMode) {
-            updated[id] = { ...obj, maskEditMode: false } as CanvasObject
+          if ((obj.type === 'image' || obj.type === 'video') && (obj as ImageObject | VideoObject).clipEditMode) {
+            updated[id] = { ...obj, clipEditMode: false } as CanvasObject
             changed = true
           } else {
             updated[id] = obj
           }
         }
-        if (!changed) return { maskDrawMode: null }
-        return { objects: updated, maskDrawMode: null, _openEditModeCount: 0 }
+        if (!changed) return {}
+        return { objects: updated, _openEditModeCount: 0 }
       }),
 
-    enterMaskEditMode: (id) =>
+    enterClipEditMode: (id) =>
       set((state) => {
         const updated: Record<string, CanvasObject> = {}
         for (const [oid, obj] of Object.entries(state.objects)) {
@@ -1104,34 +1236,258 @@ export const useCanvasStore = create<CanvasState>((set) => {
             updated[oid] = {
               ...obj,
               contentEditMode: false,
-              maskEditMode: oid === id,
+              clipEditMode: oid === id,
             } as CanvasObject
           } else {
             updated[oid] = obj
           }
         }
-        // Exactly one object is now in maskEditMode
-        return { objects: updated, maskDrawMode: null, _openEditModeCount: 1 }
+        // Exactly one object is now in clipEditMode
+        return { objects: updated, _openEditModeCount: 1 }
       }),
 
-    enterMaskDrawMode: (id, tool) =>
+    swapObjectPreservingId: (id, replacement) =>
+      set((state) => idPreservingSwapState(state, id, replacement) ?? state),
+
+    convertShapeToFrame: (id) =>
       set((state) => {
-        const updated: Record<string, CanvasObject> = {}
-        for (const [oid, obj] of Object.entries(state.objects)) {
-          if (obj.type === 'image' || obj.type === 'video') {
-            updated[oid] = { ...obj, contentEditMode: false, maskEditMode: false } as CanvasObject
-          } else if (obj.type === 'path') {
-            updated[oid] = { ...(obj as PathObject), pathEditMode: false } as CanvasObject
+        const obj = state.objects[id]
+        if (!obj) return state
+
+        let frameRect: { x: number; y: number; width: number; height: number }
+        let clipShape: ClipShape
+        let fillColor: string
+        let stroke: string
+        let strokeWidth: number
+        let rotation: number
+
+        if (obj.type === 'shape') {
+          const s = obj as ShapeObject
+          if (s.kind !== 'rect' && s.kind !== 'ellipse') return state // no-op for line/arrow
+          // Pivot rule: the frame Group rotates about its top-left origin (frameX/frameY).
+          // A Rect ShapeObject also rotates about its top-left, so its geometry maps 1:1.
+          // A Konva Ellipse rotates about its CENTER, so offset the frame origin to keep
+          // the rotated frame visually coincident with the rotated ellipse.
+          if (s.kind === 'ellipse' && s.rotation) {
+            const rad = (s.rotation * Math.PI) / 180
+            const cos = Math.cos(rad), sin = Math.sin(rad)
+            const hw = s.width / 2, hh = s.height / 2
+            frameRect = {
+              x: s.x + hw - (hw * cos - hh * sin),
+              y: s.y + hh - (hw * sin + hh * cos),
+              width: s.width, height: s.height,
+            }
           } else {
-            updated[oid] = obj
+            frameRect = { x: s.x, y: s.y, width: s.width, height: s.height }
           }
+          clipShape = s.kind === 'rect'
+            ? { kind: 'rect', ...(s.cornerRadius ? { cornerRadius: s.cornerRadius } : {}) }
+            : { kind: 'ellipse' }
+          fillColor = s.fill
+          stroke = s.stroke
+          strokeWidth = s.strokeWidth
+          rotation = s.rotation
+        } else if (obj.type === 'path') {
+          const p = obj as PathObject
+          if (!p.closed) return state // no-op for open paths
+          const bbox = computePathBBox(p.anchors, true)
+          frameRect = { x: bbox.x, y: bbox.y, width: bbox.width, height: bbox.height }
+          clipShape = { kind: 'path', anchors: normalizeAnchors(p.anchors, bbox) }
+          fillColor = p.fill
+          stroke = p.stroke
+          strokeWidth = p.strokeWidth
+          rotation = p.rotation
+        } else {
+          return state
         }
-        return { objects: updated, maskDrawMode: { id, tool }, _openEditModeCount: 0 }
+
+        const frame: ImageObject = {
+          id,
+          type: 'image',
+          scope: obj.scope,
+          pinnedFrame: obj.pinnedFrame,
+          parentGroupId: obj.parentGroupId,
+          name: obj.name,
+          isEmpty: true,
+          src: '',
+          backgroundRemoved: false,
+          frameX: frameRect.x, frameY: frameRect.y,
+          frameWidth: frameRect.width, frameHeight: frameRect.height,
+          x: frameRect.x, y: frameRect.y,
+          width: frameRect.width, height: frameRect.height,
+          contentOffsetX: 0, contentOffsetY: 0,
+          contentWidth: 0, contentHeight: 0,
+          naturalWidth: 0, naturalHeight: 0,
+          contentEditMode: false,
+          clipEditMode: false,
+          clipShape,
+          fill: { type: 'solid', color: fillColor },
+          frameStroke: stroke,
+          frameStrokeWidth: strokeWidth,
+          rotation,
+          scaleX: 1, scaleY: 1,
+          opacity: obj.opacity,
+          visible: obj.visible,
+          locked: obj.locked,
+          zIndex: obj.zIndex,
+          effects: obj.effects,
+        }
+        return idPreservingSwapState(state, id, frame) ?? state
       }),
 
-    clearMaskDrawMode: () => set({ maskDrawMode: null }),
+    convertFrameToShape: (id) =>
+      set((state) => {
+        const obj = state.objects[id]
+        if (!obj || (obj.type !== 'image' && obj.type !== 'video')) return state
+        const f = obj as ImageObject | VideoObject
+        const clip: ClipShape = f.clipShape ?? { kind: 'rect' }
+        const fillColor = f.fill?.color ?? '#ffffff'
+        const stroke = f.frameStroke ?? '#000000'
+        const strokeWidth = f.frameStrokeWidth ?? 0
 
-    setMaskModeActive: (v) => set({ maskModeActive: v }),
+        const common = {
+          id,
+          scope: f.scope,
+          pinnedFrame: f.pinnedFrame,
+          parentGroupId: f.parentGroupId,
+          name: f.name,
+          rotation: f.rotation,
+          scaleX: 1,
+          scaleY: 1,
+          opacity: f.opacity,
+          visible: f.visible,
+          locked: f.locked,
+          zIndex: f.zIndex,
+          effects: f.effects,
+        }
+
+        let replacement: CanvasObject
+        if (clip.kind === 'path') {
+          // Pivot rule: the frame Group rotates about its top-left origin (frameX/frameY).
+          // PathObjects always carry rotation: 0 with rotation baked into the anchors
+          // (CanvasPathNode applies no rotation prop). So denormalize to frame-local px,
+          // then rotate every point + handle about the frame origin and emit rotation: 0
+          // — otherwise the frame's rotation would be silently dropped on conversion.
+          const rad = (f.rotation * Math.PI) / 180
+          const cos = Math.cos(rad), sin = Math.sin(rad)
+          const denorm = denormalizeAnchors(clip.anchors, f.frameWidth, f.frameHeight).map((a) => ({
+            x: f.frameX + a.x * cos - a.y * sin,
+            y: f.frameY + a.x * sin + a.y * cos,
+            handleIn: { dx: a.handleIn.dx * cos - a.handleIn.dy * sin, dy: a.handleIn.dx * sin + a.handleIn.dy * cos },
+            handleOut: { dx: a.handleOut.dx * cos - a.handleOut.dy * sin, dy: a.handleOut.dx * sin + a.handleOut.dy * cos },
+          }))
+          const bbox = computePathBBox(denorm, true)
+          replacement = {
+            ...common,
+            rotation: 0,
+            type: 'path',
+            anchors: denorm,
+            closed: true,
+            fill: fillColor,
+            stroke,
+            strokeWidth,
+            pathEditMode: false,
+            x: bbox.x, y: bbox.y, width: bbox.width, height: bbox.height,
+          } as PathObject
+        } else {
+          // Rect keeps the frame's top-left origin (same pivot). A Konva Ellipse rotates
+          // about its center, so offset its origin — inverse of convertShapeToFrame.
+          let sx = f.frameX, sy = f.frameY
+          if (clip.kind === 'ellipse' && f.rotation) {
+            const rad = (f.rotation * Math.PI) / 180
+            const cos = Math.cos(rad), sin = Math.sin(rad)
+            const hw = f.frameWidth / 2, hh = f.frameHeight / 2
+            sx = f.frameX - hw + (hw * cos - hh * sin)
+            sy = f.frameY - hh + (hw * sin + hh * cos)
+          }
+          replacement = {
+            ...common,
+            type: 'shape',
+            kind: clip.kind === 'ellipse' ? 'ellipse' : 'rect',
+            fill: fillColor,
+            stroke,
+            strokeWidth,
+            ...(clip.kind === 'rect' && clip.cornerRadius ? { cornerRadius: clip.cornerRadius } : {}),
+            x: sx, y: sy, width: f.frameWidth, height: f.frameHeight,
+          } as ShapeObject
+        }
+        return idPreservingSwapState(state, id, replacement) ?? state
+      }),
+
+    insertMediaIntoFrame: (id, media) =>
+      set((state) => {
+        const obj = state.objects[id]
+        if (!obj || (obj.type !== 'image' && obj.type !== 'video')) return state
+        const frame = obj as ImageObject | VideoObject
+        const cover = fitCover(media.naturalWidth, media.naturalHeight, frame.frameWidth, frame.frameHeight)
+
+        if (media.kind === 'image') {
+          const base = obj.type === 'image' ? (obj as ImageObject) : frameToEmptyImage(frame, id)
+          const newImage: ImageObject = {
+            ...base,
+            isEmpty: false,
+            src: media.src,
+            originalSrc: undefined,
+            backgroundRemoved: false,
+            naturalWidth: media.naturalWidth,
+            naturalHeight: media.naturalHeight,
+            contentOffsetX: cover.contentOffsetX,
+            contentOffsetY: cover.contentOffsetY,
+            contentWidth: cover.contentWidth,
+            contentHeight: cover.contentHeight,
+            contentEditMode: false,
+            clipEditMode: false,
+          }
+          return idPreservingSwapState(state, id, newImage) ?? state
+        }
+
+        const video: VideoObject = {
+          id,
+          type: 'video',
+          scope: frame.scope,
+          pinnedFrame: frame.pinnedFrame,
+          parentGroupId: frame.parentGroupId,
+          name: media.name ?? frame.name,
+          filePath: media.filePath,
+          muted: false,
+          naturalWidth: media.naturalWidth,
+          naturalHeight: media.naturalHeight,
+          naturalDuration: media.naturalDuration,
+          frameX: frame.frameX, frameY: frame.frameY,
+          frameWidth: frame.frameWidth, frameHeight: frame.frameHeight,
+          x: frame.x, y: frame.y, width: frame.width, height: frame.height,
+          contentOffsetX: cover.contentOffsetX,
+          contentOffsetY: cover.contentOffsetY,
+          contentWidth: cover.contentWidth,
+          contentHeight: cover.contentHeight,
+          contentEditMode: false,
+          clipEditMode: false,
+          clipShape: frame.clipShape,
+          fill: frame.fill,
+          frameStroke: frame.frameStroke,
+          frameStrokeWidth: frame.frameStrokeWidth,
+          rotation: frame.rotation,
+          scaleX: 1, scaleY: 1,
+          opacity: frame.opacity,
+          visible: frame.visible,
+          locked: frame.locked,
+          zIndex: frame.zIndex,
+          effects: frame.effects,
+          // Carry photo adjustments across the swap (VideoSection composes the same
+          // AdjustmentsSection) — mirrors the image branch, which inherits them via
+          // the `...base` spread.
+          adjustments: frame.adjustments,
+        }
+        return idPreservingSwapState(state, id, video) ?? state
+      }),
+
+    removeMediaFromFrame: (id) =>
+      set((state) => {
+        const obj = state.objects[id]
+        if (!obj || (obj.type !== 'image' && obj.type !== 'video')) return state
+        const frame = obj as ImageObject | VideoObject
+        return idPreservingSwapState(state, id, frameToEmptyImage(frame, id)) ?? state
+      }),
 
     setShowFrameSettings: (v) => set((state) => ({ showFrameSettings: typeof v === 'function' ? v(state.showFrameSettings) : v })),
     setExportOpen: (v) => set((state) => ({ exportOpen: typeof v === 'function' ? v(state.exportOpen) : v })),
@@ -1200,16 +1556,19 @@ export const useCanvasStore = create<CanvasState>((set) => {
               migratedObjects[id] = obj
             }
           } else if (obj.type === 'image') {
-            const img = obj as ImageObject & { maskEditMode?: boolean }
+            // Strip legacy mask fields (deleted in the media-frame migration).
+            const { mask: _mask, maskEditMode: _maskEdit, ...img } =
+              obj as ImageObject & { mask?: unknown; maskEditMode?: boolean }
             migratedObjects[id] = {
               ...img,
-              maskEditMode: img.maskEditMode ?? false,
+              clipEditMode: false,
             } as ImageObject
           } else if (obj.type === 'video') {
-            const vid = obj as VideoObject
+            const { mask: _mask, maskEditMode: _maskEdit, ...vid } =
+              obj as VideoObject & { mask?: unknown; maskEditMode?: boolean }
             migratedObjects[id] = {
               ...vid,
-              maskEditMode: vid.maskEditMode ?? false,
+              clipEditMode: false,
             } as VideoObject
           } else {
             migratedObjects[id] = obj
@@ -1333,7 +1692,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
             id: newId,
             name: undefined,
             contentEditMode: false,
-            maskEditMode: false,
+            clipEditMode: false,
             frameX: img.frameX + offsetX,
             frameY: img.frameY + offsetY,
             x: img.x + offsetX,
@@ -1394,7 +1753,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
             id: newId,
             name: undefined,
             contentEditMode: false,
-            maskEditMode: false,
+            clipEditMode: false,
             frameX: op.frameX,
             frameY: op.frameY,
             x: op.frameX,
@@ -1517,7 +1876,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
             naturalWidth: 0,
             naturalHeight: 0,
             contentEditMode: false,
-            maskEditMode: false,
+            clipEditMode: false,
+            fill: { type: 'solid', color: '#d9d2c7' },
             rotation: 0,
             opacity: 1,
             visible: true,

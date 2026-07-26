@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
-import { useThumbnailStore } from '@/canvas/useThumbnailStore'
 import { useAI } from '@/ai'
 import { useAIStore } from '@/ai'
 import { useExternalEdit } from '@/canvas/useExternalEdit'
@@ -9,8 +8,6 @@ import type { BackgroundRemovalOperation } from '@/types/ai'
 import type { ImageObject, TextObject, ShapeObject, PathObject, VideoObject, GroupObject, GuidelineObject, CanvasObject } from '@/types/canvas'
 import { GRID_TEMPLATES } from '@/canvas/gridTemplates'
 import Tooltip from './Tooltip'
-import { iconBtnStyle } from './iconBtnStyle'
-import { PenTool, Square, Circle, Trash2, Pencil, Eye, EyeOff } from 'lucide-react'
 import './adjustments.css'
 import { ColorInput } from './ColorInput'
 import { NumericInput } from './NumericInput'
@@ -23,6 +20,37 @@ import { TextSection } from './properties/TextSection'
 import { EffectsSection } from './properties/EffectsSection'
 import { AdjustmentsSection } from './properties/AdjustmentsSection'
 import { VideoSection } from './properties/VideoSection'
+import { FrameSection } from './properties/FrameSection'
+import { pickImageMedia, pickVideoMedia } from './properties/mediaPickers'
+
+// A media frame is an image/video object that owns clip/fill/stroke state
+// (clipShape) or is an empty placeholder awaiting media (isEmpty).
+function isFrameObject(obj: CanvasObject | null): obj is ImageObject | VideoObject {
+  if (obj == null || (obj.type !== 'image' && obj.type !== 'video')) return false
+  const f = obj as ImageObject | VideoObject
+  return f.clipShape != null || (obj.type === 'image' && (obj as ImageObject).isEmpty === true)
+}
+
+// Converts a rect/ellipse shape or closed path into a media frame in one
+// gesture, then inserts the picked media. Two sequential store calls =
+// two undo steps for v1 (see FrameSection deviation notes).
+async function insertMediaIntoShape(id: string, mediaKind: 'image' | 'video'): Promise<void> {
+  const media = mediaKind === 'image' ? await pickImageMedia() : await pickVideoMedia()
+  if (!media) return
+  useCanvasStore.getState().convertShapeToFrame(id)
+  useCanvasStore.getState().insertMediaIntoFrame(id, media)
+}
+
+const mediaFrameCtaButtonStyle: React.CSSProperties = {
+  flex: 1,
+  height: 28,
+  background: '#ffffff',
+  color: '#555555',
+  border: '1px solid #d4ccc2',
+  borderRadius: 999,
+  cursor: 'pointer',
+  fontSize: 12,
+}
 
 // ---------------------------------------------------------------------------
 // CanvasSection — shown when nothing is selected
@@ -50,15 +78,10 @@ export function PropertiesPanel(): React.ReactElement {
   const startDrag = useCanvasStore((s) => s.startDrag)
   const adjustmentsBypass = useCanvasStore((s) => s.adjustmentsBypass)
   const toggleAdjustmentsBypass = useCanvasStore((s) => s.toggleAdjustmentsBypass)
-  const enterMaskEditMode = useCanvasStore((s) => s.enterMaskEditMode)
-  const maskDrawMode = useCanvasStore((s) => s.maskDrawMode)
-  const enterMaskDrawMode = useCanvasStore((s) => s.enterMaskDrawMode)
-  const clearMaskDrawMode = useCanvasStore((s) => s.clearMaskDrawMode)
   const alignObjects = useCanvasStore((s) => s.alignObjects)
   const anchorId = useCanvasStore((s) => s.anchorId)
   const setAnchor = useCanvasStore((s) => s.setAnchor)
 
-  const thumbnails = useThumbnailStore((s) => s.thumbnails)
   const distributeObjects = useCanvasStore((s) => s.distributeObjects)
   const textEditingId = useCanvasStore((s) => s.textEditingId)
   const textSelection = useCanvasStore((s) => s.textSelection)
@@ -235,6 +258,15 @@ export function PropertiesPanel(): React.ReactElement {
         {/* Video object */}
         {!isMultiSelect && selectedObj !== null && isVideo && selectedId !== null && (
           <>
+            {isFrameObject(selectedObj) && (
+              <FrameSection
+                frameObj={selectedObj as VideoObject}
+                selectedId={selectedId}
+                onStartDrag={startDrag}
+                onUpdate={updateObject}
+                onCommit={commitUpdate}
+              />
+            )}
             <VideoSection
               videoObj={selectedObj as VideoObject}
               selectedId={selectedId}
@@ -365,6 +397,23 @@ export function PropertiesPanel(): React.ReactElement {
               {shapeObj.kind === 'rect' && (
                 <NumberField label="Corner R." value={shapeObj.cornerRadius ?? 0} min={0} onChange={(val) => { commitUpdate(shapeObj.id, { cornerRadius: val }) }} />
               )}
+              {(shapeObj.kind === 'rect' || shapeObj.kind === 'ellipse') && (
+                <div style={{ marginTop: 4, marginBottom: 8, padding: 8, border: '1px dashed #d4ccc2', borderRadius: 12 }}>
+                  <div style={sectionLabelStyle}>Media Frame</div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <Tooltip label="Convert to a media frame and insert an image">
+                      <button style={mediaFrameCtaButtonStyle} onClick={() => { void insertMediaIntoShape(shapeObj.id, 'image') }}>
+                        + Image
+                      </button>
+                    </Tooltip>
+                    <Tooltip label="Convert to a media frame and insert a video">
+                      <button style={mediaFrameCtaButtonStyle} onClick={() => { void insertMediaIntoShape(shapeObj.id, 'video') }}>
+                        + Video
+                      </button>
+                    </Tooltip>
+                  </div>
+                </div>
+              )}
               <EffectsSection
                 effects={shapeObj.effects}
                 onUpdate={(fx) => updateObject(shapeObj.id, { effects: fx })}
@@ -425,6 +474,23 @@ export function PropertiesPanel(): React.ReactElement {
                 step={0.5}
                 onChange={(val) => { commitUpdate(pathObj.id, { strokeWidth: val }) }}
               />
+              {pathObj.closed && (
+                <div style={{ marginTop: 4, marginBottom: 8, padding: 8, border: '1px dashed #d4ccc2', borderRadius: 12 }}>
+                  <div style={sectionLabelStyle}>Media Frame</div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <Tooltip label="Convert to a media frame and insert an image">
+                      <button style={mediaFrameCtaButtonStyle} onClick={() => { void insertMediaIntoShape(pathObj.id, 'image') }}>
+                        + Image
+                      </button>
+                    </Tooltip>
+                    <Tooltip label="Convert to a media frame and insert a video">
+                      <button style={mediaFrameCtaButtonStyle} onClick={() => { void insertMediaIntoShape(pathObj.id, 'video') }}>
+                        + Video
+                      </button>
+                    </Tooltip>
+                  </div>
+                </div>
+              )}
               <EffectsSection
                 effects={pathObj.effects}
                 onUpdate={(fx) => updateObject(pathObj.id, { effects: fx })}
@@ -599,10 +665,14 @@ export function PropertiesPanel(): React.ReactElement {
                     onCommit={v => commitUpdate(imgObj.id, { opacity: v / 100 })}
                   />
                 </div>
-                {(imgObj as ImageObject).isEmpty && (
-                  <div style={{ padding: '4px 0 8px', color: 'var(--text-muted)', fontSize: 12, fontStyle: 'italic' }}>
-                    No media — click + to add
-                  </div>
+                {isFrameObject(imgObj) && (
+                  <FrameSection
+                    frameObj={imgObj}
+                    selectedId={selectedId!}
+                    onStartDrag={startDrag}
+                    onUpdate={updateObject}
+                    onCommit={commitUpdate}
+                  />
                 )}
                 {imgObj.parentGroupId && (
                   <div style={{ marginTop: 8, marginBottom: 4 }}>
@@ -628,188 +698,6 @@ export function PropertiesPanel(): React.ReactElement {
                   Double-click image to edit content
                 </div>
 
-                {/* Mask section */}
-                <div style={{ borderTop: '1px solid #e8e0d5', paddingTop: 10, marginTop: 4, marginBottom: 10 }}>
-                  <div style={{ color: '#555555', fontSize: 9, fontWeight: 700, letterSpacing: '1.5px',
-                    textTransform: 'uppercase' as const, fontFamily: 'var(--font)', marginBottom: 8 }}>Mask</div>
-
-                  {imgObj.maskEditMode ? (
-                    /* Mask edit mode active banner */
-                    <div style={{
-                      background: 'rgba(82,183,136,0.1)',
-                      border: '1px solid #52b788',
-                      borderRadius: 8,
-                      padding: '6px 10px',
-                      marginBottom: 8,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}>
-                      <span style={{ color: '#2d6a4f', fontSize: 11 }}>Editing mask path</span>
-                      <button
-                        onClick={() => {
-                          if (selectedId) commitUpdate(selectedId, { maskEditMode: false })
-                        }}
-                        style={{
-                          background: '#2d6a4f',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: 999,
-                          padding: '2px 8px',
-                          cursor: 'pointer',
-                          fontSize: 11,
-                        }}
-                      >
-                        Done
-                      </button>
-                    </div>
-                  ) : imgObj.mask == null ? (
-                    /* No mask — draw mode picker or active draw banner */
-                    maskDrawMode?.id === selectedId ? (
-                      /* Draw in progress for this image */
-                      <div>
-                        <div style={{ color: '#f94608', fontSize: 11, marginBottom: 8 }}>
-                          Drawing {maskDrawMode.tool} mask —{' '}
-                          {maskDrawMode.tool === 'pen'
-                            ? 'click to add points, close path to finish'
-                            : 'drag to define shape'}
-                        </div>
-                        <button
-                          onClick={() => clearMaskDrawMode()}
-                          style={{
-                            width: '100%',
-                            height: 28,
-                            background: 'rgba(249,70,8,0.08)',
-                            color: '#f94608',
-                            border: '1px solid #f94608',
-                            borderRadius: 999,
-                            cursor: 'pointer',
-                            fontSize: 12,
-                          }}
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    ) : (
-                      /* Tool picker — icon-only buttons */
-                      <div>
-                        <div style={{ color: '#555555', fontSize: 11, marginBottom: 6 }}>Add mask:</div>
-                        <div style={{ display: 'flex', gap: 6 }}>
-                          <Tooltip label="Pen mask">
-                            <button
-                              onClick={() => { if (selectedId) enterMaskDrawMode(selectedId, 'pen') }}
-                              style={iconBtnStyle()}
-                            >
-                              <PenTool size={14} />
-                            </button>
-                          </Tooltip>
-                          <Tooltip label="Rectangle mask">
-                            <button
-                              onClick={() => { if (selectedId) enterMaskDrawMode(selectedId, 'rect') }}
-                              style={iconBtnStyle()}
-                            >
-                              <Square size={14} />
-                            </button>
-                          </Tooltip>
-                          <Tooltip label="Oval mask">
-                            <button
-                              onClick={() => { if (selectedId) enterMaskDrawMode(selectedId, 'ellipse') }}
-                              style={iconBtnStyle()}
-                            >
-                              <Circle size={14} />
-                            </button>
-                          </Tooltip>
-                        </div>
-                      </div>
-                    )
-                  ) : (
-                    /* Mask controls */
-                    <>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                        {thumbnails[`${selectedId}__mask`] != null && (
-                          <div style={{
-                            width: 36, height: 36, flexShrink: 0, borderRadius: 6,
-                            overflow: 'hidden', border: '1px solid #d4ccc2', background: '#f5ede2',
-                          }}>
-                            <img
-                              src={thumbnails[`${selectedId}__mask`]}
-                              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                              alt="mask"
-                              draggable={false}
-                            />
-                          </div>
-                        )}
-                        <Tooltip label="Edit mask">
-                          <button
-                            onClick={() => { if (selectedId) enterMaskEditMode(selectedId) }}
-                            style={{ ...iconBtnStyle(), flex: 1, width: 'auto' }}
-                          >
-                            <Pencil size={14} />
-                          </button>
-                        </Tooltip>
-                        <Tooltip label={imgObj.mask.visible ? 'Hide mask' : 'Show mask'}>
-                          <button
-                            onClick={() => {
-                              if (selectedId) commitUpdate(selectedId, { mask: { ...imgObj.mask!, visible: !imgObj.mask!.visible } })
-                            }}
-                            style={iconBtnStyle()}
-                          >
-                            {imgObj.mask.visible
-                              ? <Eye size={14} />
-                              : <EyeOff size={14} />}
-                          </button>
-                        </Tooltip>
-                        <Tooltip label="Delete mask">
-                          <button
-                            onClick={() => {
-                              if (selectedId) commitUpdate(selectedId, { mask: undefined })
-                            }}
-                            style={iconBtnStyle()}
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </Tooltip>
-                      </div>
-
-                      {/* Feather */}
-                      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: 8 }}>
-                        <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Feather</label>
-                        <input
-                          type="range"
-                          min={0}
-                          max={50}
-                          step={1}
-                          value={imgObj.mask.feather}
-                          onMouseDown={startDrag}
-                          onChange={(e) => {
-                            if (!selectedId) return
-                            updateObject(selectedId, { mask: { ...imgObj.mask!, feather: Number(e.target.value) } })
-                          }}
-                          onMouseUp={(e) => {
-                            if (!selectedId) return
-                            commitUpdate(selectedId, { mask: { ...imgObj.mask!, feather: Number((e.target as HTMLInputElement).value) } })
-                          }}
-                          style={{ flex: 1 }}
-                        />
-                        <span style={{ color: '#111111', fontSize: 12, width: 24, textAlign: 'right' }}>
-                          {imgObj.mask.feather}
-                        </span>
-                      </div>
-
-                      {/* Invert */}
-                      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: 8 }}>
-                        <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Invert</label>
-                        <input
-                          type="checkbox"
-                          checked={imgObj.mask.inverted}
-                          onChange={() => {
-                            if (selectedId) commitUpdate(selectedId, { mask: { ...imgObj.mask!, inverted: !imgObj.mask!.inverted } })
-                          }}
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
                 {!(imgObj as ImageObject).isEmpty && (
                   <>
                     <AdjustmentsSection

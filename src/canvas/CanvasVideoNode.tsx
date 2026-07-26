@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react'
-import { Group, Image as KonvaImage, Rect, Transformer, Shape, Circle, Line } from 'react-konva'
+import { Group, Image as KonvaImage, Rect, Path as KonvaPath, Transformer } from 'react-konva'
 import type Konva from 'konva'
-import type { VideoObject, AnchorPoint } from '@/types/canvas'
+import type { VideoObject } from '@/types/canvas'
 import { DEFAULT_ADJUSTMENTS } from '@/types/canvas'
 import { useCanvasStore } from './useCanvasStore'
 import { makeCanvasNode } from './makeCanvasNode'
@@ -10,9 +10,11 @@ import type { SnapGuide } from './useSnapGuides'
 import { axisLock } from './constants'
 import { useViewportStore, selectScale } from './useViewportStore'
 import { registerVideoElement, unregisterVideoElement } from './videoElementRegistry'
-import { anchorsToPathData } from './CanvasPathNode'
 import { buildFilterPipeline } from './adjustments/pipeline'
 import { buildEffectFilters } from './effects/buildEffectFilters'
+import { fitCover } from './geometry'
+import { buildClipFunc, clipShapeToPathData, isPlainRectClip } from './frameClip'
+import { ClipEditOverlay } from './ClipEditOverlay'
 
 interface CanvasVideoNodeProps {
   id: string
@@ -28,7 +30,6 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   const isSelected = useCanvasStore((s) => s.selectedId === id)
   const isPlaying = useCanvasStore((s) => s.videoPlayingIds.has(id))
   const commitUpdate = useCanvasStore((s) => s.commitUpdate)
-  const updateObject = useCanvasStore((s) => s.updateObject)
   const selectedIds = useCanvasStore((s) => s.selectedIds)
   const addToSelection = useCanvasStore((s) => s.addToSelection)
   const anchorId = useCanvasStore((s) => s.anchorId)
@@ -36,11 +37,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   const duplicateObjectAtOrigin = useCanvasStore((s) => s.duplicateObjectAtOrigin)
   const setContextMenu = useCanvasStore((s) => s.setContextMenu)
   const resizeMode = useCanvasStore((s) => s.resizeMode)
-  const maskDrawMode = useCanvasStore((s) => s.maskDrawMode)
-  const isDrawTarget = maskDrawMode?.id === id
-  const maskModeActive = useCanvasStore((s) => s.maskModeActive)
   const adjustmentsBypass = useCanvasStore((s) => s.adjustmentsBypass)
-  const activeTool = useCanvasStore((s) => s.activeTool)
   const scale = useViewportStore(selectScale)
   const panX = useViewportStore((s) => s.panX)
   const panY = useViewportStore((s) => s.panY)
@@ -59,8 +56,6 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   const innerGroupRef = useRef<Konva.Group>(null)
   const videoImageRef = useRef<Konva.Image>(null)
   const transformerRef = useRef<Konva.Transformer>(null)
-  const maskEditRectRef = useRef<Konva.Rect>(null)
-  const maskEditTransformerRef = useRef<Konva.Transformer>(null)
   const cmdHeldRef = useRef(false)
   const pendingGuidesRef = useRef<SnapGuide[]>([])
   const rectMouseDownPosRef = useRef<{ x: number; y: number } | null>(null)
@@ -70,9 +65,6 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   const contentDragStartRef = useRef<{ x: number; y: number } | null>(null)
   const pendingDuplicateRef = useRef(false)
   const rafRef = useRef<number | null>(null)
-  // Stores active mask cache bounds so the RAF tick can re-cache each frame.
-  // null when no mask is active (caching disabled).
-  const innerCacheBoundsRef = useRef<{ x: number; y: number; width: number; height: number } | null>(null)
   // Countdown (seconds) before playback starts after a play command — drives start offset.
   const startOffsetRemainingRef = useRef(0)
   // Timestamp of the last RAF tick for delta-time calculation.
@@ -179,13 +171,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
       const frameChanged = currentTime !== lastCachedTimeRef.current
       if (frameChanged) {
         lastCachedTimeRef.current = currentTime
-        const bounds = innerCacheBoundsRef.current
-        if (bounds) {
-          if (allFiltersRef.current.length > 0) videoImageRef.current?.cache()
-          innerGroupRef.current?.cache(bounds)
-        } else if (allFiltersRef.current.length > 0) {
-          videoImageRef.current?.cache()
-        }
+        if (allFiltersRef.current.length > 0) videoImageRef.current?.cache()
       }
       const layer = groupRef.current?.getLayer()
       if (layer && frameChanged) layer.batchDraw()
@@ -246,6 +232,45 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     [obj.frameWidth, obj.frameHeight],
   )
 
+  // --- Media-frame clip geometry (see CanvasImageNode for the full contract) ---
+  const plainRect = isPlainRectClip(obj.clipShape)
+  const clipFunc = useMemo(
+    () => (plainRect || !obj.clipShape ? undefined : buildClipFunc(obj.clipShape, obj.frameWidth, obj.frameHeight)),
+    [plainRect, obj.clipShape, obj.frameWidth, obj.frameHeight],
+  )
+  const hitFunc = useMemo(() => {
+    if (plainRect || !obj.clipShape) return undefined
+    const trace = buildClipFunc(obj.clipShape, obj.frameWidth, obj.frameHeight)
+    return (ctx: Konva.Context, shape: Konva.Shape): void => {
+      ctx.beginPath()
+      trace(ctx)
+      ctx.closePath()
+      ctx.fillStrokeShape(shape)
+    }
+  }, [plainRect, obj.clipShape, obj.frameWidth, obj.frameHeight])
+  const frameStrokeData = useMemo(
+    () => (obj.frameStroke && obj.frameStrokeWidth
+      ? clipShapeToPathData(obj.clipShape ?? { kind: 'rect' }, obj.frameWidth, obj.frameHeight)
+      : ''),
+    [obj.frameStroke, obj.frameStrokeWidth, obj.clipShape, obj.frameWidth, obj.frameHeight],
+  )
+  const fillRectRef = useRef<Konva.Rect>(null)
+  const frameStrokeRef = useRef<Konva.Path>(null)
+
+  function syncFrameDecor(width: number, height: number): void {
+    const group = groupRef.current
+    if (group && !plainRect && obj.clipShape) {
+      group.clipFunc(buildClipFunc(obj.clipShape, width, height))
+    }
+    const fr = fillRectRef.current
+    if (fr) { fr.width(width); fr.height(height) }
+    const fs = frameStrokeRef.current
+    if (fs && obj.frameStroke && obj.frameStrokeWidth) {
+      fs.data(clipShapeToPathData(obj.clipShape ?? { kind: 'rect' }, width, height))
+      if (group) { fs.x(group.x()); fs.y(group.y()); fs.rotation(group.rotation()) }
+    }
+  }
+
   const filterPipeline = useMemo(
     () => adjustmentsBypass ? [] : buildFilterPipeline(obj.adjustments ?? DEFAULT_ADJUSTMENTS),
     [obj.adjustments, adjustmentsBypass],
@@ -263,68 +288,6 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   const allFiltersRef = useRef(allFilters)
   useEffect(() => { allFiltersRef.current = allFilters }, [allFilters])
 
-  // Build the mask shape's sceneFunc whenever mask data or content dimensions change.
-  // The function draws the mask into the inner group's cached canvas using destination-in
-  // composite — white pixels = keep video, transparent = erase video.
-  const maskSceneFunc = useMemo((): ((ctx: Konva.Context) => void) | undefined => {
-    if (!obj.mask || !obj.mask.visible || obj.mask.anchors.length < 3) return undefined
-    const { anchors, feather, inverted } = obj.mask
-    const ox = obj.contentOffsetX
-    const oy = obj.contentOffsetY
-    const cw = obj.contentWidth
-    const ch = obj.contentHeight
-    // Translate anchors from content space to inner-group local space
-    const shiftedAnchors = anchors.map((a) => ({ ...a, x: a.x + ox, y: a.y + oy }))
-    const pathData = anchorsToPathData(shiftedAnchors, true)
-
-    return (ctx: Konva.Context): void => {
-      const native = ctx._context as CanvasRenderingContext2D
-      if (!pathData) return
-      if (inverted) {
-        // Fill content rect white (destination-in keeps video pixels there)
-        native.fillStyle = 'white'
-        native.fillRect(ox, oy, cw, ch)
-        // Cut hole for the mask path using destination-out + optional blur
-        const prevGco = native.globalCompositeOperation
-        native.globalCompositeOperation = 'destination-out'
-        if (feather > 0) native.filter = `blur(${feather}px)`
-        native.fillStyle = 'white'
-        native.fill(new Path2D(pathData))
-        if (feather > 0) native.filter = 'none'
-        native.globalCompositeOperation = prevGco
-      } else {
-        if (feather > 0) native.filter = `blur(${feather}px)`
-        native.fillStyle = 'white'
-        native.fill(new Path2D(pathData))
-        if (feather > 0) native.filter = 'none'
-      }
-    }
-  }, [obj.mask, obj.contentOffsetX, obj.contentOffsetY, obj.contentWidth, obj.contentHeight])
-
-  // Manage the inner group's cache for mask compositing.
-  // innerCacheBoundsRef is kept in sync so the RAF tick can re-cache each frame.
-  useEffect(() => {
-    const inner = innerGroupRef.current
-    if (!inner) return
-    if (obj.mask && obj.mask.visible && obj.mask.anchors.length >= 3) {
-      const feather = obj.mask.feather
-      const buf = Math.max(feather, 0) + 2
-      const bounds = {
-        x: obj.contentOffsetX - buf,
-        y: obj.contentOffsetY - buf,
-        width: obj.contentWidth + buf * 2,
-        height: obj.contentHeight + buf * 2,
-      }
-      innerCacheBoundsRef.current = bounds
-      inner.cache(bounds)
-      inner.getLayer()?.batchDraw()
-    } else {
-      innerCacheBoundsRef.current = null
-      inner.clearCache()
-      inner.getLayer()?.batchDraw()
-    }
-  }, [obj.mask, obj.contentOffsetX, obj.contentOffsetY, obj.contentWidth, obj.contentHeight, videoEl])
-
   // When filters change, reset the RAF frame-guard so the next tick re-caches
   // even if the video is paused (currentTime unchanged). When all filters are
   // removed, clear the cache immediately so the node reverts to live rendering.
@@ -336,17 +299,6 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
       lastCachedTimeRef.current = -1
     }
   }, [allFilters])
-
-  // Wire mask-edit Transformer to its target Rect when entering edit mode for rect/ellipse masks.
-  useEffect(() => {
-    const kind = obj.mask?.kind
-    if (!obj.maskEditMode || (kind !== 'rect' && kind !== 'ellipse')) return
-    const r = maskEditRectRef.current
-    const tr = maskEditTransformerRef.current
-    if (!r || !tr) return
-    tr.nodes([r])
-    tr.getLayer()?.batchDraw()
-  }, [obj.maskEditMode, obj.mask?.kind, obj.mask?.anchors])
 
   // Wire transformer to its target.
   useEffect(() => {
@@ -361,7 +313,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
       return
     }
 
-    if (isSelected && !obj.maskEditMode && !isDrawTarget) {
+    if (isSelected) {
       if (obj.contentEditMode && imgNode) {
         tr.nodes([imgNode])
         tr.borderStroke('#f94608')
@@ -383,7 +335,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
       tr.nodes([])
       tr.getLayer()?.draw()
     }
-  }, [isSelected, isInMultiSelectMode, obj.contentEditMode, obj.maskEditMode, obj.locked, videoEl, isDrawTarget, maskDrawMode])
+  }, [isSelected, isInMultiSelectMode, obj.contentEditMode, obj.locked, videoEl])
 
   // Sync nodeRef to frameRectRef for group transformer bbox.
   useEffect(() => {
@@ -424,6 +376,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     group.y(rect.y())
     group.rotation(rect.rotation())
     group.clip({ x: 0, y: 0, width: newWidth, height: newHeight })
+    syncFrameDecor(newWidth, newHeight)
 
     if (imgNode) {
       if (isGroupTransform) {
@@ -448,22 +401,15 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
         imgNode.x(obj.contentOffsetX)
         imgNode.y(obj.contentOffsetY)
       } else if (resizeMode === 'auto') {
-        const aspect = obj.contentWidth / obj.contentHeight
-        const fAspect = newWidth / newHeight
-        let cW: number, cH: number
-        if (aspect > fAspect) { cH = newHeight; cW = cH * aspect }
-        else { cW = newWidth; cH = cW / aspect }
+        const cover = fitCover(obj.contentWidth, obj.contentHeight, newWidth, newHeight)
         if (inner) { inner.x(0); inner.y(0) }
-        imgNode.x((newWidth - cW) / 2)
-        imgNode.y((newHeight - cH) / 2)
-        imgNode.width(cW)
-        imgNode.height(cH)
+        imgNode.x(cover.contentOffsetX)
+        imgNode.y(cover.contentOffsetY)
+        imgNode.width(cover.contentWidth)
+        imgNode.height(cover.contentHeight)
       } else {
         // Normal resize: keep image at its stored offset and shift the inner group
-        // instead. When a mask is present the inner group is cached — moving imgNode.x
-        // alone would leave the cached bitmap (video + mask) stationary while only
-        // the uncached video node moves, causing the mask to drift. Shifting the
-        // entire inner group moves the cached bitmap as a unit.
+        // instead, so both stay fixed in canvas space.
         imgNode.x(obj.contentOffsetX)
         imgNode.y(obj.contentOffsetY)
         if (inner) {
@@ -508,6 +454,10 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
       group.y(snappedY)
       group.rotation(rect.rotation())
       group.clip({ x: 0, y: 0, width: obj.frameWidth, height: obj.frameHeight })
+      const fs = frameStrokeRef.current
+      if (fs && obj.frameStroke && obj.frameStrokeWidth) {
+        fs.x(snappedX); fs.y(snappedY); fs.rotation(rect.rotation())
+      }
       group.getLayer()?.batchDraw()
     }
 
@@ -553,6 +503,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     if (group) {
       group.clip({ x: 0, y: 0, width: newFrameWidth, height: newFrameHeight })
     }
+    syncFrameDecor(newFrameWidth, newFrameHeight)
 
     const inner = innerGroupRef.current
     if (inner) { inner.x(0); inner.y(0) }
@@ -589,21 +540,15 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
         contentOffsetY: obj.contentOffsetY,
       })
     } else if (resizeMode === 'auto') {
-      const aspect = obj.contentWidth / obj.contentHeight
-      const fAspect = newFrameWidth / newFrameHeight
-      let cW: number, cH: number
-      if (aspect > fAspect) { cH = newFrameHeight; cW = cH * aspect }
-      else { cW = newFrameWidth; cH = cW / aspect }
-      const offsetX = (newFrameWidth - cW) / 2
-      const offsetY = (newFrameHeight - cH) / 2
-      if (imgNode) { imgNode.x(offsetX); imgNode.y(offsetY); imgNode.width(cW); imgNode.height(cH) }
+      const cover = fitCover(obj.contentWidth, obj.contentHeight, newFrameWidth, newFrameHeight)
+      if (imgNode) { imgNode.x(cover.contentOffsetX); imgNode.y(cover.contentOffsetY); imgNode.width(cover.contentWidth); imgNode.height(cover.contentHeight) }
       commitUpdate(obj.id, {
         frameX: newFrameX, frameY: newFrameY,
         frameWidth: newFrameWidth, frameHeight: newFrameHeight,
         rotation: newRotation, x: newFrameX, y: newFrameY,
         width: newFrameWidth, height: newFrameHeight,
-        contentOffsetX: offsetX, contentOffsetY: offsetY,
-        contentWidth: cW, contentHeight: cH,
+        contentOffsetX: cover.contentOffsetX, contentOffsetY: cover.contentOffsetY,
+        contentWidth: cover.contentWidth, contentHeight: cover.contentHeight,
       })
     } else {
       const newContentOffsetX = obj.contentOffsetX + (obj.frameX - newFrameX)
@@ -620,6 +565,29 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     }
   }
 
+  // Content drag with frame-edge snapping (see CanvasImageNode for the contract).
+  function handleContentDragMove(e: Konva.KonvaEventObject<DragEvent>): void {
+    const node = e.target as Konva.Image
+    const start = contentDragStartRef.current
+    let nx = node.x()
+    let ny = node.y()
+    if (e.evt.shiftKey && start) {
+      const { dx, dy } = axisLock(nx - start.x, ny - start.y)
+      nx = start.x + dx
+      ny = start.y + dy
+      node.x(nx)
+      node.y(ny)
+    }
+    if (obj.rotation) { onGuidesChange([]); return }
+    const { x: sx, y: sy, guides } = computeSnap(
+      { x: obj.frameX + nx, y: obj.frameY + ny, width: obj.contentWidth, height: obj.contentHeight },
+      obj.id,
+    )
+    node.x(sx - obj.frameX)
+    node.y(sy - obj.frameY)
+    onGuidesChange(guides)
+  }
+
   function handleContentDragEnd(e: Konva.KonvaEventObject<DragEvent>): void {
     commitUpdate(obj.id, {
       contentOffsetX: e.target.x(),
@@ -628,6 +596,8 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   }
 
   function handleContentTransformEnd(): void {
+    endSnapSession()
+    onGuidesChange([])
     const imgNode = videoImageRef.current
     if (!imgNode) return
     const newContentOffsetX = imgNode.x()
@@ -656,11 +626,20 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
         x={obj.frameX}
         y={obj.frameY}
         clip={groupClip}
+        clipFunc={clipFunc}
         rotation={obj.rotation}
-        opacity={(obj.maskEditMode || isDrawTarget) ? obj.opacity * 0.5 : obj.opacity}
-        listening={obj.contentEditMode && !isDrawTarget}
+        opacity={obj.opacity}
+        listening={obj.contentEditMode}
       >
-        {/* Inner group: cached when a mask is active to enable destination-in compositing */}
+        {obj.fill ? (
+          <Rect
+            ref={fillRectRef}
+            x={0} y={0}
+            width={obj.frameWidth} height={obj.frameHeight}
+            fill={obj.fill.color}
+            listening={false}
+          />
+        ) : null}
         <Group ref={innerGroupRef}>
           <KonvaImage
             ref={videoImageRef}
@@ -675,218 +654,26 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
             onTap={() => { if (obj.contentEditMode) useCanvasStore.getState().setSelected(id) }}
             onDragStart={() => {
               contentDragStartRef.current = { x: obj.contentOffsetX, y: obj.contentOffsetY }
+              startSnapSession(obj.id, { contentMode: true })
             }}
-            onDragMove={(e) => {
-              const node = e.target as Konva.Image
-              const start = contentDragStartRef.current
-              if (e.evt.shiftKey && start) {
-                const { dx, dy } = axisLock(node.x() - start.x, node.y() - start.y)
-                node.x(start.x + dx)
-                node.y(start.y + dy)
-              }
-            }}
-            onDragEnd={handleContentDragEnd}
+            onDragMove={handleContentDragMove}
+            onDragEnd={(e) => { endSnapSession(); onGuidesChange([]); handleContentDragEnd(e) }}
             onTransformEnd={handleContentTransformEnd}
           />
-          {maskSceneFunc !== undefined && (
-            <Shape
-              sceneFunc={maskSceneFunc}
-              globalCompositeOperation="destination-in"
-              listening={false}
-            />
-          )}
         </Group>
       </Group>
 
-      {/* Mask edit overlay — Transformer-based for rect/ellipse, anchor circles for pen */}
-      {obj.maskEditMode && obj.mask && (() => {
-        const mask = obj.mask!
-        const kind = mask.kind
-
-        if (kind === 'rect' || kind === 'ellipse') {
-          const axs = mask.anchors.map(a => a.x + obj.contentOffsetX)
-          const ays = mask.anchors.map(a => a.y + obj.contentOffsetY)
-          const bboxX = Math.min(...axs)
-          const bboxY = Math.min(...ays)
-          const bboxW = Math.max(...axs) - bboxX
-          const bboxH = Math.max(...ays) - bboxY
-          return (
-            <Group x={obj.frameX} y={obj.frameY} rotation={obj.rotation} listening={true}>
-              <Rect
-                ref={maskEditRectRef}
-                x={bboxX} y={bboxY}
-                width={bboxW} height={bboxH}
-                fill="transparent"
-                stroke="#f94608" strokeWidth={1}
-                strokeScaleEnabled={false}
-                dash={[4, 3]}
-                draggable
-                onDragEnd={() => {
-                  const r = maskEditRectRef.current!
-                  const dx = r.x() - bboxX
-                  const dy = r.y() - bboxY
-                  const newAnchors = mask.anchors.map(a => ({ ...a, x: a.x + dx, y: a.y + dy }))
-                  r.position({ x: bboxX, y: bboxY })
-                  commitUpdate(obj.id, { mask: { ...mask, anchors: newAnchors } })
-                }}
-                onTransformEnd={() => {
-                  const r = maskEditRectRef.current!
-                  const sx = r.scaleX(); const sy = r.scaleY()
-                  const rw = bboxW * sx; const rh = bboxH * sy
-                  const x1 = rw >= 0 ? r.x() : r.x() + rw
-                  const y1 = rh >= 0 ? r.y() : r.y() + rh
-                  const x2 = rw >= 0 ? r.x() + rw : r.x()
-                  const y2 = rh >= 0 ? r.y() + rh : r.y()
-                  r.scaleX(1); r.scaleY(1)
-                  r.x(x1); r.y(y1); r.width(x2 - x1); r.height(y2 - y1)
-                  let newAnchors: AnchorPoint[]
-                  if (kind === 'ellipse') {
-                    const K = 0.5523
-                    const ecx = (x1 + x2) / 2 - obj.contentOffsetX
-                    const ecy = (y1 + y2) / 2 - obj.contentOffsetY
-                    const erx = (x2 - x1) / 2
-                    const ery = (y2 - y1) / 2
-                    newAnchors = [
-                      { x: ecx,       y: ecy - ery, handleIn: { dx: -K*erx, dy: 0 },  handleOut: { dx: K*erx, dy: 0 } },
-                      { x: ecx + erx, y: ecy,       handleIn: { dx: 0, dy: -K*ery },  handleOut: { dx: 0, dy: K*ery } },
-                      { x: ecx,       y: ecy + ery, handleIn: { dx: K*erx,  dy: 0 },  handleOut: { dx: -K*erx, dy: 0 } },
-                      { x: ecx - erx, y: ecy,       handleIn: { dx: 0, dy: K*ery },   handleOut: { dx: 0, dy: -K*ery } },
-                    ]
-                  } else {
-                    newAnchors = [
-                      { x: x1 - obj.contentOffsetX, y: y1 - obj.contentOffsetY, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
-                      { x: x2 - obj.contentOffsetX, y: y1 - obj.contentOffsetY, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
-                      { x: x2 - obj.contentOffsetX, y: y2 - obj.contentOffsetY, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
-                      { x: x1 - obj.contentOffsetX, y: y2 - obj.contentOffsetY, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
-                    ]
-                  }
-                  commitUpdate(obj.id, { mask: { ...mask, anchors: newAnchors } })
-                }}
-              />
-              <Transformer
-                ref={maskEditTransformerRef}
-                rotateEnabled={false}
-                keepRatio={false}
-                boundBoxFunc={(oldBox, newBox) => (newBox.width < 5 || newBox.height < 5 ? oldBox : newBox)}
-              />
-            </Group>
-          )
-        }
-
-        // pen (or legacy masks without a kind): individual anchor circles
-        return (
-          <Group x={obj.frameX} y={obj.frameY} rotation={obj.rotation} listening={true}>
-            {mask.anchors.map((anchor, i) => {
-              const ax = obj.contentOffsetX + anchor.x
-              const ay = obj.contentOffsetY + anchor.y
-              const hix = ax + anchor.handleIn.dx
-              const hiy = ay + anchor.handleIn.dy
-              const hox = ax + anchor.handleOut.dx
-              const hoy = ay + anchor.handleOut.dy
-              const hasHandleIn = anchor.handleIn.dx !== 0 || anchor.handleIn.dy !== 0
-              const hasHandleOut = anchor.handleOut.dx !== 0 || anchor.handleOut.dy !== 0
-              return (
-                <React.Fragment key={i}>
-                  {hasHandleIn && (
-                    <>
-                      <Line points={[ax, ay, hix, hiy]} stroke="#f94608" strokeWidth={1} listening={false} />
-                      <Circle
-                        x={hix} y={hiy} radius={6}
-                        fill="#fff" stroke="#f94608" strokeWidth={1}
-                        draggable
-                        onDragMove={(e) => {
-                          const n = e.target as Konva.Circle
-                          const newAnchors = mask.anchors.map((a, j) =>
-                            j === i ? { ...a, handleIn: { dx: n.x() - ax, dy: n.y() - ay } } : a
-                          )
-                          updateObject(obj.id, { mask: { ...mask, anchors: newAnchors } })
-                        }}
-                        onDragEnd={(e) => {
-                          const n = e.target as Konva.Circle
-                          const newAnchors = mask.anchors.map((a, j) =>
-                            j === i ? { ...a, handleIn: { dx: n.x() - ax, dy: n.y() - ay } } : a
-                          )
-                          commitUpdate(obj.id, { mask: { ...mask, anchors: newAnchors } })
-                        }}
-                      />
-                    </>
-                  )}
-                  {hasHandleOut && (
-                    <>
-                      <Line points={[ax, ay, hox, hoy]} stroke="#f94608" strokeWidth={1} listening={false} />
-                      <Circle
-                        x={hox} y={hoy} radius={6}
-                        fill="#fff" stroke="#f94608" strokeWidth={1}
-                        draggable
-                        onDragMove={(e) => {
-                          const n = e.target as Konva.Circle
-                          const newAnchors = mask.anchors.map((a, j) =>
-                            j === i ? { ...a, handleOut: { dx: n.x() - ax, dy: n.y() - ay } } : a
-                          )
-                          updateObject(obj.id, { mask: { ...mask, anchors: newAnchors } })
-                        }}
-                        onDragEnd={(e) => {
-                          const n = e.target as Konva.Circle
-                          const newAnchors = mask.anchors.map((a, j) =>
-                            j === i ? { ...a, handleOut: { dx: n.x() - ax, dy: n.y() - ay } } : a
-                          )
-                          commitUpdate(obj.id, { mask: { ...mask, anchors: newAnchors } })
-                        }}
-                      />
-                    </>
-                  )}
-                  <Circle
-                    x={ax} y={ay} radius={7}
-                    fill="#f94608" stroke="#fff" strokeWidth={1.5}
-                    draggable
-                    onDragMove={(e) => {
-                      const n = e.target as Konva.Circle
-                      const newAnchors = mask.anchors.map((a, j) =>
-                        j === i ? { ...a, x: n.x() - obj.contentOffsetX, y: n.y() - obj.contentOffsetY } : a
-                      )
-                      updateObject(obj.id, { mask: { ...mask, anchors: newAnchors } })
-                    }}
-                    onDragEnd={(e) => {
-                      const n = e.target as Konva.Circle
-                      const newAnchors = mask.anchors.map((a, j) =>
-                        j === i ? { ...a, x: n.x() - obj.contentOffsetX, y: n.y() - obj.contentOffsetY } : a
-                      )
-                      commitUpdate(obj.id, { mask: { ...mask, anchors: newAnchors } })
-                    }}
-                    onDblClick={() => {
-                      const hasHandles =
-                        anchor.handleIn.dx !== 0 || anchor.handleIn.dy !== 0 ||
-                        anchor.handleOut.dx !== 0 || anchor.handleOut.dy !== 0
-                      let newAnchors: AnchorPoint[]
-                      if (hasHandles) {
-                        newAnchors = mask.anchors.map((a, j) =>
-                          j === i ? { ...a, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } } : a
-                        )
-                      } else {
-                        const total = mask.anchors.length
-                        const prevIdx = (i - 1 + total) % total
-                        const nextIdx = (i + 1) % total
-                        const prev = mask.anchors[prevIdx]
-                        const next = mask.anchors[nextIdx]
-                        const tx = next.x - prev.x
-                        const ty = next.y - prev.y
-                        const len = Math.sqrt(tx * tx + ty * ty)
-                        const HANDLE_LEN = 30
-                        const hdx = len > 0.001 ? (tx / len) * HANDLE_LEN : HANDLE_LEN
-                        const hdy = len > 0.001 ? (ty / len) * HANDLE_LEN : 0
-                        newAnchors = mask.anchors.map((a, j) =>
-                          j === i ? { ...a, handleOut: { dx: hdx, dy: hdy }, handleIn: { dx: -hdx, dy: -hdy } } : a
-                        )
-                      }
-                      commitUpdate(obj.id, { mask: { ...mask, anchors: newAnchors } })
-                    }}
-                  />
-                </React.Fragment>
-              )
-            })}
-          </Group>
-        )
-      })()}
+      {obj.clipEditMode && obj.clipShape?.kind === 'path' && (
+        <ClipEditOverlay
+          id={obj.id}
+          clipShape={obj.clipShape}
+          frameX={obj.frameX}
+          frameY={obj.frameY}
+          frameWidth={obj.frameWidth}
+          frameHeight={obj.frameHeight}
+          rotation={obj.rotation}
+        />
+      )}
 
       {/* Invisible frame rect — sole interaction/transform target in frame mode. */}
       <Rect
@@ -902,9 +689,10 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
         strokeEnabled={obj.contentEditMode || isInMultiSelect}
         strokeScaleEnabled={false}
         perfectDrawEnabled={false}
-        draggable={!obj.locked && !obj.contentEditMode && !obj.maskEditMode && !isDrawTarget && !isInMultiSelectMode && !isGridCell && !(maskModeActive && isSelected && (activeTool === 'shape' || activeTool === 'pen'))}
+        hitFunc={hitFunc}
+        draggable={!obj.locked && !obj.contentEditMode && !isInMultiSelectMode && !isGridCell}
         listening={
-          !obj.contentEditMode && !obj.maskEditMode && !isDrawTarget &&
+          !obj.contentEditMode &&
           !(isGridCell && isParentGroupSelected && !isSelected)
         }
         onMouseDown={(e) => {
@@ -913,7 +701,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
           }
         }}
         onClick={(e) => {
-          if (!obj.contentEditMode && !obj.maskEditMode && !isDrawTarget) {
+          if (!obj.contentEditMode) {
             if (e.evt.shiftKey) {
               addToSelection(obj.id)
             } else if (isInMultiSelectMode && selectedIds.includes(obj.id)) {
@@ -931,7 +719,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
             }
           }
         }}
-        onTap={() => { if (!obj.contentEditMode && !obj.maskEditMode) useCanvasStore.getState().setSelected(id) }}
+        onTap={() => { if (!obj.contentEditMode) useCanvasStore.getState().setSelected(id) }}
         onDblClick={handleDblClick}
         onDblTap={handleDblClick}
         onDragStart={() => {
@@ -956,12 +744,22 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
         }}
       />
 
+      {frameStrokeData ? (
+        <KonvaPath
+          ref={frameStrokeRef}
+          x={obj.frameX} y={obj.frameY} rotation={obj.rotation}
+          data={frameStrokeData}
+          stroke={obj.frameStroke} strokeWidth={obj.frameStrokeWidth}
+          strokeScaleEnabled={false} listening={false} perfectDrawEnabled={false}
+        />
+      ) : null}
+
       <Transformer
         ref={transformerRef}
         keepRatio={false}
         rotationSnaps={snapEnabled ? [0, 45, 90, 135, 180, 225, 270, 315] : []}
         rotationSnapTolerance={8}
-        onTransformStart={() => startSnapSession(obj.id)}
+        onTransformStart={() => startSnapSession(obj.id, obj.contentEditMode ? { contentMode: true } : undefined)}
         boundBoxFunc={(oldBox, newBox) => {
           if (newBox.width < 5 || newBox.height < 5) return oldBox
 

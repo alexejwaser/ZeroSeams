@@ -20,6 +20,10 @@ async function capturePreviewFrames(
   frameWidth: number,
   frameHeight: number,
 ): Promise<string[]> {
+  // Exit any open clip-edit session so its ClipEditOverlay isn't captured into the
+  // preview JPEGs (mirrors exportFrames.ts).
+  useCanvasStore.getState().clearClipEditMode()
+
   const transformers = stage.find<Konva.Transformer>('Transformer')
   transformers.forEach((t) => t.hide())
   const textNodes = stage.find<Konva.Text>('Text')

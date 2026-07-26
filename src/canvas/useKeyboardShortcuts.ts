@@ -33,7 +33,7 @@ export function useKeyboardShortcuts(): void {
   const setSelected = useCanvasStore((s) => s.setSelected)
   const clearContentEditMode = useCanvasStore((s) => s.clearContentEditMode)
   const clearPathEditMode = useCanvasStore((s) => s.clearPathEditMode)
-  const clearMaskDrawMode = useCanvasStore((s) => s.clearMaskDrawMode)
+  const clearClipEditMode = useCanvasStore((s) => s.clearClipEditMode)
   const selectAll = useCanvasStore((s) => s.selectAll)
   const duplicateObject = useCanvasStore((s) => s.duplicateObject)
   const bringForward = useCanvasStore((s) => s.bringForward)
@@ -108,18 +108,6 @@ export function useKeyboardShortcuts(): void {
         }
         if (e.key === 's') { toggleSnap(); return }
         if (e.key === 'f') { useCanvasStore.getState().setShowFrameSettings((v) => !v); return }
-        if (e.key === 'm') {
-          // Toggle mask strokes for the selected image: selecting an image
-          // auto-arms maskModeActive (see setSelected); M disarms so pen
-          // strokes draw normally, and re-arms without reselecting.
-          const s = useCanvasStore.getState()
-          if (s.maskModeActive) {
-            s.setMaskModeActive(false)
-          } else if (s.selectedId && s.objects[s.selectedId]?.type === 'image') {
-            s.setMaskModeActive(true)
-          }
-          return
-        }
         if (e.key === '\\') { setAdjustmentsBypass(true); return }
       }
 
@@ -131,11 +119,6 @@ export function useKeyboardShortcuts(): void {
         }
         // If context menu is open, let it handle its own Escape — don't clear selection
         if (useCanvasStore.getState().contextMenu !== null) return
-        // If mask draw is active, cancel draw without deselecting the image
-        if (useCanvasStore.getState().maskDrawMode !== null) {
-          clearMaskDrawMode()
-          return
-        }
         // Cancel guideline placement without touching selection
         if (useCanvasStore.getState().activeTool === 'guideline') {
           setActiveTool('select')
@@ -144,6 +127,7 @@ export function useKeyboardShortcuts(): void {
         setSelected(null)
         clearContentEditMode()
         clearPathEditMode()
+        clearClipEditMode()
         return
       }
 
@@ -399,7 +383,7 @@ export function useKeyboardShortcuts(): void {
     setSelected,
     clearContentEditMode,
     clearPathEditMode,
-    clearMaskDrawMode,
+    clearClipEditMode,
     selectAll,
     duplicateObject,
     bringForward,

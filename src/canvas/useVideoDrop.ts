@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import type React from 'react'
 import { useCanvasStore } from './useCanvasStore'
 import { useViewportStore, getCanvasScale } from './useViewportStore'
+import { findDropTargetId } from './geometry'
 
 interface ElectronFile extends File {
   readonly path: string
@@ -43,6 +44,38 @@ export function useVideoDrop(containerRef: React.RefObject<HTMLDivElement>): voi
           ACCEPTED_EXTS.some((ext) => f.name.toLowerCase().endsWith(ext)),
       ) as ElectronFile[]
       if (videoFiles.length === 0) return
+
+      // Drop-on-shape: insert the first video into an empty frame or fillable
+      // shape/closed-path under the drop point instead of adding standalone.
+      const { objects, objectOrder: order } = useCanvasStore.getState()
+      const targetId = findDropTargetId(canvasX, canvasY, objects, order)
+      if (targetId) {
+        const file = videoFiles[0]
+        const absolutePath = file.path
+        const rawName = file.name.replace(/\.[^.]+$/, '')
+        const vid = document.createElement('video')
+        vid.preload = 'metadata'
+        vid.onloadedmetadata = () => {
+          const w = vid.videoWidth
+          const h = vid.videoHeight
+          const dur = vid.duration
+          URL.revokeObjectURL(vid.src)
+          const store = useCanvasStore.getState()
+          const t = store.objects[targetId]
+          if (!t) return
+          if (t.type === 'shape' || t.type === 'path') store.convertShapeToFrame(targetId)
+          useCanvasStore.getState().insertMediaIntoFrame(targetId, {
+            kind: 'video',
+            filePath: absolutePath,
+            naturalWidth: w,
+            naturalHeight: h,
+            naturalDuration: dur,
+            name: rawName,
+          })
+        }
+        vid.src = URL.createObjectURL(file)
+        return
+      }
 
       videoFiles.forEach((file, index) => {
         const rawName = file.name.replace(/\.[^.]+$/, '')

@@ -51,7 +51,7 @@ export function anchorsToPathData(anchors: AnchorPoint[], closed: boolean): stri
   return d
 }
 
-export function computePathBBox(anchors: AnchorPoint[]): { x: number; y: number; width: number; height: number } {
+export function computePathBBox(anchors: AnchorPoint[], closed = false): { x: number; y: number; width: number; height: number } {
   if (anchors.length === 0) return { x: 0, y: 0, width: 0, height: 0 }
   if (anchors.length === 1) return { x: anchors[0].x, y: anchors[0].y, width: 0, height: 0 }
 
@@ -85,8 +85,7 @@ export function computePathBBox(anchors: AnchorPoint[]): { x: number; y: number;
     return mt * mt * mt * p0 + 3 * mt * mt * t * p1 + 3 * mt * t * t * p2 + t * t * t * p3
   }
 
-  for (let i = 0; i < anchors.length - 1; i++) {
-    const a = anchors[i]; const b = anchors[i + 1]
+  function expandSegment(a: AnchorPoint, b: AnchorPoint): void {
     expand(a.x, a.y); expand(b.x, b.y)
     const c1x = a.x + a.handleOut.dx; const c1y = a.y + a.handleOut.dy
     const c2x = b.x + b.handleIn.dx; const c2y = b.y + b.handleIn.dy
@@ -95,6 +94,9 @@ export function computePathBBox(anchors: AnchorPoint[]): { x: number; y: number;
     for (const t of cubicExtrema(a.y, c1y, c2y, b.y))
       expand(evalCubic(a.x, c1x, c2x, b.x, t), evalCubic(a.y, c1y, c2y, b.y, t))
   }
+
+  for (let i = 0; i < anchors.length - 1; i++) expandSegment(anchors[i], anchors[i + 1])
+  if (closed && anchors.length > 2) expandSegment(anchors[anchors.length - 1], anchors[0])
 
   return { x: minX, y: minY, width: maxX - minX, height: maxY - minY }
 }

@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "zeroseams-renderer-verify",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--config", "vite.verify.config.mts"],
+      "port": 5199,
+      "autoPort": false
+    }
+  ]
+}

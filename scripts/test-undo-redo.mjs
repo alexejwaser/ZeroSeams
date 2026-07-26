@@ -142,7 +142,7 @@ const addImage = (src) => page.evaluate((s) => {
     contentOffsetX: 0, contentOffsetY: 0, contentWidth: 200, contentHeight: 200,
     naturalWidth: 10, naturalHeight: 10,
     src: s, backgroundRemoved: false,
-    contentEditMode: false, maskEditMode: false,
+    contentEditMode: false,
     opacity: 1, rotation: 0, visible: true, locked: false, zIndex: 0,
     scaleX: 1, scaleY: 1,
   })
@@ -451,64 +451,159 @@ console.log('\n── E. Object properties ──')
   await wait(100)
 }
 
-// ── F. Mask ───────────────────────────────────────────────────────────────────
-console.log('\n── F. Mask ──')
+// ── F. Media Frames (shape↔frame conversion) ─────────────────────────────────
+console.log('\n── F. Media Frames ──')
 
 {
-  const id = await addImage(TEST_IMG_SRC)
+  // F1. Shape → frame conversion: id + objectOrder position preserved,
+  // undo restores the original ShapeObject (fill/stroke/strokeWidth).
+  const id = await addShape()
   await wait(100)
+  const s0 = await getState()
+  const origIndex = s0.objectOrder.indexOf(id)
+  const origFill = s0.objects[id]?.fill
+  const origStroke = s0.objects[id]?.stroke
+  const origStrokeWidth = s0.objects[id]?.strokeWidth
 
-  // Add a mask via commitUpdate
-  const mask = { anchors: [], feather: 0, inverted: false, visible: true, kind: 'rect' }
-  await page.evaluate(([id, mask]) => window.__canvasStore__.getState().commitUpdate(id, { mask }), [id, mask])
+  await page.evaluate((id) => window.__canvasStore__.getState().convertShapeToFrame(id), id)
+  await wait(100)
   const s1 = await getState()
-  ok(s1.objects[id]?.mask !== undefined, 'mask added')
-
-  // Change feather (slider: startDrag on mouseDown, updateObject on drag, commitUpdate on mouseUp)
-  await page.evaluate((id) => {
-    const gs = () => window.__canvasStore__.getState()
-    const m = gs().objects[id].mask
-    gs().startDrag()
-    gs().updateObject(id, { mask: { ...m, feather: 5 } })
-    gs().updateObject(id, { mask: { ...m, feather: 10 } })
-  }, id)
-  const s2 = await getState()
-  eq(s2.pastLen - s1.pastLen, 0, 'feather updateObject calls don\'t push history')
-
-  await page.evaluate((id) => {
-    const gs = () => window.__canvasStore__.getState()
-    const m = gs().objects[id].mask
-    gs().commitUpdate(id, { mask: { ...m, feather: 10 } })
-  }, id)
-  const s3 = await getState()
-  eq(s3.pastLen - s1.pastLen, 1, 'feather commitUpdate pushes 1 entry')
+  eq(s1.pastLen - s0.pastLen, 1, 'F1: convertShapeToFrame pushes exactly 1 history entry')
+  eq(s1.objects[id]?.type, 'image', 'F1: converted object is type image')
+  ok(s1.objects[id]?.isEmpty === true, 'F1: converted frame is empty')
+  eq(s1.objects[id]?.clipShape?.kind, 'rect', 'F1: clipShape kind is rect')
+  eq(s1.objectOrder.indexOf(id), origIndex, 'F1: objectOrder index unchanged')
+  eq(s1.objectOrder.length, s0.objectOrder.length, 'F1: objectOrder length unchanged')
 
   await undo()
   await wait(100)
-  const s4 = await getState()
-  eq(s4.objects[id]?.mask?.feather ?? -1, 0, 'undo reverts feather to 0')
+  const s2 = await getState()
+  eq(s2.objects[id]?.type, 'shape', 'F1: undo restores ShapeObject')
+  eq(s2.objects[id]?.fill, origFill, 'F1: undo restores original fill')
+  eq(s2.objects[id]?.stroke, origStroke, 'F1: undo restores original stroke')
+  eq(s2.objects[id]?.strokeWidth, origStrokeWidth, 'F1: undo restores original strokeWidth')
 
-  // Toggle mask visibility
-  await page.evaluate((id) => {
-    const s = window.__canvasStore__.getState()
-    const m = s.objects[id].mask
-    s.commitUpdate(id, { mask: { ...m, visible: false } })
-  }, id)
+  await redo()
+  await wait(100)
+  const s3 = await getState()
+  eq(s3.objects[id]?.type, 'image', 'F1: redo re-converts to frame')
+  ok(s3.objects[id]?.isEmpty === true, 'F1: redo frame is empty')
+
+  // F2. insertMediaIntoFrame on the (now empty) frame — cover-fit content dims,
+  // undo re-empties, redo restores src via srcVault reinjection.
+  await page.evaluate(([id, src]) => {
+    window.__canvasStore__.getState().insertMediaIntoFrame(id, { kind: 'image', src, naturalWidth: 10, naturalHeight: 10 })
+  }, [id, TEST_IMG_SRC])
+  await wait(100)
+  const s4 = await getState()
+  eq(s4.pastLen - s3.pastLen, 1, 'F2: insertMediaIntoFrame pushes exactly 1 history entry')
+  ok(s4.objects[id]?.isEmpty === false, 'F2: insertMediaIntoFrame clears isEmpty')
+  eq(s4.objects[id]?.src, TEST_IMG_SRC, 'F2: src set on frame')
+  ok((s4.objects[id]?.contentWidth ?? 0) > 0 && (s4.objects[id]?.contentHeight ?? 0) > 0, 'F2: cover-fit produced nonzero content dims')
+
   await undo()
   await wait(100)
   const s5 = await getState()
-  ok(s5.objects[id]?.mask?.visible === true, 'undo restores mask visibility')
+  ok(s5.objects[id]?.isEmpty === true, 'F2: undo restores empty frame')
+  eq(s5.objects[id]?.src, '', 'F2: undo clears src')
 
-  // Delete mask
-  await page.evaluate((id) => window.__canvasStore__.getState().commitUpdate(id, { mask: undefined }), id)
+  await redo()
+  await wait(100)
   const s6 = await getState()
-  ok(s6.objects[id]?.mask === undefined, 'mask deleted')
+  ok(s6.objects[id]?.isEmpty === false, 'F2: redo restores media')
+  eq(s6.objects[id]?.src, TEST_IMG_SRC, 'F2: redo restores src via srcVault reinjection')
+
+  // F3. removeMediaFromFrame — clipShape/fill preserved on the empty frame;
+  // undo restores media with src intact (validates vault-retention on removal).
+  const s7 = await getState()
+  const preRemoveClipKind = s7.objects[id]?.clipShape?.kind
+  const preRemoveFill = JSON.stringify(s7.objects[id]?.fill)
+  await page.evaluate((id) => window.__canvasStore__.getState().removeMediaFromFrame(id), id)
+  await wait(100)
+  const s8 = await getState()
+  eq(s8.pastLen - s7.pastLen, 1, 'F3: removeMediaFromFrame pushes exactly 1 history entry')
+  ok(s8.objects[id]?.isEmpty === true, 'F3: removeMediaFromFrame empties the frame')
+  eq(s8.objects[id]?.clipShape?.kind, preRemoveClipKind, 'F3: clipShape preserved after media removal')
+  eq(JSON.stringify(s8.objects[id]?.fill), preRemoveFill, 'F3: fill preserved after media removal')
+
   await undo()
   await wait(100)
-  const s7 = await getState()
-  ok(s7.objects[id]?.mask !== undefined, 'undo restores deleted mask')
+  const s9 = await getState()
+  ok(s9.objects[id]?.isEmpty === false, 'F3: undo restores media')
+  eq(s9.objects[id]?.src, TEST_IMG_SRC, 'F3: undo restores src intact (srcVault retained on removal)')
+
+  // Cleanup
+  await page.evaluate((id) => window.__canvasStore__.getState().removeObject(id), id)
+  await wait(100)
+}
+
+{
+  // F4. Round-trip shape → frame → shape preserves geometry and style.
+  const id = await addShape()
+  await wait(100)
+  const s0 = await getState()
+  const orig = s0.objects[id]
+
+  await page.evaluate((id) => window.__canvasStore__.getState().convertShapeToFrame(id), id)
+  await wait(100)
+  await page.evaluate((id) => window.__canvasStore__.getState().convertFrameToShape(id), id)
+  await wait(100)
+  const s1 = await getState()
+  const final = s1.objects[id]
+
+  eq(final?.type, 'shape', 'F4: round-trip ends as ShapeObject')
+  ok(Math.abs((final?.x ?? 0) - orig.x) < 0.5, 'F4: x preserved within 0.5px')
+  ok(Math.abs((final?.y ?? 0) - orig.y) < 0.5, 'F4: y preserved within 0.5px')
+  ok(Math.abs((final?.width ?? 0) - orig.width) < 0.5, 'F4: width preserved within 0.5px')
+  ok(Math.abs((final?.height ?? 0) - orig.height) < 0.5, 'F4: height preserved within 0.5px')
+  eq(final?.fill, orig.fill, 'F4: fill preserved')
+  eq(final?.stroke, orig.stroke, 'F4: stroke preserved')
+  eq(final?.strokeWidth, orig.strokeWidth, 'F4: strokeWidth preserved')
 
   await page.evaluate((id) => window.__canvasStore__.getState().removeObject(id), id)
+  await wait(100)
+}
+
+{
+  // F5. Fill-color drag pattern on a frame object: updateObject calls during
+  // the drag don't flood history, commitUpdate adds exactly 1 entry, and a
+  // single undo returns to the pre-drag fill.
+  const shapeId = await addShape()
+  await wait(100)
+  await page.evaluate((id) => window.__canvasStore__.getState().convertShapeToFrame(id), shapeId)
+  await wait(100)
+  const s0 = await getState()
+  const preDragFill = JSON.stringify(s0.objects[shapeId]?.fill)
+
+  const result = await page.evaluate((id) => {
+    const gs = () => window.__canvasStore__.getState()
+    const before = gs().past.length
+    gs().startDrag()
+    gs().updateObject(id, { fill: { type: 'solid', color: '#ff0000' } })
+    gs().updateObject(id, { fill: { type: 'solid', color: '#00ff00' } })
+    const afterUpdates = gs().past.length
+    gs().commitUpdate(id, { fill: { type: 'solid', color: '#00ff00' } })
+    const afterCommit = gs().past.length
+    return { updateDelta: afterUpdates - before, commitDelta: afterCommit - before }
+  }, shapeId)
+
+  eq(result.updateDelta, 0, 'F5: fill updateObject calls don\'t flood history')
+  eq(result.commitDelta, 1, 'F5: fill commitUpdate adds exactly 1 entry')
+
+  const s1 = await getState()
+  eq(s1.objects[shapeId]?.fill?.color, '#00ff00', 'F5: fill committed to green')
+
+  await undo()
+  await wait(100)
+  const s2 = await getState()
+  eq(JSON.stringify(s2.objects[shapeId]?.fill), preDragFill, 'F5: single undo returns to pre-drag fill')
+
+  // Cleanup
+  await page.evaluate((id) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    gs().removeObject(id)
+  }, shapeId)
   await wait(100)
 }
 

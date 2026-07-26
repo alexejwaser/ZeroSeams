@@ -3,6 +3,7 @@ import UTIF from 'utif'
 import type { CanvasObject, VideoObject, VideoExportSettings, ImageExportSettings, ExportResult } from '@/types/canvas'
 import { getVideoElement } from './videoElementRegistry'
 import { encodeVideoFrames, encodeVideoWithAudio } from './videoExport'
+import { useCanvasStore } from './useCanvasStore'
 
 /**
  * Exports each carousel frame as a PNG/JPEG/TIFF Blob at 2x pixel ratio (2160×2160 for
@@ -30,6 +31,10 @@ export async function exportFrames(
   imageSettings?: ImageExportSettings,
   pixelRatio = 2,
 ): Promise<Array<{ blob: Blob; extension: string }>> {
+  // 0. Exit any open clip-edit session so its ClipEditOverlay (a Group inside the
+  // objects layer) isn't baked into the exported PNGs.
+  useCanvasStore.getState().clearClipEditMode()
+
   // 1. Hide Transformer handles so selection UI is absent from export
   const transformers = stage.find<Konva.Transformer>('Transformer')
   transformers.forEach((t) => t.hide())
@@ -247,6 +252,9 @@ export async function exportMixedFrames(
 ): Promise<ExportResult[]> {
   const start = startFrame ?? 0
   const end = endFrame ?? frameCount - 1
+
+  // Exit any open clip-edit session so its ClipEditOverlay isn't baked into output.
+  useCanvasStore.getState().clearClipEditMode()
 
   const transformers = stage.find<Konva.Transformer>('Transformer')
   transformers.forEach((t) => t.hide())

@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import type React from 'react'
 import { useCanvasStore } from './useCanvasStore'
 import { useViewportStore, getCanvasScale } from './useViewportStore'
+import { findDropTargetId } from './geometry'
 
 export function useImageDrop(containerRef: React.RefObject<HTMLDivElement>): void {
   const addObject = useCanvasStore((s) => s.addObject)
@@ -33,7 +34,45 @@ export function useImageDrop(containerRef: React.RefObject<HTMLDivElement>): voi
 
       const files = Array.from(e.dataTransfer?.files ?? [])
 
+      // Drop-on-shape: if the drop point lands on an empty frame or a fillable
+      // shape/closed-path, insert the media there instead of adding standalone.
+      const { objects, objectOrder: order } = useCanvasStore.getState()
+      const targetId = findDropTargetId(canvasX, canvasY, objects, order)
+
       const videoFiles = files.filter((f) => f.type.startsWith('video/'))
+
+      if (targetId) {
+        // Video wins on frames: if the drop contains ANY video, let useVideoDrop
+        // own the target insertion. Bail before the image target-insert branch so
+        // the two hooks never both write to the same frame (last-write-wins race).
+        if (videoFiles.length > 0) return
+
+        const imageFile = files.find((f) => f.type.startsWith('image/'))
+        if (imageFile) {
+          const reader = new FileReader()
+          reader.onload = (readerEvent) => {
+            const dataUrl = readerEvent.target?.result
+            if (typeof dataUrl !== 'string') return
+            const img = new Image()
+            img.onload = () => {
+              const store = useCanvasStore.getState()
+              const t = store.objects[targetId]
+              if (!t) return
+              if (t.type === 'shape' || t.type === 'path') store.convertShapeToFrame(targetId)
+              useCanvasStore.getState().insertMediaIntoFrame(targetId, {
+                kind: 'image',
+                src: dataUrl,
+                naturalWidth: img.naturalWidth,
+                naturalHeight: img.naturalHeight,
+              })
+            }
+            img.src = dataUrl
+          }
+          reader.readAsDataURL(imageFile)
+          return
+        }
+      }
+
       if (videoFiles.length > 0) {
         videoFiles.forEach((videoFile, index) => {
           const filePath = (videoFile as File & { path: string }).path
@@ -133,7 +172,6 @@ export function useImageDrop(containerRef: React.RefObject<HTMLDivElement>): voi
               naturalWidth: img.naturalWidth,
               naturalHeight: img.naturalHeight,
               contentEditMode: false,
-              maskEditMode: false,
               // keep in sync with frame for compatibility
               x: frameX,
               y: frameY,

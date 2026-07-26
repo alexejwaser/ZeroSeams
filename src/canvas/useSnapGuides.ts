@@ -321,7 +321,7 @@ export function useSnapGuides(): {
   computeSnapGroup: (box: DragBox, excludeIds: string[]) => { x: number; y: number; guides: SnapGuide[] }
   computeSnapResizeGroup: (box: DragBox, anchor: string, excludeIds: string[], threshold: number, keepRatio?: boolean) => { box: DragBox; guides: SnapGuide[] }
   snapRotation: (degrees: number) => number
-  startSnapSession: (excludeId: string | string[]) => void
+  startSnapSession: (excludeId: string | string[], opts?: { contentMode?: boolean }) => void
   endSnapSession: () => void
 } {
   const objects = useCanvasStore((s) => s.objects)
@@ -347,10 +347,34 @@ export function useSnapGuides(): {
       .filter((obj): obj is CanvasObject => obj !== undefined)
   }
 
-  function startSnapSession(excludeId: string | string[]): void {
+  function startSnapSession(excludeId: string | string[], opts?: { contentMode?: boolean }): void {
     const excludeKey = Array.isArray(excludeId) ? [...excludeId].sort().join(',') : excludeId
     const objs = getObjects(excludeId)
     const { verticalTargets, horizontalTargets } = buildTargets(objs, frameCount, frameWidth, frameHeight)
+    // Content-edit mode: the dragged object is excluded from the target set (so
+    // content doesn't snap to itself), but we ADD its own frame edges/centers as
+    // targets so content can snap to the frame it lives in.
+    if (opts?.contentMode && typeof excludeId === 'string') {
+      const self = objects[excludeId]
+      if (self) {
+        let fx: number, fy: number, fw: number, fh: number
+        if (self.type === 'image' || self.type === 'video') {
+          fx = self.frameX; fy = self.frameY; fw = self.frameWidth; fh = self.frameHeight
+        } else {
+          fx = self.x; fy = self.y; fw = self.width; fh = self.height
+        }
+        verticalTargets.push(
+          { position: fx, kind: 'frame' },
+          { position: fx + fw / 2, kind: 'frame' },
+          { position: fx + fw, kind: 'frame' },
+        )
+        horizontalTargets.push(
+          { position: fy, kind: 'frame' },
+          { position: fy + fh / 2, kind: 'frame' },
+          { position: fy + fh, kind: 'frame' },
+        )
+      }
+    }
     snapSessionRef.current = { excludeKey, verticalTargets, horizontalTargets }
   }
 

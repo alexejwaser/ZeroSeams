@@ -29,7 +29,6 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
     entries: [
       { keys: 'S', label: 'Toggle snapping' },
       { keys: 'F', label: 'Frame settings' },
-      { keys: 'M', label: 'Toggle mask strokes (image selected)' },
       { keys: '\\ (hold)', label: 'Compare without adjustments' },
       { keys: '⌘ +', label: 'Zoom in' },
       { keys: '⌘ −', label: 'Zoom out' },

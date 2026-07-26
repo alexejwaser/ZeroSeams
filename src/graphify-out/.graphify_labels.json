@@ -1,1 +1,22 @@
-{"0": "Shared Type Definitions", "1": "AI Context & UI Integration", "2": "Electron Main Process", "3": "Adjustments Pipeline & LUTs", "4": "Canvas Nodes & HUD", "5": "Canvas Node Rendering", "6": "Grid & Group System", "7": "Toolbar & Frame Settings", "8": "Platform Preview Shells", "9": "Carousel Stage & Export Glue", "10": "Text Spans & Thumbnails", "11": "Properties Panel Sections", "12": "Layer Effects", "13": "Panel Controls & Icon Styles", "14": "Video Export", "15": "Color Input UI", "16": "Viewport & Media Drop", "17": "Snap System", "18": "Numeric Input & Adjustments UI", "19": "Color Utilities", "20": "Frame Label Strip & Tooltip", "21": "Project Save & Path Utils", "22": "Shortcut Cheatsheet", "23": "Electron Decls", "24": "Geometry Helpers", "25": "Electron Preload"}
+{
+  "0": "Shared Type Definitions",
+  "1": "AI Context & UI Integration",
+  "2": "Electron Main Process",
+  "3": "Adjustments Pipeline & LUTs",
+  "4": "Canvas Nodes & HUD",
+  "5": "Canvas Node Rendering",
+  "6": "Grid & Group System",
+  "7": "Toolbar & Frame Settings",
+  "8": "Platform Preview Shells",
+  "9": "Carousel Stage & Export Glue",
+  "10": "Text Spans & Thumbnails",
+  "11": "Properties Panel Sections",
+  "12": "Layer Effects",
+  "13": "Panel Controls & Icon Styles",
+  "14": "Video Export",
+  "15": "Color Input UI",
+  "17": "Snap System",
+  "22": "Shortcut Cheatsheet",
+  "23": "Electron Decls",
+  "25": "Electron Preload"
+}

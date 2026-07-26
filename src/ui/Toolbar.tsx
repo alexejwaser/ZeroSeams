@@ -1340,16 +1340,10 @@ export function ToolBar(): React.ReactElement {
   const toggleSnap = useCanvasStore((s) => s.toggleSnap)
   const activeShapeKind = useCanvasStore((s) => s.activeShapeKind)
   const setActiveShapeKind = useCanvasStore((s) => s.setActiveShapeKind)
-  const selectedId = useCanvasStore((s) => s.selectedId)
-  const objects = useCanvasStore((s) => s.objects)
-  const maskModeActive = useCanvasStore((s) => s.maskModeActive)
-  const setMaskModeActive = useCanvasStore((s) => s.setMaskModeActive)
   const addObject = useCanvasStore((s) => s.addObject)
   const objectOrder = useCanvasStore((s) => s.objectOrder)
 
   const [gridPickerAnchor, setGridPickerAnchor] = useState<HTMLElement | null>(null)
-
-  const selectedObj = selectedId != null ? objects[selectedId] : undefined
 
   function handleToolClick(tool: ActiveTool): void {
     setActiveTool(tool)
@@ -1421,7 +1415,7 @@ export function ToolBar(): React.ReactElement {
       naturalWidth: img.naturalWidth, naturalHeight: img.naturalHeight,
       frameX: x, frameY: y, frameWidth: contentWidth, frameHeight: contentHeight,
       contentOffsetX: 0, contentOffsetY: 0, contentWidth, contentHeight,
-      contentEditMode: false, maskEditMode: false,
+      contentEditMode: false,
       x, y, width: contentWidth, height: contentHeight,
       rotation: 0, scaleX: 1, scaleY: 1, opacity: 1, visible: true, locked: false,
       zIndex: objectOrder.length,
@@ -1632,24 +1626,6 @@ export function ToolBar(): React.ReactElement {
             </button>
           </Tooltip>
         </div>
-      )}
-
-      {selectedObj?.type === 'image' && (
-        <Tooltip
-          label={maskModeActive ? 'Mask strokes: on' : 'Mask strokes: off'}
-          shortcut="M"
-          description={maskModeActive ? 'Strokes over this image become its mask — click to draw normal strokes' : 'Click so the next stroke becomes a mask'}
-        >
-          <button
-            style={iconBtnStyle(maskModeActive)}
-            onClick={() => { setMaskModeActive(!maskModeActive) }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-              <circle cx="12" cy="12" r="5.8" fill="currentColor" stroke="none"/>
-            </svg>
-          </button>
-        </Tooltip>
       )}
 
       <GridPicker

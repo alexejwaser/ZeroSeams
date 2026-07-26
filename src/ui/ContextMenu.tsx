@@ -5,7 +5,8 @@ import { useBackgroundRemoval } from '../ai/useBackgroundRemoval'
 import { useAIStore } from '../ai/useAIStore'
 import { useExternalEdit } from '../canvas/useExternalEdit'
 import { useSaveStatusStore } from '@/store'
-import type { ImageObject } from '@/types/canvas'
+import type { ImageObject, ShapeObject, PathObject, VideoObject } from '@/types/canvas'
+import { pickImageMedia, pickVideoMedia } from './properties/mediaPickers'
 
 interface MenuItemProps {
   label: string
@@ -148,6 +149,19 @@ export function ContextMenu(): React.ReactElement | null {
     setContextMenu(null)
   }
 
+  async function handleInsertMediaIntoShape(id: string, mediaKind: 'image' | 'video'): Promise<void> {
+    const media = mediaKind === 'image' ? await pickImageMedia() : await pickVideoMedia()
+    if (!media) return
+    useCanvasStore.getState().convertShapeToFrame(id)
+    useCanvasStore.getState().insertMediaIntoFrame(id, media)
+  }
+
+  async function handleReplaceMedia(id: string, frame: ImageObject | VideoObject): Promise<void> {
+    const media = frame.type === 'video' ? await pickVideoMedia() : await pickImageMedia()
+    if (!media) return
+    useCanvasStore.getState().insertMediaIntoFrame(id, media)
+  }
+
   const content = (
     <div
       ref={menuRef}
@@ -175,6 +189,14 @@ export function ContextMenu(): React.ReactElement | null {
                      op.targetObjectId === targetId &&
                      op.status === 'running'
           )
+          const isConvertibleShape = obj?.type === 'shape' &&
+            ((obj as ShapeObject).kind === 'rect' || (obj as ShapeObject).kind === 'ellipse')
+          const isConvertiblePath = obj?.type === 'path' && (obj as PathObject).closed === true
+          const isFrameTarget = (obj?.type === 'image' || obj?.type === 'video') && (
+            (obj as ImageObject | VideoObject).clipShape != null ||
+            (obj?.type === 'image' && (obj as ImageObject).isEmpty === true)
+          )
+          const isEmptyFrame = obj?.type === 'image' && (obj as ImageObject).isEmpty === true
           return (
             <>
               <MenuItem
@@ -268,6 +290,41 @@ export function ContextMenu(): React.ReactElement | null {
                       void editExternally(targetId, effectiveFilePath)
                       dismiss()
                     }}
+                  />
+                </>
+              )}
+              {(isConvertibleShape || isConvertiblePath) && (
+                <>
+                  <Divider />
+                  <MenuItem
+                    label="Insert Image…"
+                    disabled={locked}
+                    onClick={() => { void handleInsertMediaIntoShape(targetId, 'image'); dismiss() }}
+                  />
+                  <MenuItem
+                    label="Insert Video…"
+                    disabled={locked}
+                    onClick={() => { void handleInsertMediaIntoShape(targetId, 'video'); dismiss() }}
+                  />
+                </>
+              )}
+              {isFrameTarget && (
+                <>
+                  <Divider />
+                  <MenuItem
+                    label="Replace Media…"
+                    disabled={locked}
+                    onClick={() => { void handleReplaceMedia(targetId, obj as ImageObject | VideoObject); dismiss() }}
+                  />
+                  <MenuItem
+                    label="Remove Media"
+                    disabled={locked || isEmptyFrame}
+                    onClick={() => { useCanvasStore.getState().removeMediaFromFrame(targetId); dismiss() }}
+                  />
+                  <MenuItem
+                    label="Convert to Shape"
+                    disabled={locked}
+                    onClick={() => { useCanvasStore.getState().convertFrameToShape(targetId); dismiss() }}
                   />
                 </>
               )}

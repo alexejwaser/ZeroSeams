@@ -40,6 +40,18 @@ export interface BaseCanvasObject {
   effects?: LayerEffect[]
 }
 
+/** Universal fill for media frames. Gradient will be added later as
+ *  another union member — always switch on fill.type. */
+export type Fill = { type: 'solid'; color: string }
+
+/** Clip geometry of a media frame. Path anchors are NORMALIZED:
+ *  x/y and handle dx/dy in 0–1 units of frameWidth/frameHeight.
+ *  Normalized coords mean NO transform ever rewrites the clip. */
+export type ClipShape =
+  | { kind: 'rect'; cornerRadius?: number }  // cornerRadius in canvas px
+  | { kind: 'ellipse' }
+  | { kind: 'path'; anchors: AnchorPoint[] } // always closed
+
 export interface ImageObject extends BaseCanvasObject {
   type: 'image'
   /** Data URL or resolved file path (after IPC load) */
@@ -74,28 +86,21 @@ export interface ImageObject extends BaseCanvasObject {
   // --- Edit mode ---
   /** When true, transformer targets the image content rather than the frame */
   contentEditMode: boolean
-  /** When true, mask anchor overlay is shown and editable */
-  maskEditMode: boolean
+  /** When true, the clip-shape anchor overlay is shown and editable */
+  clipEditMode?: boolean
 
-  // --- Vector mask ---
-  mask?: MaskData
+  // --- Media frame (InDesign-style shape-based frame) ---
+  /** Clip geometry; absent = plain rect frame */
+  clipShape?: ClipShape
+  /** Fill painted inside the clip behind media; sole paint when isEmpty */
+  fill?: Fill
+  /** Frame border stroke color */
+  frameStroke?: string
+  /** Frame border stroke width (canvas px) */
+  frameStrokeWidth?: number
 
   // --- Photo adjustments (non-destructive, applied via Konva filter pipeline) ---
   adjustments?: PhotoAdjustments
-}
-
-/** Closed bezier path that clips the visible area of an image. Anchors are in content space. */
-export interface MaskData {
-  /** Closed bezier path — anchors in content space (0,0 = image bitmap top-left) */
-  anchors: AnchorPoint[]
-  /** Soft edge blur in canvas pixels; 0 = hard edge */
-  feather: number
-  /** false = hide outside path, true = hide inside path */
-  inverted: boolean
-  /** Toggle mask on/off without deleting it */
-  visible: boolean
-  /** How the mask was drawn — determines edit UI (rect/ellipse → Transformer; pen → anchor circles) */
-  kind?: 'pen' | 'rect' | 'ellipse'
 }
 
 /** Lightroom-style non-destructive scalar adjustments for image objects. */
@@ -252,10 +257,17 @@ export interface VideoObject extends BaseCanvasObject {
   // --- Photo adjustments (non-destructive, applied via Konva filter pipeline) ---
   adjustments?: PhotoAdjustments
 
-  // --- Vector mask (mirrors ImageObject masking) ---
-  mask?: MaskData
-  /** When true, mask anchor overlay is shown and editable */
-  maskEditMode?: boolean
+  // --- Media frame (InDesign-style shape-based frame; mirrors ImageObject) ---
+  /** Clip geometry; absent = plain rect frame */
+  clipShape?: ClipShape
+  /** Fill painted inside the clip behind media */
+  fill?: Fill
+  /** Frame border stroke color */
+  frameStroke?: string
+  /** Frame border stroke width (canvas px) */
+  frameStrokeWidth?: number
+  /** When true, the clip-shape anchor overlay is shown and editable */
+  clipEditMode?: boolean
 }
 
 /** FFmpeg encoding settings used by the video export pipeline. */
