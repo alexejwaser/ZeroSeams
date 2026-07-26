@@ -46,8 +46,8 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
   const isSelected = useCanvasStore((s) => s.selectedId === id)
   const setSelected = useCanvasStore((s) => s.setSelected)
-  const panX = useViewportStore((s) => s.panX)
-  const panY = useViewportStore((s) => s.panY)
+  // pan is read via getState() inside the callbacks below (issue #59, Phase 1a)
+  // — subscribing here re-rendered every group on every pan pointermove.
   const viewScale = useViewportStore(selectScale)
 
   // True when any child cell is individually selected (user has "entered" the grid).
@@ -224,6 +224,7 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
           if (!stage) return
           const pos = stage.getPointerPosition()
           if (!pos) return
+          const { panX, panY } = useViewportStore.getState()
           const scale = viewScale
           const logicalX = (pos.x - panX) / scale
           const logicalY = (pos.y - panY) / scale
@@ -251,6 +252,7 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
           boundBoxFunc={(oldBox, newBox) => {
             if (newBox.width < 5 || newBox.height < 5) return oldBox
 
+            const { panX, panY } = useViewportStore.getState()
             const anchor = trRef.current?.getActiveAnchor() ?? ''
             if (anchor === 'rotater' || Math.abs(newBox.rotation ?? 0) > 0.01 || !anchor) {
               pendingGuidesRef.current = []

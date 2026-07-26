@@ -1,5 +1,6 @@
 import React from 'react'
 import type { Frame, FrameDragState } from '@/types/project'
+import { useViewportStore, selectScale } from '@/canvas/useViewportStore'
 import { ColorInput } from './ColorInput'
 import Tooltip from './Tooltip'
 
@@ -17,9 +18,6 @@ interface FrameLabelStripProps {
   frameWidth: number
   frameHeight: number
   backgroundColor: string
-  panX: number
-  panY: number
-  scale: number
   frameDrag: FrameDragState | null
   framePreviews: string[] | null
   setFrameBackground: (index: number, color: string | null) => void
@@ -34,8 +32,11 @@ interface FrameLabelStripProps {
  * HTML overlay strip above the canvas: per-frame label pill (drag grip,
  * color swatch, reset, "Frame N") plus the animated frame previews shown
  * during a reorder drag. Positioning follows the canvas viewport via
- * panX/panY/scale; pills animate with translateX (ColorInput therefore
- * needs `fixed` — a transform ancestor breaks position:fixed).
+ * panX/panY/scale, which it subscribes to directly from the viewport store
+ * (issue #59, Phase 1a): the owning CarouselStage no longer re-renders on
+ * pan/zoom, so this cheap HTML overlay tracks the viewport on its own. Pills
+ * animate with translateX (ColorInput therefore needs `fixed` — a transform
+ * ancestor breaks position:fixed).
  */
 export function FrameLabelStrip({
   frames,
@@ -43,14 +44,14 @@ export function FrameLabelStrip({
   frameWidth,
   frameHeight,
   backgroundColor,
-  panX,
-  panY,
-  scale,
   frameDrag,
   framePreviews,
   setFrameBackground,
   onGripPointerDown,
 }: FrameLabelStripProps): React.ReactElement {
+  const panX = useViewportStore((s) => s.panX)
+  const panY = useViewportStore((s) => s.panY)
+  const scale = useViewportStore(selectScale)
   const previewTo = frameDrag
     ? Math.max(0, Math.min(frameCount - 1,
         Math.round((frameDrag.currentClientX - frameDrag.containerLeft - panX) / scale / frameWidth)

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useLayoutEffect, useState } from 'react'
 import { Stage, Layer, Rect as KonvaRect, Line as KonvaLine, Circle as KonvaCircle, Path as KonvaPath, Transformer } from 'react-konva'
 import type Konva from 'konva'
 import type { ImageObject, TextObject, ShapeObject, PathObject, AnchorPoint, CanvasObject } from '@/types/canvas'
@@ -6,7 +6,7 @@ import type { ShapeKind } from '@/types/canvas'
 import type { FrameDragState } from '@/types/project'
 import { axisLock } from './constants'
 import { useCanvasStore } from './useCanvasStore'
-import { useViewportStore, selectScale, scaleForZoom } from './useViewportStore'
+import { useViewportStore, scaleForZoom, getCanvasScale } from './useViewportStore'
 import { FrameGuides } from './FrameGuides'
 import { CanvasImageNode } from './CanvasImageNode'
 import { CanvasTextNode } from './CanvasTextNode'
@@ -67,9 +67,13 @@ export function CarouselStage(): React.ReactElement {
   const guidelineOrientation = useCanvasStore((s) => s.guidelineOrientation)
 
   // Viewport store
-  const scale = useViewportStore(selectScale)
-  const panX = useViewportStore((s) => s.panX)
-  const panY = useViewportStore((s) => s.panY)
+  // NOTE (issue #59, Phase 1a): pan/zoom are intentionally NOT subscribed here.
+  // Subscribing re-rendered this 1400-line component (and every canvas node,
+  // which also read pan) on every pointermove — ~46ms/frame, all React, ~1ms of
+  // actual drawing. Instead the Stage transform is applied imperatively from a
+  // store subscription (see the useLayoutEffect below), and callbacks read
+  // pan/scale via getState(). Only cheap HTML overlays (FrameLabelStrip,
+  // EmptyFrameOverlay) still subscribe and re-render on pan.
   const setPan = useViewportStore((s) => s.setPan)
 
   // --- Group transformer + marquee ---
@@ -174,6 +178,27 @@ export function CarouselStage(): React.ReactElement {
     return () => {
       _stageInstance = null
     }
+  }, [])
+
+  // Imperative pan/zoom (issue #59, Phase 1a). Apply the viewport transform
+  // straight to the Konva Stage from a store subscription, bypassing React so
+  // pan/zoom never re-render the node tree. useLayoutEffect for the initial
+  // apply so there's no first-paint flash. batchDraw coalesces to one rAF, so
+  // a burst of trackpad wheel events still costs a single redraw per frame.
+  useLayoutEffect(() => {
+    const applyViewport = (): void => {
+      const st = stageRef.current
+      if (!st) return
+      const { panX, panY } = useViewportStore.getState()
+      const sc = getCanvasScale()
+      st.x(panX)
+      st.y(panY)
+      st.scaleX(sc)
+      st.scaleY(sc)
+      st.batchDraw()
+    }
+    applyViewport()
+    return useViewportStore.subscribe(applyViewport)
   }, [])
 
   // ResizeObserver — keep containerSize in sync with the actual DOM size
@@ -517,6 +542,7 @@ export function CarouselStage(): React.ReactElement {
     if (e.button === 1 || (e.button === 0 && spacePanActiveRef.current)) {
       e.preventDefault()
       isPanningRef.current = true
+      const { panX, panY } = useViewportStore.getState()
       panStartRef.current = { x: e.clientX, y: e.clientY, panX, panY }
     }
   }
@@ -614,6 +640,8 @@ export function CarouselStage(): React.ReactElement {
         const cur = frameDragRef.current
         if (!cur) return
         stageRef.current?.container().style.removeProperty('opacity')
+        const { panX } = useViewportStore.getState()
+        const scale = getCanvasScale()
         const toIndex = Math.max(0, Math.min(frameCount - 1,
           Math.round((e.clientX - cur.containerLeft - panX) / scale / frameWidth)
         ))
@@ -640,9 +668,6 @@ export function CarouselStage(): React.ReactElement {
           frameWidth={frameWidth}
           frameHeight={frameHeight}
           backgroundColor={backgroundColor}
-          panX={panX}
-          panY={panY}
-          scale={scale}
           frameDrag={frameDrag}
           framePreviews={framePreviews}
           setFrameBackground={setFrameBackground}
@@ -653,10 +678,7 @@ export function CarouselStage(): React.ReactElement {
         ref={stageRef}
         width={containerSize.width}
         height={containerSize.height}
-        x={panX}
-        y={panY}
-        scaleX={scale}
-        scaleY={scale}
+        /* x/y/scale are driven imperatively — see the useLayoutEffect above (issue #59). */
         onMouseDown={(e) => {
           // Block Stage events when panning
           if (isPanningRef.current) return
@@ -1218,6 +1240,8 @@ export function CarouselStage(): React.ReactElement {
             }}
             boundBoxFunc={(oldBox, newBox) => {
               if (newBox.width < 5 || newBox.height < 5) return oldBox
+              const { panX, panY } = useViewportStore.getState()
+              const scale = getCanvasScale()
               const anchor = groupTransformerRef.current?.getActiveAnchor() ?? ''
               const rotation = newBox.rotation ?? 0
               if (anchor === 'rotater') {

@@ -7,6 +7,7 @@ import { useExportStore } from '@/store'
 import { PreviewShell } from '@/ui/preview/PreviewShell'
 import { ShortcutOverlay } from '@/ui/ShortcutOverlay'
 import { CanvasHud } from '@/ui/CanvasHud'
+import { PerfHud } from '@/ui/PerfHud'
 import { AIProvider } from '@/ai'
 
 class ErrorBoundary extends React.Component<
@@ -103,6 +104,7 @@ function App(): React.ReactElement {
           >
             <CarouselStage />
             <CanvasHud />
+            <PerfHud />
 
             {exporting && (
               <div

@@ -133,8 +133,8 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
   const { computeSnapResize, startSnapSession, endSnapSession } = useSnapGuides()
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
   const scale = useViewportStore(selectScale)
-  const panX = useViewportStore((s) => s.panX)
-  const panY = useViewportStore((s) => s.panY)
+  // pan is read via getState() inside the transform callback (issue #59, Phase
+  // 1a) — subscribing here re-rendered every path on every pan pointermove.
   const pendingGuidesRef = useRef<SnapGuide[]>([])
 
   const altHeldRef = useRef(false)
@@ -454,6 +454,7 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
           onTransformEnd={handleTransformEnd}
           boundBoxFunc={(oldBox, newBox) => {
             if (newBox.width < 5 || newBox.height < 5) return oldBox
+            const { panX, panY } = useViewportStore.getState()
             const anchor = transformerRef.current?.getActiveAnchor() ?? ''
             if (anchor === 'rotater') return newBox
             if (Math.abs(newBox.rotation ?? 0) > 0.01 || !anchor) return newBox

@@ -76,8 +76,8 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
   const setContextMenu = useCanvasStore((s) => s.setContextMenu)
   const resizeMode = useCanvasStore((s) => s.resizeMode)
   const scale = useViewportStore(selectScale)
-  const panX = useViewportStore((s) => s.panX)
-  const panY = useViewportStore((s) => s.panY)
+  // pan is read via getState() inside the transform callback (issue #59, Phase
+  // 1a) — subscribing here re-rendered every image on every pan pointermove.
 
   const isInMultiSelectMode = selectedIds.length > 1
   const isAnchor = anchorId === id
@@ -758,6 +758,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
         boundBoxFunc={(oldBox, newBox) => {
           if (newBox.width < 5 || newBox.height < 5) return oldBox
 
+          const { panX, panY } = useViewportStore.getState()
           const rotation = newBox.rotation ?? 0
           const anchor = transformerRef.current?.getActiveAnchor() ?? ''
 

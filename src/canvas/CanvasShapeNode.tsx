@@ -42,8 +42,8 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
   const { computeSnap, computeSnapResize, snapRotation, startSnapSession, endSnapSession } = useSnapGuides()
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
   const scale = useViewportStore(selectScale)
-  const panX = useViewportStore((s) => s.panX)
-  const panY = useViewportStore((s) => s.panY)
+  // pan is read via getState() inside the transform callback (issue #59, Phase
+  // 1a) — subscribing here re-rendered every shape on every pan pointermove.
 
   const isInMultiSelectMode = selectedIds.length > 1
   const isAnchor = anchorId === id
@@ -520,6 +520,7 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
         onTransformStart={() => startSnapSession(obj.id)}
         boundBoxFunc={(oldBox, newBox) => {
           if (newBox.width < 5 || newBox.height < 5) return oldBox
+          const { panX, panY } = useViewportStore.getState()
           const rotation = newBox.rotation ?? 0
           const anchor = transformerRef.current?.getActiveAnchor() ?? ''
           if (anchor === 'rotater') {
