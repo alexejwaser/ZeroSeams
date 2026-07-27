@@ -904,7 +904,7 @@ export function TitleBar(): React.ReactElement {
             color: 'var(--text-primary)',
             fontSize: 14,
             fontWeight: 'bold',
-            minWidth: 16,
+            minWidth: 22,
             textAlign: 'center',
             fontFamily: 'var(--font)',
           }}
@@ -914,15 +914,14 @@ export function TitleBar(): React.ReactElement {
         <Tooltip label="Add frame" shortcut="⌘→">
           <button
             onClick={handlePlus}
-            disabled={frameCount >= 10}
             style={{
               width: 20,
               height: 20,
               background: 'none',
-              color: frameCount >= 10 ? 'var(--text-muted)' : 'var(--text-secondary)',
+              color: 'var(--text-secondary)',
               border: 'none',
               borderRadius: 999,
-              cursor: frameCount >= 10 ? 'default' : 'pointer',
+              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

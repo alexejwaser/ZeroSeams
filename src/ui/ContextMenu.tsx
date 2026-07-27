@@ -330,7 +330,6 @@ export function ContextMenu(): React.ReactElement | null {
         <>
           <MenuItem
             label="Add Frame"
-            disabled={frameCount >= 10}
             onClick={() => { setFrameCount(frameCount + 1); dismiss() }}
           />
           <MenuItem

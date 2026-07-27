@@ -1036,7 +1036,8 @@ export const useCanvasStore = create<CanvasState>((set) => {
 
     setFrameCount: (n) =>
       set((state) => {
-        const clamped = Math.max(1, Math.min(10, n))
+        // No upper bound — frame count is uncapped; `|| 1` also absorbs NaN/fractional input.
+        const clamped = Math.max(1, Math.floor(n) || 1)
         const current = state.frames
         let frames: Frame[]
         if (clamped > current.length) {
