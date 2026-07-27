@@ -5,7 +5,8 @@ import { useBackgroundRemoval } from '../ai/useBackgroundRemoval'
 import { useAIStore } from '../ai/useAIStore'
 import { useExternalEdit } from '../canvas/useExternalEdit'
 import { useSaveStatusStore } from '@/store'
-import type { ImageObject, ShapeObject, PathObject, VideoObject } from '@/types/canvas'
+import type { ImageObject, VideoObject } from '@/types/canvas'
+import { canBecomeFrame } from '@/canvas/geometry'
 import { pickImageMedia, pickVideoMedia } from './properties/mediaPickers'
 
 interface MenuItemProps {
@@ -152,8 +153,7 @@ export function ContextMenu(): React.ReactElement | null {
   async function handleInsertMediaIntoShape(id: string, mediaKind: 'image' | 'video'): Promise<void> {
     const media = mediaKind === 'image' ? await pickImageMedia() : await pickVideoMedia()
     if (!media) return
-    useCanvasStore.getState().convertShapeToFrame(id)
-    useCanvasStore.getState().insertMediaIntoFrame(id, media)
+    useCanvasStore.getState().insertMediaIntoShape(id, media)
   }
 
   async function handleReplaceMedia(id: string, frame: ImageObject | VideoObject): Promise<void> {
@@ -189,9 +189,7 @@ export function ContextMenu(): React.ReactElement | null {
                      op.targetObjectId === targetId &&
                      op.status === 'running'
           )
-          const isConvertibleShape = obj?.type === 'shape' &&
-            ((obj as ShapeObject).kind === 'rect' || (obj as ShapeObject).kind === 'ellipse')
-          const isConvertiblePath = obj?.type === 'path' && (obj as PathObject).closed === true
+          const isConvertible = canBecomeFrame(obj)
           const isFrameTarget = (obj?.type === 'image' || obj?.type === 'video') && (
             (obj as ImageObject | VideoObject).clipShape != null ||
             (obj?.type === 'image' && (obj as ImageObject).isEmpty === true)
@@ -293,7 +291,7 @@ export function ContextMenu(): React.ReactElement | null {
                   />
                 </>
               )}
-              {(isConvertibleShape || isConvertiblePath) && (
+              {isConvertible && (
                 <>
                   <Divider />
                   <MenuItem
@@ -316,15 +314,12 @@ export function ContextMenu(): React.ReactElement | null {
                     disabled={locked}
                     onClick={() => { void handleReplaceMedia(targetId, obj as ImageObject | VideoObject); dismiss() }}
                   />
+                  {/* Removing media collapses a standalone frame back to its shape —
+                      no separate "Convert to Shape", they were the same action. */}
                   <MenuItem
                     label="Remove Media"
                     disabled={locked || isEmptyFrame}
                     onClick={() => { useCanvasStore.getState().removeMediaFromFrame(targetId); dismiss() }}
-                  />
-                  <MenuItem
-                    label="Convert to Shape"
-                    disabled={locked}
-                    onClick={() => { useCanvasStore.getState().convertFrameToShape(targetId); dismiss() }}
                   />
                 </>
               )}

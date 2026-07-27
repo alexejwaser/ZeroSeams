@@ -44,6 +44,70 @@ export function rotateAroundCenter(
 // Rotation is ignored (unrotated bbox) — acceptable for v1.
 // ---------------------------------------------------------------------------
 
+/**
+ * Snap a rect that lives in a rotated frame's local space.
+ *
+ * Content inside a media frame is positioned in frame-local coordinates, but snap
+ * targets are canvas-absolute and axis-aligned. So: rotate the local rect's corners
+ * into absolute space, snap that AABB, then rotate the correction back into local
+ * space. Without this, content snapping has to be switched off whenever the frame
+ * is rotated.
+ *
+ * `snapAABB` receives the absolute axis-aligned box and returns the snapped
+ * top-left, mirroring computeSnap's contract.
+ */
+export function snapRectInRotatedFrame(
+  local: { x: number; y: number; width: number; height: number },
+  frameX: number,
+  frameY: number,
+  rotationDeg: number,
+  snapAABB: (box: { x: number; y: number; width: number; height: number }) => { x: number; y: number },
+): { x: number; y: number } {
+  if (!rotationDeg) {
+    const snapped = snapAABB({
+      x: frameX + local.x, y: frameY + local.y, width: local.width, height: local.height,
+    })
+    return { x: snapped.x - frameX, y: snapped.y - frameY }
+  }
+
+  const rad = (rotationDeg * Math.PI) / 180
+  const cos = Math.cos(rad)
+  const sin = Math.sin(rad)
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+  for (const [cx, cy] of [
+    [local.x, local.y], [local.x + local.width, local.y],
+    [local.x + local.width, local.y + local.height], [local.x, local.y + local.height],
+  ]) {
+    const ax = frameX + cx * cos - cy * sin
+    const ay = frameY + cx * sin + cy * cos
+    minX = Math.min(minX, ax); maxX = Math.max(maxX, ax)
+    minY = Math.min(minY, ay); maxY = Math.max(maxY, ay)
+  }
+
+  const snapped = snapAABB({ x: minX, y: minY, width: maxX - minX, height: maxY - minY })
+  // Rotate the absolute correction back into frame-local space (R⁻¹ = Rᵀ).
+  const dax = snapped.x - minX
+  const day = snapped.y - minY
+  return {
+    x: local.x + dax * cos + day * sin,
+    y: local.y - dax * sin + day * cos,
+  }
+}
+
+/**
+ * The single convertibility predicate: can this object become a media frame?
+ * Lines, arrows and open paths have no interior to fill. Every caller (context
+ * menu, properties panel, the drop hit-test below, the store action) must use
+ * this — re-deriving it is how the drop hooks ended up silently swallowing media
+ * dropped on a line.
+ */
+export function canBecomeFrame(obj: CanvasObject | undefined): boolean {
+  if (!obj) return false
+  if (obj.type === 'shape') return obj.kind === 'rect' || obj.kind === 'ellipse'
+  if (obj.type === 'path') return obj.closed
+  return false
+}
+
 function pointInRect(px: number, py: number, x: number, y: number, w: number, h: number): boolean {
   return px >= x && px <= x + w && py >= y && py <= y + h
 }
@@ -70,12 +134,16 @@ export function findDropTargetId(
       if (obj.isEmpty && pointInRect(px, py, obj.frameX, obj.frameY, obj.frameWidth, obj.frameHeight)) {
         return obj.id
       }
+    } else if (!canBecomeFrame(obj)) {
+      continue // line/arrow/open path have no interior to fill
     } else if (obj.type === 'shape') {
-      if (obj.kind === 'rect' && pointInRect(px, py, obj.x, obj.y, obj.width, obj.height)) return obj.id
-      if (obj.kind === 'ellipse' && pointInEllipse(px, py, obj.x, obj.y, obj.width, obj.height)) return obj.id
-      // line/arrow are not fillable frames — skip
+      if (obj.kind === 'ellipse') {
+        if (pointInEllipse(px, py, obj.x, obj.y, obj.width, obj.height)) return obj.id
+      } else if (pointInRect(px, py, obj.x, obj.y, obj.width, obj.height)) {
+        return obj.id
+      }
     } else if (obj.type === 'path') {
-      if (obj.closed && pointInRect(px, py, obj.x, obj.y, obj.width, obj.height)) return obj.id
+      if (pointInRect(px, py, obj.x, obj.y, obj.width, obj.height)) return obj.id
     }
   }
   return null

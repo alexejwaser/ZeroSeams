@@ -513,18 +513,27 @@ console.log('\n── F. Media Frames ──')
   ok(s6.objects[id]?.isEmpty === false, 'F2: redo restores media')
   eq(s6.objects[id]?.src, TEST_IMG_SRC, 'F2: redo restores src via srcVault reinjection')
 
-  // F3. removeMediaFromFrame — clipShape/fill preserved on the empty frame;
-  // undo restores media with src intact (validates vault-retention on removal).
+  // F3. removeMediaFromFrame on a STANDALONE frame collapses it back to a shape —
+  // there is only one empty state, so "remove media" and "convert to shape" are the
+  // same action. (Grid cells are the exception and stay isEmpty frames.)
+  // Undo restores media with src intact (validates vault-retention on removal).
   const s7 = await getState()
   const preRemoveClipKind = s7.objects[id]?.clipShape?.kind
-  const preRemoveFill = JSON.stringify(s7.objects[id]?.fill)
+  const preRemoveFillColor = s7.objects[id]?.fill?.color
+  const preRemoveX = s7.objects[id]?.frameX
+  const preRemoveW = s7.objects[id]?.frameWidth
   await page.evaluate((id) => window.__canvasStore__.getState().removeMediaFromFrame(id), id)
   await wait(100)
   const s8 = await getState()
   eq(s8.pastLen - s7.pastLen, 1, 'F3: removeMediaFromFrame pushes exactly 1 history entry')
-  ok(s8.objects[id]?.isEmpty === true, 'F3: removeMediaFromFrame empties the frame')
-  eq(s8.objects[id]?.clipShape?.kind, preRemoveClipKind, 'F3: clipShape preserved after media removal')
-  eq(JSON.stringify(s8.objects[id]?.fill), preRemoveFill, 'F3: fill preserved after media removal')
+  eq(s8.objects[id]?.type, 'shape', 'F3: standalone frame collapses back to a shape')
+  eq(s8.objects[id]?.kind, preRemoveClipKind, 'F3: clip kind becomes the shape kind')
+  ok(s8.objects[id]?.isEmpty === undefined, 'F3: no lingering isEmpty frame state')
+  ok(s8.objects[id]?.clipShape === undefined, 'F3: no lingering clipShape')
+  // ShapeObject.fill is a plain colour string, not the frame's Fill union.
+  eq(s8.objects[id]?.fill, preRemoveFillColor, 'F3: fill colour preserved after media removal')
+  eq(s8.objects[id]?.x, preRemoveX, 'F3: geometry preserved (x)')
+  eq(s8.objects[id]?.width, preRemoveW, 'F3: geometry preserved (width)')
 
   await undo()
   await wait(100)
@@ -597,6 +606,60 @@ console.log('\n── F. Media Frames ──')
   await wait(100)
   const s2 = await getState()
   eq(JSON.stringify(s2.objects[shapeId]?.fill), preDragFill, 'F5: single undo returns to pre-drag fill')
+
+  // Cleanup
+  await page.evaluate((id) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    gs().removeObject(id)
+  }, shapeId)
+  await wait(100)
+}
+
+{
+  // F6. Video and image cover-fit a shape IDENTICALLY — no stretching. A landscape
+  // source in a square frame must overflow horizontally and match the frame height,
+  // preserving its aspect ratio. Regression guard: reading videoWidth on
+  // `durationchange` (before it's populated) yields 0, and fitCover's degenerate
+  // branch then returns the frame size verbatim — i.e. a stretched video.
+  const shapeId = await page.evaluate(() => {
+    const id = crypto.randomUUID()
+    window.__canvasStore__.getState().addObject({
+      id, type: 'shape', kind: 'rect', scope: 'global', name: 'sq',
+      fill: '#ffffff', stroke: '#000000', strokeWidth: 0,
+      x: 0, y: 0, width: 400, height: 400,
+      rotation: 0, scaleX: 1, scaleY: 1, opacity: 1, visible: true, locked: false, zIndex: 0,
+    })
+    return id
+  })
+  await wait(100)
+
+  // 1920×1080 landscape source into a 400×400 frame.
+  await page.evaluate((id) => {
+    window.__canvasStore__.getState().insertMediaIntoShape(id, {
+      kind: 'video', filePath: '/tmp/fake.mp4', name: 'v',
+      naturalWidth: 1920, naturalHeight: 1080, naturalDuration: 5,
+    })
+  }, shapeId)
+  await wait(100)
+  const v = (await getState()).objects[shapeId]
+  eq(v?.type, 'video', 'F6: shape became a video frame')
+  eq(v?.contentHeight, 400, 'F6: video cover-fit matches frame height')
+  ok(Math.abs(v.contentWidth - (400 * 1920) / 1080) < 0.5, 'F6: video content width preserves 16:9 aspect')
+  ok(v.contentWidth > 400, 'F6: video overflows the frame horizontally (cropped, not squashed)')
+  ok(Math.abs(v.contentOffsetX - (400 - v.contentWidth) / 2) < 0.5, 'F6: video overflow centered')
+
+  // Same source dims as an image must produce identical content geometry.
+  await page.evaluate(([id, src]) => {
+    window.__canvasStore__.getState().insertMediaIntoFrame(id, {
+      kind: 'image', src, naturalWidth: 1920, naturalHeight: 1080,
+    })
+  }, [shapeId, TEST_IMG_SRC])
+  await wait(100)
+  const i = (await getState()).objects[shapeId]
+  eq(i?.contentWidth, v.contentWidth, 'F6: image and video cover-fit produce identical width')
+  eq(i?.contentHeight, v.contentHeight, 'F6: image and video cover-fit produce identical height')
+  eq(i?.contentOffsetX, v.contentOffsetX, 'F6: image and video cover-fit produce identical offset')
 
   // Cleanup
   await page.evaluate((id) => {

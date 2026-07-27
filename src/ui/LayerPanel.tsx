@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
 import { useThumbnailStore } from '@/canvas/useThumbnailStore'
+import { solidColorOf } from '@/canvas/frameClip'
 import type { CanvasObject, CanvasObjectType, GroupObject, GuidelineObject, VideoObject, ImageObject } from '@/types/canvas'
 import Tooltip from './Tooltip'
 import { iconBtnStyle } from './iconBtnStyle'
@@ -13,7 +14,7 @@ function isEmptyFrame(obj: CanvasObject | undefined): obj is ImageObject {
 // Fill-color swatch + shape glyph for empty media frames — a broken <img>
 // thumbnail would otherwise render since isEmpty frames have no src.
 function EmptyFrameThumb({ obj }: { obj: ImageObject }): React.ReactElement {
-  const fillColor = obj.fill?.type === 'solid' ? obj.fill.color : 'var(--bg-panel)'
+  const fillColor = solidColorOf(obj.fill) ?? 'var(--bg-panel)'
   const kind = obj.clipShape?.kind ?? 'rect'
   return (
     <div

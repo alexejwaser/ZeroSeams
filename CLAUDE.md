@@ -54,8 +54,14 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 
 **Media Frames** (`src/canvas/frameClip.ts`, `src/canvas/geometry.ts`):
 - `clipShape?` on `ImageObject`/`VideoObject`: `{kind:'rect', cornerRadius?}|{kind:'ellipse'}|{kind:'path', anchors}` — absent = plain rect; `path` anchors are NORMALIZED 0–1 in frame units, never display px (storing display px was the bug that killed the old mask system — it doesn't survive frame resize)
-- `fill?` is a union (`{type:'solid', color}` today, gradient lands later) — always switch on `fill.type`, never assume solid
-- An empty frame is just `ImageObject` with `isEmpty: true` — grid cells and standalone shape-frames are the same representation, both rendered by `EmptyFrameOverlay` (ex-`GridCellOverlay`)
+- `fill?` is a union (`{type:'solid', color}` today, gradient lands later) — read it only via `solidColorOf(fill)`, never `fill.color`
+- Node-type dispatch in `CarouselStage` must stay REACTIVE (`useShallow` over the type list). Objects change type in place via `swapObjectPreservingId`, and a `getState()` read leaves the old node component mounted rendering nothing — the layer panel shows the media, the canvas doesn't
+- `makeCanvasNode(Inner, expectedType)` returns null on a type mismatch, so a stale dispatch degrades to blank instead of throwing
+- `canBecomeFrame(obj)` (`geometry.ts`) is the ONLY convertibility predicate — line/arrow/open path have no interior. Never re-derive it
+- `insertMediaIntoShape(id, media)` = convert + fill in one `set()`, one undo step; returns `false` when the target can't hold media so drop handlers fall back to standalone placement
+- `convertShapeToFrame` rejects sub-1px bboxes and `buildClipFunc` returns `undefined` for a degenerate frame — an *empty* clipFunc clips the whole group away, it does not mean "no clip"
+- There is exactly ONE empty state per object: a standalone object with no media is a `ShapeObject`/`PathObject` (with the `+ Image / + Video` CTA), NOT an empty frame. `removeMediaFromFrame` collapses a standalone frame back to its shape via `buildShapeFromFrame` — that's why there's no separate "Convert to Shape" button; they were the same action with two indistinguishable results
+- `isEmpty: true` `ImageObject` therefore means **grid cell** — a cell must keep its slot, so it's the one case `removeMediaFromFrame` leaves as a frame. `EmptyFrameOverlay` (ex-`GridCellOverlay`) renders it. Legacy projects may still contain standalone empty frames; they stay functional
 - `convertShapeToFrame`/`convertFrameToShape`/`insertMediaIntoFrame`/`removeMediaFromFrame` all go through `swapObjectPreservingId` — id-preserving, single history entry, `objectOrder` index untouched
 - `_srcVault` entries are KEPT (not deleted) on `removeMediaFromFrame` — undo needs the src back without a save round-trip
 - `clipFunc` is only set when `clipShape` is non-plain-rect; the frame `Rect`'s `hitFunc` follows the same clip geometry so hit-testing matches the visible shape
@@ -71,6 +77,8 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `boundBoxFunc` receives absolute screen coords — convert absolute→logical before snapping, back to absolute before returning; `logicalThreshold = 8 / scale`
 - `snapEnabled: boolean` in store; `rotationSnaps=[0,45,90,135,180,225,270,315]` on all Transformers
 - Snap is **disabled** for pen anchor drag and line endpoint drag
+- Media frames expose `frameSnapBox()`, not raw `frameX/Y/Width/Height`: rotated frames snap to their rotated corners' AABB, and `path` clips snap to the clip silhouette bbox rather than the enclosing frame rect
+- Content dragged inside a frame lives in frame-local space — route it through `snapRectInRotatedFrame` (`geometry.ts`) so snapping still works on a rotated frame
 - `startSnapSession(id)` / `endSnapSession()` — call at `onDragStart`/`onDragEnd` and `onTransformStart`/`onTransformEnd` on every draggable node; caches `buildTargets` result for the drag duration so it runs once per gesture, not per mousemove
 
 **History & Drag Pattern:**
@@ -90,6 +98,7 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - Shape/Ellipse: store uses bounding-box top-left `(x,y)`; Konva Ellipse uses center — convert at render time
 - Text: handles resize the textbox, text reflows; `scaleX/Y` always 1 after transform
 - Pen: `PathObject` with `anchors: AnchorPoint[]`; transform bakes full affine matrix into anchors, resets node to identity
+- Pen: `penDrawingId` in store (transient) mirrors CarouselStage's `currentPenPathIdRef` — the pen selects the path on its first anchor, so `CanvasPathNode` needs this to suppress the transform box until the path is committed. Update both together at every assignment site
 - Shift+drag axis-locks via `axisLock(dx,dy)` in `constants.ts`
 - `locked: boolean` on every object — no handles, no drag, no double-click
 
@@ -121,6 +130,7 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - RAF trim end: `obj.trimEnd ?? obj.naturalDuration ?? Infinity` — `Infinity` guards against `naturalDuration: null` on older saves; `null` coerces to `0` and makes the trim check always-true, causing constant seek-to-frame-0
 - `obj.effects ?? []` when calling `buildEffectFilters` — video objects saved before the effects field was introduced omit it entirely
 - RAF cache throttle: skip `.cache()` + `batchDraw()` when `currentTime` unchanged; reset throttle ref to `-1` on `allFilters` change — otherwise paused-video adjustment changes never apply
+- The cache effect MUST also depend on `contentWidth`/`contentHeight` (as `CanvasImageNode` does): `.cache()` snapshots the node at its current size and Konva scales that bitmap to the node's new box, so re-fitting content without re-caching renders the video **stretched**
 - `zeroseams-media://` scheme with Range support + CORP/COEP headers enables `SharedArrayBuffer` for FFmpeg WASM
 - Store `platform` must be subscribed as a hook in Toolbar components — `getState()` inside handlers only leaves it undefined during render
 
@@ -139,7 +149,6 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - Delete on a cell with `parentGroupId` restores an empty frame (`isEmpty: true` via `removeMediaFromFrame`) — never removes the cell slot from the grid
 - `disconnectGridCell(id)` removes the cell from `childIds` and clears `parentGroupId`, making it a standalone object
 - `EmptyFrameOverlay` container must be `pointerEvents: none`; only the `+image`/`+video` buttons set `pointerEvents: auto` — otherwise the div captures clicks before Konva hit-tests the group rect
-- `replaceGridCell(cellId, newObj)` atomically swaps a cell (e.g. ImageObject → VideoObject), updating parent `childIds` and `objectOrder`
 - Gap slider and group transform must update ALL child types (image + video) — filtering by `child.type === 'image'` breaks video cells
 
 **Guidelines** (`src/canvas/CanvasGuidelineNode.tsx`):

@@ -12,7 +12,7 @@ import './adjustments.css'
 import { ColorInput } from './ColorInput'
 import { NumericInput } from './NumericInput'
 
-import { rotateAroundCenter } from '@/canvas/geometry'
+import { rotateAroundCenter, canBecomeFrame } from '@/canvas/geometry'
 
 import { NumberField, sectionLabelStyle } from './properties/shared'
 import { AlignDistributeSection } from './properties/AlignDistributeSection'
@@ -31,14 +31,12 @@ function isFrameObject(obj: CanvasObject | null): obj is ImageObject | VideoObje
   return f.clipShape != null || (obj.type === 'image' && (obj as ImageObject).isEmpty === true)
 }
 
-// Converts a rect/ellipse shape or closed path into a media frame in one
-// gesture, then inserts the picked media. Two sequential store calls =
-// two undo steps for v1 (see FrameSection deviation notes).
+// Converts a rect/ellipse shape or closed path into a media frame and inserts the
+// picked media. The store action does both in one set(), so this is one undo step.
 async function insertMediaIntoShape(id: string, mediaKind: 'image' | 'video'): Promise<void> {
   const media = mediaKind === 'image' ? await pickImageMedia() : await pickVideoMedia()
   if (!media) return
-  useCanvasStore.getState().convertShapeToFrame(id)
-  useCanvasStore.getState().insertMediaIntoFrame(id, media)
+  useCanvasStore.getState().insertMediaIntoShape(id, media)
 }
 
 const mediaFrameCtaButtonStyle: React.CSSProperties = {
@@ -397,7 +395,7 @@ export function PropertiesPanel(): React.ReactElement {
               {shapeObj.kind === 'rect' && (
                 <NumberField label="Corner R." value={shapeObj.cornerRadius ?? 0} min={0} onChange={(val) => { commitUpdate(shapeObj.id, { cornerRadius: val }) }} />
               )}
-              {(shapeObj.kind === 'rect' || shapeObj.kind === 'ellipse') && (
+              {canBecomeFrame(shapeObj) && (
                 <div style={{ marginTop: 4, marginBottom: 8, padding: 8, border: '1px dashed #d4ccc2', borderRadius: 12 }}>
                   <div style={sectionLabelStyle}>Media Frame</div>
                   <div style={{ display: 'flex', gap: 6 }}>
@@ -474,7 +472,7 @@ export function PropertiesPanel(): React.ReactElement {
                 step={0.5}
                 onChange={(val) => { commitUpdate(pathObj.id, { strokeWidth: val }) }}
               />
-              {pathObj.closed && (
+              {canBecomeFrame(pathObj) && (
                 <div style={{ marginTop: 4, marginBottom: 8, padding: 8, border: '1px dashed #d4ccc2', borderRadius: 12 }}>
                   <div style={sectionLabelStyle}>Media Frame</div>
                   <div style={{ display: 'flex', gap: 6 }}>

@@ -4,10 +4,18 @@
 // clip is stored transform-free and re-scales with the frame automatically.
 
 import type Konva from 'konva'
-import type { AnchorPoint, ClipShape } from '@/types/canvas'
+import type { AnchorPoint, ClipShape, Fill } from '@/types/canvas'
 import { anchorsToPathData } from './CanvasPathNode'
 
 type PathCtx = CanvasRenderingContext2D | Konva.Context
+
+/** Solid colour of a Fill, or undefined for fill kinds that have none.
+ *  Always read `fill` through this — the union grows (gradient) and an unguarded
+ *  `fill.color` would silently break. */
+export function solidColorOf(fill: Fill | undefined): string | undefined {
+  if (!fill) return undefined
+  return fill.type === 'solid' ? fill.color : undefined
+}
 
 /** Feather-style "image" glyph in a 24×24 box — centered hint on empty frames. */
 export const EMPTY_FRAME_ICON_PATH =
@@ -61,13 +69,17 @@ export function denormalizeAnchors(
 // beginPath()/clip() around it.
 // ---------------------------------------------------------------------------
 
+/** Returns undefined for a degenerate frame. Critical: Konva runs
+ *  `beginPath(); clipFunc(); clip()`, so a clipFunc that issues NO path commands
+ *  clips the entire group away — it does not mean "no clip". Callers must pass
+ *  the undefined straight through to Konva rather than invoking an empty trace. */
 export function buildClipFunc(
   clipShape: ClipShape,
   frameW: number,
   frameH: number,
-): (ctx: PathCtx) => void {
+): ((ctx: PathCtx) => void) | undefined {
+  if (frameW <= 0 || frameH <= 0) return undefined
   return (ctx: PathCtx) => {
-    if (frameW <= 0 || frameH <= 0) return
     if (clipShape.kind === 'rect') {
       const r = clipShape.cornerRadius
       if (r && r > 0) {

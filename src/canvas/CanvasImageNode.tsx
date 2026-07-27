@@ -12,8 +12,8 @@ import { useViewportStore, selectScale } from './useViewportStore'
 import { buildFilterPipeline } from './adjustments/pipeline'
 import { DEFAULT_ADJUSTMENTS } from '@/types/canvas'
 import { buildEffectFilters } from './effects/buildEffectFilters'
-import { fitCover } from './geometry'
-import { buildClipFunc, clipShapeToPathData, isPlainRectClip, EMPTY_FRAME_ICON_PATH } from './frameClip'
+import { fitCover, snapRectInRotatedFrame } from './geometry'
+import { buildClipFunc, clipShapeToPathData, isPlainRectClip, solidColorOf, EMPTY_FRAME_ICON_PATH } from './frameClip'
 import { ClipEditOverlay } from './ClipEditOverlay'
 
 const EMPTY_FRAME_FILL = '#d9d2c7'
@@ -99,6 +99,10 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
     [obj.frameWidth, obj.frameHeight],
   )
 
+  // Always read `fill` through solidColorOf — the union grows (gradient next) and
+  // a bare fill.color would silently break.
+  const frameFill = solidColorOf(obj.fill)
+
   // --- Media-frame clip geometry ---
   // Plain rect / absent clip keeps the zero-cost `clip` rect prop. Ellipse/path
   // (and rounded-rect) use a traced clipFunc that Konva prefers over `clip`.
@@ -111,6 +115,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
   const hitFunc = useMemo(() => {
     if (plainRect || !obj.clipShape) return undefined
     const trace = buildClipFunc(obj.clipShape, obj.frameWidth, obj.frameHeight)
+    if (!trace) return undefined
     return (ctx: Konva.Context, shape: Konva.Shape): void => {
       ctx.beginPath()
       trace(ctx)
@@ -132,7 +137,8 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
   function syncFrameDecor(width: number, height: number): void {
     const group = groupRef.current
     if (group && !plainRect && obj.clipShape) {
-      group.clipFunc(buildClipFunc(obj.clipShape, width, height))
+      const trace = buildClipFunc(obj.clipShape, width, height)
+      if (trace) group.clipFunc(trace)
     }
     const fr = fillRectRef.current
     if (fr) { fr.width(width); fr.height(height) }
@@ -505,13 +511,21 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
       node.x(nx)
       node.y(ny)
     }
-    if (obj.rotation) { onGuidesChange([]); return }
-    const { x: sx, y: sy, guides } = computeSnap(
-      { x: obj.frameX + nx, y: obj.frameY + ny, width: obj.contentWidth, height: obj.contentHeight },
-      obj.id,
+    // Content lives in frame-local space; snap targets are canvas-absolute and
+    // axis-aligned. snapRectInRotatedFrame bridges the two so this works on a
+    // rotated frame instead of bailing out.
+    let guides: SnapGuide[] = []
+    const localSnap = snapRectInRotatedFrame(
+      { x: nx, y: ny, width: obj.contentWidth, height: obj.contentHeight },
+      obj.frameX, obj.frameY, obj.rotation,
+      (box) => {
+        const res = computeSnap(box, obj.id)
+        guides = res.guides
+        return res
+      },
     )
-    node.x(sx - obj.frameX)
-    node.y(sy - obj.frameY)
+    node.x(localSnap.x)
+    node.y(localSnap.y)
     onGuidesChange(guides)
   }
 
@@ -541,7 +555,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
     })
   }
 
-  const emptyFill = obj.fill?.color ?? EMPTY_FRAME_FILL
+  const emptyFill = frameFill ?? EMPTY_FRAME_FILL
   const emptyIconSize = Math.min(obj.frameWidth, obj.frameHeight) * 0.18
   const emptyIconScale = emptyIconSize / 24
   // Centered image-icon hint painted on empty frames — shared by the grid-cell
@@ -618,12 +632,12 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
           </>
         ) : (
           <>
-            {obj.fill ? (
+            {frameFill != null ? (
               <Rect
                 ref={fillRectRef}
                 x={0} y={0}
                 width={obj.frameWidth} height={obj.frameHeight}
-                fill={obj.fill.color}
+                fill={frameFill}
                 listening={false}
               />
             ) : null}
@@ -799,4 +813,4 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
   )
 }
 
-export const CanvasImageNode = makeCanvasNode<ImageObject, CanvasImageNodeProps>(CanvasImageNodeInner)
+export const CanvasImageNode = makeCanvasNode<ImageObject, CanvasImageNodeProps>(CanvasImageNodeInner, 'image')

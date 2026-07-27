@@ -1,6 +1,7 @@
 import React from 'react'
 import type { CanvasObject, ImageObject, VideoObject, ClipShape } from '@/types/canvas'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
+import { solidColorOf } from '@/canvas/frameClip'
 import Tooltip from '../Tooltip'
 import { ColorInput } from '../ColorInput'
 import { NumericInput } from '../NumericInput'
@@ -58,9 +59,12 @@ export function FrameSection({
   const clipShape = frameObj.clipShape
   const clipKind = clipShape?.kind ?? 'rect'
   const isEmpty = frameObj.type === 'image' && (frameObj as ImageObject).isEmpty === true
+  // Empty standalone frames no longer exist — they collapse to shapes — so an
+  // isEmpty frame reaching this panel is always a grid cell.
+  const isGridCell = frameObj.parentGroupId != null
   const cornerRadius = clipShape?.kind === 'rect' ? (clipShape.cornerRadius ?? 0) : 0
   const maxCorner = Math.max(0, Math.floor(Math.min(frameObj.frameWidth, frameObj.frameHeight) / 2))
-  const fillColor = frameObj.fill?.type === 'solid' ? frameObj.fill.color : undefined
+  const fillColor = solidColorOf(frameObj.fill)
   const clipEditActive = frameObj.clipEditMode === true
 
   function setCornerRadius(value: number, commit: boolean): void {
@@ -93,10 +97,6 @@ export function FrameSection({
 
   function handleRemoveMedia(): void {
     useCanvasStore.getState().removeMediaFromFrame(selectedId)
-  }
-
-  function handleConvertToShape(): void {
-    useCanvasStore.getState().convertFrameToShape(selectedId)
   }
 
   return (
@@ -219,18 +219,21 @@ export function FrameSection({
               Replace with Video…
             </button>
           </Tooltip>
-          <Tooltip label="Remove media, keep the empty frame">
+          {/* Standalone frames collapse back to their shape; grid cells keep the
+              empty slot. There is no separate "Convert to Shape" — it was the
+              same action, which left two indistinguishable empty states. */}
+          <Tooltip
+            label="Remove Media"
+            description={isGridCell
+              ? 'Empties this grid cell, keeping the slot'
+              : 'Turns the frame back into a plain shape'}
+          >
             <button style={destructiveButtonStyle} onClick={handleRemoveMedia}>
               Remove Media
             </button>
           </Tooltip>
         </>
       )}
-      <Tooltip label="Convert frame back to a shape" description="Drops any media in the frame">
-        <button style={buttonStyle} onClick={handleConvertToShape}>
-          Convert to Shape
-        </button>
-      </Tooltip>
     </div>
   )
 }

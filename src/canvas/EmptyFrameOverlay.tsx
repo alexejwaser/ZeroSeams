@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react'
 import { useCanvasStore } from './useCanvasStore'
 import { useViewportStore, selectScale } from './useViewportStore'
+import { loadVideoMetadataFromPath } from './videoMetadata'
 import type { ImageObject } from '@/types/canvas'
 
 /**
@@ -49,26 +50,18 @@ export function EmptyFrameOverlay() {
     const filePath = result.filePath
     const rawName = filePath.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'video'
 
-    await new Promise<void>((resolve) => {
-      const vid = document.createElement('video')
-      vid.preload = 'metadata'
-      const onMeta = () => {
-        if (!isFinite(vid.duration) || vid.duration <= 0) return
-        vid.removeEventListener('durationchange', onMeta)
-        useCanvasStore.getState().insertMediaIntoFrame(cellId, {
-          kind: 'video',
-          filePath,
-          naturalWidth: vid.videoWidth,
-          naturalHeight: vid.videoHeight,
-          naturalDuration: vid.duration,
-          name: rawName,
-        })
-        vid.src = ''
-        resolve()
-      }
-      vid.addEventListener('durationchange', onMeta)
-      vid.onerror = () => resolve()
-      vid.src = `zeroseams-media://localhost${filePath}`
+    // Real dimensions required — a 0 makes fitCover fall back to the frame size,
+    // stretching the video instead of cover-cropping it.
+    const meta = await loadVideoMetadataFromPath(filePath)
+    if (!meta) return
+    // The cell may have been deleted while metadata loaded.
+    if (!useCanvasStore.getState().objects[cellId]) return
+
+    useCanvasStore.getState().insertMediaIntoFrame(cellId, {
+      kind: 'video',
+      filePath,
+      name: rawName,
+      ...meta,
     })
   }, [])
 

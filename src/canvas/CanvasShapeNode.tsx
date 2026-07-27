@@ -559,4 +559,4 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
   )
 }
 
-export const CanvasShapeNode = makeCanvasNode<ShapeObject, CanvasShapeNodeProps>(CanvasShapeNodeInner)
+export const CanvasShapeNode = makeCanvasNode<ShapeObject, CanvasShapeNodeProps>(CanvasShapeNodeInner, 'shape')
