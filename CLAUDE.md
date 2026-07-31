@@ -151,8 +151,9 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `GroupObject` with `isGrid: true` owns N `ImageObject`/`VideoObject` cells via `childIds`; `gridTemplateId` references the template used
 - `gridTemplates.ts` `cells(groupW, groupH, gap)` is pure — zero hardcoded pixels; always proportional to group dimensions
 - `parentGroupId` on `BaseCanvasObject` drives click routing: single click → select group; `listening={false}` on cells when group selected + cell not entered (passes events through to group hit rect)
-- Delete on a cell with `parentGroupId` restores an empty frame (`isEmpty: true` via `removeMediaFromFrame`) — never removes the cell slot from the grid
-- `disconnectGridCell(id)` removes the cell from `childIds` and clears `parentGroupId`, making it a standalone object
+- Delete on a *filled* cell restores an empty frame (`isEmpty: true`) — never removes the slot. Delete on an *already-empty* cell falls through to the generic delete (both interceptions in `removeObject` require media), which is why that path must detach too
+- `detachCellFromParent(objects, cellId, parentGroupId)` is the ONLY way a cell leaves a grid — it strips the id from `childIds` and deletes the group when that was the last cell. Skipping it leaves a dangling child id and a slot that can never be refilled. Mutates the `objects` copy; returns the deleted group's id so the caller can drop it from `objectOrder` and selection
+- `disconnectGridCell(id)` detaches, and **collapses an empty cell to a shape** in the same `set()` — one undo step, one empty state. It builds the replacement inline rather than via `swapObjectPreservingId` because that helper re-attaches `parentGroupId` from the old object, which is the exact field disconnect clears
 - `EmptyFrameOverlay` container must be `pointerEvents: none`; only the `+image`/`+video` buttons set `pointerEvents: auto` — otherwise the div captures clicks before Konva hit-tests the group rect
 - Gap slider and group transform must update ALL child types (image + video) — filtering by `child.type === 'image'` breaks video cells
 - `computeGridChildPatches` (`gridTemplates.ts`) is the ONLY place cell geometry is derived — `CanvasGroupNode` (drag/transform) and the Properties gap slider both call it. Never re-derive `template.cells(...)` inline

@@ -4,7 +4,7 @@ import type { GridTemplate } from './gridTemplates'
 import type { Frame, FrameRatio, Platform, CarouselProject } from '@/types/project'
 import { fitCover } from './geometry'
 import { normalizeAnchors, denormalizeAnchors, solidColorOf } from './frameClip'
-import { buildEmptyFrameImage, frameToEmptyImage, makeEmptyCell } from './frameModel'
+import { buildEmptyFrameImage, frameToEmptyImage, isEmptyFrame, makeEmptyCell } from './frameModel'
 import { computePathBBox } from './CanvasPathNode'
 
 /** Media payload accepted by insertMediaIntoFrame. */
@@ -600,6 +600,29 @@ export const useCanvasStore = create<CanvasState>((set) => {
     return [...trimmed, snapshot]
   }
 
+  // Remove `cellId` from its parent grid group's childIds. Mutates `objects`,
+  // which must already be a fresh copy. Returns the group id when that was the
+  // group's last cell and the group has been deleted — a grid owning nothing is
+  // an orphan the user can't select, move or refill, so it must not survive.
+  //
+  // Every path that takes a cell out of a grid goes through here. Skipping it is
+  // what left a dangling child id and a permanently unrecoverable slot (#62).
+  function detachCellFromParent(
+    objects: Record<string, CanvasObject>,
+    cellId: string,
+    parentGroupId: string,
+  ): string | null {
+    const parent = objects[parentGroupId] as GroupObject | undefined
+    if (!parent) return null
+    const childIds = parent.childIds.filter((cid) => cid !== cellId)
+    if (childIds.length === 0) {
+      delete objects[parentGroupId]
+      return parentGroupId
+    }
+    objects[parentGroupId] = { ...parent, childIds }
+    return null
+  }
+
   // Id-preserving object swap: replaces state.objects[id] with `replacement`
   // (forced to the same id), keeping the object's objectOrder position and
   // parentGroupId, updating _srcVault and _openEditModeCount. Returns a state
@@ -823,7 +846,15 @@ export const useCanvasStore = create<CanvasState>((set) => {
             _openEditModeCount: state._openEditModeCount - (isInEditMode(cell) ? 1 : 0),
           }
         }
-        const { [id]: _removed, ...rest } = state.objects
+        const rest = { ...state.objects }
+        delete rest[id]
+        // An ALREADY-EMPTY cell reaches here: both interceptions above require media.
+        // Deleting it without detaching would leave its id dangling in the parent's
+        // childIds and the slot unrecoverable (#62).
+        const emptiedGroupId = existing?.parentGroupId
+          ? detachCellFromParent(rest, id, existing.parentGroupId)
+          : null
+        const removedIds = new Set(emptiedGroupId ? [id, emptiedGroupId] : [id])
         // Opt #1: remove from vault
         let nextVault = state._srcVault
         if (state._srcVault.has(id)) {
@@ -836,10 +867,10 @@ export const useCanvasStore = create<CanvasState>((set) => {
           past: pushHistoryFrom(state),
           future: [],
           objects: rest,
-          objectOrder: state.objectOrder.filter((oid) => oid !== id),
-          selectedId: state.selectedId === id ? null : state.selectedId,
-          selectedIds: state.selectedIds.filter((sid) => sid !== id),
-          anchorId: state.anchorId === id ? null : state.anchorId,
+          objectOrder: state.objectOrder.filter((oid) => !removedIds.has(oid)),
+          selectedId: removedIds.has(state.selectedId ?? '') ? null : state.selectedId,
+          selectedIds: state.selectedIds.filter((sid) => !removedIds.has(sid)),
+          anchorId: removedIds.has(state.anchorId ?? '') ? null : state.anchorId,
           _srcVault: nextVault,
           _openEditModeCount: state._openEditModeCount - (removedInEditMode ? 1 : 0),
         }
@@ -1878,24 +1909,37 @@ export const useCanvasStore = create<CanvasState>((set) => {
         const cell = state.objects[cellId]
         if (!cell?.parentGroupId) return state
 
-        const parentGroup = state.objects[cell.parentGroupId] as GroupObject | undefined
         const updatedObjects = { ...state.objects }
+        const emptiedGroupId = detachCellFromParent(updatedObjects, cellId, cell.parentGroupId)
 
-        // Remove cell from parent group's childIds
-        if (parentGroup) {
-          updatedObjects[parentGroup.id] = {
-            ...parentGroup,
-            childIds: parentGroup.childIds.filter((cid) => cid !== cellId),
-          }
-        }
+        // A standalone object with no media IS a shape — there is exactly ONE empty
+        // state. Leaving a disconnected empty cell as an isEmpty frame would create
+        // the second one, complete with a floating "+ image / + video" CTA where the
+        // user expects a shape.
+        //
+        // Built inline rather than through swapObjectPreservingId: that helper
+        // deliberately re-attaches parentGroupId from the OLD object, which is the
+        // exact field disconnect exists to clear — layering it on top would silently
+        // re-parent the cell. Doing both here also keeps disconnect one undo step.
+        const replacement = isEmptyFrame(cell) ? buildShapeFromFrame(cell, cellId) : cell
+        updatedObjects[cellId] = { ...replacement, parentGroupId: undefined }
 
-        // Clear parentGroupId on the cell so it becomes a standalone object
-        updatedObjects[cellId] = { ...cell, parentGroupId: undefined }
+        const countDelta =
+          (isInEditMode(cell) ? 1 : 0) - (isInEditMode(updatedObjects[cellId]) ? 1 : 0)
 
         return {
           past: pushHistoryFrom(state),
           future: [],
           objects: updatedObjects,
+          ...(emptiedGroupId
+            ? {
+                objectOrder: state.objectOrder.filter((oid) => oid !== emptiedGroupId),
+                selectedId: state.selectedId === emptiedGroupId ? null : state.selectedId,
+                selectedIds: state.selectedIds.filter((sid) => sid !== emptiedGroupId),
+                anchorId: state.anchorId === emptiedGroupId ? null : state.anchorId,
+              }
+            : {}),
+          _openEditModeCount: state._openEditModeCount - countDelta,
         }
       }),
   }

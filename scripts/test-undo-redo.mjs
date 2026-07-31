@@ -1128,8 +1128,10 @@ await page.evaluate((src) => { window.__zsImg__ = src }, TEST_IMG_SRC)
   const after = await cellInfo(cellId, groupId)
 
   ok(!after.exists, 'L4: empty cell is hard-deleted')
-  // Expected-fail until #62 Phase B:
-  xok(!after.childIds?.includes(cellId), 'L4: deleted empty cell is also removed from parent childIds')
+  // #62 Phase B: both interceptions in removeObject require media, so an empty cell
+  // falls through to the generic delete. Before Phase B that left its id dangling in
+  // childIds and the slot permanently unrecoverable.
+  ok(!after.childIds?.includes(cellId), 'L4: deleted empty cell is also removed from parent childIds')
 
   await page.evaluate(({ groupId }) => {
     const gs = () => window.__canvasStore__.getState()
@@ -1169,9 +1171,9 @@ await page.evaluate((src) => { window.__zsImg__ = src }, TEST_IMG_SRC)
 {
   // L6 (cases 27-28). disconnectGridCell on an EMPTY cell. CLAUDE.md and
   // FrameSection both assert there is exactly ONE empty state — a standalone object
-  // with no media is a shape, not an empty frame. Disconnect currently clears
-  // parentGroupId without collapsing, producing the standalone empty frame that
-  // invariant says cannot exist.
+  // with no media is a shape, not an empty frame. Before #62 Phase B, disconnect
+  // cleared parentGroupId without collapsing, producing exactly the standalone empty
+  // frame that invariant says cannot exist.
   const { groupId, cellIds } = await makeGrid()
   await wait(120)
 
@@ -1181,14 +1183,24 @@ await page.evaluate((src) => { window.__zsImg__ = src }, TEST_IMG_SRC)
 
   ok(!after.parentGroupId, 'L6: parentGroupId cleared')
   ok(!after.childIds?.includes(cellIds[0]), 'L6: removed from parent childIds')
-  // Expected-fail until #62 Phase B:
-  xeq(after.type, 'shape', 'L6: disconnected EMPTY cell collapses to a shape (one-empty-state invariant)')
+  // #62 Phase B — the one-empty-state invariant:
+  eq(after.type, 'shape', 'L6: disconnected EMPTY cell collapses to a shape (one-empty-state invariant)')
 
   // Disconnect the last remaining cell — the group has nothing left to own.
   await page.evaluate((id) => window.__canvasStore__.getState().disconnectGridCell(id), cellIds[1])
   await wait(120)
   const emptied = await cellInfo(cellIds[1], groupId)
-  xok(!emptied.groupExists, 'L6: group is removed once its last cell is disconnected')
+  ok(!emptied.groupExists, 'L6: group is removed once its last cell is disconnected')
+  ok(!emptied.parentGroupId, 'L6: last cell is detached even though its group is gone')
+
+  // Collapse + detach + group removal must be ONE undo step, or dismantling a grid
+  // by hand leaves the user pressing Cmd+Z through a pile of half-states.
+  await undo()
+  await wait(120)
+  const restored = await cellInfo(cellIds[1], groupId)
+  ok(restored.groupExists, 'L6: one undo brings the group back')
+  eq(restored.parentGroupId, groupId, 'L6: one undo re-parents the last cell')
+  eq(restored.type, 'image', 'L6: undone cell is an empty frame again, not a shape')
 
   await page.evaluate(({ groupId, cellIds }) => {
     const gs = () => window.__canvasStore__.getState()
