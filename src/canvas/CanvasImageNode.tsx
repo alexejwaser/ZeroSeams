@@ -14,9 +14,8 @@ import { DEFAULT_ADJUSTMENTS } from '@/types/canvas'
 import { buildEffectFilters } from './effects/buildEffectFilters'
 import { fitCover, snapRectInRotatedFrame } from './geometry'
 import { buildClipFunc, clipShapeToPathData, isPlainRectClip, solidColorOf, EMPTY_FRAME_ICON_PATH } from './frameClip'
+import { EMPTY_FRAME_FILL } from './frameModel'
 import { ClipEditOverlay } from './ClipEditOverlay'
-
-const EMPTY_FRAME_FILL = '#d9d2c7'
 
 interface CanvasImageNodeProps {
   id: string

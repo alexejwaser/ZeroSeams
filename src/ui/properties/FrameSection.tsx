@@ -2,6 +2,7 @@ import React from 'react'
 import type { CanvasObject, ImageObject, VideoObject, ClipShape } from '@/types/canvas'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
 import { solidColorOf } from '@/canvas/frameClip'
+import { isEmptyFrame, isGridCell as isGridCellObject } from '@/canvas/frameModel'
 import Tooltip from '../Tooltip'
 import { ColorInput } from '../ColorInput'
 import { NumericInput } from '../NumericInput'
@@ -58,10 +59,10 @@ export function FrameSection({
 }: FrameSectionProps): React.ReactElement {
   const clipShape = frameObj.clipShape
   const clipKind = clipShape?.kind ?? 'rect'
-  const isEmpty = frameObj.type === 'image' && (frameObj as ImageObject).isEmpty === true
+  const isEmpty = isEmptyFrame(frameObj)
   // Empty standalone frames no longer exist — they collapse to shapes — so an
   // isEmpty frame reaching this panel is always a grid cell.
-  const isGridCell = frameObj.parentGroupId != null
+  const isGridCell = isGridCellObject(frameObj)
   const cornerRadius = clipShape?.kind === 'rect' ? (clipShape.cornerRadius ?? 0) : 0
   const maxCorner = Math.max(0, Math.floor(Math.min(frameObj.frameWidth, frameObj.frameHeight) / 2))
   const fillColor = solidColorOf(frameObj.fill)

@@ -13,6 +13,7 @@ import { ColorInput } from './ColorInput'
 import { NumericInput } from './NumericInput'
 
 import { rotateAroundCenter, canBecomeFrame } from '@/canvas/geometry'
+import { isFrameObject } from '@/canvas/frameModel'
 
 import { NumberField, sectionLabelStyle } from './properties/shared'
 import { AlignDistributeSection } from './properties/AlignDistributeSection'
@@ -22,14 +23,6 @@ import { AdjustmentsSection } from './properties/AdjustmentsSection'
 import { VideoSection } from './properties/VideoSection'
 import { FrameSection } from './properties/FrameSection'
 import { pickImageMedia, pickVideoMedia } from './properties/mediaPickers'
-
-// A media frame is an image/video object that owns clip/fill/stroke state
-// (clipShape) or is an empty placeholder awaiting media (isEmpty).
-function isFrameObject(obj: CanvasObject | null): obj is ImageObject | VideoObject {
-  if (obj == null || (obj.type !== 'image' && obj.type !== 'video')) return false
-  const f = obj as ImageObject | VideoObject
-  return f.clipShape != null || (obj.type === 'image' && (obj as ImageObject).isEmpty === true)
-}
 
 // Converts a rect/ellipse shape or closed path into a media frame and inserts the
 // picked media. The store action does both in one set(), so this is one undo step.

@@ -7,6 +7,7 @@ import { useExternalEdit } from '../canvas/useExternalEdit'
 import { useSaveStatusStore } from '@/store'
 import type { ImageObject, VideoObject } from '@/types/canvas'
 import { canBecomeFrame } from '@/canvas/geometry'
+import { isFrameObject, isEmptyFrame as isEmptyFrameObject } from '@/canvas/frameModel'
 import { pickImageMedia, pickVideoMedia } from './properties/mediaPickers'
 
 interface MenuItemProps {
@@ -190,11 +191,8 @@ export function ContextMenu(): React.ReactElement | null {
                      op.status === 'running'
           )
           const isConvertible = canBecomeFrame(obj)
-          const isFrameTarget = (obj?.type === 'image' || obj?.type === 'video') && (
-            (obj as ImageObject | VideoObject).clipShape != null ||
-            (obj?.type === 'image' && (obj as ImageObject).isEmpty === true)
-          )
-          const isEmptyFrame = obj?.type === 'image' && (obj as ImageObject).isEmpty === true
+          const isFrameTarget = isFrameObject(obj)
+          const isEmptyFrame = isEmptyFrameObject(obj)
           return (
             <>
               <MenuItem

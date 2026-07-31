@@ -54,7 +54,10 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `resizeMode` (`'advanced'|'auto'`): advanced = frame resize crops; auto = cover-fits content to new frame
 - Image Transformer always `keepRatio={false}`; Group transformer always `keepRatio={true}`
 
-**Media Frames** (`src/canvas/frameClip.ts`, `src/canvas/geometry.ts`):
+**Media Frames** (`src/canvas/frameClip.ts`, `src/canvas/frameModel.ts`, `src/canvas/geometry.ts`):
+- `frameModel.ts` owns frame *identity*; `frameClip.ts` owns clip *geometry* — don't merge them. `frameModel` is a leaf (type-only imports, no store, no React), so anything may import it
+- `buildEmptyFrameImage(id, spec)` is the ONLY place that knows an empty `ImageObject`'s field list; `frameToEmptyImage` (clear an existing frame), `makeEmptyCell` (fresh grid cell) and `buildFrameFromShape` all delegate to it. Three hand-written copies had already drifted before this existed
+- `isFrameObject` (has clip/fill/stroke state OR is empty) and `isEmptyFrame` (is a placeholder) are deliberately DISTINCT — a filled clipped image is the first but not the second. Never re-derive either; `EmptyFrameOverlay` layers its `visible`/`rotation` policy on top as a second filter rather than folding it into the predicate
 - `clipShape?` on `ImageObject`/`VideoObject`: `{kind:'rect', cornerRadius?}|{kind:'ellipse'}|{kind:'path', anchors}` — absent = plain rect; `path` anchors are NORMALIZED 0–1 in frame units, never display px (storing display px was the bug that killed the old mask system — it doesn't survive frame resize)
 - `fill?` is a union (`{type:'solid', color}` today, gradient lands later) — read it only via `solidColorOf(fill)`, never `fill.color`
 - Node-type dispatch in `CarouselStage` must stay REACTIVE (`useShallow` over the type list). Objects change type in place via `swapObjectPreservingId`, and a `getState()` read leaves the old node component mounted rendering nothing — the layer panel shows the media, the canvas doesn't

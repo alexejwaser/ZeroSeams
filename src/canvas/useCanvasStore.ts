@@ -4,6 +4,7 @@ import type { GridTemplate } from './gridTemplates'
 import type { Frame, FrameRatio, Platform, CarouselProject } from '@/types/project'
 import { fitCover } from './geometry'
 import { normalizeAnchors, denormalizeAnchors, solidColorOf } from './frameClip'
+import { buildEmptyFrameImage, frameToEmptyImage, makeEmptyCell } from './frameModel'
 import { computePathBBox } from './CanvasPathNode'
 
 /** Media payload accepted by insertMediaIntoFrame. */
@@ -17,41 +18,6 @@ export type InsertMedia =
       naturalDuration: number
       name?: string
     }
-
-/** Build an empty media-frame ImageObject that inherits `f`'s geometry, clip,
- *  fill and stroke. Used when clearing media back to an empty frame. */
-function frameToEmptyImage(f: ImageObject | VideoObject, id: string): ImageObject {
-  return {
-    id,
-    type: 'image',
-    scope: f.scope,
-    pinnedFrame: f.pinnedFrame,
-    parentGroupId: f.parentGroupId,
-    name: f.name,
-    isEmpty: true,
-    src: '',
-    backgroundRemoved: false,
-    frameX: f.frameX, frameY: f.frameY,
-    frameWidth: f.frameWidth, frameHeight: f.frameHeight,
-    x: f.x, y: f.y, width: f.width, height: f.height,
-    contentOffsetX: 0, contentOffsetY: 0,
-    contentWidth: 0, contentHeight: 0,
-    naturalWidth: 0, naturalHeight: 0,
-    contentEditMode: false,
-    clipEditMode: false,
-    clipShape: f.clipShape,
-    fill: f.fill,
-    frameStroke: f.frameStroke,
-    frameStrokeWidth: f.frameStrokeWidth,
-    rotation: f.rotation,
-    scaleX: 1, scaleY: 1,
-    opacity: f.opacity,
-    visible: f.visible,
-    locked: f.locked,
-    zIndex: f.zIndex,
-    effects: f.effects,
-  }
-}
 
 /** Smallest frame a media frame may be. Below this, computePathBBox can return a
  *  zero dimension (collinear closed path), which makes buildClipFunc emit an empty
@@ -112,37 +78,23 @@ function buildFrameFromShape(obj: CanvasObject, id: string): ImageObject | null 
 
   if (frameRect.width < MIN_FRAME_SIZE || frameRect.height < MIN_FRAME_SIZE) return null
 
-  return {
-    id,
-    type: 'image',
+  return buildEmptyFrameImage(id, {
+    rect: frameRect,
     scope: obj.scope,
-    pinnedFrame: obj.pinnedFrame,
-    parentGroupId: obj.parentGroupId,
-    name: obj.name,
-    isEmpty: true,
-    src: '',
-    backgroundRemoved: false,
-    frameX: frameRect.x, frameY: frameRect.y,
-    frameWidth: frameRect.width, frameHeight: frameRect.height,
-    x: frameRect.x, y: frameRect.y,
-    width: frameRect.width, height: frameRect.height,
-    contentOffsetX: 0, contentOffsetY: 0,
-    contentWidth: 0, contentHeight: 0,
-    naturalWidth: 0, naturalHeight: 0,
-    contentEditMode: false,
-    clipEditMode: false,
-    clipShape,
-    fill: { type: 'solid', color: fillColor },
-    frameStroke: stroke,
-    frameStrokeWidth: strokeWidth,
     rotation,
-    scaleX: 1, scaleY: 1,
     opacity: obj.opacity,
     visible: obj.visible,
     locked: obj.locked,
     zIndex: obj.zIndex,
+    pinnedFrame: obj.pinnedFrame,
+    parentGroupId: obj.parentGroupId,
+    name: obj.name,
+    clipShape,
+    fill: { type: 'solid', color: fillColor },
+    frameStroke: stroke,
+    frameStrokeWidth: strokeWidth,
     effects: obj.effects,
-  }
+  })
 }
 
 /** Build the filled frame that results from dropping `media` into `frame`.
@@ -842,17 +794,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
         // so the cell slot stays in the grid and can be refilled.
         if (existing?.parentGroupId && existing.type === 'image' && !(existing as ImageObject).isEmpty) {
           const cell = existing as ImageObject
-          const placeholder: ImageObject = {
-            ...cell,
-            isEmpty: true,
-            src: '',
-            naturalWidth: 0, naturalHeight: 0,
-            contentWidth: 0, contentHeight: 0,
-            contentOffsetX: 0, contentOffsetY: 0,
-            contentEditMode: false,
-            clipEditMode: false,
-            adjustments: undefined,
-          }
+          const placeholder = frameToEmptyImage(cell, id)
           let nextVault = state._srcVault
           if (state._srcVault.has(id)) {
             nextVault = new Map(state._srcVault)
@@ -871,28 +813,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
         // Video grid cells: restore to empty image placeholder
         if (existing?.parentGroupId && existing.type === 'video') {
           const cell = existing as VideoObject
-          const placeholder: ImageObject = {
-            id: cell.id,
-            type: 'image',
-            isEmpty: true,
-            parentGroupId: cell.parentGroupId,
-            src: '',
-            frameX: cell.frameX, frameY: cell.frameY,
-            frameWidth: cell.frameWidth, frameHeight: cell.frameHeight,
-            x: cell.x, y: cell.y, width: cell.width, height: cell.height,
-            naturalWidth: 0, naturalHeight: 0,
-            contentWidth: 0, contentHeight: 0,
-            contentOffsetX: 0, contentOffsetY: 0,
-            contentEditMode: false, clipEditMode: false,
-            backgroundRemoved: false,
-            clipShape: cell.clipShape,
-            fill: cell.fill,
-            frameStroke: cell.frameStroke,
-            frameStrokeWidth: cell.frameStrokeWidth,
-            rotation: cell.rotation, scaleX: cell.scaleX, scaleY: cell.scaleY,
-            opacity: cell.opacity, visible: cell.visible, locked: cell.locked,
-            scope: cell.scope, zIndex: cell.zIndex,
-          }
+          const placeholder = frameToEmptyImage(cell, id)
           return {
             past: pushHistoryFrom(state),
             future: [],
@@ -1935,40 +1856,12 @@ export const useCanvasStore = create<CanvasState>((set) => {
         const cellsById: Record<string, CanvasObject> = {}
         cells.forEach((cell, i) => {
           const cellId = cellIds[i]
-          const img: ImageObject = {
-            id: cellId,
-            type: 'image',
-            isEmpty: true,
-            parentGroupId: groupId,
-            src: '',
-            backgroundRemoved: false,
-            frameX: canvasX + cell.x,
-            frameY: canvasY + cell.y,
-            frameWidth: cell.w,
-            frameHeight: cell.h,
+          cellsById[cellId] = makeEmptyCell(cellId, groupId, {
             x: canvasX + cell.x,
             y: canvasY + cell.y,
-            width: cell.w,
-            height: cell.h,
-            contentOffsetX: 0,
-            contentOffsetY: 0,
-            contentWidth: 0,
-            contentHeight: 0,
-            naturalWidth: 0,
-            naturalHeight: 0,
-            contentEditMode: false,
-            clipEditMode: false,
-            fill: { type: 'solid', color: '#d9d2c7' },
-            rotation: 0,
-            opacity: 1,
-            visible: true,
-            locked: false,
-            scaleX: 1,
-            scaleY: 1,
-            scope: 'global',
-            zIndex: 0,
-          }
-          cellsById[cellId] = img
+            w: cell.w,
+            h: cell.h,
+          })
         })
 
         // isEmpty cells have no src — no vault entries needed

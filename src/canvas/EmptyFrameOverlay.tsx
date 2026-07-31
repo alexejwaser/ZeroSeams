@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import { useCanvasStore } from './useCanvasStore'
 import { useViewportStore, selectScale } from './useViewportStore'
 import { loadVideoMetadataFromPath } from './videoMetadata'
-import type { ImageObject } from '@/types/canvas'
+import { isEmptyFrame } from './frameModel'
 
 /**
  * HTML overlay that renders "+ image" / "+ video" buttons centred over every
@@ -67,16 +67,13 @@ export function EmptyFrameOverlay() {
 
   const emptyCells = objectOrder
     .map((id) => objects[id])
-    .filter((obj): obj is ImageObject =>
-      obj?.type === 'image' &&
-      (obj as ImageObject).isEmpty === true &&
-      // Hidden frames must not show floating +image/+video buttons.
-      obj.visible !== false &&
-      // The overlay is an axis-aligned HTML box; it can't track a rotated frame's
-      // corners, so hide the buttons for any rotated frame (simplest v1 — the frame
-      // stays fillable via drag-drop and the Properties panel).
-      !obj.rotation,
-    )
+    .filter(isEmptyFrame)
+    // Overlay policy, deliberately kept out of the shared predicate:
+    // hidden frames must not show floating +image/+video buttons, and the overlay
+    // is an axis-aligned HTML box that can't track a rotated frame's corners, so
+    // rotated frames get no buttons (simplest v1 — they stay fillable via
+    // drag-drop and the Properties panel).
+    .filter((obj) => obj.visible !== false && !obj.rotation)
 
   const btnStyle: React.CSSProperties = {
     background: 'rgba(255,255,255,0.9)',

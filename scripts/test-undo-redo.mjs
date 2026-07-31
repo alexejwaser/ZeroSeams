@@ -983,7 +983,7 @@ const cellInfo = (id, groupId) => page.evaluate(({ id, groupId }) => {
     exists: !!o, type: o?.type, isEmpty: o?.isEmpty, src: o?.src,
     parentGroupId: o?.parentGroupId, clipShape: o?.clipShape, fill: o?.fill,
     name: o?.name, pinnedFrame: o?.pinnedFrame, effects: o?.effects,
-    rotation: o?.rotation,
+    rotation: o?.rotation, scaleX: o?.scaleX, originalSrc: o?.originalSrc,
     orderIndex: s.objectOrder.indexOf(id),
     groupExists: !!g, childIds: g?.childIds ? [...g.childIds] : null,
     inVault: s._srcVault.has(id),
@@ -1054,6 +1054,11 @@ await page.evaluate((src) => { window.__zsImg__ = src }, TEST_IMG_SRC)
   ok(after.orderIndex >= 0, 'L2: cell stays in objectOrder')
   ok(after.childIds?.includes(cellId), 'L2: cell stays in the parent childIds')
   ok(!after.inVault, 'L2: _srcVault entry dropped (differs from removeMediaFromFrame — intentional)')
+  // Both pinned by #62 Phase A, which routed this branch through frameToEmptyImage:
+  // the placeholder is built fresh rather than spread from the filled cell, so stale
+  // transform state and the pre-AI src can't survive on an object that has no media.
+  eq(after.scaleX, 1, 'L2: placeholder scaleX reset to 1 (no stale transform state)')
+  ok(!after.originalSrc, 'L2: placeholder drops originalSrc')
 
   await page.evaluate(({ groupId }) => {
     const gs = () => window.__canvasStore__.getState()
@@ -1074,6 +1079,7 @@ await page.evaluate((src) => { window.__zsImg__ = src }, TEST_IMG_SRC)
     gs().commitUpdate(id, {
       name: 'My Cell', pinnedFrame: 1, clipShape: { kind: 'ellipse' },
       fill: { type: 'solid', color: '#abcdef' }, rotation: 15,
+      effects: [{ id: 'fx1', type: 'shadow', enabled: true, params: {} }],
     })
     gs().insertMediaIntoFrame(id, {
       kind: 'video', filePath: '/tmp/fake.mp4',
@@ -1094,9 +1100,11 @@ await page.evaluate((src) => { window.__zsImg__ = src }, TEST_IMG_SRC)
   eq(after.clipShape?.kind, 'ellipse', 'L3: clipShape carried over')
   eq(after.fill?.color, '#abcdef', 'L3: fill carried over')
   eq(after.rotation, 15, 'L3: rotation carried over')
-  // Expected-fail until #62 Phase A routes this through frameToEmptyImage:
-  xeq(after.name, 'My Cell', 'L3: name carried over')
-  xeq(after.pinnedFrame, 1, 'L3: pinnedFrame carried over')
+  // #62 Phase A routed this branch through frameToEmptyImage — the hand-built
+  // placeholder used to silently drop all three of these.
+  eq(after.name, 'My Cell', 'L3: name carried over')
+  eq(after.pinnedFrame, 1, 'L3: pinnedFrame carried over')
+  eq(after.effects?.[0]?.id, 'fx1', 'L3: effects carried over')
 
   await page.evaluate(({ groupId }) => {
     const gs = () => window.__canvasStore__.getState()
