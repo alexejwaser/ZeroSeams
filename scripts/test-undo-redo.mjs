@@ -30,6 +30,20 @@ function eq(a, b, msg) {
   ok(pass, pass ? msg : `${msg} — got ${JSON.stringify(a)}, want ${JSON.stringify(b)}`)
 }
 
+// Assertions written against behaviour that issue #62 will introduce. They are the
+// executable spec for that work — red today, on purpose, and deliberately kept out
+// of the pass/fail tally so this script stays green. Flip each to ok()/eq() as the
+// corresponding #62 phase lands.
+let xpassed = 0, xfailed = 0
+const unexpectedPasses = []
+function xok(cond, msg) {
+  if (cond) { console.log(`  ⚑ ${msg} — NOW PASSES, promote to ok()`); xpassed++; unexpectedPasses.push(msg) }
+  else      { console.log(`  ○ ${msg} (expected fail — #62)`); xfailed++ }
+}
+function xeq(a, b, msg) {
+  xok(a === b, a === b ? msg : `${msg} — got ${JSON.stringify(a)}, want ${JSON.stringify(b)}`)
+}
+
 // ─── Launch via CDP (electron.launch + Playwright 1.60/Electron 42 has target-detection bug) ──
 console.log('Launching app…')
 const electronProc = spawn(ELECTRON_BIN, [
@@ -931,12 +945,265 @@ console.log('\n── K. Arrow-key nudge coalescing ──')
   await wait(100)
 }
 
+console.log('\n── L. Grid cells: the frame/cell fork ──')
+
+// A grid cell is the ONE case that must not collapse to a shape when emptied — it
+// has to keep its slot. That `parentGroupId` branch in removeMediaFromFrame is the
+// only thing keeping cells and standalone frames as distinct representations, and
+// it shipped with no coverage (issues #62 and #66). Section F covers the standalone
+// half of the fork; this covers the cell half.
+
+// Build a 2-cell grid and return its ids. Uses a real GRID_TEMPLATES id so
+// CanvasGroupNode's template lookup still resolves on resize.
+const makeGrid = () => page.evaluate(() => {
+  const gs = () => window.__canvasStore__.getState()
+  gs().addGrid({
+    id: 'vertical-2', label: '2 Columns', cols: 2, rows: 1,
+    cells: (w, h, gap) => {
+      const cw = (w - gap) / 2
+      return [{ x: 0, y: 0, w: cw, h }, { x: cw + gap, y: 0, w: cw, h }]
+    },
+  }, 200, 200)
+  const s = gs()
+  const group = Object.values(s.objects).find(o => o.type === 'group' && o.isGrid)
+  return { groupId: group.id, cellIds: [...group.childIds] }
+})
+
+const fillCell = (id) => page.evaluate((id) => {
+  window.__canvasStore__.getState().insertMediaIntoFrame(id, {
+    kind: 'image', src: window.__zsImg__, naturalWidth: 10, naturalHeight: 10,
+  })
+}, id)
+
+const cellInfo = (id, groupId) => page.evaluate(({ id, groupId }) => {
+  const s = window.__canvasStore__.getState()
+  const o = s.objects[id]
+  const g = s.objects[groupId]
+  return {
+    exists: !!o, type: o?.type, isEmpty: o?.isEmpty, src: o?.src,
+    parentGroupId: o?.parentGroupId, clipShape: o?.clipShape, fill: o?.fill,
+    name: o?.name, pinnedFrame: o?.pinnedFrame, effects: o?.effects,
+    rotation: o?.rotation,
+    orderIndex: s.objectOrder.indexOf(id),
+    groupExists: !!g, childIds: g?.childIds ? [...g.childIds] : null,
+    inVault: s._srcVault.has(id),
+    pastLen: s.past.length,
+  }
+}, { id, groupId })
+
+await page.evaluate((src) => { window.__zsImg__ = src }, TEST_IMG_SRC)
+
+{
+  // L1 (case 21). removeMediaFromFrame on a grid cell: keeps the slot.
+  const { groupId, cellIds } = await makeGrid()
+  const cellId = cellIds[0]
+  await page.evaluate(({ id }) => {
+    // Give the cell frame-identity state so we can assert it survives the swap.
+    window.__canvasStore__.getState().commitUpdate(id, {
+      clipShape: { kind: 'ellipse' }, frameStroke: '#123456', frameStrokeWidth: 3,
+    })
+  }, { id: cellId })
+  await fillCell(cellId)
+  await wait(120)
+  const before = await cellInfo(cellId, groupId)
+
+  await page.evaluate((id) => window.__canvasStore__.getState().removeMediaFromFrame(id), cellId)
+  await wait(120)
+  const after = await cellInfo(cellId, groupId)
+
+  eq(after.pastLen - before.pastLen, 1, 'L1: removeMediaFromFrame on a cell pushes exactly 1 history entry')
+  eq(after.type, 'image', 'L1: cell stays an ImageObject (does NOT collapse to a shape)')
+  eq(after.isEmpty, true, 'L1: cell is marked empty')
+  eq(after.parentGroupId, groupId, 'L1: parentGroupId preserved')
+  eq(after.clipShape?.kind, 'ellipse', 'L1: clipShape preserved through the swap')
+  eq(after.orderIndex, before.orderIndex, 'L1: objectOrder index untouched')
+  eq(JSON.stringify(after.childIds), JSON.stringify(before.childIds), 'L1: parent childIds unchanged')
+  ok(after.inVault, 'L1: _srcVault entry retained (undo needs the src back)')
+
+  await undo()
+  await wait(120)
+  const undone = await cellInfo(cellId, groupId)
+  eq(undone.isEmpty, false, 'L1: undo restores the filled cell')
+  eq(undone.src, TEST_IMG_SRC, 'L1: undo restores src via vault reinjection')
+
+  await page.evaluate(({ groupId }) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    gs().removeObject(groupId)
+  }, { groupId })
+  await wait(120)
+}
+
+{
+  // L2 (case 23). removeObject on a FILLED image cell restores a placeholder rather
+  // than deleting. Note the _srcVault asymmetry vs L1: removeObject drops the vault
+  // entry, removeMediaFromFrame keeps it. Pinned here so the #62 Phase A
+  // consolidation doesn't accidentally unify the two.
+  const { groupId, cellIds } = await makeGrid()
+  const cellId = cellIds[0]
+  await fillCell(cellId)
+  await wait(120)
+
+  await page.evaluate((id) => window.__canvasStore__.getState().removeObject(id), cellId)
+  await wait(120)
+  const after = await cellInfo(cellId, groupId)
+
+  ok(after.exists, 'L2: removeObject on a filled cell does not delete it')
+  eq(after.type, 'image', 'L2: cell remains an ImageObject')
+  eq(after.isEmpty, true, 'L2: cell becomes an empty placeholder')
+  ok(after.orderIndex >= 0, 'L2: cell stays in objectOrder')
+  ok(after.childIds?.includes(cellId), 'L2: cell stays in the parent childIds')
+  ok(!after.inVault, 'L2: _srcVault entry dropped (differs from removeMediaFromFrame — intentional)')
+
+  await page.evaluate(({ groupId }) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    gs().removeObject(groupId)
+  }, { groupId })
+  await wait(120)
+}
+
+{
+  // L3 (case 24). removeObject on a VIDEO cell converts it to an empty ImageObject.
+  // The placeholder is currently hand-built and drops name/pinnedFrame/effects, which
+  // frameToEmptyImage preserves — #62 Phase A routes both through the shared builder.
+  const { groupId, cellIds } = await makeGrid()
+  const cellId = cellIds[0]
+  await page.evaluate(({ id }) => {
+    const gs = () => window.__canvasStore__.getState()
+    gs().commitUpdate(id, {
+      name: 'My Cell', pinnedFrame: 1, clipShape: { kind: 'ellipse' },
+      fill: { type: 'solid', color: '#abcdef' }, rotation: 15,
+    })
+    gs().insertMediaIntoFrame(id, {
+      kind: 'video', filePath: '/tmp/fake.mp4',
+      naturalWidth: 1920, naturalHeight: 1080, naturalDuration: 5,
+    })
+  }, { id: cellId })
+  await wait(150)
+  const filled = await cellInfo(cellId, groupId)
+  eq(filled.type, 'video', 'L3: cell holds a video before removal')
+
+  await page.evaluate((id) => window.__canvasStore__.getState().removeObject(id), cellId)
+  await wait(150)
+  const after = await cellInfo(cellId, groupId)
+
+  eq(after.type, 'image', 'L3: video cell becomes an empty ImageObject (VideoObject has no isEmpty)')
+  eq(after.isEmpty, true, 'L3: placeholder is empty')
+  eq(after.parentGroupId, groupId, 'L3: parentGroupId preserved')
+  eq(after.clipShape?.kind, 'ellipse', 'L3: clipShape carried over')
+  eq(after.fill?.color, '#abcdef', 'L3: fill carried over')
+  eq(after.rotation, 15, 'L3: rotation carried over')
+  // Expected-fail until #62 Phase A routes this through frameToEmptyImage:
+  xeq(after.name, 'My Cell', 'L3: name carried over')
+  xeq(after.pinnedFrame, 1, 'L3: pinnedFrame carried over')
+
+  await page.evaluate(({ groupId }) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    gs().removeObject(groupId)
+  }, { groupId })
+  await wait(120)
+}
+
+{
+  // L4 (case 25). removeObject on an ALREADY-EMPTY cell. The interception at
+  // useCanvasStore.ts:843 requires !isEmpty, so this falls through to the generic
+  // delete — which strips the object but never removes its id from the parent's
+  // childIds, leaving a dangling reference and an unrecoverable slot.
+  const { groupId, cellIds } = await makeGrid()
+  const cellId = cellIds[0]
+  await wait(120)
+
+  await page.evaluate((id) => window.__canvasStore__.getState().removeObject(id), cellId)
+  await wait(120)
+  const after = await cellInfo(cellId, groupId)
+
+  ok(!after.exists, 'L4: empty cell is hard-deleted')
+  // Expected-fail until #62 Phase B:
+  xok(!after.childIds?.includes(cellId), 'L4: deleted empty cell is also removed from parent childIds')
+
+  await page.evaluate(({ groupId }) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    gs().removeObject(groupId)
+  }, { groupId })
+  await wait(120)
+}
+
+{
+  // L5 (case 26). disconnectGridCell on a FILLED cell — detaches, keeps the media.
+  const { groupId, cellIds } = await makeGrid()
+  const cellId = cellIds[0]
+  await fillCell(cellId)
+  await wait(120)
+
+  await page.evaluate((id) => window.__canvasStore__.getState().disconnectGridCell(id), cellId)
+  await wait(120)
+  const after = await cellInfo(cellId, groupId)
+
+  ok(after.exists, 'L5: disconnected cell still exists')
+  eq(after.type, 'image', 'L5: disconnected filled cell stays an image')
+  ok(!after.isEmpty, 'L5: disconnected filled cell is not marked empty')
+  eq(after.src, TEST_IMG_SRC, 'L5: disconnected filled cell keeps its media')
+  ok(!after.parentGroupId, 'L5: parentGroupId cleared')
+  ok(!after.childIds?.includes(cellId), 'L5: removed from parent childIds')
+
+  await page.evaluate(({ groupId, cellId }) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    gs().removeObject(cellId)
+    gs().removeObject(groupId)
+  }, { groupId, cellId })
+  await wait(120)
+}
+
+{
+  // L6 (cases 27-28). disconnectGridCell on an EMPTY cell. CLAUDE.md and
+  // FrameSection both assert there is exactly ONE empty state — a standalone object
+  // with no media is a shape, not an empty frame. Disconnect currently clears
+  // parentGroupId without collapsing, producing the standalone empty frame that
+  // invariant says cannot exist.
+  const { groupId, cellIds } = await makeGrid()
+  await wait(120)
+
+  await page.evaluate((id) => window.__canvasStore__.getState().disconnectGridCell(id), cellIds[0])
+  await wait(120)
+  const after = await cellInfo(cellIds[0], groupId)
+
+  ok(!after.parentGroupId, 'L6: parentGroupId cleared')
+  ok(!after.childIds?.includes(cellIds[0]), 'L6: removed from parent childIds')
+  // Expected-fail until #62 Phase B:
+  xeq(after.type, 'shape', 'L6: disconnected EMPTY cell collapses to a shape (one-empty-state invariant)')
+
+  // Disconnect the last remaining cell — the group has nothing left to own.
+  await page.evaluate((id) => window.__canvasStore__.getState().disconnectGridCell(id), cellIds[1])
+  await wait(120)
+  const emptied = await cellInfo(cellIds[1], groupId)
+  xok(!emptied.groupExists, 'L6: group is removed once its last cell is disconnected')
+
+  await page.evaluate(({ groupId, cellIds }) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    for (const c of cellIds) gs().removeObject(c)
+    gs().removeObject(groupId)
+  }, { groupId, cellIds })
+  await wait(120)
+}
+
 // ─── Results ──────────────────────────────────────────────────────────────────
 console.log('\n' + '─'.repeat(50))
 console.log(`Results: ${passed} passed, ${failed} failed`)
 if (failures.length > 0) {
   console.log('\nFailed:')
   failures.forEach(f => console.log(`  ✗ ${f}`))
+}
+if (xfailed > 0 || xpassed > 0) {
+  console.log(`\n#62 spec assertions: ${xfailed} still red (expected), ${xpassed} now green`)
+  if (unexpectedPasses.length > 0) {
+    console.log('These now pass — promote them to real assertions:')
+    unexpectedPasses.forEach(m => console.log(`  ⚑ ${m}`))
+  }
 }
 
 await ss('final')

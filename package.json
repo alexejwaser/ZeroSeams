@@ -11,7 +11,14 @@
     "preview": "electron-vite preview",
     "postinstall": "node node_modules/electron/install.js",
     "typecheck": "tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.node.json",
-    "lint": "eslint src --ext .ts,.tsx"
+    "lint": "eslint src --ext .ts,.tsx",
+    "test": "npm run build && npm run test:undo && npm run test:frames",
+    "test:undo": "node scripts/test-undo-redo.mjs",
+    "test:frames": "node scripts/test-frame-render-export.mjs",
+    "test:video": "node scripts/test-video.mjs",
+    "test:axis": "node scripts/test-axis-lock.mjs",
+    "test:multiselect": "node scripts/test-multiselect-transform.mjs",
+    "test:save-path": "node scripts/test-save-path.mjs"
   },
   "dependencies": {
     "@ffmpeg/core": "^0.12.10",

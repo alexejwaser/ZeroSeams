@@ -11,6 +11,8 @@ Only fall back to reading source files when the graph answer is incomplete or yo
 
 `npm run typecheck` checks both tsconfig projects (web + node) — the root tsconfig is references-only (`files: []`), so never run bare `tsc -p tsconfig.json`; it validates nothing. Keep both projects at zero errors.
 
+`npm test` builds, then runs the history suite and the render/export pixel suite. See `docs/testing.md` — it covers the `window.__*__` test-exposure contract, why new scripts must use the CDP launch pattern, and the video-decode sequence.
+
 **God nodes — touch carefully:**
 - `useCanvasStore` (45+ edges) — owns all canvas state
 - `buildFilterPipeline` (18 edges) — called on every image render; LUT-cached
@@ -150,6 +152,9 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `disconnectGridCell(id)` removes the cell from `childIds` and clears `parentGroupId`, making it a standalone object
 - `EmptyFrameOverlay` container must be `pointerEvents: none`; only the `+image`/`+video` buttons set `pointerEvents: auto` — otherwise the div captures clicks before Konva hit-tests the group rect
 - Gap slider and group transform must update ALL child types (image + video) — filtering by `child.type === 'image'` breaks video cells
+- `computeGridChildPatches` (`gridTemplates.ts`) is the ONLY place cell geometry is derived — `CanvasGroupNode` (drag/transform) and the Properties gap slider both call it. Never re-derive `template.cells(...)` inline
+- Cell content refit goes through `fitCover` off `naturalWidth/naturalHeight`, never by scaling the previous content dims. Scaling by the group's independent x/y deltas destroys the media's aspect ratio, and scaling the previous *result* compounds when applied per-mousemove. Deriving from the source bitmap is idempotent, which is what lets live transform preview the real result (#69)
+- `refitContent` must be `false` for a plain move — the cell size hasn't changed, and refitting would discard any content offset set in content-edit mode
 
 **Guidelines** (`src/canvas/CanvasGuidelineNode.tsx`):
 - `GuidelineObject` extends `BaseCanvasObject`: `orientation: 'horizontal'|'vertical'`, `position: number` (canvas-absolute), `frameIndex: number` (-1 = global), `spanAllFrames: boolean`
