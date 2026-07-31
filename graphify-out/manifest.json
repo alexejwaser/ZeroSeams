@@ -140,8 +140,8 @@
     "semantic_hash": ""
   },
   "src/canvas/useCanvasStore.ts": {
-    "mtime": 1785482630.4722214,
-    "ast_hash": "494a20974d25d1f0939686cbd260da03",
+    "mtime": 1785484948.2650962,
+    "ast_hash": "f092237929dd99fac98cdb0dedbeade6",
     "semantic_hash": ""
   },
   "src/canvas/CanvasTextNode.tsx": {

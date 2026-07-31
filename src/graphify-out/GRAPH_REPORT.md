@@ -1,16 +1,16 @@
 # Graph Report - src  (2026-07-31)
 
 ## Corpus Check
-- 90 files · ~84,061 words
+- 90 files · ~84,374 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 526 nodes · 1214 edges · 23 communities (22 shown, 1 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 37 edges (avg confidence: 0.79)
+- 526 nodes · 1215 edges · 23 communities (22 shown, 1 thin omitted)
+- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 47 edges (avg confidence: 0.73)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `356711f4`
+- Built from commit: `abe93f70`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -163,12 +163,12 @@ Nodes (4): ShortcutOverlay(), SHORTCUT_GROUPS, ShortcutEntry, ShortcutGroup
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `useCanvasStore` connect `useCanvasStore` to `ContextMenu.tsx`, `relativizeVideoObjects`, `useCanvasStore.ts`, `Toolbar.tsx`, `VideoSection.tsx`, `useThumbnailStore.ts`, `CanvasVideoNode.tsx`, `exportFrames.ts`, `PreviewShell.tsx`, `NumericInput.tsx`, `shortcuts.ts`?**
-  _High betweenness centrality (0.312) - this node is a cross-community bridge._
+  _High betweenness centrality (0.311) - this node is a cross-community bridge._
 - **Why does `TitleBar()` connect `Toolbar.tsx` to `VideoSection.tsx`, `useCanvasStore`, `ColorInput.tsx`, `relativizeVideoObjects`?**
   _High betweenness centrality (0.057) - this node is a cross-community bridge._
 - **Why does `PropertiesPanel()` connect `ContextMenu.tsx` to `relativizeVideoObjects`, `useCanvasStore`, `useThumbnailStore.ts`, `ColorInput.tsx`, `PropertiesPanel.tsx`?**
   _High betweenness centrality (0.056) - this node is a cross-community bridge._
-- **Are the 10 inferred relationships involving `useCanvasStore` (e.g. with `PreviewShell()` and `VideoSection()`) actually correct?**
+- **Are the 10 inferred relationships involving `useCanvasStore` (e.g. with `CanvasHud()` and `ContextMenu()`) actually correct?**
   _`useCanvasStore` has 10 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 7 inferred relationships involving `selectScale()` (e.g. with `CanvasImageNodeInner()` and `CanvasPathNodeInner()`) actually correct?**
   _`selectScale()` has 7 INFERRED edges - model-reasoned connections that need verification._
