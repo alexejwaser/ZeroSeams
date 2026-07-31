@@ -1,67 +1,7 @@
 {
-  "electron.vite.config.ts": {
-    "mtime": 1785152680.68238,
-    "ast_hash": "e0900fbc2ffc9b1154a018336291b5d4",
-    "semantic_hash": ""
-  },
-  "tsconfig.node.json": {
-    "mtime": 1785152680.7580636,
-    "ast_hash": "899523ba641de63146713ef804329efc",
-    "semantic_hash": "899523ba641de63146713ef804329efc"
-  },
-  "electron.vite.config.d.ts": {
-    "mtime": 1785152680.6822562,
-    "ast_hash": "f8afcc1e790fe2b89f83b53b4433032d",
-    "semantic_hash": "f8afcc1e790fe2b89f83b53b4433032d"
-  },
-  "tsconfig.web.json": {
-    "mtime": 1785152680.7581143,
-    "ast_hash": "a6c762c231e4d55f86fb7004086f7696",
-    "semantic_hash": "a6c762c231e4d55f86fb7004086f7696"
-  },
-  "package.json": {
-    "mtime": 1785152680.6936195,
-    "ast_hash": "509d5119d587665816000648f059d582",
-    "semantic_hash": ""
-  },
-  "electron.vite.config.js": {
-    "mtime": 1785152680.682323,
-    "ast_hash": "b1c31c4eb237f9b4bfeceec94bd17cb3",
-    "semantic_hash": "b1c31c4eb237f9b4bfeceec94bd17cb3"
-  },
-  "tsconfig.json": {
-    "mtime": 1785152680.7580101,
-    "ast_hash": "20340495003cb80714eef25962dbe17e",
-    "semantic_hash": "20340495003cb80714eef25962dbe17e"
-  },
-  ".claude/settings.local.json": {
-    "mtime": 1785152761.7202687,
-    "ast_hash": "f4a6c87ca7fd61acdda4d44fad823419",
-    "semantic_hash": ""
-  },
-  "scripts/debug-selection.mjs": {
-    "mtime": 1785152680.7405698,
-    "ast_hash": "e40e3d78139d0f8aabb7cf5935641c9c",
-    "semantic_hash": "e40e3d78139d0f8aabb7cf5935641c9c"
-  },
-  "scripts/test-multiselect-transform.mjs": {
-    "mtime": 1785152680.74074,
-    "ast_hash": "968d120bc0086887aad842284a549c6a",
-    "semantic_hash": "968d120bc0086887aad842284a549c6a"
-  },
-  "scripts/test-axis-lock.mjs": {
-    "mtime": 1785152680.7406466,
-    "ast_hash": "c33103ad9511cfe9392229d4818e109a",
-    "semantic_hash": "c33103ad9511cfe9392229d4818e109a"
-  },
-  "scripts/test-save-path.mjs": {
-    "mtime": 1785152680.7408638,
-    "ast_hash": "9f441b4858d5fb08dcb9a25ddf5c7914",
-    "semantic_hash": "9f441b4858d5fb08dcb9a25ddf5c7914"
-  },
   "src/main.tsx": {
-    "mtime": 1785152680.7532113,
-    "ast_hash": "22fb18ae8e98c320031841d01edbd250",
+    "mtime": 1785481640.352547,
+    "ast_hash": "912f6a59f6b2a6954044e2e886c03c0c",
     "semantic_hash": ""
   },
   "src/ui/FrameSettingsPopover.tsx": {
@@ -70,8 +10,8 @@
     "semantic_hash": ""
   },
   "src/ui/PropertiesPanel.tsx": {
-    "mtime": 1785154076.4539635,
-    "ast_hash": "ae53cef92ad4969c3d06f84d1ecf7391",
+    "mtime": 1785482677.6746264,
+    "ast_hash": "b8eef12276b41895aa1f9ea8d798f23c",
     "semantic_hash": ""
   },
   "src/ui/FontPicker.tsx": {
@@ -90,8 +30,8 @@
     "semantic_hash": "c5f049f4ac9b5fd3d7a481610bf7f3ae"
   },
   "src/ui/LayerPanel.tsx": {
-    "mtime": 1785154364.6099253,
-    "ast_hash": "76519fb5165bec466b86c87bf2489c80",
+    "mtime": 1785482656.0733266,
+    "ast_hash": "20b339a3754fdcca2faa6335e19eba5c",
     "semantic_hash": ""
   },
   "src/ui/Tooltip.tsx": {
@@ -100,8 +40,8 @@
     "semantic_hash": ""
   },
   "src/ui/ContextMenu.tsx": {
-    "mtime": 1785159520.1226122,
-    "ast_hash": "5208e81d4b7441bb95d87aea71c7453c",
+    "mtime": 1785482687.9250345,
+    "ast_hash": "c3b9785cf18e940eee64abeba115b3fc",
     "semantic_hash": ""
   },
   "src/ui/index.ts": {
@@ -185,13 +125,13 @@
     "semantic_hash": "905e70c7937788642734760a1e8117c2"
   },
   "src/canvas/exportFrames.ts": {
-    "mtime": 1785152680.7431498,
-    "ast_hash": "94ab4b47a8b44181fad2c8cd8fd277fb",
+    "mtime": 1785480780.048677,
+    "ast_hash": "8f72370d9b5eaca02c020d2f7881d714",
     "semantic_hash": ""
   },
   "src/canvas/CanvasImageNode.tsx": {
-    "mtime": 1785154447.9552968,
-    "ast_hash": "7b942c3cf120be3eda0cda9691a6df1e",
+    "mtime": 1785482644.5046864,
+    "ast_hash": "e214812607919cdeeb5e6529e54b6b32",
     "semantic_hash": ""
   },
   "src/canvas/constants.ts": {
@@ -200,8 +140,8 @@
     "semantic_hash": ""
   },
   "src/canvas/useCanvasStore.ts": {
-    "mtime": 1785159518.6425154,
-    "ast_hash": "7304630fb50eb157bf9e528e78fce517",
+    "mtime": 1785482630.4722214,
+    "ast_hash": "494a20974d25d1f0939686cbd260da03",
     "semantic_hash": ""
   },
   "src/canvas/CanvasTextNode.tsx": {
@@ -284,41 +224,6 @@
     "ast_hash": "2fae0d0819bb9c9ff42efad446a00c46",
     "semantic_hash": ""
   },
-  "index.html": {
-    "mtime": 1785152680.69341,
-    "ast_hash": "08685ee44f7c5dc9e947b5eca81cb83c",
-    "semantic_hash": "08685ee44f7c5dc9e947b5eca81cb83c"
-  },
-  "README.md": {
-    "mtime": 1785152680.6817608,
-    "ast_hash": "d69b8e247cb7c129acf2968c75f50b84",
-    "semantic_hash": ""
-  },
-  "CLAUDE.md": {
-    "mtime": 1785156462.455879,
-    "ast_hash": "f57074ec6f2c01967dc8aa1caefc6cd8",
-    "semantic_hash": ""
-  },
-  ".claude/agents/ui-engineer.md": {
-    "mtime": 1785152680.6758723,
-    "ast_hash": "2d6ef08b1ba04c2d47eb285f4b5d64e7",
-    "semantic_hash": "2d6ef08b1ba04c2d47eb285f4b5d64e7"
-  },
-  ".claude/agents/ai-engineer.md": {
-    "mtime": 1785152680.675674,
-    "ast_hash": "71dcccf4468d2b67403fa11aa8d541a0",
-    "semantic_hash": "71dcccf4468d2b67403fa11aa8d541a0"
-  },
-  ".claude/agents/canvas-engineer.md": {
-    "mtime": 1785152680.675741,
-    "ast_hash": "06aa2bdbd6b9ce307b2c1110a7e71111",
-    "semantic_hash": "06aa2bdbd6b9ce307b2c1110a7e71111"
-  },
-  ".claude/agents/qa-reviewer.md": {
-    "mtime": 1785152680.6758115,
-    "ast_hash": "f12a04404e632b1c4968d2ce750c00d3",
-    "semantic_hash": "f12a04404e632b1c4968d2ce750c00d3"
-  },
   "src/canvas/effects/vignette.ts": {
     "mtime": 1785152680.7430716,
     "ast_hash": "077d5a444e816177de0965f240519bc1",
@@ -374,61 +279,6 @@
     "ast_hash": "eec00f63a7d06f6139effb4f1dcc35e6",
     "semantic_hash": ""
   },
-  ".claude/settings.json": {
-    "mtime": 1785152680.6759992,
-    "ast_hash": "87f0d903477984d0587a02f8fe185263",
-    "semantic_hash": ""
-  },
-  "public/ffmpeg/types.js": {
-    "mtime": 1785152680.7398012,
-    "ast_hash": "4baa18878a8a2deb19d3b95faafc2ff5",
-    "semantic_hash": ""
-  },
-  "public/ffmpeg/worker.js": {
-    "mtime": 1785152680.7399662,
-    "ast_hash": "aab4de16d17406892682983dc8843d9f",
-    "semantic_hash": ""
-  },
-  "public/ffmpeg/ffmpeg-core.js": {
-    "mtime": 1785152680.6940806,
-    "ast_hash": "19d26463a5c5da7616a183919dcbd7d0",
-    "semantic_hash": ""
-  },
-  "public/ffmpeg/index.js": {
-    "mtime": 1785152680.7397325,
-    "ast_hash": "2c4c6a2abe3d789909eafaa7d700e7a0",
-    "semantic_hash": ""
-  },
-  "public/ffmpeg/classes.js": {
-    "mtime": 1785152680.6938229,
-    "ast_hash": "b691a699da606c6e98ca72cd2776c28f",
-    "semantic_hash": ""
-  },
-  "public/ffmpeg/errors.js": {
-    "mtime": 1785152680.693923,
-    "ast_hash": "760c4bf51b40bfb7992b696b0362aa32",
-    "semantic_hash": ""
-  },
-  "public/ffmpeg/const.js": {
-    "mtime": 1785152680.6938772,
-    "ast_hash": "7a5a57136e45b62ab330f05e794d2ed7",
-    "semantic_hash": ""
-  },
-  "public/ffmpeg/utils.js": {
-    "mtime": 1785152680.739863,
-    "ast_hash": "f1440d46d9d80450e48ba792d2e4bc6b",
-    "semantic_hash": ""
-  },
-  "scripts/test-video.mjs": {
-    "mtime": 1785152680.7410345,
-    "ast_hash": "b33177a077792ad2463f679e0503a1b1",
-    "semantic_hash": ""
-  },
-  "scripts/test-undo-redo.mjs": {
-    "mtime": 1785156141.4537525,
-    "ast_hash": "7ddcb3b93ebc19536fa832c8c31e59be",
-    "semantic_hash": ""
-  },
   "src/ui/preview/PreviewShell.tsx": {
     "mtime": 1785152680.7567837,
     "ast_hash": "d47c9058dadcbec73d84dd7007a9258e",
@@ -470,14 +320,14 @@
     "semantic_hash": ""
   },
   "src/canvas/CanvasGroupNode.tsx": {
-    "mtime": 1785152680.7415197,
-    "ast_hash": "ad840f1f7b13a0386edb27f74297be40",
+    "mtime": 1785481608.4515746,
+    "ast_hash": "ea26b4965b92e621ec158e09e9140e81",
     "semantic_hash": ""
   },
   "src/canvas/gridTemplates.ts": {
-    "mtime": 1785152680.7433975,
-    "ast_hash": "b39ce154ef8aeff54c86a1f2ba716495",
-    "semantic_hash": "b39ce154ef8aeff54c86a1f2ba716495"
+    "mtime": 1785481769.0866635,
+    "ast_hash": "fc1753a1b810372a9cedbb1b23d44c84",
+    "semantic_hash": ""
   },
   "src/canvas/CanvasGuidelineNode.tsx": {
     "mtime": 1785152680.7415867,
@@ -555,8 +405,8 @@
     "semantic_hash": ""
   },
   "src/ui/properties/FrameSection.tsx": {
-    "mtime": 1785155618.5658872,
-    "ast_hash": "658dcc152be2de86a731e80d87f3c37e",
+    "mtime": 1785482695.7913666,
+    "ast_hash": "c8d9f2ba13b2e06314563f3a15753112",
     "semantic_hash": ""
   },
   "src/utils/color.ts": {
@@ -565,8 +415,8 @@
     "semantic_hash": ""
   },
   "src/canvas/EmptyFrameOverlay.tsx": {
-    "mtime": 1785156089.9774292,
-    "ast_hash": "61bcd04fb7b89aba9632e660187a9253",
+    "mtime": 1785482707.8459432,
+    "ast_hash": "c2c43f0930157536f87459ada373fe0d",
     "semantic_hash": ""
   },
   "src/canvas/ClipEditOverlay.tsx": {
@@ -589,44 +439,14 @@
     "ast_hash": "41f4700fb1289458583c3cf88c3dd786",
     "semantic_hash": ""
   },
-  ".claude/launch.json": {
-    "mtime": 1785152680.6759346,
-    "ast_hash": "909c6f3820cb34382de81e127d5909fb",
-    "semantic_hash": ""
-  },
   "src/canvas/videoMetadata.ts": {
     "mtime": 1785156037.7122567,
     "ast_hash": "8953014bb57034fddb9fbec84f682157",
     "semantic_hash": ""
   },
-  "vite.verify.config.mts": {
-    "mtime": 1785152680.7581675,
-    "ast_hash": "4290859f1d452e1f2035de53ea2356ed",
-    "semantic_hash": ""
-  },
-  ".github/issues/56-update.md": {
-    "mtime": 1785152680.676122,
-    "ast_hash": "fdadbca4a66d07f1807e3a6b708344ac",
-    "semantic_hash": ""
-  },
-  "2026-04-05_Porto_test-4.jpg": {
-    "mtime": 1785152680.6813989,
-    "ast_hash": "bb0aa5700ede987314d354439622b712",
-    "semantic_hash": ""
-  },
-  "docs/preview-references/instagram-feed-carousel.jpg": {
-    "mtime": 1785159940.354039,
-    "ast_hash": "e3d9924ce0d9d8b825b5705a7b24886c",
-    "semantic_hash": ""
-  },
-  "docs/preview-references/tiktok-photo-carousel.png": {
-    "mtime": 1785159940.362455,
-    "ast_hash": "af7ef13ead51a8efe0dee1addcff0770",
-    "semantic_hash": ""
-  },
-  "pen-tool.png": {
-    "mtime": 1785152680.6936662,
-    "ast_hash": "aeb291a30667813707ff07b72ae5683e",
+  "src/canvas/frameModel.ts": {
+    "mtime": 1785482853.8628051,
+    "ast_hash": "727450f8e317b76323877cff79968b6b",
     "semantic_hash": ""
   }
 }
