@@ -6,7 +6,7 @@ import { useExternalEdit } from '@/canvas/useExternalEdit'
 import { useSaveStatusStore } from '@/store'
 import type { BackgroundRemovalOperation } from '@/types/ai'
 import type { ImageObject, TextObject, ShapeObject, PathObject, VideoObject, GroupObject, GuidelineObject, CanvasObject } from '@/types/canvas'
-import { GRID_TEMPLATES } from '@/canvas/gridTemplates'
+import { computeGridChildPatches } from '@/canvas/gridTemplates'
 import Tooltip from './Tooltip'
 import './adjustments.css'
 import { ColorInput } from './ColorInput'
@@ -518,21 +518,17 @@ export function PropertiesPanel(): React.ReactElement {
                   onChange={e => {
                     const newGap = Number(e.target.value)
                     updateObject(group.id, { gridGap: newGap })
-                    const template = GRID_TEMPLATES.find(t => t.id === group.gridTemplateId)
-                    if (template) {
-                      const cells = template.cells(group.width, group.height, newGap)
-                      group.childIds.forEach((childId, i) => {
-                        const cell = cells[i]
-                        if (!cell) return
-                        const child = useCanvasStore.getState().objects[childId]
-                        if (!child) return
-                        updateObject(childId, {
-                          frameX: group.x + cell.x, frameY: group.y + cell.y,
-                          frameWidth: cell.w, frameHeight: cell.h,
-                          x: group.x + cell.x, y: group.y + cell.y,
-                          width: cell.w, height: cell.h,
-                        } as Partial<CanvasObject>)
-                      })
+                    // Same relayout CanvasGroupNode uses. refitContent: true — a gap
+                    // change resizes every cell, so the media has to re-cover-fit or
+                    // it keeps the old size inside the new box (#69).
+                    const patches = computeGridChildPatches(
+                      { ...group, gridGap: newGap },
+                      useCanvasStore.getState().objects,
+                      { x: group.x, y: group.y, width: group.width, height: group.height },
+                      true,
+                    )
+                    for (const [childId, patch] of Object.entries(patches)) {
+                      updateObject(childId, patch as Partial<CanvasObject>)
                     }
                   }}
                   onMouseUp={() => commitUpdate(group.id, {})}
