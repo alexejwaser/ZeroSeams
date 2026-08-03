@@ -13,7 +13,7 @@ import { useCanvasStore } from './useCanvasStore'
 import { makeCanvasNode } from './makeCanvasNode'
 import { useSnapGuides } from './useSnapGuides'
 import type { SnapGuide } from './useSnapGuides'
-import { axisLock } from './constants'
+import { axisLock, ACCENT, ACCENT_GOLD } from './constants'
 import { useViewportStore, selectScale } from './useViewportStore'
 import { buildEffectFilters } from './effects/buildEffectFilters'
 
@@ -355,7 +355,7 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
       {isInMultiSelect && (obj.kind === 'line' || obj.kind === 'arrow') && (
         <KonvaLine
           points={[obj.x, obj.y, obj.x2 ?? obj.x + obj.width, obj.y2 ?? obj.y + obj.height]}
-          stroke={isAnchor ? '#f5a623' : '#f94608'} strokeWidth={isAnchor ? 2 : 1} strokeScaleEnabled={false}
+          stroke={isAnchor ? ACCENT_GOLD : ACCENT} strokeWidth={isAnchor ? 2 : 1} strokeScaleEnabled={false}
           perfectDrawEnabled={false} listening={false}
         />
       )}
@@ -367,7 +367,7 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
           height={obj.height}
           rotation={obj.rotation}
           fill="transparent"
-          stroke={isAnchor ? '#f5a623' : '#f94608'}
+          stroke={isAnchor ? ACCENT_GOLD : ACCENT}
           strokeWidth={isAnchor ? 2 : 1}
           strokeScaleEnabled={false}
           perfectDrawEnabled={false}
@@ -482,7 +482,7 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
             {isSelected && (
               <KonvaLine
                 points={[x1, y1, x2, y2]}
-                stroke="#f94608"
+                stroke={ACCENT}
                 strokeWidth={1}
                 strokeScaleEnabled={false}
                 dash={[6, 3]}
@@ -494,14 +494,14 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
               <>
                 <KonvaCircle
                   x={x1} y={y1} radius={6}
-                  fill="#fff" stroke="#f94608" strokeWidth={2}
+                  fill="#fff" stroke={ACCENT} strokeWidth={2}
                   draggable
                   onDragMove={(e) => handleEndpointDragMove('a', e)}
                   onDragEnd={(e) => handleEndpointDragEnd('a', e)}
                 />
                 <KonvaCircle
                   x={x2} y={y2} radius={6}
-                  fill="#fff" stroke="#f94608" strokeWidth={2}
+                  fill="#fff" stroke={ACCENT} strokeWidth={2}
                   draggable
                   onDragMove={(e) => handleEndpointDragMove('b', e)}
                   onDragEnd={(e) => handleEndpointDragEnd('b', e)}
@@ -514,6 +514,8 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
 
       <Transformer
         ref={transformerRef}
+        borderStroke={ACCENT}
+        anchorStroke={ACCENT}
         keepRatio={false}
         rotationSnaps={snapEnabled ? [0, 45, 90, 135, 180, 225, 270, 315] : []}
         rotationSnapTolerance={8}

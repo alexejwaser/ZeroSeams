@@ -15,9 +15,31 @@
   --stroke: #d4ccc2;
   --text-primary: #111111;
   --text-secondary: #555555;
+  /* Readable supporting text. --text-muted fails WCAG AA on every surface we
+     have (2.0:1 on --bg-panel), so it is for off-state iconography only —
+     any glyph that carries words uses this instead. Warm-tinted rather than
+     neutral so it sits in the paper palette instead of on top of it. */
+  --text-tertiary: #6f6a60;
   --text-muted: #aaaaaa;
-  --accent: #f94608;
+  /* Inverted surface — tooltips today, any dark overlay later. */
+  --bg-inverse: #111111;
+  --text-inverse: #ffffff;
+  --text-inverse-muted: #a9a9a9;
+  /* Kept in sync by hand with ACCENT / ACCENT_GOLD in canvas/constants.ts —
+     Konva can't read custom properties. Darkened from #f94608 so white labels
+     on accent-filled buttons clear 4.5:1 (they sat at 3.55:1). */
+  --accent: #d63a05;
   --accent-gold: #f5a623;
+  /* Status. Both clear AA on --bg-base at 12px, which the previous #4c4 / #f55
+     did not (2.0:1 and 2.9:1). --danger is deliberately red rather than
+     orange-red so it never reads as the accent. */
+  /* Selected-row / recommended-option wash. Warm enough to read as "this one"
+     without competing with a filled accent button next to it. */
+  --accent-tint: #fff4f0;
+  --success: #2f7d32;
+  --danger: #b3261e;
+  --danger-bg: #fdecea;
+  --danger-border: #f5b5ac;
   --font: 'Uncut Sans Variable', system-ui, sans-serif;
 }
 
@@ -25,6 +47,71 @@
 body {
   font-family: var(--font);
   -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Keyboard focus ───────────────────────────────────────────────────────────
+   Scoped to interactive controls so the canvas container and the contenteditable
+   text overlay never draw a ring mid-edit. Black rather than accent: the accent
+   is also the *active* fill on toggles, and an orange ring on an orange button
+   is invisible. Chromium follows border-radius, so pills stay pills. */
+button:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a[href]:focus-visible,
+[tabindex]:not([tabindex="-1"]):focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
+/* ─── Reduced motion ───────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* The spinner is the one place the loop carries the meaning, so it keeps
+     turning — just slowly enough not to read as motion noise. */
+  .save-spinner {
+    animation-duration: 2.4s !important;
+    animation-iteration-count: infinite !important;
+  }
+  .btn-raised:hover,
+  .btn-raised:active {
+    transform: none;
+  }
+}
+
+/* ─── Icon buttons ─────────────────────────────────────────────────────────────
+   Colour lives here, geometry stays in iconBtnStyle() — call sites spread that
+   object to override width/height/padding, and an inline background would beat
+   any :hover rule we wrote. The hover tint is an inset shadow for the same
+   reason: it composites over whichever background the state resolved to. */
+.zs-icon-btn {
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--stroke);
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.zs-icon-btn[data-active] {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: transparent;
+}
+.zs-icon-btn:hover:not(:disabled):not([data-disabled]) {
+  box-shadow: inset 0 0 0 999px rgba(17, 17, 17, 0.07);
+  border-color: var(--accent);
+}
+.zs-icon-btn[data-active]:hover:not(:disabled):not([data-disabled]) {
+  border-color: transparent;
+}
+.zs-icon-btn:active:not(:disabled):not([data-disabled]) {
+  box-shadow: inset 0 0 0 999px rgba(17, 17, 17, 0.14);
 }
 
 /* ─── Range inputs ─────────────────────────────────────────────────────────── */

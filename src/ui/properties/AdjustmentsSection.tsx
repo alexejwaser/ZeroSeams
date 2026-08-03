@@ -2,7 +2,7 @@ import React from 'react'
 import type { PhotoAdjustments } from '@/types/canvas'
 import { DEFAULT_ADJUSTMENTS } from '@/types/canvas'
 import Tooltip from '../Tooltip'
-import { iconBtnStyle } from '../iconBtnStyle'
+import { iconBtnProps } from '../iconBtnStyle'
 import { Power } from 'lucide-react'
 import '../adjustments.css'
 import { NumericInput } from '../NumericInput'
@@ -25,7 +25,7 @@ interface AdjustmentsSectionProps {
 }
 
 const subGroupLabelStyle: React.CSSProperties = {
-  color: '#aaaaaa',
+  color: 'var(--text-tertiary)',
   fontSize: 9,
   fontWeight: 700,
   letterSpacing: '1px',
@@ -64,7 +64,7 @@ export function AdjustmentsSection({ imgObj, selectedId: _selectedId, bypass, on
     return (
       <div key={key} style={{ display: 'flex', alignItems: 'center', marginBottom: 6, gap: 8 }}>
         <label
-          style={{ color: '#555555', fontSize: 12, width: 80, flexShrink: 0, cursor: 'pointer' }}
+          style={{ color: 'var(--text-secondary)', fontSize: 12, width: 80, flexShrink: 0, cursor: 'pointer' }}
           onDoubleClick={() => onCommit({ ...adj, [key]: 0 })}
         >
           {label}
@@ -95,12 +95,12 @@ export function AdjustmentsSection({ imgObj, selectedId: _selectedId, bypass, on
   }
 
   return (
-    <div style={{ borderTop: '1px solid #e8e0d5', paddingTop: 10, marginTop: 4 }}>
+    <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10, marginTop: 4 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
         <div style={{ ...sectionLabelStyle, marginBottom: 0 }}>Adjustments</div>
         <Tooltip label={bypass ? 'Show adjustments' : 'Bypass adjustments'} shortcut="\">
           <button
-            style={{ ...iconBtnStyle(!bypass), width: 22, height: 22 }}
+            {...iconBtnProps(!bypass, false, { width: 22, height: 22 })}
             onClick={onToggleBypass}
           >
             <Power size={12} />
@@ -134,9 +134,9 @@ export function AdjustmentsSection({ imgObj, selectedId: _selectedId, bypass, on
           marginTop: 8,
           width: '100%',
           fontSize: 11,
-          background: '#ffffff',
-          color: '#555555',
-          border: '1px solid #d4ccc2',
+          background: 'var(--bg-surface)',
+          color: 'var(--text-secondary)',
+          border: '1px solid var(--stroke)',
           borderRadius: 999,
           padding: '3px 0',
           cursor: 'pointer',

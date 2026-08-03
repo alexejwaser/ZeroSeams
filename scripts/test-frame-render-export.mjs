@@ -54,7 +54,7 @@ const TOL = 12
 const MEDIA   = [255, 0, 255]   // magenta fixture
 const BG      = [255, 255, 255] // frame background
 const EMPTY   = [217, 210, 199] // EMPTY_FRAME_FILL #d9d2c7
-const ANCHOR  = [249, 70, 8]    // ClipEditOverlay #f94608
+const ANCHOR  = [214, 58, 5]    // ClipEditOverlay ACCENT #d63a05
 // Transformer anchorStroke/borderStroke are set to the SAME accent (probed off a
 // live Transformer), not Konva's default blue — so a colour hunt cannot tell
 // resize handles from clip anchors. It only proves no accent-coloured selection
@@ -1044,7 +1044,7 @@ if (SKIP_VIDEO_PIXEL) {
 }
 
 // 16-17 — absence proofs over the whole image. Far stronger than point sampling:
-// #f94608 and rgb(0,161,255) are unique in the palette, so any leak is caught.
+// #d63a05 and rgb(0,161,255) are unique in the palette, so any leak is caught.
 absent(analysis.hunts.anchor, 'export: no ClipEditOverlay anchors leaked in')
 absent(analysis.hunts.transformer, 'export: no Transformer handles leaked in')
 
@@ -1115,16 +1115,19 @@ console.log(`    💾 exported PNGs → ${SHOTS}/export-frame-{0,1,2}.png`)
   })
   ok(cellSelectionArmed, 'a selected empty cell actually arms a Transformer (guards a vacuous pass)')
 
-  const leaks = await page.evaluate(async ({ FW, FH }) => {
+  // Hunt colours are threaded in rather than written literally: both were stale
+  // copies of a previous accent, and a hunt for a colour the palette no longer
+  // contains cannot fail, so these two absence proofs were passing on nothing.
+  const leaks = await page.evaluate(async ({ FW, FH, ANCHOR, TRANSF }) => {
     const stage = window.__getStage__()
     window.__zsBlobs = await window.__exportFrames__(stage, 1, FW, FH)
     return window.__zs.analyzeBlobs([], [
-      { name: 'anchor', rgb: [249, 70, 8] },
-      { name: 'transformer', rgb: [0, 161, 255] },
+      { name: 'anchor', rgb: ANCHOR },
+      { name: 'transformer', rgb: TRANSF },
     ], FW)
-  }, { FW, FH })
+  }, { FW, FH, ANCHOR, TRANSF })
 
-  absent(leaks.hunts.anchor, 'export: selected empty cell leaks no #f94608 selection border')
+  absent(leaks.hunts.anchor, 'export: selected empty cell leaks no accent selection border')
   absent(leaks.hunts.transformer, 'export: selected empty cell leaks no Transformer handles')
   await ss('export-empty-cell-selected')
 }

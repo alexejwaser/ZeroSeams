@@ -36,9 +36,9 @@ async function insertMediaIntoShape(id: string, mediaKind: 'image' | 'video'): P
 const mediaFrameCtaButtonStyle: React.CSSProperties = {
   flex: 1,
   height: 28,
-  background: '#ffffff',
-  color: '#555555',
-  border: '1px solid #d4ccc2',
+  background: 'var(--bg-surface)',
+  color: 'var(--text-secondary)',
+  border: '1px solid var(--stroke)',
   borderRadius: 999,
   cursor: 'pointer',
   fontSize: 12,
@@ -50,7 +50,7 @@ const mediaFrameCtaButtonStyle: React.CSSProperties = {
 
 function CanvasSection(): React.ReactElement {
   return (
-    <div style={{ padding: '12px 12px 0', color: '#555555', fontSize: 12 }}>
+    <div style={{ padding: '12px 12px 0', color: 'var(--text-secondary)', fontSize: 12 }}>
       Select an object to see its properties, or open Frame Settings to configure the canvas.
     </div>
   )
@@ -190,13 +190,13 @@ export function PropertiesPanel(): React.ReactElement {
       <div
         style={{
           padding: '12px 12px 8px',
-          color: '#111111',
+          color: 'var(--text-primary)',
           fontSize: 13,
           fontWeight: 700,
           letterSpacing: '1.5px',
           textTransform: 'uppercase',
           fontFamily: 'var(--font)',
-          borderBottom: '1px solid #e8e0d5',
+          borderBottom: '1px solid var(--border)',
           position: 'sticky',
           top: 0,
           background: 'var(--bg-panel)',
@@ -239,7 +239,7 @@ export function PropertiesPanel(): React.ReactElement {
           <div
             style={{
               padding: '20px 12px',
-              color: '#555555',
+              color: 'var(--text-secondary)',
               fontSize: 13,
             }}
           >
@@ -320,7 +320,7 @@ export function PropertiesPanel(): React.ReactElement {
             <div style={{ padding: '12px 12px 0' }}>
               {/* Rotation slider + numeric input */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
+                <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
                 <input
                   type="range" min={-360} max={360} step={1}
                   value={Math.round(shapeObj.rotation ?? 0)}
@@ -367,7 +367,7 @@ export function PropertiesPanel(): React.ReactElement {
               </div>
               {/* Opacity slider + numeric input */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
+                <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
                 <input
                   type="range" min={0} max={100} step={1}
                   value={Math.round((shapeObj.opacity ?? 1) * 100)}
@@ -392,7 +392,7 @@ export function PropertiesPanel(): React.ReactElement {
                 <NumberField label="Corner R." value={shapeObj.cornerRadius ?? 0} min={0} onChange={(val) => { commitUpdate(shapeObj.id, { cornerRadius: val }) }} />
               )}
               {canBecomeFrame(shapeObj) && (
-                <div style={{ marginTop: 4, marginBottom: 8, padding: 8, border: '1px dashed #d4ccc2', borderRadius: 12 }}>
+                <div style={{ marginTop: 4, marginBottom: 8, padding: 8, border: '1px dashed var(--stroke)', borderRadius: 12 }}>
                   <div style={sectionLabelStyle}>Media Frame</div>
                   <div style={{ display: 'flex', gap: 6 }}>
                     <Tooltip label="Convert to a media frame and insert an image">
@@ -425,18 +425,18 @@ export function PropertiesPanel(): React.ReactElement {
               {pathObj.pathEditMode && (
                 <div style={{
                   background: 'rgba(249,70,8,0.08)',
-                  border: '1px solid #f94608',
+                  border: '1px solid var(--accent)',
                   borderRadius: 8,
                   padding: '6px 8px',
                   marginBottom: 8,
-                  color: '#f94608',
+                  color: 'var(--accent)',
                   fontSize: 11,
                 }}>
                   Path edit mode — drag anchors and handles
                 </div>
               )}
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
+                <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
                 <input
                   type="range" min={0} max={100} step={1}
                   value={Math.round((pathObj.opacity ?? 1) * 100)}
@@ -445,7 +445,7 @@ export function PropertiesPanel(): React.ReactElement {
                   onMouseUp={e => commitUpdate(pathObj.id, { opacity: Number((e.target as HTMLInputElement).value) / 100 })}
                   style={{ flex: 1 }}
                 />
-                <span style={{ minWidth: 32, textAlign: 'right', fontSize: 11, color: '#555555' }}>
+                <span style={{ minWidth: 32, textAlign: 'right', fontSize: 11, color: 'var(--text-secondary)' }}>
                   {Math.round((pathObj.opacity ?? 1) * 100)}%
                 </span>
               </div>
@@ -469,7 +469,7 @@ export function PropertiesPanel(): React.ReactElement {
                 onChange={(val) => { commitUpdate(pathObj.id, { strokeWidth: val }) }}
               />
               {canBecomeFrame(pathObj) && (
-                <div style={{ marginTop: 4, marginBottom: 8, padding: 8, border: '1px dashed #d4ccc2', borderRadius: 12 }}>
+                <div style={{ marginTop: 4, marginBottom: 8, padding: 8, border: '1px dashed var(--stroke)', borderRadius: 12 }}>
                   <div style={sectionLabelStyle}>Media Frame</div>
                   <div style={{ display: 'flex', gap: 6 }}>
                     <Tooltip label="Convert to a media frame and insert an image">
@@ -553,7 +553,7 @@ export function PropertiesPanel(): React.ReactElement {
                 onChange={(val) => commitUpdate(g.id, { position: val })}
               />
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Orientation</label>
+                <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Orientation</label>
                 <div style={{ display: 'flex', gap: 4 }}>
                   {(['horizontal', 'vertical'] as const).map((o) => (
                     <button
@@ -564,9 +564,9 @@ export function PropertiesPanel(): React.ReactElement {
                         fontSize: 11,
                         borderRadius: 6,
                         border: '1px solid',
-                        borderColor: g.orientation === o ? '#f94608' : '#d4ccc2',
-                        background: g.orientation === o ? '#f94608' : '#ffffff',
-                        color: g.orientation === o ? '#ffffff' : '#555555',
+                        borderColor: g.orientation === o ? 'var(--accent)' : 'var(--stroke)',
+                        background: g.orientation === o ? 'var(--accent)' : 'var(--bg-surface)',
+                        color: g.orientation === o ? 'var(--bg-surface)' : 'var(--text-secondary)',
                         cursor: 'pointer',
                       }}
                     >
@@ -576,7 +576,7 @@ export function PropertiesPanel(): React.ReactElement {
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>All frames</label>
+                <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>All frames</label>
                 <input
                   type="checkbox"
                   checked={g.spanAllFrames}
@@ -601,7 +601,7 @@ export function PropertiesPanel(): React.ReactElement {
               <div style={{ padding: '12px 12px 0' }}>
                 {/* Rotation slider + numeric input */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                  <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
+                  <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
                   <input
                     type="range" min={-360} max={360} step={1}
                     value={Math.round(imgObj.rotation ?? 0)}
@@ -639,7 +639,7 @@ export function PropertiesPanel(): React.ReactElement {
                 </div>
                 {/* Opacity slider + numeric input */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                  <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
+                  <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
                   <input
                     type="range" min={0} max={100} step={1}
                     value={Math.round((imgObj.opacity ?? 1) * 100)}
@@ -688,7 +688,7 @@ export function PropertiesPanel(): React.ReactElement {
                     </button>
                   </div>
                 )}
-                <div style={{ color: '#555555', fontSize: 11, marginTop: 8, marginBottom: 8 }}>
+                <div style={{ color: 'var(--text-secondary)', fontSize: 11, marginTop: 8, marginBottom: 8 }}>
                   Double-click image to edit content
                 </div>
 
@@ -724,7 +724,7 @@ export function PropertiesPanel(): React.ReactElement {
                 marginTop: -12,
                 marginBottom: 12,
                 padding: '6px 12px',
-                background: '#ff7043',
+                background: 'var(--accent)',
                 color: '#fff',
                 fontSize: 12,
                 fontWeight: 'bold',
@@ -732,7 +732,7 @@ export function PropertiesPanel(): React.ReactElement {
                 Content Edit Mode
               </div>
 
-              <div style={{ color: '#555555', fontSize: 9, fontWeight: 700, letterSpacing: '1.5px',
+              <div style={{ color: 'var(--text-secondary)', fontSize: 9, fontWeight: 700, letterSpacing: '1.5px',
                 textTransform: 'uppercase' as const, fontFamily: 'var(--font)', marginBottom: 6 }}>Content</div>
               <NumberField
                 label="Offset X"
@@ -766,8 +766,8 @@ export function PropertiesPanel(): React.ReactElement {
                   }}
                   style={{
                     width: '100%', height: 30,
-                    background: '#ffffff', color: '#555555',
-                    border: '1px solid #d4ccc2', borderRadius: 999,
+                    background: 'var(--bg-surface)', color: 'var(--text-secondary)',
+                    border: '1px solid var(--stroke)', borderRadius: 999,
                     cursor: 'pointer', fontSize: 12, marginBottom: 6,
                   }}
                 >
@@ -806,9 +806,9 @@ export function PropertiesPanel(): React.ReactElement {
                   style={{
                     width: '100%',
                     height: 30,
-                    background: '#ffffff',
-                    color: '#555555',
-                    border: '1px solid #d4ccc2',
+                    background: 'var(--bg-surface)',
+                    color: 'var(--text-secondary)',
+                    border: '1px solid var(--stroke)',
                     borderRadius: 999,
                     cursor: 'pointer',
                     fontSize: 12,
@@ -838,9 +838,9 @@ export function PropertiesPanel(): React.ReactElement {
                   style={{
                     width: '100%',
                     height: 30,
-                    background: '#ffffff',
-                    color: '#555555',
-                    border: '1px solid #d4ccc2',
+                    background: 'var(--bg-surface)',
+                    color: 'var(--text-secondary)',
+                    border: '1px solid var(--stroke)',
                     borderRadius: 999,
                     cursor: 'pointer',
                     fontSize: 12,
@@ -851,7 +851,7 @@ export function PropertiesPanel(): React.ReactElement {
                 </button>
               </Tooltip>
 
-              <div style={{ color: '#aaaaaa', fontSize: 11, marginTop: 8, marginBottom: 8 }}>
+              <div style={{ color: 'var(--text-tertiary)', fontSize: 11, marginTop: 8, marginBottom: 8 }}>
                 Click outside to exit content mode
               </div>
             </div>
@@ -863,13 +863,13 @@ export function PropertiesPanel(): React.ReactElement {
           <div
             style={{
               padding: 12,
-              borderTop: '1px solid #e8e0d5',
+              borderTop: '1px solid var(--border)',
               flexShrink: 0,
             }}
           >
             <div
               style={{
-                color: '#555555',
+                color: 'var(--text-secondary)',
                 fontSize: 9,
                 fontWeight: 700,
                 letterSpacing: '1.5px',
@@ -881,14 +881,14 @@ export function PropertiesPanel(): React.ReactElement {
               AI Tools
             </div>
             {activeBgOp?.status === 'running' && (
-              <div style={{ background: '#f5ede2', borderRadius: 8, padding: '8px 10px' }}>
-                <div style={{ color: '#555555', fontSize: 12, marginBottom: 6 }}>
+              <div style={{ background: 'var(--bg-panel)', borderRadius: 8, padding: '8px 10px' }}>
+                <div style={{ color: 'var(--text-secondary)', fontSize: 12, marginBottom: 6 }}>
                   Removing background… {activeBgOp.progress}%
                 </div>
-                <div style={{ background: '#e8e0d5', borderRadius: 3, height: 6, overflow: 'hidden' }}>
+                <div style={{ background: 'var(--border)', borderRadius: 3, height: 6, overflow: 'hidden' }}>
                   <div
                     style={{
-                      background: '#f94608',
+                      background: 'var(--accent)',
                       width: `${activeBgOp.progress}%`,
                       height: '100%',
                       transition: 'width 0.2s',
@@ -910,8 +910,8 @@ export function PropertiesPanel(): React.ReactElement {
                   style={{
                     width: '100%',
                     height: 32,
-                    background: '#f94608',
-                    color: '#ffffff',
+                    background: 'var(--accent)',
+                    color: 'var(--bg-surface)',
                     border: 'none',
                     borderRadius: 999,
                     cursor: 'pointer',
@@ -931,13 +931,13 @@ export function PropertiesPanel(): React.ReactElement {
           <div
             style={{
               padding: 12,
-              borderTop: '1px solid #e8e0d5',
+              borderTop: '1px solid var(--border)',
               flexShrink: 0,
             }}
           >
             <div
               style={{
-                color: '#555555',
+                color: 'var(--text-secondary)',
                 fontSize: 9,
                 fontWeight: 700,
                 letterSpacing: '1.5px',
@@ -948,12 +948,12 @@ export function PropertiesPanel(): React.ReactElement {
             >
               External Editor
             </div>
-            <div style={{ color: '#aaaaaa', fontSize: 11, marginBottom: 6 }}>
+            <div style={{ color: 'var(--text-tertiary)', fontSize: 11, marginBottom: 6 }}>
               {externalEditor ? `Default: ${externalEditor.name}` : 'No default editor set'}
             </div>
             {activeObjectId === selectedId ? (
               <>
-                <div style={{ color: '#2d6a4f', fontSize: 12, marginBottom: 6 }}>
+                <div style={{ color: 'var(--success)', fontSize: 12, marginBottom: 6 }}>
                   Watching for changes…
                 </div>
                 <Tooltip label="Stop watching">
@@ -962,9 +962,9 @@ export function PropertiesPanel(): React.ReactElement {
                     style={{
                       width: '100%',
                       height: 28,
-                      background: '#ffffff',
-                      color: '#555555',
-                      border: '1px solid #d4ccc2',
+                      background: 'var(--bg-surface)',
+                      color: 'var(--text-secondary)',
+                      border: '1px solid var(--stroke)',
                       borderRadius: 999,
                       cursor: 'pointer',
                       fontSize: 12,
@@ -982,8 +982,8 @@ export function PropertiesPanel(): React.ReactElement {
                     style={{
                       flex: 1,
                       height: 32,
-                      background: '#f94608',
-                      color: '#ffffff',
+                      background: 'var(--accent)',
+                      color: 'var(--bg-surface)',
                       border: 'none',
                       borderRadius: 999,
                       cursor: 'pointer',
@@ -1000,9 +1000,9 @@ export function PropertiesPanel(): React.ReactElement {
                       style={{
                         height: 32,
                         padding: '0 10px',
-                        background: '#ffffff',
-                        color: '#555555',
-                        border: '1px solid #d4ccc2',
+                        background: 'var(--bg-surface)',
+                        color: 'var(--text-secondary)',
+                        border: '1px solid var(--stroke)',
                         borderRadius: 999,
                         cursor: 'pointer',
                         fontSize: 11,

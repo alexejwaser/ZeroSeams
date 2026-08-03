@@ -1,4 +1,5 @@
 import React, { useRef, useCallback } from 'react'
+import { ACCENT } from './constants'
 import Konva from 'konva'
 import { Rect, Transformer } from 'react-konva'
 import { useCanvasStore } from './useCanvasStore'
@@ -210,7 +211,7 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
         width={obj.width}
         height={obj.height}
         fill="transparent"
-        stroke={isSelected && !isCellSelected ? '#f94608' : 'transparent'}
+        stroke={isSelected && !isCellSelected ? ACCENT : 'transparent'}
         strokeWidth={isSelected && !isCellSelected ? 1 : 0}
         strokeScaleEnabled={false}
         // Stop listening when a child cell is entered — let cell's own handlers take over
@@ -251,8 +252,8 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
           keepRatio={false}
           rotationSnaps={snapEnabled ? [0, 45, 90, 135, 180, 225, 270, 315] : []}
           rotationSnapTolerance={8}
-          borderStroke="#f94608"
-          anchorStroke="#f94608"
+          borderStroke={ACCENT}
+          anchorStroke={ACCENT}
           anchorFill="#fff"
           anchorSize={8}
           onTransformStart={() => startSnapSession(id)}

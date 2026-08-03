@@ -10,7 +10,7 @@ import { relativizeVideoObjects, resolveVideoObjects } from '@/canvas/pathUtils'
 import {
   MousePointer2, Type, Square, Circle, Minus, PenTool,
   Undo2, Redo2, FolderOpen, Save, ImageDown,
-  ChevronDown, ChevronUp, Plus, LayoutTemplate, Check, AlertTriangle, Film, Eye, EyeOff,
+  ChevronDown, ChevronUp, Plus, LayoutTemplate, Check, AlertTriangle, Film, Eye, EyeOff, X,
 } from 'lucide-react'
 import Tooltip from './Tooltip'
 import type { Platform } from '@/types/project'
@@ -30,7 +30,7 @@ const PLATFORM_RECOMMENDED: Partial<Record<Platform, 'draft' | 'balanced' | 'hig
 }
 
 type PresetKey = 'draft' | 'balanced' | 'high'
-import { iconBtnStyle } from './iconBtnStyle'
+import { iconBtnProps } from './iconBtnStyle'
 import { FrameSettingsPopover } from './FrameSettingsPopover'
 import { NumericInput } from './NumericInput'
 import { useExportStore } from '@/store'
@@ -64,15 +64,19 @@ function SaveStatusPill({ status }: { status: SaveStatus }): React.ReactElement 
   if (status === 'idle') return null
 
   const config: Record<Exclude<SaveStatus, 'idle'>, { icon: React.ReactElement; text: string; color: string }> = {
-    saving: { icon: <span className="save-spinner" />, text: 'Saving…', color: 'var(--text-muted)' },
-    saved: { icon: <Check size={12} strokeWidth={1.5}/>, text: ' Saved', color: '#4c4' },
-    error: { icon: <AlertTriangle size={12} strokeWidth={1.5}/>, text: ' Save failed', color: '#f55' },
+    saving: { icon: <span className="save-spinner" />, text: 'Saving…', color: 'var(--text-tertiary)' },
+    saved: { icon: <Check size={12} strokeWidth={1.5}/>, text: ' Saved', color: 'var(--success)' },
+    error: { icon: <AlertTriangle size={12} strokeWidth={1.5}/>, text: ' Save failed', color: 'var(--danger)' },
   }
 
   const { icon, text, color } = config[status as Exclude<SaveStatus, 'idle'>]
 
   return (
     <span
+      // Save state is announced rather than only shown — the pill is the only
+      // feedback that a ⌘S landed, and it lives outside the focus path.
+      role="status"
+      aria-live="polite"
       style={{
         fontSize: 12,
         color,
@@ -101,7 +105,7 @@ function ToolGroup({ label, style, children }: {
     <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 6, ...style }}>
       <span style={{
         position: 'absolute', top: -13, left: 0,
-        fontSize: 9, fontWeight: 500, color: '#b0a89e',
+        fontSize: 9, fontWeight: 500, color: 'var(--text-tertiary)',
         letterSpacing: '0.03em', textTransform: 'uppercase',
         pointerEvents: 'none', userSelect: 'none', lineHeight: 1, whiteSpace: 'nowrap',
       }}>
@@ -199,14 +203,14 @@ function VideoExportSettingsPanel({
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   padding: '6px 10px',
-                  background: isActive ? '#fff4f0' : 'var(--bg-surface)',
+                  background: isActive ? 'var(--accent-tint)' : 'var(--bg-surface)',
                   border: `1px solid ${isActive ? 'var(--accent)' : 'var(--stroke)'}`,
                   borderRadius: 6, cursor: 'pointer', textAlign: 'left',
                 }}
               >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <span style={{ color: isActive ? 'var(--accent)' : '#333333', fontSize: 12, fontWeight: 'bold' }}>{p.label}</span>
-                  <span style={{ color: 'var(--text-muted)', fontSize: 10 }}>{p.hint}</span>
+                  <span style={{ color: isActive ? 'var(--accent)' : 'var(--text-primary)', fontSize: 12, fontWeight: 'bold' }}>{p.label}</span>
+                  <span style={{ color: 'var(--text-tertiary)', fontSize: 10 }}>{p.hint}</span>
                 </div>
                 {isRecommended && (
                   <span style={{
@@ -255,7 +259,7 @@ function VideoExportSettingsPanel({
                 onChange={v => onSettingsChange(s => ({ ...s, audioBitrate: v }))}
                 onCommit={v => onSettingsChange(s => ({ ...s, audioBitrate: v }))}
               />
-              <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>kbps</span>
+              <span style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>kbps</span>
             </div>
           </div>
           {/* Frame rate */}
@@ -703,25 +707,31 @@ export function TitleBar(): React.ReactElement {
             }}
           >
             {recentFiles.length === 0 ? (
-              <div style={{ padding: '8px 14px', color: 'var(--text-muted)', fontSize: 12 }}>No recent projects</div>
+              <div style={{ padding: '8px 14px', color: 'var(--text-tertiary)', fontSize: 12 }}>No recent projects</div>
             ) : (
               recentFiles.map((file) => (
                 <Tooltip key={file.path} label={file.path}>
-                <div
+                <button
                   onClick={() => { void handleOpenFromPath(file.path) }}
                   style={{
+                    display: 'block',
+                    width: '100%',
+                    textAlign: 'left',
                     padding: '7px 14px',
-                    cursor: 'pointer',
+                    background: 'transparent',
+                    border: 'none',
                     borderBottom: '1px solid var(--border)',
+                    cursor: 'pointer',
+                    fontFamily: 'var(--font)',
                   }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-panel)' }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = 'transparent' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-panel)' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
                 >
                   <div style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 'bold' }}>{file.name}</div>
-                  <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>
+                  <div style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>
                     {new Date(file.modifiedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                   </div>
-                </div>
+                </button>
                 </Tooltip>
               ))
             )}
@@ -754,7 +764,7 @@ export function TitleBar(): React.ReactElement {
               padding: '4px 10px',
               height: 30,
               background: 'var(--bg-surface)',
-              color: '#333333',
+              color: 'var(--text-primary)',
               border: '1px solid var(--stroke)',
               borderRight: 'none',
               borderRadius: '999px 0 0 999px',
@@ -817,7 +827,7 @@ export function TitleBar(): React.ReactElement {
               }}
               style={{
                 display: 'block', width: '100%', textAlign: 'left',
-                background: 'none', border: 'none', color: '#333333',
+                background: 'none', border: 'none', color: 'var(--text-primary)',
                 fontSize: 13, padding: '7px 14px', cursor: 'pointer',
                 fontFamily: 'var(--font)',
               }}
@@ -835,7 +845,7 @@ export function TitleBar(): React.ReactElement {
               }}
               style={{
                 display: 'block', width: '100%', textAlign: 'left',
-                background: 'none', border: 'none', color: '#333333',
+                background: 'none', border: 'none', color: 'var(--text-primary)',
                 fontSize: 13, padding: '7px 14px', cursor: 'pointer',
                 fontFamily: 'var(--font)',
               }}
@@ -857,14 +867,11 @@ export function TitleBar(): React.ReactElement {
         <Tooltip label="Frame Settings" shortcut="F">
           <button
             onClick={() => setShowFrameSettings(v => !v)}
-            style={{
-              ...iconBtnStyle(showFrameSettings),
+            {...iconBtnProps(showFrameSettings, false, {
               width: 'auto',
               padding: '0 10px',
-              display: 'flex',
-              alignItems: 'center',
               gap: 4,
-            }}
+            })}
           >
             <LayoutTemplate size={15} strokeWidth={1.5}/>
             <span style={{ fontSize: 12, fontFamily: 'var(--font)' }}>Frame Settings</span>
@@ -941,7 +948,7 @@ export function TitleBar(): React.ReactElement {
           onClick={togglePreviewMode}
           disabled={platform === 'custom'}
           aria-pressed={previewMode}
-          style={iconBtnStyle(previewMode, platform === 'custom')}
+          {...iconBtnProps(previewMode, platform === 'custom')}
         >
           <Eye size={15} />
         </button>
@@ -1069,10 +1076,9 @@ export function TitleBar(): React.ReactElement {
                   padding: '4px 8px',
                   background: 'var(--bg-surface)',
                   color: 'var(--text-primary)',
-                  outline: 'none',
                 }}
               />
-              <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'var(--font)' }}>
+              <span style={{ fontSize: 10, color: 'var(--text-tertiary)', fontFamily: 'var(--font)' }}>
                 Preview: {filenameTemplate.replace('{frame}', '1')}.{imageSettings.format === 'jpeg' ? 'jpg' : imageSettings.format === 'tiff' ? 'tif' : 'png'}
               </span>
             </div>
@@ -1124,7 +1130,7 @@ export function TitleBar(): React.ReactElement {
             {imageSettings.format === 'jpeg' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <label style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: 'var(--font)' }}>
-                  Max file size <span style={{ color: 'var(--text-muted)' }}>(optional)</span>
+                  Max file size <span style={{ color: 'var(--text-tertiary)' }}>(optional)</span>
                 </label>
                 <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                   <NumericInput
@@ -1155,7 +1161,6 @@ export function TitleBar(): React.ReactElement {
                       padding: '4px 6px',
                       background: 'var(--bg-surface)',
                       color: 'var(--text-secondary)',
-                      outline: 'none',
                     }}
                   >
                     <option value="KB">KB</option>
@@ -1190,7 +1195,7 @@ export function TitleBar(): React.ReactElement {
                   </button>
                 ))}
               </div>
-              <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'var(--font)' }}>
+              <span style={{ fontSize: 10, color: 'var(--text-tertiary)', fontFamily: 'var(--font)' }}>
                 {frameWidth * exportPixelRatio} × {frameHeight * exportPixelRatio} px
               </span>
             </div>
@@ -1231,8 +1236,8 @@ export function TitleBar(): React.ReactElement {
                     Video Settings
                   </span>
                   {showVideoSettings
-                    ? <ChevronUp size={13} style={{ color: 'var(--text-muted)' }} strokeWidth={1.5}/>
-                    : <ChevronDown size={13} style={{ color: 'var(--text-muted)' }} strokeWidth={1.5}/>}
+                    ? <ChevronUp size={13} style={{ color: 'var(--text-tertiary)' }} strokeWidth={1.5}/>
+                    : <ChevronDown size={13} style={{ color: 'var(--text-tertiary)' }} strokeWidth={1.5}/>}
                 </button>
 
                 {showVideoSettings && (
@@ -1259,15 +1264,16 @@ export function TitleBar(): React.ReactElement {
 
             {exportError != null && (
               <div
+                role="alert"
                 style={{
                   display: 'flex',
                   alignItems: 'flex-start',
                   gap: 8,
                   padding: '8px 10px',
                   borderRadius: 8,
-                  background: '#fdecea',
-                  border: '1px solid #f5b5ac',
-                  color: '#a4262c',
+                  background: 'var(--danger-bg)',
+                  border: '1px solid var(--danger-border)',
+                  color: 'var(--danger)',
                   fontSize: 12,
                   fontFamily: 'var(--font)',
                 }}
@@ -1275,10 +1281,13 @@ export function TitleBar(): React.ReactElement {
                 <span style={{ flex: 1, wordBreak: 'break-word' }}>{exportError}</span>
                 <button
                   onClick={() => { setExportError(null) }}
-                  style={{ background: 'none', border: 'none', color: '#a4262c', cursor: 'pointer', padding: 0, fontSize: 14, lineHeight: 1 }}
+                  style={{
+                    background: 'none', border: 'none', color: 'var(--danger)',
+                    cursor: 'pointer', padding: 0, lineHeight: 0, flexShrink: 0,
+                  }}
                   aria-label="Dismiss error"
                 >
-                  ×
+                  <X size={14} strokeWidth={2} />
                 </button>
               </div>
             )}
@@ -1286,13 +1295,17 @@ export function TitleBar(): React.ReactElement {
               className={exporting ? '' : 'btn-raised'}
               onClick={() => { void handleExportAction() }}
               disabled={exporting}
+              // Mid-export the label carries live progress ("Rendering frame 3 of 8"),
+              // so it stays on the accent rather than dropping to a grey fill that
+              // put white text at 2.3:1 exactly when it had the most to say.
               style={{
                 height: 32,
-                background: exporting ? 'var(--text-muted)' : 'var(--accent)',
-                color: 'var(--bg-surface)',
-                border: exporting ? 'none' : '1px solid #000000',
+                background: 'var(--accent)',
+                color: '#fff',
+                border: '1px solid #000000',
                 borderRadius: 999,
                 cursor: exporting ? 'default' : 'pointer',
+                opacity: exporting ? 0.75 : 1,
                 fontSize: 13,
                 fontWeight: 'bold',
                 fontFamily: 'var(--font)',
@@ -1309,12 +1322,12 @@ export function TitleBar(): React.ReactElement {
       {/* Undo/Redo pill */}
       <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-surface)', border: '1px solid var(--stroke)', borderRadius: 999, padding: 3, gap: 2 }}>
         <Tooltip label="Undo" shortcut="⌘Z">
-          <button onClick={undo} disabled={undoDisabled} style={{ ...iconBtnStyle(false, undoDisabled), border: 'none' }}>
+          <button onClick={undo} disabled={undoDisabled} {...iconBtnProps(false, undoDisabled, { border: 'none' })}>
             <Undo2 size={15} />
           </button>
         </Tooltip>
         <Tooltip label="Redo" shortcut="⌘⇧Z">
-          <button onClick={redo} disabled={redoDisabled} style={{ ...iconBtnStyle(false, redoDisabled), border: 'none' }}>
+          <button onClick={redo} disabled={redoDisabled} {...iconBtnProps(false, redoDisabled, { border: 'none' })}>
             <Redo2 size={15} />
           </button>
         </Tooltip>
@@ -1458,7 +1471,7 @@ export function ToolBar(): React.ReactElement {
         <Tooltip label="Select" shortcut="V">
           <button
             onClick={() => handleToolClick('select')}
-            style={iconBtnStyle(activeTool === 'select')}
+            {...iconBtnProps(activeTool === 'select')}
           >
             <MousePointer2 size={15} />
           </button>
@@ -1468,7 +1481,7 @@ export function ToolBar(): React.ReactElement {
           <button
             onClick={toggleSnap}
             aria-pressed={snapEnabled}
-            style={iconBtnStyle(snapEnabled)}
+            {...iconBtnProps(snapEnabled)}
           >
             {SNAP_ICON}
           </button>
@@ -1495,7 +1508,7 @@ export function ToolBar(): React.ReactElement {
         <Tooltip label="Text" shortcut="T">
           <button
             onClick={() => handleToolClick('text')}
-            style={iconBtnStyle(activeTool === 'text')}
+            {...iconBtnProps(activeTool === 'text')}
           >
             <Type size={15} />
           </button>
@@ -1504,7 +1517,7 @@ export function ToolBar(): React.ReactElement {
         <Tooltip label="Shape" shortcut="R">
           <button
             onClick={() => handleToolClick('shape')}
-            style={iconBtnStyle(activeTool === 'shape')}
+            {...iconBtnProps(activeTool === 'shape')}
           >
             {activeShapeKind === 'ellipse'
               ? <Circle size={15} />
@@ -1517,7 +1530,7 @@ export function ToolBar(): React.ReactElement {
         <Tooltip label="Pen" shortcut="P">
           <button
             onClick={() => handleToolClick('pen')}
-            style={iconBtnStyle(activeTool === 'pen')}
+            {...iconBtnProps(activeTool === 'pen')}
           >
             <PenTool size={15} />
           </button>
@@ -1526,7 +1539,7 @@ export function ToolBar(): React.ReactElement {
         <Tooltip label="Add image">
           <button
             onClick={() => { void handleAddImage() }}
-            style={iconBtnStyle(false)}
+            {...iconBtnProps(false)}
           >
             <ImageDown size={15} />
           </button>
@@ -1535,7 +1548,7 @@ export function ToolBar(): React.ReactElement {
         <Tooltip label="Add video">
           <button
             onClick={() => { void handleAddVideo() }}
-            style={iconBtnStyle(false)}
+            {...iconBtnProps(false)}
           >
             <Film size={15} />
           </button>
@@ -1546,7 +1559,7 @@ export function ToolBar(): React.ReactElement {
       <ToolGroup label="Layout">
         <Tooltip label="Grid">
           <button
-            style={iconBtnStyle(activeTool === 'grid')}
+            {...iconBtnProps(activeTool === 'grid')}
             onClick={e => {
               setActiveTool('grid')
               setGridPickerAnchor(e.currentTarget)
@@ -1564,7 +1577,7 @@ export function ToolBar(): React.ReactElement {
         <Tooltip label="Guideline" shortcut="G" description="Add ruler guideline">
           <button
             onClick={() => activeTool === 'guideline' ? setActiveTool('select') : handleToolClick('guideline')}
-            style={iconBtnStyle(activeTool === 'guideline')}
+            {...iconBtnProps(activeTool === 'guideline')}
           >
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
               <line x1="1" y1="7.5" x2="14" y2="7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/>
@@ -1576,7 +1589,7 @@ export function ToolBar(): React.ReactElement {
         <Tooltip label={guidelinesVisible ? 'Hide guidelines' : 'Show guidelines'}>
           <button
             onClick={toggleGuidelinesVisible}
-            style={iconBtnStyle(!guidelinesVisible)}
+            {...iconBtnProps(!guidelinesVisible)}
           >
             {guidelinesVisible ? <Eye size={15} /> : <EyeOff size={15} />}
           </button>
@@ -1599,13 +1612,12 @@ export function ToolBar(): React.ReactElement {
           <Tooltip label="Horizontal" shortcut="X">
             <button
               onClick={() => setGuidelineOrientation('horizontal')}
-              style={{
-                ...iconBtnStyle(guidelineOrientation === 'horizontal'),
+              {...iconBtnProps(guidelineOrientation === 'horizontal', false, {
                 width: 28,
                 height: 28,
                 fontSize: 11,
                 fontWeight: 600,
-              }}
+              })}
             >
               H
             </button>
@@ -1613,13 +1625,12 @@ export function ToolBar(): React.ReactElement {
           <Tooltip label="Vertical" shortcut="X">
             <button
               onClick={() => setGuidelineOrientation('vertical')}
-              style={{
-                ...iconBtnStyle(guidelineOrientation === 'vertical'),
+              {...iconBtnProps(guidelineOrientation === 'vertical', false, {
                 width: 28,
                 height: 28,
                 fontSize: 11,
                 fontWeight: 600,
-              }}
+              })}
             >
               V
             </button>

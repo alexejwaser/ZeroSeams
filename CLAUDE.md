@@ -49,7 +49,7 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - Frame (`frameX/Y`, `frameWidth/Height`) = visible crop viewport; `x/y/width/height` kept in sync
 - Content (`contentOffsetX/Y`, `contentWidth/Height`) = bitmap floating inside frame
 - `naturalWidth/naturalHeight` = intrinsic bitmap dims, set at drop time, never changes
-- `contentEditMode: boolean` — false = frame transformer (blue); true = content mode (orange `#f94608`)
+- `contentEditMode: boolean` — false = frame transformer (blue); true = content mode (orange `ACCENT`)
 - Transformer is always a sibling of the Group, never inside it; Rect (not Group) is transform target in frame mode
 - `resizeMode` (`'advanced'|'auto'`): advanced = frame resize crops; auto = cover-fits content to new frame
 - Image Transformer always `keepRatio={false}`; Group transformer always `keepRatio={true}`
@@ -76,7 +76,7 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `clipEditMode`, `ClipEditOverlay` and `enterClipEditMode` are retained but have **no UI entry point** since the Edit Shape button was removed — they're the machinery a pen-tool-edits-a-frame's-edges flow would reuse. Case 15 keeps them honest
 - `isPointInClipShape` is for hit tests done in logical coords with no Konva node (entering a grid cell); on-canvas hit-testing already goes through the frame Rect's `hitFunc`
 - `clipEditMode` disarms the frame Transformer (`tr.nodes([])`, same branch as multi-select) in both node files — its resize anchors sit on the exact points as a path clip's corner anchors, so leaving it up makes those corners ungrabbable
-- Transformer `anchorStroke`/`borderStroke` are the accent `#f94608`, NOT Konva's default blue — a pixel hunt can't tell resize handles from clip anchors, so assert "is the transformer up?" on the scene graph (`find('Transformer')` + `nodes().length`), never by colour
+- Transformer `anchorStroke`/`borderStroke` are the accent `ACCENT`, NOT Konva's default blue — a pixel hunt can't tell resize handles from clip anchors, so assert "is the transformer up?" on the scene graph (`find('Transformer')` + `nodes().length`), never by colour
 
 **Multi-Select:**
 - `selectedId` — Properties Panel; `selectedIds[]` — group transformer + align/distribute; `anchorId` — alignment reference (gold `#f5a623` border)
@@ -220,17 +220,22 @@ Tokens in `src/ui/theme.css` — single source of truth. Imported once in `src/m
 **Palette:**
 - `--bg-base` `#fdf8f2` · `--bg-panel` `#f5ede2` · `--bg-canvas` `#ede7dc` · `--bg-surface` `#ffffff`
 - `--border` `#e8e0d5` · `--stroke` `#d4ccc2`
-- `--text-primary` `#111111` · `--text-secondary` `#555555` · `--text-muted` `#aaaaaa`
-- `--accent` `#f94608` — active states, Konva handles, primary CTA
-- `--accent-gold` `#f5a623` — multi-select anchor star/outline
-- Use `var(--…)` tokens in components — Toolbar/LayerPanel are fully tokenized; don't reintroduce raw hex for token values
+- `--text-primary` `#111111` · `--text-secondary` `#555555` · `--text-tertiary` `#6f6a60` · `--text-muted` `#aaaaaa`
+- `--text-muted` is **2.0:1 on `--bg-panel`** — it is the *disabled* colour and nothing else. Anything carrying words or a meaningful glyph uses `--text-tertiary` (4.6:1), which is warm-tinted so the ramp reads as a tier rather than a shade
+- `--accent` `#d63a05` — active states, Konva handles, primary CTA. Darkened from `#f94608` so white labels on accent fills clear 4.5:1
+- `--accent-gold` `#f5a623` — multi-select anchor star/outline · `--accent-tint` `#fff4f0` — selected-row wash
+- `--success` / `--danger` / `--danger-bg` / `--danger-border` — status. Both foregrounds clear AA at 12px on `--bg-base`
+- `--bg-inverse` / `--text-inverse` / `--text-inverse-muted` — the tooltip surface
+- **Konva can't read CSS custom properties**, so `ACCENT` / `ACCENT_GOLD` / `SNAP_GUIDE_FRAME` / `GUIDELINE` in `canvas/constants.ts` mirror these by hand — change both or a selected object's handles stop matching the panel that edits it. `scripts/test-frame-render-export.mjs` also hunts `ACCENT` by RGB; a stale literal there makes its absence proofs pass on a colour the palette no longer contains
+- Use `var(--…)` tokens in components — `src/ui/` is fully tokenized; don't reintroduce raw hex for token values
 - `--font` — always use `var(--font)`, never hardcode `'Uncut Sans Variable'`
 
 **Components:**
 - Buttons: pill shape (`borderRadius: 999`). Inputs/selects: `borderRadius: 6`. Cards/popovers: `borderRadius: 16`
 - `.btn-raised` (in `theme.css`): shadow button with press-down animation — `box-shadow: 2px 4px 0 #000` at rest
-- `iconBtnStyle(active)` (`src/ui/iconBtnStyle.ts`): active = `#f94608` fill + white icon; inactive = white fill + `#555` icon + `#d4ccc2` border; always `borderRadius: 999`
-- Sliders: global `input[type="range"]` in `theme.css` handles all. Adjustments sliders override track via inline `background`. Never add `.adj-slider`
+- `iconBtnProps(active, disabled?, extraStyle?)` (`src/ui/iconBtnStyle.ts`) — spread it, don't pass a separate `style=`. Colour and every state live in `.zs-icon-btn` in `theme.css`; the helper returns geometry plus `data-active`. That split exists because an inline `background` beats any `:hover` rule, which is how 32 icon buttons ended up with a `transition` and no hover for so long. `extraStyle` is where per-site width/padding overrides go
+- Focus: `theme.css` draws one `:focus-visible` ring for all interactive controls. **Never set `outline: none` on a focusable element** — an inline one wins over the ring and silently removes it
+- Sliders: global `input[type="range"]` in `theme.css` handles all. `.adj-slider` (`adjustments.css`) additionally exists for the gradient adjustment tracks
 - Tooltips: every interactive button must be wrapped in `<Tooltip label shortcut? description?>` (`src/ui/Tooltip.tsx`). Never use native `title=` on buttons — wrong font, timing, style. Tooltip chains the child's mouse/focus handlers and shows on keyboard focus. `label` always required; `shortcut` required if a shortcut exists; `description` for ambiguous labels. Empty `label=""` renders children unwrapped (no tooltip).
 - Color picker: `<ColorInput>` / `<MixedColorInput>` in `src/ui/ColorInput.tsx` (exported from `src/ui/index.ts`) — never use raw `input[type="color"]`. Popover uses `react-colorful` + HEX/RGB/HSL modes + eyedropper + 5 recent colors (localStorage `zeroseams:recentColors`). `fixed` prop portals the popover into `document.body` — required whenever the trigger has a CSS `transform` ancestor (even `translateX(0px)` creates a containing block that breaks `position:fixed`). `popoverAnchorFn?: () => {top,left}` overrides automatic `getBoundingClientRect` positioning when you need a fixed anchor (e.g. frame label strip). `MixedColorInput` renders a `—` overlay and shows `value=undefined` as mixed state.
 
@@ -240,7 +245,7 @@ Tokens in `src/ui/theme.css` — single source of truth. Imported once in `src/m
 - `LayerPanel` + `PropertiesPanel` are `position: absolute` inside the center column — `left: 0` / `right: 0`, `top: 0`, `zIndex: 20` (above toolbar gradient); height driven by `ResizeObserver`, `max-height: calc(100vh - 52px)`; `borderRadius: 0 0 16px 16px`; sticky header; `panel-scroll` class applies slim 4px scrollbar
 - Middle row: center column only (panels float inside it) — see `src/main.tsx`
 
-**Konva handles:** `borderStroke`/`anchorStroke` = `#f94608`. Snap guides: `#f94608` object snaps · `#ff3b5c` frame snaps (intentionally distinct).
+**Konva handles:** every node's Transformer sets `borderStroke`/`anchorStroke` = `ACCENT` declaratively as JSX props. Setting only `borderStroke` leaves the anchors on Konva's default blue, which is what they were. Snap guides: `ACCENT` object snaps · `SNAP_GUIDE_FRAME` frame snaps (intentionally distinct).
 
 ## Keyboard Shortcuts
 `useKeyboardShortcuts.ts`, mounted once in CarouselStage. No-op in input/textarea.

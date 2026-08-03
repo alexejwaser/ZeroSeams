@@ -118,10 +118,10 @@ export function FontPicker({
         onClick={() => setOpen((o) => !o)}
         style={{
           width: '100%',
-          background: '#ffffff',
-          border: '1px solid #d4ccc2',
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--stroke)',
           borderRadius: 6,
-          color: value ? '#111111' : '#aaaaaa',
+          color: value ? 'var(--text-primary)' : 'var(--text-tertiary)',
           fontSize: 13,
           padding: '3px 8px',
           textAlign: 'left',
@@ -144,8 +144,8 @@ export function FontPicker({
             left: 0,
             right: 0,
             zIndex: 1000,
-            background: '#ffffff',
-            border: '1px solid #e8e0d5',
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border)',
             borderRadius: 8,
             boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
             display: 'flex',
@@ -161,13 +161,12 @@ export function FontPicker({
             onChange={handleSearchChange}
             placeholder="Search fonts…"
             style={{
-              background: '#f5ede2',
+              background: 'var(--bg-panel)',
               border: 'none',
-              borderBottom: '1px solid #e8e0d5',
-              color: '#111111',
+              borderBottom: '1px solid var(--border)',
+              color: 'var(--text-primary)',
               fontSize: 12,
               padding: '6px 8px',
-              outline: 'none',
               flexShrink: 0,
             }}
           />
@@ -178,7 +177,7 @@ export function FontPicker({
             style={{ overflowY: 'auto', flex: 1 }}
           >
             {filtered.length === 0 && (
-              <div style={{ color: '#aaaaaa', fontSize: 12, padding: '8px 10px' }}>
+              <div style={{ color: 'var(--text-tertiary)', fontSize: 12, padding: '8px 10px' }}>
                 No fonts found
               </div>
             )}
@@ -195,8 +194,8 @@ export function FontPicker({
                 style={{
                   padding: '5px 10px',
                   cursor: 'pointer',
-                  background: idx === highlightIdx ? '#f5ede2' : family === value ? '#fff4f0' : 'transparent',
-                  color: '#111111',
+                  background: idx === highlightIdx ? 'var(--bg-panel)' : family === value ? 'var(--accent-tint)' : 'transparent',
+                  color: 'var(--text-primary)',
                   fontSize: 14,
                   fontFamily: family,
                   overflow: 'hidden',

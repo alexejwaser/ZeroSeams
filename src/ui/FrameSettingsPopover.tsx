@@ -22,9 +22,9 @@ function segmentButtonStyle(active: boolean): React.CSSProperties {
   return {
     padding: '3px 10px',
     height: 24,
-    background: active ? '#f94608' : '#ffffff',
-    color: active ? '#ffffff' : '#555555',
-    border: active ? 'none' : '1px solid #d4ccc2',
+    background: active ? 'var(--accent)' : 'var(--bg-surface)',
+    color: active ? 'var(--bg-surface)' : 'var(--text-secondary)',
+    border: active ? 'none' : '1px solid var(--stroke)',
     borderRadius: 999,
     cursor: 'pointer',
     fontSize: 12,
@@ -37,7 +37,7 @@ function segmentButtonStyle(active: boolean): React.CSSProperties {
 
 
 const labelStyle: React.CSSProperties = {
-  color: '#555555',
+  color: 'var(--text-secondary)',
   fontSize: 11,
   fontFamily: 'var(--font)',
   fontWeight: 'bold',
@@ -88,8 +88,8 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
         left: 0,
         zIndex: 1000,
         marginTop: 6,
-        background: '#ffffff',
-        border: '1px solid #e8e0d5',
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border)',
         borderRadius: 16,
         padding: 16,
         boxShadow: '0 8px 28px rgba(0,0,0,0.13)',
@@ -103,15 +103,14 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
         style={{
           width: '100%',
           height: 28,
-          background: '#ffffff',
-          color: '#111111',
-          border: '1px solid #d4ccc2',
+          background: 'var(--bg-surface)',
+          color: 'var(--text-primary)',
+          border: '1px solid var(--stroke)',
           borderRadius: 6,
           fontSize: 12,
           fontFamily: 'var(--font)',
           padding: '0 6px',
           cursor: 'pointer',
-          outline: 'none',
         }}
       >
         {PLATFORMS.map((p) => (
@@ -127,10 +126,10 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
           display: 'flex',
           alignItems: 'center',
           gap: 2,
-          background: '#ffffff',
+          background: 'var(--bg-surface)',
           borderRadius: 999,
           padding: '2px',
-          border: '1px solid #d4ccc2',
+          border: '1px solid var(--stroke)',
         }}
       >
         {presets.map((preset) => (
@@ -143,7 +142,7 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
           </button>
         ))}
       </div>
-      <div style={{ fontSize: 11, color: '#aaaaaa', fontFamily: 'var(--font)', marginTop: 5 }}>
+      <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontFamily: 'var(--font)', marginTop: 5 }}>
         {frameWidth} × {frameHeight} px
       </div>
 
@@ -161,7 +160,7 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
                 setRatio('custom', w, customH)
               }}
             />
-            <span style={{ color: '#aaaaaa', fontSize: 12 }}>×</span>
+            <span style={{ color: 'var(--text-tertiary)', fontSize: 12 }}>×</span>
             <NumericInput
               value={customH}
               min={100} max={8000}
@@ -176,7 +175,7 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
         </>
       )}
 
-      <div style={{ height: 1, background: '#e8e0d5', margin: '12px 0 0' }} />
+      <div style={{ height: 1, background: 'var(--border)', margin: '12px 0 0' }} />
 
       <div style={{ ...labelStyle, marginTop: 12 }}>Background</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

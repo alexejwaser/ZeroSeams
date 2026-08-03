@@ -121,7 +121,7 @@ export function TextSection({
     <div style={{ padding: '12px 12px 0' }}>
       {/* Rotation slider + numeric input */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
+        <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
         <input
           type="range" min={-360} max={360} step={1}
           value={Math.round(textObj.rotation ?? 0)}
@@ -160,7 +160,7 @@ export function TextSection({
 
       {/* Opacity slider + numeric input */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
+        <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
         <input
           type="range" min={0} max={100} step={1}
           value={Math.round((textObj.opacity ?? 1) * 100)}
@@ -182,12 +182,12 @@ export function TextSection({
         <div
           style={{
             background: 'rgba(249,70,8,0.08)',
-            border: '1px solid #f94608',
+            border: '1px solid var(--accent)',
             borderRadius: 8,
             padding: '5px 8px',
             marginTop: 10,
             marginBottom: 4,
-            color: '#f94608',
+            color: 'var(--accent)',
             fontSize: 11,
           }}
         >
@@ -198,7 +198,7 @@ export function TextSection({
       ) : (
         <div
           style={{
-            color: '#555555',
+            color: 'var(--text-secondary)',
             fontSize: 12,
             marginTop: 10,
             marginBottom: 4,
@@ -212,7 +212,7 @@ export function TextSection({
       {/* Font family */}
       <div style={{ ...sectionLabelStyle }}>Font</div>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: 8 }}>
-        <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Family</label>
+        <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Family</label>
         <FontPicker
           value={currentFontFamily}
           onChange={(family) => applySpanField({ fontFamily: family })}
@@ -240,9 +240,9 @@ export function TextSection({
                 style={{
                   padding: '3px 10px',
                   height: 28,
-                  background: active ? '#f94608' : '#ffffff',
-                  color: active ? '#ffffff' : '#555555',
-                  border: active ? 'none' : '1px solid #d4ccc2',
+                  background: active ? 'var(--accent)' : 'var(--bg-surface)',
+                  color: active ? 'var(--bg-surface)' : 'var(--text-secondary)',
+                  border: active ? 'none' : '1px solid var(--stroke)',
                   borderRadius: 999,
                   cursor: 'pointer',
                   fontSize: 13,
@@ -267,9 +267,9 @@ export function TextSection({
                 padding: '3px 10px',
                 height: 28,
                 flex: 1,
-                background: textObj.align === a ? '#f94608' : '#ffffff',
-                color: textObj.align === a ? '#ffffff' : '#555555',
-                border: textObj.align === a ? 'none' : '1px solid #d4ccc2',
+                background: textObj.align === a ? 'var(--accent)' : 'var(--bg-surface)',
+                color: textObj.align === a ? 'var(--bg-surface)' : 'var(--text-secondary)',
+                border: textObj.align === a ? 'none' : '1px solid var(--stroke)',
                 borderRadius: 999,
                 cursor: 'pointer',
                 fontSize: 12,
@@ -291,7 +291,7 @@ export function TextSection({
       {/* Fill color */}
       <div style={{ ...sectionLabelStyle }}>Color</div>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, gap: 8 }}>
-        <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Fill</label>
+        <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Fill</label>
         <div style={{ flex: 1 }}>
           <MixedColorInput
             value={currentFill}

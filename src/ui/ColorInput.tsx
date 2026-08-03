@@ -264,7 +264,6 @@ function ColorPopover({
     fontSize: 12,
     fontFamily: 'var(--font)',
     padding: '5px 8px',
-    outline: 'none',
   }
 
   return wrap(
@@ -400,7 +399,6 @@ function ColorPopover({
                 padding: 0,
                 cursor: c != null ? 'pointer' : 'default',
                 flexShrink: 0,
-                outline: 'none',
               }}
             />
           )

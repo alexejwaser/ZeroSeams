@@ -5,7 +5,8 @@ import { solidColorOf } from '@/canvas/frameClip'
 import { isEmptyFrame } from '@/canvas/frameModel'
 import type { CanvasObject, CanvasObjectType, GroupObject, GuidelineObject, VideoObject, ImageObject } from '@/types/canvas'
 import Tooltip from './Tooltip'
-import { iconBtnStyle } from './iconBtnStyle'
+import { iconBtnProps } from './iconBtnStyle'
+import { GUIDELINE } from '@/canvas/constants'
 import { Star, Lock, LockOpen, Eye, EyeOff, Volume2, VolumeX, ChevronDown, ChevronRight, Layers } from 'lucide-react'
 
 // Fill-color swatch + shape glyph for empty media frames — a broken <img>
@@ -23,11 +24,11 @@ function EmptyFrameThumb({ obj }: { obj: ImageObject }): React.ReactElement {
     >
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
         {kind === 'ellipse' ? (
-          <ellipse cx="7" cy="7" rx="5.5" ry="4" stroke="var(--text-muted)" strokeWidth="1.2" />
+          <ellipse cx="7" cy="7" rx="5.5" ry="4" stroke="var(--text-tertiary)" strokeWidth="1.2" />
         ) : kind === 'path' ? (
-          <path d="M2 10 L5 3 L9 7 L12 2" stroke="var(--text-muted)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M2 10 L5 3 L9 7 L12 2" stroke="var(--text-tertiary)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
         ) : (
-          <rect x="2" y="2" width="10" height="10" rx="1.5" stroke="var(--text-muted)" strokeWidth="1.2" />
+          <rect x="2" y="2" width="10" height="10" rx="1.5" stroke="var(--text-tertiary)" strokeWidth="1.2" />
         )}
       </svg>
     </div>
@@ -202,12 +203,17 @@ export function LayerPanel(): React.ReactElement {
           {reversedOrder.length === 0 && (
             <div
               style={{
-                padding: '16px 6px',
-                color: 'var(--text-muted)',
+                padding: '28px 14px',
+                textAlign: 'center',
+                color: 'var(--text-tertiary)',
                 fontSize: 12,
+                lineHeight: 1.5,
               }}
             >
-              No layers yet
+              <div style={{ color: 'var(--text-secondary)', fontWeight: 600, marginBottom: 2 }}>
+                No layers yet
+              </div>
+              Drop an image on the canvas, or add one from the toolbar.
             </div>
           )}
           {(() => {
@@ -301,7 +307,7 @@ export function LayerPanel(): React.ReactElement {
                       border: 'none',
                       cursor: 'pointer',
                       padding: '0 2px',
-                      color: 'var(--text-muted)',
+                      color: 'var(--text-tertiary)',
                       display: 'flex',
                       alignItems: 'center',
                       fontSize: 9,
@@ -317,7 +323,7 @@ export function LayerPanel(): React.ReactElement {
                       width: 26, height: 26, flexShrink: 0, borderRadius: 4,
                       background: 'var(--bg-panel)', border: '1px solid var(--border)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: 'var(--text-muted)',
+                      color: 'var(--text-tertiary)',
                     }}
                   >
                     <Layers size={14} strokeWidth={1.5} />
@@ -332,9 +338,9 @@ export function LayerPanel(): React.ReactElement {
                   >
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                       {(obj as GuidelineObject).orientation === 'horizontal' ? (
-                        <line x1="1" y1="7" x2="13" y2="7" stroke="#4A90E2" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/>
+                        <line x1="1" y1="7" x2="13" y2="7" stroke={GUIDELINE} strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/>
                       ) : (
-                        <line x1="7" y1="1" x2="7" y2="13" stroke="#4A90E2" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/>
+                        <line x1="7" y1="1" x2="7" y2="13" stroke={GUIDELINE} strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/>
                       )}
                     </svg>
                   </div>
@@ -379,14 +385,13 @@ export function LayerPanel(): React.ReactElement {
                       border: '1px solid var(--accent)',
                       borderRadius: 6,
                       padding: '0 5px',
-                      outline: 'none',
                     }}
                   />
                 ) : (
                   <span
                     style={{
                       flex: 1,
-                      color: obj.visible ? 'var(--text-primary)' : 'var(--text-muted)',
+                      color: obj.visible ? 'var(--text-primary)' : 'var(--text-tertiary)',
                       fontSize: 13,
                       fontFamily: 'var(--font)',
                       overflow: 'hidden',
@@ -416,12 +421,12 @@ export function LayerPanel(): React.ReactElement {
                         padding: '0 2px',
                         fontSize: 12,
                         lineHeight: '1',
-                        color: isAnchor ? 'var(--accent-gold)' : 'var(--text-muted)',
+                        color: isAnchor ? 'var(--accent-gold)' : 'var(--text-tertiary)',
                         display: 'flex',
                         alignItems: 'center',
                       }}
                     >
-                      <Star size={13} strokeWidth={1.5} fill={isAnchor ? 'gold' : 'none'} color={isAnchor ? 'gold' : 'var(--text-muted)'}/>
+                      <Star size={13} strokeWidth={1.5} fill={isAnchor ? 'gold' : 'none'} color={isAnchor ? 'gold' : 'var(--text-tertiary)'}/>
                     </button>
                   </Tooltip>
                 )}
@@ -432,15 +437,14 @@ export function LayerPanel(): React.ReactElement {
                     <button
                       draggable={false}
                       onClick={(e) => handleMuteClick(e, obj as VideoObject)}
-                      style={{
-                        ...iconBtnStyle(false),
+                      {...iconBtnProps(false, false, {
                         width: 22,
                         height: 22,
                         flexShrink: 0,
                         background: 'none',
                         border: 'none',
-                        color: (obj as VideoObject).muted ? 'var(--accent)' : 'var(--text-muted)',
-                      }}
+                        color: (obj as VideoObject).muted ? 'var(--accent)' : 'var(--text-secondary)',
+                      })}
                     >
                       {(obj as VideoObject).muted
                         ? <VolumeX size={12} strokeWidth={1.5}/>
@@ -462,7 +466,7 @@ export function LayerPanel(): React.ReactElement {
                       padding: '0 2px',
                       fontSize: 13,
                       lineHeight: '1',
-                      color: obj.locked ? 'var(--accent)' : 'var(--text-muted)',
+                      color: obj.locked ? 'var(--accent)' : 'var(--text-tertiary)',
                       display: 'flex',
                       alignItems: 'center',
                     }}
@@ -484,7 +488,7 @@ export function LayerPanel(): React.ReactElement {
                       padding: '0 2px',
                       fontSize: 14,
                       lineHeight: '1',
-                      color: obj.visible ? 'var(--accent)' : 'var(--text-muted)',
+                      color: obj.visible ? 'var(--accent)' : 'var(--text-tertiary)',
                       display: 'flex',
                       alignItems: 'center',
                     }}
@@ -552,7 +556,7 @@ export function LayerPanel(): React.ReactElement {
                     <span
                       style={{
                         flex: 1,
-                        color: childObj.visible ? 'var(--text-primary)' : 'var(--text-muted)',
+                        color: childObj.visible ? 'var(--text-primary)' : 'var(--text-tertiary)',
                         fontSize: 12,
                         fontFamily: 'var(--font)',
                         overflow: 'hidden',
@@ -576,11 +580,11 @@ export function LayerPanel(): React.ReactElement {
                           style={{
                             flexShrink: 0, background: 'none', border: 'none',
                             cursor: 'pointer', padding: '0 2px', lineHeight: '1',
-                            color: childIsAnchor ? 'var(--accent-gold)' : 'var(--text-muted)',
+                            color: childIsAnchor ? 'var(--accent-gold)' : 'var(--text-tertiary)',
                             display: 'flex', alignItems: 'center',
                           }}
                         >
-                          <Star size={13} strokeWidth={1.5} fill={childIsAnchor ? 'gold' : 'none'} color={childIsAnchor ? 'gold' : 'var(--text-muted)'}/>
+                          <Star size={13} strokeWidth={1.5} fill={childIsAnchor ? 'gold' : 'none'} color={childIsAnchor ? 'gold' : 'var(--text-tertiary)'}/>
                         </button>
                       </Tooltip>
                     )}
@@ -593,7 +597,7 @@ export function LayerPanel(): React.ReactElement {
                         style={{
                           flexShrink: 0, background: 'none', border: 'none',
                           cursor: 'pointer', padding: '0 2px', lineHeight: '1',
-                          color: childObj.locked ? 'var(--accent)' : 'var(--text-muted)',
+                          color: childObj.locked ? 'var(--accent)' : 'var(--text-tertiary)',
                           display: 'flex', alignItems: 'center',
                         }}
                       >
@@ -609,7 +613,7 @@ export function LayerPanel(): React.ReactElement {
                         style={{
                           flexShrink: 0, background: 'none', border: 'none',
                           cursor: 'pointer', padding: '0 2px', lineHeight: '1',
-                          color: childObj.visible ? 'var(--accent)' : 'var(--text-muted)',
+                          color: childObj.visible ? 'var(--accent)' : 'var(--text-tertiary)',
                           display: 'flex', alignItems: 'center',
                         }}
                       >

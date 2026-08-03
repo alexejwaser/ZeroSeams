@@ -11,7 +11,7 @@ import { useCanvasStore } from './useCanvasStore'
 import { makeCanvasNode } from './makeCanvasNode'
 import { useSnapGuides } from './useSnapGuides'
 import type { SnapGuide } from './useSnapGuides'
-import { axisLock } from './constants'
+import { axisLock, ACCENT, ACCENT_GOLD } from './constants'
 import { useViewportStore, selectScale } from './useViewportStore'
 import { buildEffectFilters } from './effects/buildEffectFilters'
 
@@ -423,7 +423,7 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
           <KonvaPath
             data={pathData}
             fill="transparent"
-            stroke={isAnchor ? '#f5a623' : '#f94608'}
+            stroke={isAnchor ? ACCENT_GOLD : ACCENT}
             strokeWidth={isAnchor ? 2 : 1}
             strokeScaleEnabled={false}
             perfectDrawEnabled={false}
@@ -451,6 +451,8 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
         />
         <Transformer
           ref={transformerRef}
+          borderStroke={ACCENT}
+          anchorStroke={ACCENT}
           keepRatio={true}
           rotationSnaps={snapEnabled ? [0, 45, 90, 135, 180, 225, 270, 315] : []}
           rotationSnapTolerance={8}
@@ -513,21 +515,21 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
             {hasIn && (
               <KonvaLine
                 points={[anchor.x + anchor.handleIn.dx, anchor.y + anchor.handleIn.dy, anchor.x, anchor.y]}
-                stroke="#f94608" strokeWidth={1} strokeScaleEnabled={false}
+                stroke={ACCENT} strokeWidth={1} strokeScaleEnabled={false}
                 dash={[3, 2]} listening={false} perfectDrawEnabled={false}
               />
             )}
             {hasOut && (
               <KonvaLine
                 points={[anchor.x, anchor.y, anchor.x + anchor.handleOut.dx, anchor.y + anchor.handleOut.dy]}
-                stroke="#f94608" strokeWidth={1} strokeScaleEnabled={false}
+                stroke={ACCENT} strokeWidth={1} strokeScaleEnabled={false}
                 dash={[3, 2]} listening={false} perfectDrawEnabled={false}
               />
             )}
             {hasIn && (
               <KonvaCircle
                 x={anchor.x + anchor.handleIn.dx} y={anchor.y + anchor.handleIn.dy}
-                radius={6} fill="#fff" stroke="#f94608" strokeWidth={1.5}
+                radius={6} fill="#fff" stroke={ACCENT} strokeWidth={1.5}
                 draggable
                 onDragMove={(e) => handleHandleDragMove(idx, 'in', e)}
                 onDragEnd={(e) => handleHandleDragEnd(idx, 'in', e)}
@@ -536,7 +538,7 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
             {hasOut && (
               <KonvaCircle
                 x={anchor.x + anchor.handleOut.dx} y={anchor.y + anchor.handleOut.dy}
-                radius={6} fill="#fff" stroke="#f94608" strokeWidth={1.5}
+                radius={6} fill="#fff" stroke={ACCENT} strokeWidth={1.5}
                 draggable
                 onDragMove={(e) => handleHandleDragMove(idx, 'out', e)}
                 onDragEnd={(e) => handleHandleDragEnd(idx, 'out', e)}
@@ -546,7 +548,7 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
               x={anchor.x} y={anchor.y}
               radius={7}
               fill={hasIn || hasOut ? '#4488ff' : '#fff'}
-              stroke="#f94608" strokeWidth={2}
+              stroke={ACCENT} strokeWidth={2}
               draggable
               onDragMove={(e) => handleAnchorDragMove(idx, e)}
               onDragEnd={(e) => handleAnchorDragEnd(idx, e)}

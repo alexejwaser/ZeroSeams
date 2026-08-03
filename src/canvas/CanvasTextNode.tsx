@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useMemo } from 'react'
 import { Text as KonvaText, Rect, Transformer } from 'react-konva'
 import type Konva from 'konva'
 import type { TextObject, TextSpan, CanvasObject } from '@/types/canvas'
-import { axisLock } from './constants'
+import { axisLock, ACCENT, ACCENT_GOLD } from './constants'
 import { useCanvasStore } from './useCanvasStore'
 import { makeCanvasNode } from './makeCanvasNode'
 import { useViewportStore, selectScale, getCanvasScale } from './useViewportStore'
@@ -537,7 +537,7 @@ function CanvasTextNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasTextNod
           height={obj.height}
           rotation={obj.rotation}
           fill="transparent"
-          stroke={isAnchor ? '#f5a623' : '#f94608'}
+          stroke={isAnchor ? ACCENT_GOLD : ACCENT}
           strokeWidth={isAnchor ? 2 : 1}
           strokeScaleEnabled={false}
           perfectDrawEnabled={false}
@@ -677,6 +677,8 @@ function CanvasTextNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasTextNod
       />
       <Transformer
         ref={transformerRef}
+        borderStroke={ACCENT}
+        anchorStroke={ACCENT}
         keepRatio={false}
         rotationSnaps={snapEnabled ? [0, 45, 90, 135, 180, 225, 270, 315] : []}
         rotationSnapTolerance={8}

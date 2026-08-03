@@ -22,9 +22,9 @@ import { sectionLabelStyle } from './shared'
 const ctaButtonStyle: React.CSSProperties = {
   flex: 1,
   height: 28,
-  background: '#ffffff',
-  color: '#555555',
-  border: '1px solid #d4ccc2',
+  background: 'var(--bg-surface)',
+  color: 'var(--text-secondary)',
+  border: '1px solid var(--stroke)',
   borderRadius: 999,
   cursor: 'pointer',
   fontSize: 12,
@@ -46,7 +46,7 @@ export function AddClipRow({ objectId }: { objectId: string }): React.ReactEleme
   }
 
   return (
-    <div style={{ marginTop: 4, marginBottom: 8, padding: 8, border: '1px dashed #d4ccc2', borderRadius: 12 }}>
+    <div style={{ marginTop: 4, marginBottom: 8, padding: 8, border: '1px dashed var(--stroke)', borderRadius: 12 }}>
       <div style={sectionLabelStyle}>Clip Shape</div>
       <div style={{ display: 'flex', gap: 6 }}>
         {OPTIONS.map(({ kind, label, description }) => (

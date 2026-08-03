@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
 import type { VideoObject } from '@/types/canvas'
 import Tooltip from '../Tooltip'
-import { iconBtnStyle } from '../iconBtnStyle'
+import { iconBtnProps } from '../iconBtnStyle'
 import { Volume2, VolumeX, Play, Pause, Repeat } from 'lucide-react'
 import { videoElementRegistry } from '@/canvas/videoElementRegistry'
 import { NumericInput } from '../NumericInput'
@@ -33,7 +33,7 @@ function formatDuration(seconds: number): string {
 }
 
 const trimLabelStyle: React.CSSProperties = {
-  color: '#555555',
+  color: 'var(--text-secondary)',
   fontSize: 11,
   width: 32,
   flexShrink: 0,
@@ -79,17 +79,17 @@ export function VideoSection({
       {/* Read-only info */}
       <div style={sectionLabelStyle}>Info</div>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6, gap: 8 }}>
-        <span style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Duration</span>
-        <span style={{ color: '#111111', fontSize: 12 }}>{formatDuration(videoObj.naturalDuration)}</span>
+        <span style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Duration</span>
+        <span style={{ color: 'var(--text-primary)', fontSize: 12 }}>{formatDuration(videoObj.naturalDuration)}</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6, gap: 8 }}>
-        <span style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Dimensions</span>
-        <span style={{ color: '#111111', fontSize: 12 }}>{videoObj.naturalWidth} × {videoObj.naturalHeight}</span>
+        <span style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Dimensions</span>
+        <span style={{ color: 'var(--text-primary)', fontSize: 12 }}>{videoObj.naturalWidth} × {videoObj.naturalHeight}</span>
       </div>
       {fileSize != null && (
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10, gap: 8 }}>
-          <span style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>File Size</span>
-          <span style={{ color: '#111111', fontSize: 12 }}>{fileSize}</span>
+          <span style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>File Size</span>
+          <span style={{ color: 'var(--text-primary)', fontSize: 12 }}>{fileSize}</span>
         </div>
       )}
 
@@ -98,7 +98,7 @@ export function VideoSection({
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6, gap: 6 }}>
         <Tooltip label={videoObj.muted ? 'Unmute' : 'Mute'}>
           <button
-            style={iconBtnStyle(!videoObj.muted)}
+            {...iconBtnProps(!videoObj.muted)}
             onClick={() => onCommit(selectedId, { muted: !videoObj.muted })}
           >
             {videoObj.muted ? <VolumeX size={14} /> : <Volume2 size={14} />}
@@ -129,7 +129,7 @@ export function VideoSection({
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
         <Tooltip label={isPlaying ? 'Pause' : 'Play'}>
           <button
-            style={iconBtnStyle(isPlaying)}
+            {...iconBtnProps(isPlaying)}
             onClick={() => toggleVideoPlay(videoObj.id)}
           >
             {isPlaying ? <Pause size={14} /> : <Play size={14} />}
@@ -137,13 +137,13 @@ export function VideoSection({
         </Tooltip>
         <Tooltip label={(videoObj.loop ?? true) ? 'Loop on' : 'Loop off'}>
           <button
-            style={iconBtnStyle(videoObj.loop ?? true)}
+            {...iconBtnProps(videoObj.loop ?? true)}
             onClick={() => onCommit(selectedId, { loop: !(videoObj.loop ?? true) })}
           >
             <Repeat size={14} />
           </button>
         </Tooltip>
-        <span style={{ color: '#555555', fontSize: 11, marginLeft: 4 }}>
+        <span style={{ color: 'var(--text-secondary)', fontSize: 11, marginLeft: 4 }}>
           {formatDuration(currentTime)} / {formatDuration(videoObj.naturalDuration)}
         </span>
       </div>
@@ -177,14 +177,14 @@ export function VideoSection({
       {/* Poster frame */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
         <span style={trimLabelStyle}>Poster</span>
-        <span style={{ color: '#111111', fontSize: 11, flex: 1 }}>
+        <span style={{ color: 'var(--text-primary)', fontSize: 11, flex: 1 }}>
           {videoObj.posterFrame != null
             ? formatDuration(videoObj.posterFrame)
             : `Default (${formatDuration(videoObj.trimStart ?? 0)})`}
         </span>
         <Tooltip label="Set poster to current position">
           <button
-            style={{ ...iconBtnStyle(false), fontSize: 11, padding: '2px 6px', width: 'auto' }}
+            {...iconBtnProps(false, false, { fontSize: 11, padding: '2px 6px', width: 'auto' })}
             onClick={() => onCommit(selectedId, { posterFrame: currentTime })}
           >
             Set
@@ -193,7 +193,7 @@ export function VideoSection({
         {videoObj.posterFrame != null && (
           <Tooltip label="Reset poster to trim start">
             <button
-              style={{ ...iconBtnStyle(false), fontSize: 11, padding: '2px 6px', width: 'auto' }}
+              {...iconBtnProps(false, false, { fontSize: 11, padding: '2px 6px', width: 'auto' })}
               onClick={() => onCommit(selectedId, { posterFrame: undefined })}
             >
               Reset
@@ -216,7 +216,7 @@ export function VideoSection({
         />
         <Tooltip label="Set In to current time">
           <button
-            style={{ ...iconBtnStyle(false), fontSize: 11, padding: '2px 6px', width: 'auto' }}
+            {...iconBtnProps(false, false, { fontSize: 11, padding: '2px 6px', width: 'auto' })}
             onClick={() => onCommit(selectedId, { trimStart: currentTime })}
           >
             Set In
@@ -235,7 +235,7 @@ export function VideoSection({
         />
         <Tooltip label="Set Out to current time">
           <button
-            style={{ ...iconBtnStyle(false), fontSize: 11, padding: '2px 6px', width: 'auto' }}
+            {...iconBtnProps(false, false, { fontSize: 11, padding: '2px 6px', width: 'auto' })}
             onClick={() => onCommit(selectedId, { trimEnd: currentTime })}
           >
             Set Out
@@ -245,7 +245,7 @@ export function VideoSection({
       {/* Reset trim */}
       <div style={{ marginBottom: 10 }}>
         <button
-          style={{ ...iconBtnStyle(false), fontSize: 11, padding: '2px 8px', width: 'auto' }}
+          {...iconBtnProps(false, false, { fontSize: 11, padding: '2px 8px', width: 'auto' })}
           onClick={() => onCommit(selectedId, { trimStart: 0, trimEnd: videoObj.naturalDuration })}
         >
           Reset Trim
@@ -267,7 +267,7 @@ export function VideoSection({
       {/* Rotation slider + numeric input */}
       <div style={sectionLabelStyle}>Transform</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
+        <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
         <input
           type="range" min={-360} max={360} step={1}
           value={Math.round(videoObj.rotation ?? 0)}
@@ -306,7 +306,7 @@ export function VideoSection({
 
       {/* Opacity slider + numeric input */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <label style={{ color: '#555555', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
+        <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
         <input
           type="range" min={0} max={100} step={1}
           value={Math.round((videoObj.opacity ?? 1) * 100)}

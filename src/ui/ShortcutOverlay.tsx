@@ -53,7 +53,7 @@ export function ShortcutOverlay(): React.ReactElement | null {
               marginLeft: 'auto',
               background: 'none',
               border: 'none',
-              color: 'var(--text-muted)',
+              color: 'var(--text-tertiary)',
               cursor: 'pointer',
               fontSize: 18,
               lineHeight: 1,
@@ -78,7 +78,7 @@ export function ShortcutOverlay(): React.ReactElement | null {
                   fontWeight: 700,
                   textTransform: 'uppercase',
                   letterSpacing: 0.6,
-                  color: 'var(--text-muted)',
+                  color: 'var(--text-tertiary)',
                   marginBottom: 8,
                 }}
               >

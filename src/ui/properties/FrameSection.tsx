@@ -6,7 +6,7 @@ import { isEmptyFrame, isGridCell as isGridCellObject } from '@/canvas/frameMode
 import Tooltip from '../Tooltip'
 import { ColorInput } from '../ColorInput'
 import { NumericInput } from '../NumericInput'
-import { iconBtnStyle } from '../iconBtnStyle'
+import { iconBtnProps } from '../iconBtnStyle'
 import { sectionLabelStyle } from './shared'
 import { pickImageMedia, pickVideoMedia } from './mediaPickers'
 
@@ -24,14 +24,14 @@ interface FrameSectionProps {
 }
 
 const rowStyle: React.CSSProperties = { display: 'flex', alignItems: 'center', marginBottom: 8, gap: 8 }
-const labelStyle: React.CSSProperties = { color: '#555555', fontSize: 12, width: 64, flexShrink: 0, cursor: 'pointer' }
+const labelStyle: React.CSSProperties = { color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0, cursor: 'pointer' }
 
 const buttonStyle: React.CSSProperties = {
   width: '100%',
   height: 30,
-  background: '#ffffff',
-  color: '#555555',
-  border: '1px solid #d4ccc2',
+  background: 'var(--bg-surface)',
+  color: 'var(--text-secondary)',
+  border: '1px solid var(--stroke)',
   borderRadius: 999,
   cursor: 'pointer',
   fontSize: 12,
@@ -40,7 +40,7 @@ const buttonStyle: React.CSSProperties = {
 
 const destructiveButtonStyle: React.CSSProperties = {
   ...buttonStyle,
-  color: '#f94608',
+  color: 'var(--accent)',
 }
 
 // Rect and Ellipse only. A clip can only ever SUBTRACT area — the bitmap stops at
@@ -126,13 +126,12 @@ export function FrameSection({
             <Tooltip key={kind} label={label} description={description}>
               <button
                 onClick={() => setClipKind(kind)}
-                style={{
-                  ...iconBtnStyle(kind === clipKind),
+                {...iconBtnProps(kind === clipKind, false, {
                   flex: 1,
                   width: 'auto',
                   height: 26,
                   fontSize: 11,
-                }}
+                })}
               >
                 {label}
               </button>
@@ -144,12 +143,13 @@ export function FrameSection({
           {clipKind === 'path' && (
             <Tooltip label="Custom shape" description="From the shape this frame was made of. Pick Rect or Ellipse to replace it.">
               <span
-                style={{
-                  ...iconBtnStyle(true),
+                {...iconBtnProps(true, false, {
                   flex: 1, width: 'auto', height: 26, fontSize: 11,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: 'default',
-                }}
+                })}
+                // Borrows the active pill's look but is read-only, so it opts out
+                // of the hover tint that would imply it can be clicked.
+                data-disabled=""
               >
                 Custom
               </span>
@@ -189,15 +189,15 @@ export function FrameSection({
       {/* Fill */}
       <div style={sectionLabelStyle}>Fill</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-        <ColorInput value={fillColor ?? '#ffffff'} onChange={(color) => setFillColor(color)} fixed />
+        <ColorInput value={fillColor ?? 'var(--bg-surface)'} onChange={(color) => setFillColor(color)} fixed />
         {fillColor != null && (
           <Tooltip label="Clear fill">
             <button
               onClick={() => setFillColor(undefined)}
               style={{
                 width: 20, height: 20, borderRadius: 999,
-                background: 'none', border: '1px solid #d4ccc2',
-                color: '#555555', fontSize: 11, lineHeight: 1,
+                background: 'none', border: '1px solid var(--stroke)',
+                color: 'var(--text-secondary)', fontSize: 11, lineHeight: 1,
                 cursor: 'pointer', padding: 0,
               }}
             >
@@ -206,7 +206,7 @@ export function FrameSection({
           </Tooltip>
         )}
         {fillColor == null && (
-          <span style={{ color: '#aaaaaa', fontSize: 11 }}>None</span>
+          <span style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>None</span>
         )}
       </div>
 

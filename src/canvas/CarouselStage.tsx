@@ -4,7 +4,7 @@ import type Konva from 'konva'
 import type { ImageObject, TextObject, ShapeObject, PathObject, AnchorPoint, CanvasObject } from '@/types/canvas'
 import type { ShapeKind } from '@/types/canvas'
 import type { FrameDragState } from '@/types/project'
-import { axisLock } from './constants'
+import { axisLock, ACCENT } from './constants'
 import { useShallow } from 'zustand/react/shallow'
 import { useCanvasStore } from './useCanvasStore'
 import { useViewportStore, selectScale, scaleForZoom } from './useViewportStore'
@@ -1212,10 +1212,10 @@ export function CarouselStage(): React.ReactElement {
             draggable
             rotationSnaps={snapEnabled ? [0, 45, 90, 135, 180, 225, 270, 315] : []}
             rotationSnapTolerance={8}
-            borderStroke="#f94608"
+            borderStroke={ACCENT}
             borderStrokeWidth={1.5}
             anchorFill="#fff"
-            anchorStroke="#f94608"
+            anchorStroke={ACCENT}
             anchorSize={8}
             onTransformEnd={handleGroupTransformEnd}
             onTransformStart={() => startSnapSession(useCanvasStore.getState().selectedIds)}
@@ -1280,7 +1280,7 @@ export function CarouselStage(): React.ReactElement {
               width={marquee.width}
               height={marquee.height}
               fill="rgba(0,150,255,0.08)"
-              stroke="#f94608"
+              stroke={ACCENT}
               strokeWidth={1}
               strokeScaleEnabled={false}
               dash={[6, 4]}
@@ -1368,16 +1368,16 @@ export function CarouselStage(): React.ReactElement {
                         ghostX - drag!.dx, ghostY - drag!.dy,
                         ghostX + drag!.dx, ghostY + drag!.dy,
                       ]}
-                      stroke="#f94608" strokeWidth={1} strokeScaleEnabled={false}
+                      stroke={ACCENT} strokeWidth={1} strokeScaleEnabled={false}
                       dash={[3, 2]} listening={false} perfectDrawEnabled={false}
                     />
                     <KonvaCircle
                       x={ghostX - drag!.dx} y={ghostY - drag!.dy}
-                      radius={3} fill="#fff" stroke="#f94608" strokeWidth={1.5} listening={false}
+                      radius={3} fill="#fff" stroke={ACCENT} strokeWidth={1.5} listening={false}
                     />
                     <KonvaCircle
                       x={ghostX + drag!.dx} y={ghostY + drag!.dy}
-                      radius={3} fill="#fff" stroke="#f94608" strokeWidth={1.5} listening={false}
+                      radius={3} fill="#fff" stroke={ACCENT} strokeWidth={1.5} listening={false}
                     />
                   </>
                 )}

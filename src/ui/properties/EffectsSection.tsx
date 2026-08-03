@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import type { LayerEffect } from '@/types/canvas'
 import { getAllEffectDefinitions, getEffectDefinition } from '@/canvas/effects'
 import Tooltip from '../Tooltip'
-import { iconBtnStyle } from '../iconBtnStyle'
+import { iconBtnProps } from '../iconBtnStyle'
 import { Eye, EyeOff, Plus, X, ChevronDown, ChevronRight } from 'lucide-react'
 import { ColorInput } from '../ColorInput'
 import { NumericInput } from '../NumericInput'
@@ -76,13 +76,13 @@ export function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionPr
   }
 
   return (
-    <div style={{ borderTop: '1px solid #e8e0d5', paddingTop: 10, marginTop: 4 }}>
+    <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10, marginTop: 4 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
         <div style={{ ...sectionLabelStyle, marginBottom: 0 }}>Effects</div>
         <div style={{ position: 'relative' }} ref={pickerRef}>
           <Tooltip label="Add effect">
             <button
-              style={{ ...iconBtnStyle(true), width: 22, height: 22 }}
+              {...iconBtnProps(true, false, { width: 22, height: 22 })}
               onClick={() => setPickerOpen(v => !v)}
             >
               <Plus size={12} />
@@ -91,7 +91,7 @@ export function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionPr
           {pickerOpen && (
             <div style={{
               position: 'absolute', right: 0, top: 26, zIndex: 100,
-              background: '#ffffff', border: '1px solid #d4ccc2', borderRadius: 8,
+              background: 'var(--bg-surface)', border: '1px solid var(--stroke)', borderRadius: 8,
               minWidth: 140, boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
             }}>
               {allDefs.map(def => (
@@ -101,9 +101,9 @@ export function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionPr
                   style={{
                     display: 'block', width: '100%', textAlign: 'left',
                     padding: '6px 10px', background: 'none', border: 'none',
-                    color: '#111111', fontSize: 12, cursor: 'pointer',
+                    color: 'var(--text-primary)', fontSize: 12, cursor: 'pointer',
                   }}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#f5ede2')}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-panel)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'none')}
                 >
                   {def.label}
@@ -115,7 +115,7 @@ export function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionPr
       </div>
 
       {activeEffects.length === 0 && (
-        <div style={{ color: '#aaaaaa', fontSize: 11, paddingBottom: 6 }}>No effects — click + to add</div>
+        <div style={{ color: 'var(--text-tertiary)', fontSize: 11, paddingBottom: 6 }}>No effects — click + to add</div>
       )}
 
       {activeEffects.map(effect => {
@@ -123,24 +123,24 @@ export function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionPr
         if (!def) return null
         const isCollapsed = collapsed[effect.id] ?? false
         return (
-          <div key={effect.id} style={{ marginBottom: 6, background: '#ffffff', border: '1px solid #e8e0d5', borderRadius: 8, overflow: 'hidden' }}>
+          <div key={effect.id} style={{ marginBottom: 6, background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
             {/* Effect header row */}
             <div style={{ display: 'flex', alignItems: 'center', padding: '4px 6px', gap: 4 }}>
               <button
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#555555', padding: 0, display: 'flex', alignItems: 'center' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 0, display: 'flex', alignItems: 'center' }}
                 onClick={() => setCollapsed(c => ({ ...c, [effect.id]: !isCollapsed }))}
               >
                 {isCollapsed ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
               </button>
               <span
-                style={{ flex: 1, color: '#111111', fontSize: 12, cursor: 'pointer' }}
+                style={{ flex: 1, color: 'var(--text-primary)', fontSize: 12, cursor: 'pointer' }}
                 onClick={() => setCollapsed(c => ({ ...c, [effect.id]: !isCollapsed }))}
               >
                 {def.label}
               </span>
               <Tooltip label={effect.enabled ? 'Disable effect' : 'Enable effect'}>
                 <button
-                  style={{ ...iconBtnStyle(effect.enabled), width: 20, height: 20 }}
+                  {...iconBtnProps(effect.enabled, false, { width: 20, height: 20 })}
                   onClick={() => toggleEnabled(effect.id)}
                 >
                   {effect.enabled ? <Eye size={11} /> : <EyeOff size={11} />}
@@ -148,7 +148,7 @@ export function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionPr
               </Tooltip>
               <Tooltip label="Remove effect">
                 <button
-                  style={{ ...iconBtnStyle(false), width: 20, height: 20, color: '#555555' }}
+                  {...iconBtnProps(false, false, { width: 20, height: 20, color: 'var(--text-secondary)' })}
                   onClick={() => removeEffect(effect.id)}
                 >
                   <X size={11} />
@@ -167,7 +167,7 @@ export function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionPr
                     return (
                       <div key={ctrl.key} style={{ display: 'flex', alignItems: 'center', marginBottom: 5, gap: 6 }}>
                         <label
-                          style={{ color: '#555555', fontSize: 11, width: 68, flexShrink: 0, cursor: 'pointer' }}
+                          style={{ color: 'var(--text-secondary)', fontSize: 11, width: 68, flexShrink: 0, cursor: 'pointer' }}
                           onDoubleClick={() => resetParam(effect.id, ctrl.key)}
                         >
                           {ctrl.label}
@@ -196,7 +196,7 @@ export function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionPr
                   if (ctrl.type === 'toggle') {
                     return (
                       <div key={ctrl.key} style={{ display: 'flex', alignItems: 'center', marginBottom: 5, gap: 6 }}>
-                        <label style={{ color: '#555555', fontSize: 11, width: 68, flexShrink: 0 }}>{ctrl.label}</label>
+                        <label style={{ color: 'var(--text-secondary)', fontSize: 11, width: 68, flexShrink: 0 }}>{ctrl.label}</label>
                         <input
                           type="checkbox"
                           checked={val as boolean}
@@ -208,7 +208,7 @@ export function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionPr
                   if (ctrl.type === 'color') {
                     return (
                       <div key={ctrl.key} style={{ display: 'flex', alignItems: 'center', marginBottom: 5, gap: 6 }}>
-                        <label style={{ color: '#555555', fontSize: 11, width: 68, flexShrink: 0 }}>{ctrl.label}</label>
+                        <label style={{ color: 'var(--text-secondary)', fontSize: 11, width: 68, flexShrink: 0 }}>{ctrl.label}</label>
                         <ColorInput
                           value={val as string}
                           onChange={v => updateParam(effect.id, ctrl.key, v, false)}

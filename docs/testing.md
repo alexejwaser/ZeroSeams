@@ -72,7 +72,7 @@ media appeared in the layer panel but never painted.
   assertion discriminating power.
 - Never sample within ~5% of a clip boundary (antialiasing).
 - Overlay leaks are checked by scanning the whole image for the anchor orange
-  `#f94608` and Konva's transformer blue `rgb(0,161,255)`, both unique in the
+  `ACCENT` (canvas/constants.ts) and Konva's transformer blue `rgb(0,161,255)`, both unique in the
   palette. An absence proof over the full image beats sampling a few points.
 - Exported PNGs are written to `/tmp/zeroseams-frame-render-tests/export-frame-*.png`
   so a human can confirm the silhouette once rather than trusting two sampled pixels.

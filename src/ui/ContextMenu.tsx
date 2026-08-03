@@ -41,9 +41,9 @@ function MenuItem({ label, kbd, disabled = false, destructive = false, onClick }
         borderRadius: 8,
         fontSize: 13,
         fontFamily: 'var(--font)',
-        color: disabled ? '#aaaaaa' : destructive ? '#f94608' : '#333333',
+        color: disabled ? 'var(--text-muted)' : destructive ? 'var(--accent)' : 'var(--text-primary)',
         cursor: disabled ? 'default' : 'pointer',
-        background: hovered && !disabled ? '#f5ede2' : 'transparent',
+        background: hovered && !disabled ? 'var(--bg-panel)' : 'transparent',
         userSelect: 'none',
       }}
     >
@@ -52,7 +52,7 @@ function MenuItem({ label, kbd, disabled = false, destructive = false, onClick }
         <span
           style={{
             fontSize: 11,
-            color: '#aaaaaa',
+            color: 'var(--text-tertiary)',
             marginLeft: 24,
           }}
         >
@@ -68,7 +68,7 @@ function Divider(): React.ReactElement {
     <div
       style={{
         height: 1,
-        background: '#e8e0d5',
+        background: 'var(--border)',
         margin: '4px 0',
       }}
     />
@@ -171,8 +171,8 @@ export function ContextMenu(): React.ReactElement | null {
         position: 'fixed',
         left,
         top,
-        background: '#ffffff',
-        border: '1px solid #e8e0d5',
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border)',
         borderRadius: 16,
         boxShadow: '0 8px 28px rgba(0,0,0,0.13)',
         padding: '4px 0',

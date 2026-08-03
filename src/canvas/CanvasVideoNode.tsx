@@ -7,7 +7,7 @@ import { useCanvasStore } from './useCanvasStore'
 import { makeCanvasNode } from './makeCanvasNode'
 import { useSnapGuides } from './useSnapGuides'
 import type { SnapGuide } from './useSnapGuides'
-import { axisLock } from './constants'
+import { axisLock, ACCENT, ACCENT_GOLD } from './constants'
 import { useViewportStore, selectScale } from './useViewportStore'
 import { registerVideoElement, unregisterVideoElement } from './videoElementRegistry'
 import { buildFilterPipeline } from './adjustments/pipeline'
@@ -334,19 +334,16 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     if (isSelected) {
       if (obj.contentEditMode && imgNode) {
         tr.nodes([imgNode])
-        tr.borderStroke('#f94608')
         tr.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'bottom-right', 'bottom-center', 'bottom-left', 'middle-left'])
         tr.rotateEnabled(true)
       } else if (obj.locked || isGridCell) {
         // Selection border only — cell geometry belongs to computeGridChildPatches.
         // See CanvasImageNode for the full argument.
         tr.nodes([frameRect])
-        tr.borderStroke('#f94608')
         tr.enabledAnchors([])
         tr.rotateEnabled(false)
       } else {
         tr.nodes([frameRect])
-        tr.borderStroke('#f94608')
         tr.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'bottom-right', 'bottom-center', 'bottom-left', 'middle-left'])
         tr.rotateEnabled(true)
       }
@@ -711,7 +708,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
         height={obj.frameHeight}
         rotation={obj.rotation}
         fill="transparent"
-        stroke={isAnchor && isInMultiSelect ? '#f5a623' : '#f94608'}
+        stroke={isAnchor && isInMultiSelect ? ACCENT_GOLD : ACCENT}
         strokeWidth={isAnchor && isInMultiSelect ? 2 : 1}
         strokeEnabled={obj.contentEditMode || isInMultiSelect}
         strokeScaleEnabled={false}
@@ -778,6 +775,8 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
 
       <Transformer
         ref={transformerRef}
+        borderStroke={ACCENT}
+        anchorStroke={ACCENT}
         keepRatio={false}
         rotationSnaps={snapEnabled ? [0, 45, 90, 135, 180, 225, 270, 315] : []}
         rotationSnapTolerance={8}

@@ -103,16 +103,16 @@ export function AlignDistributeSection({
 
       {/* Reference object for alignment */}
       <div style={{ marginBottom: 12 }}>
-        <div style={{ color: '#aaaaaa', fontSize: 11, marginBottom: 4 }}>Reference</div>
+        <div style={{ color: 'var(--text-tertiary)', fontSize: 11, marginBottom: 4 }}>Reference</div>
         <select
           value={anchorId ?? ''}
           onChange={(e) => onSetAnchor(e.target.value || null)}
           style={{
             width: '100%',
-            background: '#ffffff',
-            border: '1px solid #d4ccc2',
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--stroke)',
             borderRadius: 6,
-            color: anchorId ? '#f5a623' : '#555555',
+            color: anchorId ? 'var(--accent-gold)' : 'var(--text-secondary)',
             fontSize: 12,
             padding: '4px 6px',
           }}
@@ -128,11 +128,11 @@ export function AlignDistributeSection({
 
       <div
         style={{
-          color: '#aaaaaa',
+          color: 'var(--text-tertiary)',
           fontSize: 11,
           marginBottom: 12,
           paddingBottom: 12,
-          borderBottom: '1px solid #e8e0d5',
+          borderBottom: '1px solid var(--border)',
         }}
       >
         {selectedCount} objects selected

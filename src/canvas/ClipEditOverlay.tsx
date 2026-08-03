@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react'
+import { ACCENT } from './constants'
 import { Group, Path as KonvaPath, Circle as KonvaCircle, Line as KonvaLine } from 'react-konva'
 import type Konva from 'konva'
 import type { AnchorPoint, CanvasObject, ClipShape } from '@/types/canvas'
@@ -126,7 +127,7 @@ export function ClipEditOverlay({
       {/* Clip outline for visibility while editing */}
       <KonvaPath
         data={pathData}
-        stroke="#f94608"
+        stroke={ACCENT}
         strokeWidth={1}
         strokeScaleEnabled={false}
         listening={false}
@@ -140,21 +141,21 @@ export function ClipEditOverlay({
             {hasIn && (
               <KonvaLine
                 points={[a.x + a.handleIn.dx, a.y + a.handleIn.dy, a.x, a.y]}
-                stroke="#f94608" strokeWidth={1} strokeScaleEnabled={false}
+                stroke={ACCENT} strokeWidth={1} strokeScaleEnabled={false}
                 dash={[3, 2]} listening={false} perfectDrawEnabled={false}
               />
             )}
             {hasOut && (
               <KonvaLine
                 points={[a.x, a.y, a.x + a.handleOut.dx, a.y + a.handleOut.dy]}
-                stroke="#f94608" strokeWidth={1} strokeScaleEnabled={false}
+                stroke={ACCENT} strokeWidth={1} strokeScaleEnabled={false}
                 dash={[3, 2]} listening={false} perfectDrawEnabled={false}
               />
             )}
             {hasIn && (
               <KonvaCircle
                 x={a.x + a.handleIn.dx} y={a.y + a.handleIn.dy}
-                radius={6} fill="#fff" stroke="#f94608" strokeWidth={1.5}
+                radius={6} fill="#fff" stroke={ACCENT} strokeWidth={1.5}
                 draggable
                 onDragMove={(e) => handleDrag(idx, 'in', e, false)}
                 onDragEnd={(e) => handleDrag(idx, 'in', e, true)}
@@ -163,7 +164,7 @@ export function ClipEditOverlay({
             {hasOut && (
               <KonvaCircle
                 x={a.x + a.handleOut.dx} y={a.y + a.handleOut.dy}
-                radius={6} fill="#fff" stroke="#f94608" strokeWidth={1.5}
+                radius={6} fill="#fff" stroke={ACCENT} strokeWidth={1.5}
                 draggable
                 onDragMove={(e) => handleDrag(idx, 'out', e, false)}
                 onDragEnd={(e) => handleDrag(idx, 'out', e, true)}
@@ -173,7 +174,7 @@ export function ClipEditOverlay({
               x={a.x} y={a.y}
               radius={7}
               fill={hasIn || hasOut ? '#4488ff' : '#fff'}
-              stroke="#f94608" strokeWidth={2}
+              stroke={ACCENT} strokeWidth={2}
               draggable
               onDragMove={(e) => anchorDrag(idx, e, false)}
               onDragEnd={(e) => anchorDrag(idx, e, true)}

@@ -1,4 +1,5 @@
 import React from 'react'
+import { GripVertical, X } from 'lucide-react'
 import type { Frame, FrameDragState } from '@/types/project'
 import { ColorInput } from './ColorInput'
 import Tooltip from './Tooltip'
@@ -76,12 +77,12 @@ export function FrameLabelStrip({
           }}
         >
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'var(--bg-panel)', borderRadius: 8, padding: '3px 8px 3px 4px', border: '1px solid var(--border)' }}>
-            <span style={{ color: 'var(--text-muted)', fontSize: 12, lineHeight: 1, padding: '0 2px', userSelect: 'none' }}>⣿</span>
+            <GripVertical size={13} strokeWidth={1.5} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
             <div style={{ width: 14, height: 14, borderRadius: '50%', background: frames[frameDrag.fromIndex]?.backgroundColor ?? backgroundColor, border: '1.5px solid var(--stroke)', flexShrink: 0 }} />
-            <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--font)', whiteSpace: 'nowrap', userSelect: 'none' }}>Frame {frameDrag.fromIndex + 1}</span>
+            <span style={{ fontSize: 11, color: 'var(--text-tertiary)', fontFamily: 'var(--font)', whiteSpace: 'nowrap', userSelect: 'none' }}>Frame {frameDrag.fromIndex + 1}</span>
           </div>
           {framePreviews && (
-            <img src={framePreviews[frameDrag.fromIndex]} draggable={false} style={{ display: 'block', width: dispW, height: dispH, userSelect: 'none' }} />
+            <img src={framePreviews[frameDrag.fromIndex]} alt="" draggable={false} style={{ display: 'block', width: dispW, height: dispH, userSelect: 'none' }} />
           )}
         </div>
       )}
@@ -102,6 +103,7 @@ export function FrameLabelStrip({
             {framePreviews && !isDragging && (
               <img
                 src={framePreviews[i]}
+                alt=""
                 draggable={false}
                 style={{
                   position: 'absolute',
@@ -135,10 +137,17 @@ export function FrameLabelStrip({
             >
               <Tooltip label="Drag to reorder frame">
                 <span
-                  style={{ cursor: frameDrag ? 'grabbing' : 'grab', color: 'var(--text-muted)', fontSize: 12, lineHeight: 1, padding: '0 2px', userSelect: 'none' }}
+                  style={{
+                    cursor: frameDrag ? 'grabbing' : 'grab',
+                    color: 'var(--text-secondary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '2px 1px',
+                    userSelect: 'none',
+                  }}
                   onPointerDown={(e) => { onGripPointerDown(i, e) }}
                 >
-                  ⣿
+                  <GripVertical size={13} strokeWidth={1.5} />
                 </span>
               </Tooltip>
               <ColorInput
@@ -151,13 +160,13 @@ export function FrameLabelStrip({
                 <Tooltip label="Reset to canvas background">
                   <button
                     onClick={e => { e.stopPropagation(); setFrameBackground(i, null) }}
-                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 0, fontSize: 13, lineHeight: 1, display: 'flex', alignItems: 'center' }}
+                    style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 0, lineHeight: 0, display: 'flex', alignItems: 'center' }}
                   >
-                    ×
+                    <X size={12} strokeWidth={2} />
                   </button>
                 </Tooltip>
               )}
-              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--font)', whiteSpace: 'nowrap', userSelect: 'none' }}>
+              <span style={{ fontSize: 11, color: 'var(--text-tertiary)', fontFamily: 'var(--font)', whiteSpace: 'nowrap', userSelect: 'none' }}>
                 Frame {i + 1}
               </span>
             </div>

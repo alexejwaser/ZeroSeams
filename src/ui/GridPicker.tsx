@@ -124,7 +124,7 @@ export function GridPicker({ anchorEl, onClose, onSelect }: GridPickerProps): Re
                 alignItems: 'center',
                 gap: 4,
                 background: 'none',
-                border: `2px solid ${isSelected ? '#f94608' : 'transparent'}`,
+                border: `2px solid ${isSelected ? 'var(--accent)' : 'transparent'}`,
                 borderRadius: 8,
                 padding: 4,
                 cursor: 'pointer',
@@ -138,12 +138,12 @@ export function GridPicker({ anchorEl, onClose, onSelect }: GridPickerProps): Re
                 style={{
                   display: 'block',
                   borderRadius: 4,
-                  background: '#ffffff',
-                  border: '1px solid #e8e0d5',
+                  background: 'var(--bg-surface)',
+                  border: '1px solid var(--border)',
                 }}
               >
                 {/* White background */}
-                <rect x={0} y={0} width={72} height={72} fill="#ffffff" />
+                <rect x={0} y={0} width={72} height={72} fill="var(--bg-surface)" />
                 {/* Offset cells to be centered in the 72×72 SVG (cells are 64×64, so +4 each axis) */}
                 {cells.map((cell, i) => (
                   <rect
@@ -156,8 +156,8 @@ export function GridPicker({ anchorEl, onClose, onSelect }: GridPickerProps): Re
                     // template's cellClipShape will actually produce.
                     rx={template.cellClipShape?.kind === 'ellipse' ? cell.w / 2 : undefined}
                     ry={template.cellClipShape?.kind === 'ellipse' ? cell.h / 2 : undefined}
-                    fill="#f5ede2"
-                    stroke="#d4ccc2"
+                    fill="var(--bg-panel)"
+                    stroke="var(--stroke)"
                     strokeWidth={1}
                   />
                 ))}
@@ -167,7 +167,7 @@ export function GridPicker({ anchorEl, onClose, onSelect }: GridPickerProps): Re
               <span
                 style={{
                   fontSize: 9,
-                  color: '#aaaaaa',
+                  color: 'var(--text-tertiary)',
                   textAlign: 'center',
                   lineHeight: 1.2,
                   overflow: 'hidden',

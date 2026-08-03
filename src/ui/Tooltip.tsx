@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from 'react'
+import React, { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 
 interface TooltipProps {
@@ -48,10 +48,16 @@ function TooltipInner({
 
   // Clamped left after measuring the pill width.
   const [clampedLeft, setClampedLeft] = useState<number | null>(null)
+  // Set when the trigger sits too low for the pill to fit below it.
+  const [flipAbove, setFlipAbove] = useState(false)
 
   const triggerRef = useRef<HTMLElement>(null)
   const pillRef = useRef<HTMLDivElement>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // `visible` is also read from the unmount cleanup, which closes over the
+  // first render's value — the ref is what that path can trust.
+  const visibleRef = useRef(false)
+  const pillId = useId()
 
   function show(): void {
     if (triggerRef.current == null) return
@@ -61,8 +67,12 @@ function TooltipInner({
       left: rect.left + rect.width / 2,
     })
     setClampedLeft(null)
+    setFlipAbove(false)
     setVisible(true)
-    activeTooltipCount += 1
+    if (!visibleRef.current) {
+      visibleRef.current = true
+      activeTooltipCount += 1
+    }
   }
 
   function hide(): void {
@@ -70,13 +80,30 @@ function TooltipInner({
       clearTimeout(timerRef.current)
       timerRef.current = null
     }
-    if (visible) {
+    if (visibleRef.current) {
+      visibleRef.current = false
       activeTooltipCount = Math.max(0, activeTooltipCount - 1)
     }
     setVisible(false)
     setAnchorPos(null)
     setClampedLeft(null)
+    setFlipAbove(false)
   }
+
+  // Toolbar and panel buttons swap out on selection changes, so a trigger can
+  // unmount mid-hover. Without this the pending timer fires into a dead
+  // component and, worse, the instance's increment is never returned —
+  // activeTooltipCount ratchets up and every tooltip in the app loses its
+  // 400ms delay for the rest of the session.
+  useEffect(() => {
+    return () => {
+      if (timerRef.current != null) clearTimeout(timerRef.current)
+      if (visibleRef.current) {
+        visibleRef.current = false
+        activeTooltipCount = Math.max(0, activeTooltipCount - 1)
+      }
+    }
+  }, [])
 
   function handleMouseEnter(): void {
     if (timerRef.current != null) {
@@ -100,7 +127,7 @@ function TooltipInner({
   // Clamp the pill horizontally after it has been rendered and we can
   // measure its width — mirrors the exact pattern in ContextMenu.tsx.
   useLayoutEffect(() => {
-    if (!visible || anchorPos == null || pillRef.current == null) {
+    if (!visible || anchorPos == null || pillRef.current == null || triggerRef.current == null) {
       return
     }
     const pillWidth = pillRef.current.offsetWidth
@@ -111,10 +138,24 @@ function TooltipInner({
     if (rawLeft + pillWidth / 2 > window.innerWidth - 8) {
       setClampedLeft(Math.max(pillWidth / 2 + 8, maxLeft + pillWidth / 2))
     }
+    // The panels run to the bottom of the window, so their last controls had
+    // their tooltips rendered off-screen entirely. Flip above the trigger.
+    if (anchorPos.top + pillRef.current.offsetHeight > window.innerHeight - 8) {
+      setFlipAbove(true)
+    }
   }, [visible, anchorPos])
+
+  // Almost every trigger in the app is an icon-only button, so the tooltip text
+  // is the only name it has. Supply it as the accessible name unless the child
+  // already carries one, and point at the live pill when it is up.
+  const childProps = children.props as Record<string, unknown>
+  const hasOwnName =
+    childProps['aria-label'] != null || childProps['aria-labelledby'] != null
 
   const child = React.cloneElement(children, {
     ref: triggerRef,
+    ...(hasOwnName ? {} : { 'aria-label': label }),
+    ...(visible ? { 'aria-describedby': pillId } : {}),
     onMouseEnter: (e: React.MouseEvent) => {
       handleMouseEnter()
       children.props.onMouseEnter?.(e)
@@ -148,15 +189,21 @@ function TooltipInner({
   const pill = (
     <div
       ref={pillRef}
+      id={pillId}
+      role="tooltip"
       style={{
         position: 'fixed',
         top: anchorPos.top,
         left,
-        transform: 'translateX(-50%)',
+        // Flipping shifts the pill a full height up plus the 6px gap it was
+        // rendered with, landing it the same distance above the trigger.
+        transform: flipAbove
+          ? 'translateX(-50%) translateY(calc(-100% - 12px))'
+          : 'translateX(-50%)',
         zIndex: 10000,
         pointerEvents: 'none',
-        background: '#111111',
-        color: '#ffffff',
+        background: 'var(--bg-inverse)',
+        color: 'var(--text-inverse)',
         borderRadius: 8,
         padding: '4px 10px',
         fontSize: 12,
@@ -169,13 +216,13 @@ function TooltipInner({
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <span>{label}</span>
         {shortcut != null && shortcut !== '' && (
-          <span style={{ color: '#999', marginLeft: 6 }}>{shortcut}</span>
+          <span style={{ color: 'var(--text-inverse-muted)', marginLeft: 6 }}>{shortcut}</span>
         )}
       </div>
       {hasDescription && (
         <div
           style={{
-            color: '#aaa',
+            color: 'var(--text-inverse-muted)',
             fontWeight: 400,
             marginTop: 2,
             whiteSpace: 'normal',

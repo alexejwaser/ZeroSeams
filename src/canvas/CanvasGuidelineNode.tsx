@@ -4,6 +4,7 @@ import type Konva from 'konva'
 import type { GuidelineObject } from '@/types/canvas'
 import { useCanvasStore } from './useCanvasStore'
 import { useSnapGuides } from './useSnapGuides'
+import { GUIDELINE, GUIDELINE_SELECTED } from './constants'
 
 interface Props {
   id: string
@@ -51,7 +52,7 @@ function CanvasGuidelineNodeInner({ id, obj }: InnerProps): React.ReactElement |
       x={nodeX}
       y={nodeY}
       points={linePoints}
-      stroke={isSelected ? '#2171c7' : '#4A90E2'}
+      stroke={isSelected ? GUIDELINE_SELECTED : GUIDELINE}
       strokeWidth={isSelected ? 2 : 1}
       strokeScaleEnabled={false}
       dash={[8, 6]}

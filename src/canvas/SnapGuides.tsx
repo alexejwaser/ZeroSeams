@@ -1,4 +1,5 @@
 import React from 'react'
+import { ACCENT, SNAP_GUIDE_FRAME } from './constants'
 import { Line } from 'react-konva'
 import type { SnapGuide } from './useSnapGuides'
 
@@ -12,7 +13,7 @@ export function SnapGuides({ guides, totalWidth, totalHeight }: SnapGuidesProps)
   return (
     <>
       {guides.map((guide, index) => {
-        const color = guide.kind === 'frame' ? '#ff3b5c' : '#f94608'
+        const color = guide.kind === 'frame' ? SNAP_GUIDE_FRAME : ACCENT
         if (guide.orientation === 'h') {
           return (
             <Line
