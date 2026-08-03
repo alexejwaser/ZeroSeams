@@ -1211,6 +1211,72 @@ await page.evaluate((src) => { window.__zsImg__ = src }, TEST_IMG_SRC)
   await wait(120)
 }
 
+{
+  // L8 (#62 Phase C). The Frame section's shape picker is a plain commitUpdate per
+  // switch. That is the whole argument for discarding a custom path without a
+  // confirmation dialog — so the undo step it relies on has to actually exist.
+  const { groupId, cellIds } = await makeGrid()
+  const cellId = cellIds[0]
+  const before = await cellInfo(cellId, groupId)
+
+  const setClip = (id, clipShape) => page.evaluate(
+    ({ id, clipShape }) => window.__canvasStore__.getState().commitUpdate(id, { clipShape }),
+    { id, clipShape },
+  )
+
+  await setClip(cellId, { kind: 'ellipse' })
+  await wait(80)
+  const ellipsed = await cellInfo(cellId, groupId)
+  eq(ellipsed.clipShape?.kind, 'ellipse', 'L8: cell takes an ellipse clip')
+  eq(ellipsed.pastLen, before.pastLen + 1, 'L8: a shape switch is exactly one history entry')
+
+  await undo()
+  await wait(80)
+  eq((await cellInfo(cellId, groupId)).clipShape?.kind, undefined, 'L8: undo restores the previous clip kind')
+  await redo()
+  await wait(80)
+
+  // rect → path → rect, then one undo must bring the anchors back. Seeded anchors
+  // are normalized 0–1 (frameClip.clipShapeToAnchors); anything else would not
+  // survive a frame resize.
+  const seeded = await page.evaluate(() => {
+    // Same seed the picker uses for an ellipse → path switch.
+    const k = 0.5523 * 0.5
+    return [
+      { x: 0.5, y: 0, handleIn: { dx: -k, dy: 0 }, handleOut: { dx: k, dy: 0 } },
+      { x: 1, y: 0.5, handleIn: { dx: 0, dy: -k }, handleOut: { dx: 0, dy: k } },
+      { x: 0.5, y: 1, handleIn: { dx: k, dy: 0 }, handleOut: { dx: -k, dy: 0 } },
+      { x: 0, y: 0.5, handleIn: { dx: 0, dy: k }, handleOut: { dx: 0, dy: -k } },
+    ]
+  })
+  const afterEllipse = await cellInfo(cellId, groupId)
+  await setClip(cellId, { kind: 'path', anchors: seeded })
+  await wait(80)
+  await setClip(cellId, { kind: 'rect' })
+  await wait(80)
+  const backToRect = await cellInfo(cellId, groupId)
+  eq(backToRect.clipShape?.kind, 'rect', 'L8: path collapses back to rect')
+  eq(backToRect.pastLen, afterEllipse.pastLen + 2, 'L8: path→rect round trip is two entries')
+
+  await undo()
+  await wait(80)
+  const undone = await cellInfo(cellId, groupId)
+  eq(undone.clipShape?.kind, 'path', 'L8: one undo brings the discarded path back')
+  eq(undone.clipShape?.anchors?.length, 4, 'L8: …with its anchors intact')
+  ok(
+    undone.clipShape?.anchors?.every(a => a.x >= 0 && a.x <= 1 && a.y >= 0 && a.y <= 1),
+    'L8: seeded anchors are normalized 0–1, not display px',
+  )
+
+  await page.evaluate(({ groupId, cellIds }) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    for (const c of cellIds) gs().removeObject(c)
+    gs().removeObject(groupId)
+  }, { groupId, cellIds })
+  await wait(120)
+}
+
 // ─── Results ──────────────────────────────────────────────────────────────────
 console.log('\n' + '─'.repeat(50))
 console.log(`Results: ${passed} passed, ${failed} failed`)

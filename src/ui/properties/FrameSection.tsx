@@ -1,7 +1,7 @@
 import React from 'react'
 import type { CanvasObject, ImageObject, VideoObject, ClipShape } from '@/types/canvas'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
-import { solidColorOf } from '@/canvas/frameClip'
+import { clipShapeToAnchors, solidColorOf } from '@/canvas/frameClip'
 import { isEmptyFrame, isGridCell as isGridCellObject } from '@/canvas/frameModel'
 import Tooltip from '../Tooltip'
 import { ColorInput } from '../ColorInput'
@@ -43,12 +43,11 @@ const destructiveButtonStyle: React.CSSProperties = {
   color: '#f94608',
 }
 
-function clipKindLabel(clipShape: ClipShape | undefined): string {
-  if (!clipShape) return 'Rect'
-  if (clipShape.kind === 'rect') return 'Rect'
-  if (clipShape.kind === 'ellipse') return 'Ellipse'
-  return 'Custom Path'
-}
+const CLIP_KINDS: Array<{ kind: ClipShape['kind']; label: string; description: string }> = [
+  { kind: 'rect', label: 'Rect', description: 'Rectangular clip, optionally rounded' },
+  { kind: 'ellipse', label: 'Ellipse', description: 'Clips to an ellipse filling the frame' },
+  { kind: 'path', label: 'Path', description: 'Editable anchors, seeded from the current shape' },
+]
 
 export function FrameSection({
   frameObj,
@@ -72,6 +71,20 @@ export function FrameSection({
     const nextClip: ClipShape = value > 0 ? { kind: 'rect', cornerRadius: value } : { kind: 'rect' }
     if (commit) onCommit(selectedId, { clipShape: nextClip })
     else onUpdate(selectedId, { clipShape: nextClip })
+  }
+
+  // The single writer for clip kind. Each switch is one commitUpdate, so undo
+  // steps back through shape changes — which is why discarding a custom path
+  // needs no confirmation.
+  function setClipKind(kind: ClipShape['kind']): void {
+    if (kind === clipKind) return
+    const next: ClipShape =
+      kind === 'ellipse' ? { kind: 'ellipse' }
+      : kind === 'path' ? { kind: 'path', anchors: clipShapeToAnchors(clipShape) }
+      : { kind: 'rect' }
+    onCommit(selectedId, { clipShape: next })
+    // Seeded anchors are invisible until the overlay is up, so open it.
+    if (kind === 'path') useCanvasStore.getState().enterClipEditMode(selectedId)
   }
 
   function toggleClipEdit(): void {
@@ -104,10 +117,27 @@ export function FrameSection({
     <div style={{ padding: '12px 12px 0' }}>
       <div style={sectionLabelStyle}>Frame</div>
 
-      {/* Clip kind readout */}
+      {/* Clip kind picker */}
       <div style={rowStyle}>
-        <label style={labelStyle}>Shape</label>
-        <span style={{ color: '#111111', fontSize: 12 }}>{clipKindLabel(clipShape)}</span>
+        <label style={{ ...labelStyle, cursor: 'default' }}>Shape</label>
+        <div style={{ display: 'flex', gap: 4, flex: 1 }}>
+          {CLIP_KINDS.map(({ kind, label, description }) => (
+            <Tooltip key={kind} label={label} description={description}>
+              <button
+                onClick={() => setClipKind(kind)}
+                style={{
+                  ...iconBtnStyle(kind === clipKind),
+                  flex: 1,
+                  width: 'auto',
+                  height: 26,
+                  fontSize: 11,
+                }}
+              >
+                {label}
+              </button>
+            </Tooltip>
+          ))}
+        </div>
       </div>
 
       {/* Rect: corner radius */}
