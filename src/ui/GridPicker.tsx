@@ -152,6 +152,10 @@ export function GridPicker({ anchorEl, onClose, onSelect }: GridPickerProps): Re
                     y={cell.y + 4}
                     width={cell.w}
                     height={cell.h}
+                    // rx/ry at half the size renders the rect as the ellipse the
+                    // template's cellClipShape will actually produce.
+                    rx={template.cellClipShape?.kind === 'ellipse' ? cell.w / 2 : undefined}
+                    ry={template.cellClipShape?.kind === 'ellipse' ? cell.h / 2 : undefined}
                     fill="#f5ede2"
                     stroke="#d4ccc2"
                     strokeWidth={1}

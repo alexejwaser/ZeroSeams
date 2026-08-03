@@ -1,19 +1,17 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
 import { useThumbnailStore } from '@/canvas/useThumbnailStore'
+import { solidColorOf } from '@/canvas/frameClip'
+import { isEmptyFrame } from '@/canvas/frameModel'
 import type { CanvasObject, CanvasObjectType, GroupObject, GuidelineObject, VideoObject, ImageObject } from '@/types/canvas'
 import Tooltip from './Tooltip'
 import { iconBtnStyle } from './iconBtnStyle'
 import { Star, Lock, LockOpen, Eye, EyeOff, Volume2, VolumeX, ChevronDown, ChevronRight, Layers } from 'lucide-react'
 
-function isEmptyFrame(obj: CanvasObject | undefined): obj is ImageObject {
-  return obj?.type === 'image' && (obj as ImageObject).isEmpty === true
-}
-
 // Fill-color swatch + shape glyph for empty media frames — a broken <img>
 // thumbnail would otherwise render since isEmpty frames have no src.
 function EmptyFrameThumb({ obj }: { obj: ImageObject }): React.ReactElement {
-  const fillColor = obj.fill?.type === 'solid' ? obj.fill.color : 'var(--bg-panel)'
+  const fillColor = solidColorOf(obj.fill) ?? 'var(--bg-panel)'
   const kind = obj.clipShape?.kind ?? 'rect'
   return (
     <div

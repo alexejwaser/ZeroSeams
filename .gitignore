@@ -6,3 +6,8 @@ dist/
 src/**/*.js
 *.tsbuildinfo
 .claude/worktrees/
+
+# impeccable (installed per-machine via `npx impeccable install`)
+.claude/skills/impeccable/
+.github/skills/
+.github/hooks/

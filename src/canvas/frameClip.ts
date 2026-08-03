@@ -4,10 +4,18 @@
 // clip is stored transform-free and re-scales with the frame automatically.
 
 import type Konva from 'konva'
-import type { AnchorPoint, ClipShape } from '@/types/canvas'
+import type { AnchorPoint, ClipShape, Fill } from '@/types/canvas'
 import { anchorsToPathData } from './CanvasPathNode'
 
 type PathCtx = CanvasRenderingContext2D | Konva.Context
+
+/** Solid colour of a Fill, or undefined for fill kinds that have none.
+ *  Always read `fill` through this — the union grows (gradient) and an unguarded
+ *  `fill.color` would silently break. */
+export function solidColorOf(fill: Fill | undefined): string | undefined {
+  if (!fill) return undefined
+  return fill.type === 'solid' ? fill.color : undefined
+}
 
 /** Feather-style "image" glyph in a 24×24 box — centered hint on empty frames. */
 export const EMPTY_FRAME_ICON_PATH =
@@ -61,13 +69,17 @@ export function denormalizeAnchors(
 // beginPath()/clip() around it.
 // ---------------------------------------------------------------------------
 
+/** Returns undefined for a degenerate frame. Critical: Konva runs
+ *  `beginPath(); clipFunc(); clip()`, so a clipFunc that issues NO path commands
+ *  clips the entire group away — it does not mean "no clip". Callers must pass
+ *  the undefined straight through to Konva rather than invoking an empty trace. */
 export function buildClipFunc(
   clipShape: ClipShape,
   frameW: number,
   frameH: number,
-): (ctx: PathCtx) => void {
+): ((ctx: PathCtx) => void) | undefined {
+  if (frameW <= 0 || frameH <= 0) return undefined
   return (ctx: PathCtx) => {
-    if (frameW <= 0 || frameH <= 0) return
     if (clipShape.kind === 'rect') {
       const r = clipShape.cornerRadius
       if (r && r > 0) {
@@ -141,4 +153,34 @@ export function clipShapeToPathData(clipShape: ClipShape, w: number, h: number):
     return `M 0 ${ry} A ${rx} ${ry} 0 1 0 ${w} ${ry} A ${rx} ${ry} 0 1 0 0 ${ry} Z`
   }
   return anchorsToPathData(denormalizeAnchors(clipShape.anchors, w, h), true)
+}
+
+// ---------------------------------------------------------------------------
+// isPointInClipShape — frame-local hit test that follows the visible silhouette.
+// ---------------------------------------------------------------------------
+
+/** 1×1 scratch context — only ever used for isPointInPath, never drawn. */
+let hitCtx: CanvasRenderingContext2D | null = null
+
+/**
+ * Is a frame-local point inside the clip? Konva's own hitFunc covers canvas
+ * hit-testing; this is for the places that hit-test in logical coordinates
+ * without a node, i.e. entering a grid cell by double-click.
+ *
+ * Absent and plain-rect clips short-circuit to true — the caller has already
+ * done the bbox test those are equivalent to.
+ */
+export function isPointInClipShape(
+  clipShape: ClipShape | undefined,
+  frameW: number,
+  frameH: number,
+  localX: number,
+  localY: number,
+): boolean {
+  if (isPlainRectClip(clipShape) || !clipShape) return true
+  const d = clipShapeToPathData(clipShape, frameW, frameH)
+  if (!d) return false
+  if (!hitCtx) hitCtx = document.createElement('canvas').getContext('2d')
+  if (!hitCtx) return true // No 2D context (non-browser): fall back to the bbox.
+  return hitCtx.isPointInPath(new Path2D(d), localX, localY)
 }

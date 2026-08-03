@@ -1,157 +1,173 @@
-# Graph Report - src  (2026-07-04)
+# Graph Report - src  (2026-08-03)
 
 ## Corpus Check
-- 88 files · ~80,850 words
+- 91 files · ~85,867 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 477 nodes · 1049 edges · 20 communities (19 shown, 1 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 28 edges (avg confidence: 0.8)
+- 531 nodes · 1229 edges · 22 communities (21 shown, 1 thin omitted)
+- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 47 edges (avg confidence: 0.73)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `41bafdfd`
+- Built from commit: `125f6a0c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- [[_COMMUNITY_Shared Type Definitions|Shared Type Definitions]]
-- [[_COMMUNITY_AI Context & UI Integration|AI Context & UI Integration]]
-- [[_COMMUNITY_Electron Main Process|Electron Main Process]]
-- [[_COMMUNITY_Adjustments Pipeline & LUTs|Adjustments Pipeline & LUTs]]
-- [[_COMMUNITY_Canvas Nodes & HUD|Canvas Nodes & HUD]]
-- [[_COMMUNITY_Canvas Node Rendering|Canvas Node Rendering]]
-- [[_COMMUNITY_Grid & Group System|Grid & Group System]]
-- [[_COMMUNITY_Toolbar & Frame Settings|Toolbar & Frame Settings]]
-- [[_COMMUNITY_Platform Preview Shells|Platform Preview Shells]]
-- [[_COMMUNITY_Carousel Stage & Export Glue|Carousel Stage & Export Glue]]
-- [[_COMMUNITY_Text Spans & Thumbnails|Text Spans & Thumbnails]]
-- [[_COMMUNITY_Properties Panel Sections|Properties Panel Sections]]
-- [[_COMMUNITY_Layer Effects|Layer Effects]]
-- [[_COMMUNITY_Panel Controls & Icon Styles|Panel Controls & Icon Styles]]
-- [[_COMMUNITY_Video Export|Video Export]]
-- [[_COMMUNITY_Color Input UI|Color Input UI]]
-- [[_COMMUNITY_Snap System|Snap System]]
-- [[_COMMUNITY_Shortcut Cheatsheet|Shortcut Cheatsheet]]
-- [[_COMMUNITY_Electron Decls|Electron Decls]]
+- types/index.ts
+- ContextMenu.tsx
+- electron/index.ts
+- pipeline.ts
+- relativizeVideoObjects
+- effects/index.ts
+- useCanvasStore.ts
+- Toolbar.tsx
+- VideoSection.tsx
+- useCanvasStore
+- textSpans.ts
+- ColorInput.tsx
+- color.ts
+- exportFrames.ts
+- PreviewShell.tsx
+- PropertiesPanel.tsx
+- FrameSection.tsx
+- NumericInput.tsx
+- Tooltip.tsx
+- shortcuts.ts
+- electron.d.ts
 
 ## God Nodes (most connected - your core abstractions)
-1. `useCanvasStore` - 55 edges
-2. `useViewportStore` - 22 edges
-3. `buildFilterPipeline()` - 19 edges
-4. `useSnapGuides()` - 17 edges
-5. `SnapGuide` - 16 edges
-6. `iconBtnStyle()` - 14 edges
-7. `NumericInput()` - 12 edges
-8. `selectScale()` - 11 edges
-9. `CarouselStage()` - 10 edges
-10. `buildEffectFilters()` - 10 edges
+1. `useCanvasStore` - 53 edges
+2. `buildFilterPipeline()` - 20 edges
+3. `useViewportStore` - 20 edges
+4. `useSnapGuides()` - 18 edges
+5. `selectScale()` - 17 edges
+6. `SnapGuide` - 16 edges
+7. `iconBtnStyle()` - 15 edges
+8. `CanvasImageNodeInner()` - 14 edges
+9. `CarouselStage()` - 14 edges
+10. `buildEffectFilters()` - 14 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `ShortcutOverlay()` --calls--> `useCanvasStore`  [INFERRED]
-  ui/ShortcutOverlay.tsx → canvas/useCanvasStore.ts
-- `FrameSettingsPopover()` --calls--> `useCanvasStore`  [INFERRED]
-  ui/FrameSettingsPopover.tsx → canvas/useCanvasStore.ts
-- `PropertiesPanel()` --calls--> `useCanvasStore`  [INFERRED]
-  ui/PropertiesPanel.tsx → canvas/useCanvasStore.ts
-- `PropertiesPanel()` --calls--> `useThumbnailStore`  [INFERRED]
-  ui/PropertiesPanel.tsx → canvas/useThumbnailStore.ts
-- `buildProjectJson()` --calls--> `relativizeVideoObjects()`  [INFERRED]
-  ui/Toolbar.tsx → canvas/pathUtils.ts
+  src/ui/ShortcutOverlay.tsx → src/canvas/useCanvasStore.ts
+- `EmptyFrameOverlay()` --indirect_call--> `isEmptyFrame()`  [INFERRED]
+  src/canvas/EmptyFrameOverlay.tsx → src/canvas/frameModel.ts
+- `buildFilter()` --calls--> `hexToRgb()`  [INFERRED]
+  src/canvas/effects/halation.ts → src/utils/color.ts
+- `EffectsSection()` --calls--> `getAllEffectDefinitions()`  [INFERRED]
+  src/ui/properties/EffectsSection.tsx → src/canvas/effects/registry.ts
+- `TextSection()` --calls--> `getSelectionStyle()`  [INFERRED]
+  src/ui/properties/TextSection.tsx → src/canvas/textSpans.ts
 
-## Communities (20 total, 1 thin omitted)
+## Import Cycles
+- 3-file cycle: `src/canvas/CanvasPathNode.tsx -> src/canvas/useCanvasStore.ts -> src/canvas/frameClip.ts -> src/canvas/CanvasPathNode.tsx`
+- 3-file cycle: `src/canvas/CanvasPathNode.tsx -> src/canvas/useSnapGuides.ts -> src/canvas/frameClip.ts -> src/canvas/CanvasPathNode.tsx`
+- 4-file cycle: `src/canvas/CanvasPathNode.tsx -> src/canvas/makeCanvasNode.tsx -> src/canvas/useCanvasStore.ts -> src/canvas/frameClip.ts -> src/canvas/CanvasPathNode.tsx`
+- 4-file cycle: `src/canvas/CanvasPathNode.tsx -> src/canvas/useSnapGuides.ts -> src/canvas/useCanvasStore.ts -> src/canvas/frameClip.ts -> src/canvas/CanvasPathNode.tsx`
 
-### Community 0 - "Shared Type Definitions"
-Cohesion: 0.08
-Nodes (41): AIOperation, AIOperationBase, AIOperationStatus, AIOperationType, BackgroundRemovalOperation, InpaintingOperation, SegmentationOperation, AnchorPoint (+33 more)
+## Communities (22 total, 1 thin omitted)
 
-### Community 1 - "AI Context & UI Integration"
+### Community 0 - "types/index.ts"
 Cohesion: 0.09
-Nodes (23): AIContext, AIContextValue, useAI(), AIProvider(), AIStoreState, useAIStore, useBackgroundRemoval(), UseBackgroundRemovalReturn (+15 more)
+Nodes (41): MaskData, AIOperation, AIOperationBase, AIOperationStatus, AIOperationType, BackgroundRemovalOperation, InpaintingOperation, SegmentationOperation (+33 more)
 
-### Community 2 - "Electron Main Process"
+### Community 1 - "ContextMenu.tsx"
+Cohesion: 0.15
+Nodes (16): AIContext, AIContextValue, useAI(), AIProvider(), AIStoreState, useAIStore, useBackgroundRemoval(), UseBackgroundRemovalReturn (+8 more)
+
+### Community 2 - "electron/index.ts"
 Cohesion: 0.07
-Nodes (28): addRecentFile(), body, buf, buffer, corpHeaders, dir, editDir, editor (+20 more)
+Nodes (28): addRecentFile(), ExternalEditor, getPreferencesPath(), getRecentFilesPath(), Preferences, readPreferences(), tempFiles, watchers (+20 more)
 
-### Community 3 - "Adjustments Pipeline & LUTs"
-Cohesion: 0.18
-Nodes (23): adjFingerprint(), build3DLUT(), buildFilterPipeline(), buildFloatLUT(), buildLUT(), evict(), floatLutCache, isAllDefault() (+15 more)
-
-### Community 4 - "Canvas Nodes & HUD"
-Cohesion: 0.18
-Nodes (13): CanvasGuidelineNode, CanvasGuidelineNodeInner(), CanvasGuidelineNodeOuter(), InnerProps, Props, CanvasPathNodeInner(), CanvasTextNodeInner(), FrameGuides() (+5 more)
-
-### Community 5 - "Canvas Node Rendering"
+### Community 3 - "pipeline.ts"
 Cohesion: 0.19
-Nodes (9): CanvasShapeNode, CanvasShapeNodeInner(), CanvasShapeNodeInnerProps, CanvasTextNode, CanvasTextNodeInnerProps, makeCanvasNode(), buildEffectFilters(), effectsFingerprint() (+1 more)
+Nodes (24): adjFingerprint(), build3DLUT(), buildFilterPipeline(), buildFloatLUT(), buildLUT(), evict(), floatLutCache, isAllDefault() (+16 more)
 
-### Community 6 - "Grid & Group System"
-Cohesion: 0.11
-Nodes (12): findDropTargetId(), fitCover(), pointInEllipse(), pointInRect(), GridTemplate, ActiveTool, CanvasState, HistorySnapshot (+4 more)
+### Community 4 - "relativizeVideoObjects"
+Cohesion: 0.10
+Nodes (19): posixDirname(), posixRelative(), posixResolve(), relativizeVideoObjects(), resolveVideoObjects(), useAutosave(), buildProjectSnapshot(), App() (+11 more)
 
-### Community 7 - "Toolbar & Frame Settings"
-Cohesion: 0.08
-Nodes (21): posixDirname(), posixRelative(), posixResolve(), relativizeVideoObjects(), resolveVideoObjects(), buildProjectSnapshot(), FrameSettingsPopover(), FrameSettingsPopoverProps (+13 more)
-
-### Community 8 - "Platform Preview Shells"
+### Community 5 - "effects/index.ts"
 Cohesion: 0.17
-Nodes (7): FrameSlideProps, PreviewShell(), VideoOverlayItemProps, getShell(), PlatformShellProps, registerShell(), SHELL_REGISTRY
+Nodes (12): effectsFingerprint(), effectsPipelineCache, boxBlurH(), boxBlurV(), buildFilter(), EffectControlDescriptor, EffectDefinition, EffectParams (+4 more)
 
-### Community 9 - "Carousel Stage & Export Glue"
-Cohesion: 0.19
-Nodes (18): CanvasImageNode, CanvasPathNode, CanvasPathNodeInnerProps, computePathBBox(), CarouselStage(), EmptyFrameOverlay(), GridCellOverlay(), useAutosave() (+10 more)
+### Community 6 - "useCanvasStore.ts"
+Cohesion: 0.07
+Nodes (27): normalizeAnchors(), buildEmptyFrameImage(), EmptyFrameSpec, frameToEmptyImage(), isEmptyFrame(), makeEmptyCell(), canBecomeFrame(), findDropTargetId() (+19 more)
 
-### Community 10 - "Text Spans & Thumbnails"
-Cohesion: 0.14
-Nodes (20): applyStyleToAll(), applyStyleToRange(), fontStyleToCSS(), getSelectionStyle(), mergeAdjacentSpans(), ResolvedSpanStyle, resolveSpanStyle(), SelectionStyle (+12 more)
+### Community 7 - "Toolbar.tsx"
+Cohesion: 0.11
+Nodes (14): FrameSettingsPopover(), FrameSettingsPopoverProps, labelStyle, PLATFORM_LABELS, PLATFORMS, segmentButtonStyle(), GridPicker(), GridPickerProps (+6 more)
 
-### Community 11 - "Properties Panel Sections"
-Cohesion: 0.06
-Nodes (51): AdjustmentsSection(), AdjustmentsSectionProps, subGroupLabelStyle, TRACK_GRADIENT, AlignDistributeSection(), AlignDistributeSectionProps, EffectsSection(), EffectsSectionProps (+43 more)
+### Community 8 - "VideoSection.tsx"
+Cohesion: 0.18
+Nodes (11): iconBtnStyle(), LayerPanel(), AdjustmentsSection(), AdjustmentsSectionProps, subGroupLabelStyle, TRACK_GRADIENT, EffectsSection(), formatDuration() (+3 more)
 
-### Community 12 - "Layer Effects"
-Cohesion: 0.14
-Nodes (18): boxBlurH(), boxBlurV(), buildFilter(), EffectControlDescriptor, EffectDefinition, EffectParams, getAllEffectDefinitions(), getEffectDefinition() (+10 more)
+### Community 9 - "useCanvasStore"
+Cohesion: 0.07
+Nodes (83): CanvasGroupNode(), CanvasGroupNodeInner, CanvasGroupNodeProps, hitTestCell(), CanvasGuidelineNode, CanvasGuidelineNodeInner(), CanvasGuidelineNodeOuter(), InnerProps (+75 more)
 
-### Community 13 - "Panel Controls & Icon Styles"
-Cohesion: 0.19
-Nodes (15): CanvasImageNodeInner(), CanvasImageNodeInnerProps, anchorsToPathData(), CanvasVideoNode, CanvasVideoNodeInner(), CanvasVideoNodeInnerProps, ClipEditOverlay(), ClipEditOverlayProps (+7 more)
+### Community 10 - "textSpans.ts"
+Cohesion: 0.16
+Nodes (18): applyStyleToAll(), applyStyleToRange(), getSelectionStyle(), mergeAdjacentSpans(), ResolvedSpanStyle, resolveSpanStyle(), SelectionStyle, spanText() (+10 more)
 
-### Community 14 - "Video Export"
+### Community 11 - "ColorInput.tsx"
 Cohesion: 0.21
-Nodes (13): getStageInstance(), captureVideoFrameSequence(), downloadFrames(), exportFrames(), exportMixedFrames(), getVideoElement(), registerVideoElement(), registry (+5 more)
+Nodes (12): ColorInput(), ColorInputProps, ColorMode, ColorPopover(), loadRecentColors(), MixedColorInput(), MixedColorInputProps, PopoverProps (+4 more)
 
-### Community 15 - "Color Input UI"
-Cohesion: 0.13
-Nodes (13): CanvasGroupNode(), CanvasGroupNodeInner, CanvasGroupNodeProps, CanvasImageNodeProps, CanvasPathNodeProps, CanvasShapeNodeProps, CanvasTextNodeProps, CanvasVideoNodeProps (+5 more)
+### Community 12 - "color.ts"
+Cohesion: 0.36
+Nodes (8): clampInt(), clamp(), hexToHsl(), hexToRgb(), hslToHex(), hslToRgb(), rgbToHex(), rgbToHsl()
 
-### Community 17 - "Snap System"
-Cohesion: 0.29
-Nodes (8): buildTargets(), computeSnap(), computeSnapFromTargets(), computeSnapResize(), computeSnapResizeFromTargets(), DragBox, ROTATION_SNAP_ANGLES, SnapTarget
+### Community 14 - "exportFrames.ts"
+Cohesion: 0.23
+Nodes (13): getStageInstance(), captureVideoFrameSequence(), downloadFrames(), exportFrames(), exportMixedFrames(), videoObjectsInFrame(), getVideoElement(), registerVideoElement() (+5 more)
 
-### Community 22 - "Shortcut Cheatsheet"
+### Community 15 - "PreviewShell.tsx"
+Cohesion: 0.18
+Nodes (8): capturePreviewFrames(), FrameSlideProps, PreviewShell(), VideoOverlayItemProps, getShell(), PlatformShellProps, registerShell(), SHELL_REGISTRY
+
+### Community 16 - "PropertiesPanel.tsx"
+Cohesion: 0.15
+Nodes (17): FontPicker(), MAC_SYSTEM_FONTS, AddClipRow(), ctaButtonStyle, OPTIONS, AlignDistributeSection(), AlignDistributeSectionProps, alignButtonStyle() (+9 more)
+
+### Community 17 - "FrameSection.tsx"
+Cohesion: 0.25
+Nodes (7): buttonStyle, CLIP_KINDS, destructiveButtonStyle, FrameSection(), FrameSectionProps, labelStyle, rowStyle
+
+### Community 18 - "NumericInput.tsx"
+Cohesion: 0.47
+Nodes (3): formatVal(), NumericInput(), EffectsSectionProps
+
+### Community 19 - "Tooltip.tsx"
+Cohesion: 0.27
+Nodes (6): hudBtnStyle, FrameLabelStrip(), FrameLabelStripProps, frameSlotOffset(), Tooltip(), TooltipProps
+
+### Community 22 - "shortcuts.ts"
 Cohesion: 0.40
 Nodes (4): ShortcutOverlay(), SHORTCUT_GROUPS, ShortcutEntry, ShortcutGroup
 
 ## Knowledge Gaps
-- **115 isolated node(s):** `rootEl`, `FrameSettingsPopoverProps`, `PLATFORM_LABELS`, `PLATFORMS`, `labelStyle` (+110 more)
+- **112 isolated node(s):** `AIContextValue`, `AIStoreState`, `UseBackgroundRemovalReturn`, `CanvasGroupNodeInner`, `Props` (+107 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **1 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `useCanvasStore` connect `Canvas Nodes & HUD` to `AI Context & UI Integration`, `Canvas Node Rendering`, `Grid & Group System`, `Toolbar & Frame Settings`, `Platform Preview Shells`, `Carousel Stage & Export Glue`, `Text Spans & Thumbnails`, `Properties Panel Sections`, `Panel Controls & Icon Styles`, `Video Export`, `Color Input UI`, `Snap System`, `Shortcut Cheatsheet`?**
-  _High betweenness centrality (0.350) - this node is a cross-community bridge._
-- **Why does `PreviewShell()` connect `Platform Preview Shells` to `Canvas Nodes & HUD`?**
-  _High betweenness centrality (0.063) - this node is a cross-community bridge._
-- **Why does `TitleBar()` connect `AI Context & UI Integration` to `Properties Panel Sections`, `Canvas Nodes & HUD`, `Toolbar & Frame Settings`?**
-  _High betweenness centrality (0.063) - this node is a cross-community bridge._
-- **Are the 10 inferred relationships involving `useCanvasStore` (e.g. with `FrameSettingsPopover()` and `PropertiesPanel()`) actually correct?**
+- **Why does `useCanvasStore` connect `useCanvasStore` to `ContextMenu.tsx`, `relativizeVideoObjects`, `useCanvasStore.ts`, `Toolbar.tsx`, `VideoSection.tsx`, `textSpans.ts`, `exportFrames.ts`, `PreviewShell.tsx`, `shortcuts.ts`?**
+  _High betweenness centrality (0.313) - this node is a cross-community bridge._
+- **Why does `PropertiesPanel()` connect `ContextMenu.tsx` to `relativizeVideoObjects`, `useCanvasStore`, `textSpans.ts`, `ColorInput.tsx`, `PropertiesPanel.tsx`?**
+  _High betweenness centrality (0.059) - this node is a cross-community bridge._
+- **Why does `TitleBar()` connect `relativizeVideoObjects` to `VideoSection.tsx`, `useCanvasStore`, `ColorInput.tsx`, `Toolbar.tsx`?**
+  _High betweenness centrality (0.056) - this node is a cross-community bridge._
+- **Are the 10 inferred relationships involving `useCanvasStore` (e.g. with `CanvasHud()` and `ContextMenu()`) actually correct?**
   _`useCanvasStore` has 10 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `rootEl`, `FrameSettingsPopoverProps`, `PLATFORM_LABELS` to the rest of the system?**
-  _115 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Shared Type Definitions` be split into smaller, more focused modules?**
-  _Cohesion score 0.07777777777777778 - nodes in this community are weakly interconnected._
-- **Should `AI Context & UI Integration` be split into smaller, more focused modules?**
-  _Cohesion score 0.08771929824561403 - nodes in this community are weakly interconnected._
+- **Are the 7 inferred relationships involving `selectScale()` (e.g. with `CanvasImageNodeInner()` and `CanvasPathNodeInner()`) actually correct?**
+  _`selectScale()` has 7 INFERRED edges - model-reasoned connections that need verification._
+- **What connects `AIContextValue`, `AIStoreState`, `UseBackgroundRemovalReturn` to the rest of the system?**
+  _112 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `types/index.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.08787878787878788 - nodes in this community are weakly interconnected._

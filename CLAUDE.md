@@ -11,6 +11,8 @@ Only fall back to reading source files when the graph answer is incomplete or yo
 
 `npm run typecheck` checks both tsconfig projects (web + node) — the root tsconfig is references-only (`files: []`), so never run bare `tsc -p tsconfig.json`; it validates nothing. Keep both projects at zero errors.
 
+`npm test` builds, then runs the history suite and the render/export pixel suite. See `docs/testing.md` — it covers the `window.__*__` test-exposure contract, why new scripts must use the CDP launch pattern, and the video-decode sequence.
+
 **God nodes — touch carefully:**
 - `useCanvasStore` (45+ edges) — owns all canvas state
 - `buildFilterPipeline` (18 edges) — called on every image render; LUT-cached
@@ -52,14 +54,29 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `resizeMode` (`'advanced'|'auto'`): advanced = frame resize crops; auto = cover-fits content to new frame
 - Image Transformer always `keepRatio={false}`; Group transformer always `keepRatio={true}`
 
-**Media Frames** (`src/canvas/frameClip.ts`, `src/canvas/geometry.ts`):
+**Media Frames** (`src/canvas/frameClip.ts`, `src/canvas/frameModel.ts`, `src/canvas/geometry.ts`):
+- `frameModel.ts` owns frame *identity*; `frameClip.ts` owns clip *geometry* — don't merge them. `frameModel` is a leaf (type-only imports, no store, no React), so anything may import it
+- `buildEmptyFrameImage(id, spec)` is the ONLY place that knows an empty `ImageObject`'s field list; `frameToEmptyImage` (clear an existing frame), `makeEmptyCell` (fresh grid cell) and `buildFrameFromShape` all delegate to it. Three hand-written copies had already drifted before this existed
+- `isFrameObject` (has clip/fill/stroke state OR is empty) and `isEmptyFrame` (is a placeholder) are deliberately DISTINCT — a filled clipped image is the first but not the second. Never re-derive either; `EmptyFrameOverlay` layers its `visible`/`rotation` policy on top as a second filter rather than folding it into the predicate
 - `clipShape?` on `ImageObject`/`VideoObject`: `{kind:'rect', cornerRadius?}|{kind:'ellipse'}|{kind:'path', anchors}` — absent = plain rect; `path` anchors are NORMALIZED 0–1 in frame units, never display px (storing display px was the bug that killed the old mask system — it doesn't survive frame resize)
-- `fill?` is a union (`{type:'solid', color}` today, gradient lands later) — always switch on `fill.type`, never assume solid
-- An empty frame is just `ImageObject` with `isEmpty: true` — grid cells and standalone shape-frames are the same representation, both rendered by `EmptyFrameOverlay` (ex-`GridCellOverlay`)
+- `fill?` is a union (`{type:'solid', color}` today, gradient lands later) — read it only via `solidColorOf(fill)`, never `fill.color`
+- Node-type dispatch in `CarouselStage` must stay REACTIVE (`useShallow` over the type list). Objects change type in place via `swapObjectPreservingId`, and a `getState()` read leaves the old node component mounted rendering nothing — the layer panel shows the media, the canvas doesn't
+- `makeCanvasNode(Inner, expectedType)` returns null on a type mismatch, so a stale dispatch degrades to blank instead of throwing
+- `canBecomeFrame(obj)` (`geometry.ts`) is the ONLY convertibility predicate — line/arrow/open path have no interior. Never re-derive it
+- `insertMediaIntoShape(id, media)` = convert + fill in one `set()`, one undo step; returns `false` when the target can't hold media so drop handlers fall back to standalone placement
+- `convertShapeToFrame` rejects sub-1px bboxes and `buildClipFunc` returns `undefined` for a degenerate frame — an *empty* clipFunc clips the whole group away, it does not mean "no clip"
+- There is exactly ONE empty state per object: a standalone object with no media is a `ShapeObject`/`PathObject` (with the `+ Image / + Video` CTA), NOT an empty frame. `removeMediaFromFrame` collapses a standalone frame back to its shape via `buildShapeFromFrame` — that's why there's no separate "Convert to Shape" button; they were the same action with two indistinguishable results
+- `isEmpty: true` `ImageObject` therefore means **grid cell** — a cell must keep its slot, so it's the one case `removeMediaFromFrame` leaves as a frame. `EmptyFrameOverlay` (ex-`GridCellOverlay`) renders it. Legacy projects may still contain standalone empty frames; they stay functional
 - `convertShapeToFrame`/`convertFrameToShape`/`insertMediaIntoFrame`/`removeMediaFromFrame` all go through `swapObjectPreservingId` — id-preserving, single history entry, `objectOrder` index untouched
 - `_srcVault` entries are KEPT (not deleted) on `removeMediaFromFrame` — undo needs the src back without a save round-trip
 - `clipFunc` is only set when `clipShape` is non-plain-rect; the frame `Rect`'s `hitFunc` follows the same clip geometry so hit-testing matches the visible shape
 - `computePathBBox` takes a `closed` boolean param — pass `true` for closed paths, or the bbox undercounts the closing segment
+- `isFrameObject` stays narrow on purpose: a plain image becomes a frame by *acquiring* a clip (`AddClipRow` → `commitUpdate({clipShape})`), never by widening the predicate — widening it would put clip/fill/stroke UI on every image ever dropped. "Remove Clip" is the inverse and clears clip **+ fill + stroke together**; clearing only the clip flips `isFrameObject` false and strands state that still paints but can no longer be seen or edited
+- The Frame section authors **rect and ellipse only**. A clip can only ever SUBTRACT area — the bitmap stops at the frame box — so dragging a path anchor outward changes nothing visible, which made panel-driven path editing a dead end. `path` is still a first-class `ClipShape`: it arrives by drawing a shape and inserting media into it, and renders/exports/snaps like any other. A frame carrying one shows a read-only `Custom` chip
+- `clipEditMode`, `ClipEditOverlay` and `enterClipEditMode` are retained but have **no UI entry point** since the Edit Shape button was removed — they're the machinery a pen-tool-edits-a-frame's-edges flow would reuse. Case 15 keeps them honest
+- `isPointInClipShape` is for hit tests done in logical coords with no Konva node (entering a grid cell); on-canvas hit-testing already goes through the frame Rect's `hitFunc`
+- `clipEditMode` disarms the frame Transformer (`tr.nodes([])`, same branch as multi-select) in both node files — its resize anchors sit on the exact points as a path clip's corner anchors, so leaving it up makes those corners ungrabbable
+- Transformer `anchorStroke`/`borderStroke` are the accent `#f94608`, NOT Konva's default blue — a pixel hunt can't tell resize handles from clip anchors, so assert "is the transformer up?" on the scene graph (`find('Transformer')` + `nodes().length`), never by colour
 
 **Multi-Select:**
 - `selectedId` — Properties Panel; `selectedIds[]` — group transformer + align/distribute; `anchorId` — alignment reference (gold `#f5a623` border)
@@ -71,6 +88,8 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `boundBoxFunc` receives absolute screen coords — convert absolute→logical before snapping, back to absolute before returning; `logicalThreshold = 8 / scale`
 - `snapEnabled: boolean` in store; `rotationSnaps=[0,45,90,135,180,225,270,315]` on all Transformers
 - Snap is **disabled** for pen anchor drag and line endpoint drag
+- Media frames expose `frameSnapBox()`, not raw `frameX/Y/Width/Height`: rotated frames snap to their rotated corners' AABB, and `path` clips snap to the clip silhouette bbox rather than the enclosing frame rect
+- Content dragged inside a frame lives in frame-local space — route it through `snapRectInRotatedFrame` (`geometry.ts`) so snapping still works on a rotated frame
 - `startSnapSession(id)` / `endSnapSession()` — call at `onDragStart`/`onDragEnd` and `onTransformStart`/`onTransformEnd` on every draggable node; caches `buildTargets` result for the drag duration so it runs once per gesture, not per mousemove
 
 **History & Drag Pattern:**
@@ -90,6 +109,7 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - Shape/Ellipse: store uses bounding-box top-left `(x,y)`; Konva Ellipse uses center — convert at render time
 - Text: handles resize the textbox, text reflows; `scaleX/Y` always 1 after transform
 - Pen: `PathObject` with `anchors: AnchorPoint[]`; transform bakes full affine matrix into anchors, resets node to identity
+- Pen: `penDrawingId` in store (transient) mirrors CarouselStage's `currentPenPathIdRef` — the pen selects the path on its first anchor, so `CanvasPathNode` needs this to suppress the transform box until the path is committed. Update both together at every assignment site
 - Shift+drag axis-locks via `axisLock(dx,dy)` in `constants.ts`
 - `locked: boolean` on every object — no handles, no drag, no double-click
 
@@ -121,6 +141,7 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - RAF trim end: `obj.trimEnd ?? obj.naturalDuration ?? Infinity` — `Infinity` guards against `naturalDuration: null` on older saves; `null` coerces to `0` and makes the trim check always-true, causing constant seek-to-frame-0
 - `obj.effects ?? []` when calling `buildEffectFilters` — video objects saved before the effects field was introduced omit it entirely
 - RAF cache throttle: skip `.cache()` + `batchDraw()` when `currentTime` unchanged; reset throttle ref to `-1` on `allFilters` change — otherwise paused-video adjustment changes never apply
+- The cache effect MUST also depend on `contentWidth`/`contentHeight` (as `CanvasImageNode` does): `.cache()` snapshots the node at its current size and Konva scales that bitmap to the node's new box, so re-fitting content without re-caching renders the video **stretched**
 - `zeroseams-media://` scheme with Range support + CORP/COEP headers enables `SharedArrayBuffer` for FFmpeg WASM
 - Store `platform` must be subscribed as a hook in Toolbar components — `getState()` inside handlers only leaves it undefined during render
 
@@ -135,12 +156,21 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 **Grid/Collage System** (`src/canvas/gridTemplates.ts`, `CanvasGroupNode.tsx`, `EmptyFrameOverlay.tsx`):
 - `GroupObject` with `isGrid: true` owns N `ImageObject`/`VideoObject` cells via `childIds`; `gridTemplateId` references the template used
 - `gridTemplates.ts` `cells(groupW, groupH, gap)` is pure — zero hardcoded pixels; always proportional to group dimensions
-- `parentGroupId` on `BaseCanvasObject` drives click routing: single click → select group; `listening={false}` on cells when group selected + cell not entered (passes events through to group hit rect)
-- Delete on a cell with `parentGroupId` restores an empty frame (`isEmpty: true` via `removeMediaFromFrame`) — never removes the cell slot from the grid
-- `disconnectGridCell(id)` removes the cell from `childIds` and clears `parentGroupId`, making it a standalone object
+- **Listening rule:** exactly one of {a grid's group hit rect, its cells} listens at any moment — cells listen iff the grid is *entered* (some cell is `selectedId`). `CanvasGroupNode`'s `listening={!locked && !isCellSelected}` and the cell's `isGridEntered` are complements; change them together. Consequence: the group drags from anywhere on it, and once entered, clicks move directly between sibling cells
+- `EmptyFrameOverlay`'s `+image`/`+video` buttons are HTML, so they're immune to Konva listening — a cell can still be filled in one click without entering the grid. That's what makes the rule ergonomically safe
+- Grid cells get a selection border but **no resize/rotate anchors** (`obj.locked || isGridCell` branch in both node files): `computeGridChildPatches` owns cell geometry, so an individual resize is silently reverted by the next group drag or gap change. Resize a cell by detaching it (`disconnectGridCell`) or by changing the template
+- Konva node names `grid-hit` / `frame-rect-<id>` exist so click routing is assertable via `stage.getIntersection()` — see `docs/testing.md`
+- Deleting a group deletes its cells: `withGroupDescendants` expands the id set in both `removeObject` and `removeMultipleObjects`. A cell left behind keeps a `parentGroupId` pointing at nothing, and since cells only listen while the grid is entered, it becomes visible debris that can never be selected again. Keeping a cell is what `disconnectGridCell` is for
+- Cells swept up by a group delete **keep** their `_srcVault` entries (only the explicitly targeted id drops its entry) — `reinjectSrc` reads the vault, so dropping them would undo the delete with every image blank
+- `GridTemplate.cellClipShape` applies one clip to every cell **at creation only** (`addGrid` → `makeEmptyCell`); per-cell overrides come from the Frame section's shape picker. `cells()` still returns bare rects, which is what keeps `computeGridChildPatches` free of clip logic
+- Delete on a *filled* cell restores an empty frame (`isEmpty: true`) — never removes the slot. Delete on an *already-empty* cell falls through to the generic delete (both interceptions in `removeObject` require media), which is why that path must detach too
+- `detachCellFromParent(objects, cellId, parentGroupId)` is the ONLY way a cell leaves a grid — it strips the id from `childIds` and deletes the group when that was the last cell. Skipping it leaves a dangling child id and a slot that can never be refilled. Mutates the `objects` copy; returns the deleted group's id so the caller can drop it from `objectOrder` and selection
+- `disconnectGridCell(id)` detaches, and **collapses an empty cell to a shape** in the same `set()` — one undo step, one empty state. It builds the replacement inline rather than via `swapObjectPreservingId` because that helper re-attaches `parentGroupId` from the old object, which is the exact field disconnect clears
 - `EmptyFrameOverlay` container must be `pointerEvents: none`; only the `+image`/`+video` buttons set `pointerEvents: auto` — otherwise the div captures clicks before Konva hit-tests the group rect
-- `replaceGridCell(cellId, newObj)` atomically swaps a cell (e.g. ImageObject → VideoObject), updating parent `childIds` and `objectOrder`
 - Gap slider and group transform must update ALL child types (image + video) — filtering by `child.type === 'image'` breaks video cells
+- `computeGridChildPatches` (`gridTemplates.ts`) is the ONLY place cell geometry is derived — `CanvasGroupNode` (drag/transform) and the Properties gap slider both call it. Never re-derive `template.cells(...)` inline
+- Cell content refit goes through `fitCover` off `naturalWidth/naturalHeight`, never by scaling the previous content dims. Scaling by the group's independent x/y deltas destroys the media's aspect ratio, and scaling the previous *result* compounds when applied per-mousemove. Deriving from the source bitmap is idempotent, which is what lets live transform preview the real result (#69)
+- `refitContent` must be `false` for a plain move — the cell size hasn't changed, and refitting would discard any content offset set in content-edit mode
 
 **Guidelines** (`src/canvas/CanvasGuidelineNode.tsx`):
 - `GuidelineObject` extends `BaseCanvasObject`: `orientation: 'horizontal'|'vertical'`, `position: number` (canvas-absolute), `frameIndex: number` (-1 = global), `spanAllFrames: boolean`

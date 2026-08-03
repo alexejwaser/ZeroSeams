@@ -152,10 +152,29 @@ function App(): React.ReactElement {
   )
 }
 
-// Expose stores for Playwright tests (Electron is always a trusted desktop env)
+// Expose internals for Playwright tests (Electron is always a trusted desktop env).
+// Not dev-gated: the E2E scripts run against a production `npm run build`, where
+// import.meta.env.DEV is false — a dev gate would gate the tests out of existence.
+// Each global lists its consumer so this surface stays auditable.
+//   __canvasStore__     — every script in scripts/
+//   __viewportStore__   — (reserved; no current consumer)
+//   __saveStatusStore__ — test-save-path.mjs
 import('./canvas/useCanvasStore').then(m => { (window as any).__canvasStore__ = m.useCanvasStore })
 import('./canvas/useViewportStore').then(m => { (window as any).__viewportStore__ = m.useViewportStore })
 import('./store/useSaveStatusStore').then(m => { (window as any).__saveStatusStore__ = m.useSaveStatusStore })
+//   __getStage__ / __exportFrames__ / __exportMixedFrames__ / __videoRegistry__
+//     — test-frame-render-export.mjs; the stage is what makes pixel assertions
+//       possible (stage.toCanvas() → getImageData), and calling exportFrames
+//       directly skips the folder-dialog IPC that lives in Toolbar.tsx.
+import('./canvas/CarouselStage').then(m => { (window as any).__getStage__ = m.getStageInstance })
+import('./canvas/exportFrames').then(m => {
+  ;(window as any).__exportFrames__ = m.exportFrames
+  ;(window as any).__exportMixedFrames__ = m.exportMixedFrames
+})
+import('./canvas/videoElementRegistry').then(m => { (window as any).__videoRegistry__ = m.videoElementRegistry })
+//   __computeGridChildPatches__ — test-frame-render-export.mjs; the single source of
+//     truth for grid cell geometry, shared by CanvasGroupNode and the gap slider.
+import('./canvas/gridTemplates').then(m => { (window as any).__computeGridChildPatches__ = m.computeGridChildPatches })
 
 const rootEl = document.getElementById('root')
 if (!rootEl) throw new Error('Root element not found')

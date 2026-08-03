@@ -6,6 +6,32 @@ import { encodeVideoFrames, encodeVideoWithAudio } from './videoExport'
 import { useCanvasStore } from './useCanvasStore'
 
 /**
+ * Visible video objects whose frame box overlaps frame `frameIndex`. This is what
+ * decides whether a frame exports as a still image or an MP4, so a video straddling
+ * a frame boundary is returned for BOTH frames it touches.
+ *
+ * Note: Toolbar's `hasVideoInRange` (which decides whether to show video export
+ * settings) tests `obj.x`/`obj.width` rather than the frame box, so the two can
+ * disagree for a cover-cropped video. Left as-is deliberately — changing it is a
+ * behaviour change, not a refactor.
+ */
+export function videoObjectsInFrame(
+  objects: Record<string, CanvasObject>,
+  frameIndex: number,
+  frameWidth: number,
+): VideoObject[] {
+  const frameLeft = frameIndex * frameWidth
+  const frameRight = (frameIndex + 1) * frameWidth
+  return Object.values(objects).filter(
+    (obj): obj is VideoObject =>
+      obj.type === 'video' &&
+      obj.visible &&
+      obj.frameX < frameRight &&
+      obj.frameX + obj.frameWidth > frameLeft,
+  )
+}
+
+/**
  * Exports each carousel frame as a PNG/JPEG/TIFF Blob at 2x pixel ratio (2160×2160 for
  * 1080×1080 frames).
  *
@@ -296,18 +322,9 @@ export async function exportMixedFrames(
 
     for (let i = start; i <= end; i++) {
       if (isCancelled?.()) throw new Error('Export cancelled')
-      const frameLeft = i * frameWidth
-      const frameRight = (i + 1) * frameWidth
+      const videosHere = videoObjectsInFrame(objects, i, frameWidth)
 
-      const videoObjectsInFrame = Object.values(objects).filter(
-        (obj): obj is VideoObject =>
-          obj.type === 'video' &&
-          obj.visible &&
-          obj.frameX < frameRight &&
-          obj.frameX + obj.frameWidth > frameLeft,
-      )
-
-      if (videoObjectsInFrame.length === 0) {
+      if (videosHere.length === 0) {
         // Static frame — export with requested image format
         const fullCanvas = stage.toCanvas({ pixelRatio: PIXEL_RATIO })
         const cropCanvas = document.createElement('canvas')
@@ -353,19 +370,19 @@ export async function exportMixedFrames(
       } else {
         // Video frame — capture frame sequence and encode to MP4
         onStatus?.(`Rendering video frame ${i + 1}…`)
-        const videoEls = videoObjectsInFrame
+        const videoEls = videosHere
           .map((obj) => getVideoElement(obj.id))
           .filter((el): el is HTMLVideoElement => el !== undefined)
 
         // Use the longest trimmed clip duration visible in this frame, respecting trimStart/trimEnd.
-        const clipStarts = videoObjectsInFrame.map((obj) => obj.trimStart ?? 0)
-        const clipEnds = videoObjectsInFrame.map((obj) => {
+        const clipStarts = videosHere.map((obj) => obj.trimStart ?? 0)
+        const clipEnds = videosHere.map((obj) => {
           const end = obj.trimEnd ?? obj.naturalDuration
           return isFinite(end) && end > 0 ? end : null
         })
         let clipStart = clipStarts[0] ?? 0
         let clipEnd = clipEnds[0] ?? null
-        for (let k = 1; k < videoObjectsInFrame.length; k++) {
+        for (let k = 1; k < videosHere.length; k++) {
           const candidateDur = (clipEnds[k] ?? 0) - clipStarts[k]
           const currentDur = (clipEnd ?? 0) - clipStart
           if (candidateDur > currentDur) {
@@ -404,7 +421,7 @@ export async function exportMixedFrames(
         videoEls.forEach((v) => void v.play())
 
         // Find first unmuted video object to mix in audio
-        const audioSource = videoObjectsInFrame.find((obj) => !obj.muted)
+        const audioSource = videosHere.find((obj) => !obj.muted)
         let mp4Blob: Blob
         if (audioSource) {
           mp4Blob = await encodeVideoWithAudio(pngBlobs, EXPORT_FPS, frameWidth * PIXEL_RATIO, frameHeight * PIXEL_RATIO, audioSource.filePath, onStatus, exportSettings, audioSource.volume)

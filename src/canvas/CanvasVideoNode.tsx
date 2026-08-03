@@ -12,8 +12,8 @@ import { useViewportStore, selectScale } from './useViewportStore'
 import { registerVideoElement, unregisterVideoElement } from './videoElementRegistry'
 import { buildFilterPipeline } from './adjustments/pipeline'
 import { buildEffectFilters } from './effects/buildEffectFilters'
-import { fitCover } from './geometry'
-import { buildClipFunc, clipShapeToPathData, isPlainRectClip } from './frameClip'
+import { fitCover, snapRectInRotatedFrame } from './geometry'
+import { buildClipFunc, clipShapeToPathData, isPlainRectClip, solidColorOf } from './frameClip'
 import { ClipEditOverlay } from './ClipEditOverlay'
 
 interface CanvasVideoNodeProps {
@@ -45,10 +45,12 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
 
   const isInMultiSelectMode = selectedIds.length > 1
   const isAnchor = anchorId === id
-  const isParentGroupSelected = useCanvasStore(
-    (s) => obj.parentGroupId != null && s.selectedId === obj.parentGroupId,
-  )
   const isGridCell = obj.parentGroupId != null
+  // Complement of CanvasGroupNode's `!isCellSelected` — see CanvasImageNode.
+  const isGridEntered = useCanvasStore((s) => {
+    const g = obj.parentGroupId != null ? s.objects[obj.parentGroupId] : undefined
+    return g?.type === 'group' ? g.childIds.includes(s.selectedId ?? '') : false
+  })
   const { computeSnap, computeSnapResize, snapRotation, startSnapSession, endSnapSession } = useSnapGuides()
 
   const frameRectRef = useRef<Konva.Rect>(null)
@@ -232,6 +234,8 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     [obj.frameWidth, obj.frameHeight],
   )
 
+  const frameFill = solidColorOf(obj.fill)
+
   // --- Media-frame clip geometry (see CanvasImageNode for the full contract) ---
   const plainRect = isPlainRectClip(obj.clipShape)
   const clipFunc = useMemo(
@@ -241,6 +245,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   const hitFunc = useMemo(() => {
     if (plainRect || !obj.clipShape) return undefined
     const trace = buildClipFunc(obj.clipShape, obj.frameWidth, obj.frameHeight)
+    if (!trace) return undefined
     return (ctx: Konva.Context, shape: Konva.Shape): void => {
       ctx.beginPath()
       trace(ctx)
@@ -260,7 +265,8 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   function syncFrameDecor(width: number, height: number): void {
     const group = groupRef.current
     if (group && !plainRect && obj.clipShape) {
-      group.clipFunc(buildClipFunc(obj.clipShape, width, height))
+      const trace = buildClipFunc(obj.clipShape, width, height)
+      if (trace) group.clipFunc(trace)
     }
     const fr = fillRectRef.current
     if (fr) { fr.width(width); fr.height(height) }
@@ -291,14 +297,25 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   // When filters change, reset the RAF frame-guard so the next tick re-caches
   // even if the video is paused (currentTime unchanged). When all filters are
   // removed, clear the cache immediately so the node reverts to live rendering.
+  //
+  // Content dimensions are dependencies too, and must be: `cache()` snapshots the
+  // node at its CURRENT size, and Konva then draws that bitmap scaled to whatever
+  // the node's box becomes. Re-fitting the content (inserting media, an auto-mode
+  // frame resize, a content transform) without re-caching therefore renders the
+  // video stretched. CanvasImageNode has always keyed on these — this node not
+  // doing so was the one place image and video fitting diverged.
   useEffect(() => {
+    const node = videoImageRef.current
+    if (!node) return
     if (allFilters.length === 0) {
-      videoImageRef.current?.clearCache()
-      videoImageRef.current?.getLayer()?.batchDraw()
+      node.clearCache()
+      node.getLayer()?.batchDraw()
     } else {
+      node.cache()
       lastCachedTimeRef.current = -1
+      node.getLayer()?.batchDraw()
     }
-  }, [allFilters])
+  }, [allFilters, videoEl, obj.contentWidth, obj.contentHeight])
 
   // Wire transformer to its target.
   useEffect(() => {
@@ -307,7 +324,8 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     const imgNode = videoImageRef.current
     if (!tr || !frameRect) return
 
-    if (isInMultiSelectMode && !obj.contentEditMode) {
+    // Clip-edit mode owns the corners — see CanvasImageNode.
+    if ((isInMultiSelectMode && !obj.contentEditMode) || obj.clipEditMode) {
       tr.nodes([])
       tr.getLayer()?.draw()
       return
@@ -319,7 +337,9 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
         tr.borderStroke('#f94608')
         tr.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'bottom-right', 'bottom-center', 'bottom-left', 'middle-left'])
         tr.rotateEnabled(true)
-      } else if (obj.locked) {
+      } else if (obj.locked || isGridCell) {
+        // Selection border only — cell geometry belongs to computeGridChildPatches.
+        // See CanvasImageNode for the full argument.
         tr.nodes([frameRect])
         tr.borderStroke('#f94608')
         tr.enabledAnchors([])
@@ -335,7 +355,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
       tr.nodes([])
       tr.getLayer()?.draw()
     }
-  }, [isSelected, isInMultiSelectMode, obj.contentEditMode, obj.locked, videoEl])
+  }, [isSelected, isInMultiSelectMode, obj.contentEditMode, obj.clipEditMode, obj.locked, isGridCell, videoEl])
 
   // Sync nodeRef to frameRectRef for group transformer bbox.
   useEffect(() => {
@@ -578,13 +598,19 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
       node.x(nx)
       node.y(ny)
     }
-    if (obj.rotation) { onGuidesChange([]); return }
-    const { x: sx, y: sy, guides } = computeSnap(
-      { x: obj.frameX + nx, y: obj.frameY + ny, width: obj.contentWidth, height: obj.contentHeight },
-      obj.id,
+    // Mirrors CanvasImageNode — see the note there on frame-local vs absolute space.
+    let guides: SnapGuide[] = []
+    const localSnap = snapRectInRotatedFrame(
+      { x: nx, y: ny, width: obj.contentWidth, height: obj.contentHeight },
+      obj.frameX, obj.frameY, obj.rotation,
+      (box) => {
+        const res = computeSnap(box, obj.id)
+        guides = res.guides
+        return res
+      },
     )
-    node.x(sx - obj.frameX)
-    node.y(sy - obj.frameY)
+    node.x(localSnap.x)
+    node.y(localSnap.y)
     onGuidesChange(guides)
   }
 
@@ -631,12 +657,12 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
         opacity={obj.opacity}
         listening={obj.contentEditMode}
       >
-        {obj.fill ? (
+        {frameFill != null ? (
           <Rect
             ref={fillRectRef}
             x={0} y={0}
             width={obj.frameWidth} height={obj.frameHeight}
-            fill={obj.fill.color}
+            fill={frameFill}
             listening={false}
           />
         ) : null}
@@ -678,6 +704,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
       {/* Invisible frame rect — sole interaction/transform target in frame mode. */}
       <Rect
         ref={frameRectRef}
+        name={`frame-rect-${id}`}
         x={obj.frameX}
         y={obj.frameY}
         width={obj.frameWidth}
@@ -691,10 +718,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
         perfectDrawEnabled={false}
         hitFunc={hitFunc}
         draggable={!obj.locked && !obj.contentEditMode && !isInMultiSelectMode && !isGridCell}
-        listening={
-          !obj.contentEditMode &&
-          !(isGridCell && isParentGroupSelected && !isSelected)
-        }
+        listening={!obj.contentEditMode && (!isGridCell || isGridEntered)}
         onMouseDown={(e) => {
           if (isInMultiSelectMode) {
             rectMouseDownPosRef.current = { x: e.evt.clientX, y: e.evt.clientY }
@@ -712,8 +736,6 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
                 if (Math.sqrt(dx * dx + dy * dy) > 3) return
               }
               setAnchor(anchorId === obj.id ? null : obj.id)
-            } else if (isGridCell && !isParentGroupSelected && !isSelected && obj.parentGroupId) {
-              useCanvasStore.getState().setSelected(obj.parentGroupId)
             } else {
               useCanvasStore.getState().setSelected(id)
             }
@@ -804,4 +826,4 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   )
 }
 
-export const CanvasVideoNode = makeCanvasNode<VideoObject, CanvasVideoNodeProps>(CanvasVideoNodeInner)
+export const CanvasVideoNode = makeCanvasNode<VideoObject, CanvasVideoNodeProps>(CanvasVideoNodeInner, 'video')

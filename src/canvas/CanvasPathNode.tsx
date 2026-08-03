@@ -129,6 +129,10 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
 
   const isInMultiSelectMode = selectedIds.length > 1
   const isAnchor = anchorId === id
+  // The pen tool selects the path as soon as the first anchor lands, but a path
+  // that's still being drawn has nothing meaningful to transform — the box would
+  // wrap a shape the user hasn't finished. Anchors stay visible.
+  const isDrawing = useCanvasStore((s) => s.penDrawingId === id)
   const setContextMenu = useCanvasStore((s) => s.setContextMenu)
   const { computeSnapResize, startSnapSession, endSnapSession } = useSnapGuides()
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
@@ -183,7 +187,7 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
       tr.getLayer()?.draw()
       return
     }
-    if (isSelected && !obj.pathEditMode && !obj.locked) {
+    if (isSelected && !obj.pathEditMode && !obj.locked && !isDrawing) {
       tr.nodes([node])
       tr.enabledAnchors([
         'top-left', 'top-center', 'top-right', 'middle-right',
@@ -196,7 +200,7 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
       tr.nodes([])
       tr.getLayer()?.draw()
     }
-  }, [isSelected, isInMultiSelectMode, obj.pathEditMode, obj.locked])
+  }, [isSelected, isInMultiSelectMode, obj.pathEditMode, obj.locked, isDrawing])
 
   function handleClick(e: Konva.KonvaEventObject<MouseEvent>): void {
     if (e.evt.shiftKey) {
@@ -556,4 +560,4 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
   )
 }
 
-export const CanvasPathNode = makeCanvasNode<PathObject, CanvasPathNodeProps>(CanvasPathNodeInner)
+export const CanvasPathNode = makeCanvasNode<PathObject, CanvasPathNodeProps>(CanvasPathNodeInner, 'path')

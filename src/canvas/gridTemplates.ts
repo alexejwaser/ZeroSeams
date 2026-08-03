@@ -2,6 +2,9 @@
 // Every cells() function computes rects proportionally from (groupW, groupH, gap).
 // Zero hardcoded pixel values. The union of all cells (with gaps) exactly fills [0,0,groupW,groupH].
 
+import type { CanvasObject, ClipShape, GroupObject, ImageObject, VideoObject } from '@/types/canvas'
+import { fitCover } from './geometry'
+
 export interface CellRect { x: number; y: number; w: number; h: number }
 
 export interface GridTemplate {
@@ -10,6 +13,11 @@ export interface GridTemplate {
   cols: number  // for SVG thumbnail aspect hints
   rows: number
   cells: (groupW: number, groupH: number, gap: number) => CellRect[]
+  /** Clip applied to every cell at creation time only (addGrid → makeEmptyCell).
+   *  Per-cell overrides come from the Frame section's shape picker afterwards.
+   *  Deliberately one shape for the whole template: cells() keeps returning bare
+   *  rects, which is what keeps computeGridChildPatches free of clip logic. */
+  cellClipShape?: ClipShape
 }
 
 // ---------------------------------------------------------------------------
@@ -329,4 +337,82 @@ export const GRID_TEMPLATES: GridTemplate[] = [
     rows: 3,
     cells: uniformGrid(5, 3),
   },
+
+  // 25. circles-3 — 3 columns, ellipse-clipped cells. The only template that
+  // ships a cellClipShape; without it nobody would guess cell clips exist.
+  {
+    id: 'circles-3',
+    label: '3 Circles',
+    cols: 3,
+    rows: 1,
+    cells: uniformGrid(3, 1),
+    cellClipShape: { kind: 'ellipse' },
+  },
 ]
+
+/**
+ * Re-derive every cell's geometry from its template for a given group box.
+ *
+ * Single source of truth for grid relayout — used by CanvasGroupNode (drag,
+ * live transform, transform end) and by the Properties panel gap slider. Pure:
+ * `objects` is passed in rather than read from the store, so this stays testable
+ * and free of a store import.
+ *
+ * `refitContent` controls whether each cell's media is re-cover-fitted to its new
+ * size. Pass true whenever the cell SIZE changes (transform, gap change); false for
+ * a plain move, where refitting would discard any content offset the user set in
+ * content-edit mode.
+ *
+ * Content is refitted via fitCover off naturalWidth/naturalHeight rather than scaled
+ * by the group's width/height deltas. Two reasons (see #69): independent x/y scale
+ * factors destroy the media's aspect ratio on any non-uniform resize, and scaling the
+ * previous result compounds when applied per-mousemove — which is why live transform
+ * previously had to skip content entirely. Deriving from the source bitmap is
+ * idempotent, so it can run on every frame of the gesture.
+ */
+export function computeGridChildPatches(
+  group: GroupObject,
+  objects: Record<string, CanvasObject>,
+  next: { x: number; y: number; width: number; height: number },
+  refitContent: boolean,
+): Record<string, Partial<ImageObject>> {
+  const patches: Record<string, Partial<ImageObject>> = {}
+  if (!group.isGrid || !group.gridTemplateId) return patches
+
+  const template = GRID_TEMPLATES.find((t) => t.id === group.gridTemplateId)
+  if (!template) return patches
+
+  const cells = template.cells(next.width, next.height, group.gridGap ?? 8)
+
+  group.childIds.forEach((childId, i) => {
+    const cell = cells[i]
+    if (!cell) return
+    const child = objects[childId] as (ImageObject | VideoObject) | undefined
+    if (!child) return
+
+    const patch: Partial<ImageObject> = {
+      frameX: next.x + cell.x,
+      frameY: next.y + cell.y,
+      frameWidth: cell.w,
+      frameHeight: cell.h,
+      x: next.x + cell.x,
+      y: next.y + cell.y,
+      width: cell.w,
+      height: cell.h,
+    }
+
+    // Empty cells have naturalWidth 0; fitCover returns a frame-sized box for that,
+    // which is exactly right for a placeholder.
+    if (refitContent) {
+      const cover = fitCover(child.naturalWidth, child.naturalHeight, cell.w, cell.h)
+      patch.contentWidth = cover.contentWidth
+      patch.contentHeight = cover.contentHeight
+      patch.contentOffsetX = cover.contentOffsetX
+      patch.contentOffsetY = cover.contentOffsetY
+    }
+
+    patches[childId] = patch
+  })
+
+  return patches
+}

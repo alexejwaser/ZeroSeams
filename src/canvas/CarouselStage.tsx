@@ -5,6 +5,7 @@ import type { ImageObject, TextObject, ShapeObject, PathObject, AnchorPoint, Can
 import type { ShapeKind } from '@/types/canvas'
 import type { FrameDragState } from '@/types/project'
 import { axisLock } from './constants'
+import { useShallow } from 'zustand/react/shallow'
 import { useCanvasStore } from './useCanvasStore'
 import { useViewportStore, scaleForZoom, getCanvasScale } from './useViewportStore'
 import { FrameGuides } from './FrameGuides'
@@ -41,6 +42,14 @@ export function CarouselStage(): React.ReactElement {
   const stageRef = useRef<Konva.Stage>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const objectOrder = useCanvasStore((s) => s.objectOrder)
+  // Node-type dispatch must be REACTIVE: swapObjectPreservingId changes an object's
+  // type in place (shape/path → image frame) without touching objectOrder, so a
+  // getState() read here would leave the old node component mounted rendering
+  // nothing. Shallow-compared so this only re-renders on a real type swap, never on
+  // the per-frame object updates of a drag.
+  const objectTypes = useCanvasStore(
+    useShallow((s) => s.objectOrder.map((id) => s.objects[id]?.type)),
+  )
   const selectedIds = useCanvasStore((s) => s.selectedIds)
   const setSelected = useCanvasStore((s) => s.setSelected)
   const setSelectedIds = useCanvasStore((s) => s.setSelectedIds)
@@ -59,6 +68,7 @@ export function CarouselStage(): React.ReactElement {
   const clearContentEditMode = useCanvasStore((s) => s.clearContentEditMode)
   const clearPathEditMode = useCanvasStore((s) => s.clearPathEditMode)
   const clearClipEditMode = useCanvasStore((s) => s.clearClipEditMode)
+  const setPenDrawingId = useCanvasStore((s) => s.setPenDrawingId)
   const setContextMenu = useCanvasStore((s) => s.setContextMenu)
   const activeShapeKind = useCanvasStore((s) => s.activeShapeKind)
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
@@ -275,6 +285,7 @@ export function CarouselStage(): React.ReactElement {
     const pathId = currentPenPathIdRef.current
     if (!pathId) return
     currentPenPathIdRef.current = null
+    setPenDrawingId(null)
     setPenCursorPos(null)
     const currentPath = useCanvasStore.getState().objects[pathId] as PathObject | undefined
     if (!currentPath) return
@@ -293,6 +304,7 @@ export function CarouselStage(): React.ReactElement {
   function commitPenPath(closed: boolean): void {
     const pathId = currentPenPathIdRef.current
     currentPenPathIdRef.current = null
+    setPenDrawingId(null)
     setPenCursorPos(null)
 
     if (pathId === null) return
@@ -307,7 +319,10 @@ export function CarouselStage(): React.ReactElement {
       return
     }
 
-    const bbox = computePathBBox(currentPath.anchors)
+    // Must match the `closed` we're about to store: convertShapeToFrame recomputes
+    // this bbox with closed=true, and a mismatch makes the frame jump on conversion
+    // (and desyncs the drop hit-test, which reads x/y/width/height).
+    const bbox = computePathBBox(currentPath.anchors, closed)
     commitUpdate(pathId, {
       closed,
       fill: closed ? 'rgba(68,136,255,0.2)' : 'transparent',
@@ -355,7 +370,8 @@ export function CarouselStage(): React.ReactElement {
       return { x: img.frameX, y: img.frameY, width: img.frameWidth, height: img.frameHeight }
     }
     if (obj.type === 'path') {
-      return computePathBBox((obj as PathObject).anchors)
+      const p = obj as PathObject
+      return computePathBBox(p.anchors, p.closed)
     }
     return { x: obj.x, y: obj.y, width: obj.width, height: obj.height }
   }
@@ -408,7 +424,7 @@ export function CarouselStage(): React.ReactElement {
         node.x(0); node.y(0)
         node.scaleX(1); node.scaleY(1)
         const newAnchors = p.anchors.map((a) => ({ ...a, x: a.x + dx, y: a.y + dy }))
-        const bbox = computePathBBox(newAnchors)
+        const bbox = computePathBBox(newAnchors, p.closed)
         patches[id] = { anchors: newAnchors, x: bbox.x, y: bbox.y, width: bbox.width, height: bbox.height, rotation: newRotation }
       } else if (obj.type === 'text') {
         const absWidth = obj.width * newScaleX
@@ -454,7 +470,7 @@ export function CarouselStage(): React.ReactElement {
         const dx = node.x(); const dy = node.y()
         node.x(0); node.y(0)
         const newAnchors = p.anchors.map((a) => ({ ...a, x: a.x + dx, y: a.y + dy }))
-        const bbox = computePathBBox(newAnchors)
+        const bbox = computePathBBox(newAnchors, p.closed)
         patches[id] = { anchors: newAnchors, x: bbox.x, y: bbox.y, width: bbox.width, height: bbox.height }
       } else {
         patches[id] = { x: node.x(), y: node.y() }
@@ -975,7 +991,7 @@ export function CarouselStage(): React.ReactElement {
                   const dx = node.x(); const dy = node.y()
                   node.x(0); node.y(0)
                   const newAnchors = p.anchors.map((a) => ({ ...a, x: a.x + dx, y: a.y + dy }))
-                  const bbox = computePathBBox(newAnchors)
+                  const bbox = computePathBBox(newAnchors, p.closed)
                   patches[id] = { anchors: newAnchors, x: bbox.x, y: bbox.y, width: bbox.width, height: bbox.height }
                 } else {
                   patches[id] = { x: node.x(), y: node.y() }
@@ -1062,10 +1078,11 @@ export function CarouselStage(): React.ReactElement {
               } as PathObject as CanvasObject)
               setSelected(newId)
               currentPenPathIdRef.current = newId
+              setPenDrawingId(newId)
             } else {
               // Subsequent anchor — get current path from store and append
               const currentPath = useCanvasStore.getState().objects[pathId] as PathObject | undefined
-              if (!currentPath) { currentPenPathIdRef.current = null; return }
+              if (!currentPath) { currentPenPathIdRef.current = null; setPenDrawingId(null); return }
 
               // Check: clicking near first anchor closes the path
               if (currentPath.anchors.length >= 2) {
@@ -1150,8 +1167,8 @@ export function CarouselStage(): React.ReactElement {
 
         {/* Layer 2: objects */}
         <Layer name="objects">
-          {objectOrder.map((id) => {
-            const type = useCanvasStore.getState().objects[id]?.type
+          {objectOrder.map((id, i) => {
+            const type = objectTypes[i]
             if (type === 'image') {
               return (
                 <CanvasImageNode

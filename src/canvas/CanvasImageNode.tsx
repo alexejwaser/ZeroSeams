@@ -12,11 +12,10 @@ import { useViewportStore, selectScale } from './useViewportStore'
 import { buildFilterPipeline } from './adjustments/pipeline'
 import { DEFAULT_ADJUSTMENTS } from '@/types/canvas'
 import { buildEffectFilters } from './effects/buildEffectFilters'
-import { fitCover } from './geometry'
-import { buildClipFunc, clipShapeToPathData, isPlainRectClip, EMPTY_FRAME_ICON_PATH } from './frameClip'
+import { fitCover, snapRectInRotatedFrame } from './geometry'
+import { buildClipFunc, clipShapeToPathData, isPlainRectClip, solidColorOf, EMPTY_FRAME_ICON_PATH } from './frameClip'
+import { EMPTY_FRAME_FILL } from './frameModel'
 import { ClipEditOverlay } from './ClipEditOverlay'
-
-const EMPTY_FRAME_FILL = '#d9d2c7'
 
 interface CanvasImageNodeProps {
   id: string
@@ -81,11 +80,15 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
 
   const isInMultiSelectMode = selectedIds.length > 1
   const isAnchor = anchorId === id
-  // For grid cells: single-click selects the parent group; double-click enters the cell
-  const isParentGroupSelected = useCanvasStore(
-    (s) => obj.parentGroupId != null && s.selectedId === obj.parentGroupId,
-  )
   const isGridCell = obj.parentGroupId != null
+  // Exactly one of {the grid's hit rect, its cells} listens at any moment. This is
+  // the complement of CanvasGroupNode's `listening={!locked && !isCellSelected}` —
+  // change the two together. Read the group inside the selector rather than closing
+  // over it, for the same unmount-ordering reason CanvasGroupNode does.
+  const isGridEntered = useCanvasStore((s) => {
+    const g = obj.parentGroupId != null ? s.objects[obj.parentGroupId] : undefined
+    return g?.type === 'group' ? g.childIds.includes(s.selectedId ?? '') : false
+  })
   const { computeSnap, computeSnapResize, snapRotation, startSnapSession, endSnapSession } = useSnapGuides()
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
 
@@ -99,6 +102,10 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
     [obj.frameWidth, obj.frameHeight],
   )
 
+  // Always read `fill` through solidColorOf — the union grows (gradient next) and
+  // a bare fill.color would silently break.
+  const frameFill = solidColorOf(obj.fill)
+
   // --- Media-frame clip geometry ---
   // Plain rect / absent clip keeps the zero-cost `clip` rect prop. Ellipse/path
   // (and rounded-rect) use a traced clipFunc that Konva prefers over `clip`.
@@ -111,6 +118,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
   const hitFunc = useMemo(() => {
     if (plainRect || !obj.clipShape) return undefined
     const trace = buildClipFunc(obj.clipShape, obj.frameWidth, obj.frameHeight)
+    if (!trace) return undefined
     return (ctx: Konva.Context, shape: Konva.Shape): void => {
       ctx.beginPath()
       trace(ctx)
@@ -132,7 +140,8 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
   function syncFrameDecor(width: number, height: number): void {
     const group = groupRef.current
     if (group && !plainRect && obj.clipShape) {
-      group.clipFunc(buildClipFunc(obj.clipShape, width, height))
+      const trace = buildClipFunc(obj.clipShape, width, height)
+      if (trace) group.clipFunc(trace)
     }
     const fr = fillRectRef.current
     if (fr) { fr.width(width); fr.height(height) }
@@ -190,7 +199,10 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
     // Empty frames have no image node; the frame Rect is still a valid transform target.
     if (!tr || !frameRect) return
 
-    if (isInMultiSelectMode && !obj.contentEditMode) {
+    // Clip-edit mode owns the corners: the frame transformer's anchors land on the
+    // exact same points as the clip path's corner anchors, so leaving it up makes
+    // those anchors unreachable — you grab a resize handle every time.
+    if ((isInMultiSelectMode && !obj.contentEditMode) || obj.clipEditMode) {
       tr.nodes([])
       tr.getLayer()?.draw()
       return
@@ -202,7 +214,11 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
         tr.borderStroke('#f94608')
         tr.enabledAnchors(['top-left', 'top-center', 'top-right', 'middle-right', 'bottom-right', 'bottom-center', 'bottom-left', 'middle-left'])
         tr.rotateEnabled(true)
-      } else if (obj.locked) {
+      } else if (obj.locked || isGridCell) {
+        // A cell gets a selection border but no handles: computeGridChildPatches
+        // owns cell geometry, so an individual resize would be silently reverted
+        // by the next group drag or gap change. Resize a cell by detaching it
+        // (disconnectGridCell) or by changing the template.
         tr.nodes([frameRect])
         tr.borderStroke('#f94608')
         tr.enabledAnchors([])
@@ -218,7 +234,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
       tr.nodes([])
       tr.getLayer()?.draw()
     }
-  }, [isSelected, isInMultiSelectMode, obj.contentEditMode, obj.locked, loadedImage])
+  }, [isSelected, isInMultiSelectMode, obj.contentEditMode, obj.clipEditMode, obj.locked, isGridCell, loadedImage])
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent): void {
@@ -505,13 +521,21 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
       node.x(nx)
       node.y(ny)
     }
-    if (obj.rotation) { onGuidesChange([]); return }
-    const { x: sx, y: sy, guides } = computeSnap(
-      { x: obj.frameX + nx, y: obj.frameY + ny, width: obj.contentWidth, height: obj.contentHeight },
-      obj.id,
+    // Content lives in frame-local space; snap targets are canvas-absolute and
+    // axis-aligned. snapRectInRotatedFrame bridges the two so this works on a
+    // rotated frame instead of bailing out.
+    let guides: SnapGuide[] = []
+    const localSnap = snapRectInRotatedFrame(
+      { x: nx, y: ny, width: obj.contentWidth, height: obj.contentHeight },
+      obj.frameX, obj.frameY, obj.rotation,
+      (box) => {
+        const res = computeSnap(box, obj.id)
+        guides = res.guides
+        return res
+      },
     )
-    node.x(sx - obj.frameX)
-    node.y(sy - obj.frameY)
+    node.x(localSnap.x)
+    node.y(localSnap.y)
     onGuidesChange(guides)
   }
 
@@ -541,7 +565,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
     })
   }
 
-  const emptyFill = obj.fill?.color ?? EMPTY_FRAME_FILL
+  const emptyFill = frameFill ?? EMPTY_FRAME_FILL
   const emptyIconSize = Math.min(obj.frameWidth, obj.frameHeight) * 0.18
   const emptyIconScale = emptyIconSize / 24
   // Centered image-icon hint painted on empty frames — shared by the grid-cell
@@ -557,33 +581,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
     />
   )
 
-  // Grid cells stay non-interactive: the parent group's hit rect owns interaction,
-  // so the empty cell only paints its placeholder. Standalone empty frames fall
-  // through to the full interactive machinery below (frame Rect + Transformer).
-  if (obj.isEmpty && isGridCell) {
-    return (
-      <>
-        <Group
-          x={obj.frameX} y={obj.frameY} rotation={obj.rotation}
-          clip={groupClip} clipFunc={clipFunc}
-          listening={false}
-        >
-          <Rect x={0} y={0} width={obj.frameWidth} height={obj.frameHeight} fill={emptyFill} listening={false} />
-          {emptyIcon}
-        </Group>
-        {frameStrokeData ? (
-          <KonvaPath
-            x={obj.frameX} y={obj.frameY} rotation={obj.rotation}
-            data={frameStrokeData}
-            stroke={obj.frameStroke} strokeWidth={obj.frameStrokeWidth}
-            strokeScaleEnabled={false} listening={false} perfectDrawEnabled={false}
-          />
-        ) : null}
-      </>
-    )
-  }
-
-  // Non-empty frames need a decoded bitmap; empty standalone frames render without one.
+  // Non-empty frames need a decoded bitmap; empty frames render without one.
   if (!obj.isEmpty && !image) return null
 
   const isInMultiSelect = isInMultiSelectMode && selectedIds.includes(obj.id)
@@ -618,12 +616,12 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
           </>
         ) : (
           <>
-            {obj.fill ? (
+            {frameFill != null ? (
               <Rect
                 ref={fillRectRef}
                 x={0} y={0}
                 width={obj.frameWidth} height={obj.frameHeight}
-                fill={obj.fill.color}
+                fill={frameFill}
                 listening={false}
               />
             ) : null}
@@ -668,6 +666,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
       {/* Invisible frame rect — sole interaction/transform target in frame mode. */}
       <Rect
         ref={frameRectRef}
+        name={`frame-rect-${id}`}
         x={obj.frameX}
         y={obj.frameY}
         width={obj.frameWidth}
@@ -681,12 +680,10 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
         perfectDrawEnabled={false}
         hitFunc={hitFunc}
         draggable={!obj.locked && !obj.contentEditMode && !isInMultiSelectMode && !isGridCell}
-        listening={
-          !obj.contentEditMode &&
-          // When a grid cell's parent group is selected (but this cell isn't entered yet),
-          // pass all events through to the group's hit rect underneath.
-          !(isGridCell && isParentGroupSelected && !isSelected)
-        }
+        // A cell listens only once its grid has been entered; until then every
+        // event belongs to the group's hit rect underneath, so the group can be
+        // selected and dragged from anywhere on it.
+        listening={!obj.contentEditMode && (!isGridCell || isGridEntered)}
         onMouseDown={(e) => {
           if (isInMultiSelectMode) {
             rectMouseDownPosRef.current = { x: e.evt.clientX, y: e.evt.clientY }
@@ -705,10 +702,9 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
                 if (Math.sqrt(dx * dx + dy * dy) > 3) return
               }
               setAnchor(anchorId === obj.id ? null : obj.id)
-            } else if (isGridCell && !isParentGroupSelected && !isSelected && obj.parentGroupId) {
-              // Single click on a grid cell when group isn't yet selected → select the group
-              useCanvasStore.getState().setSelected(obj.parentGroupId)
             } else {
+              // A listening cell is always inside an entered grid, so there is no
+              // route-to-the-group case left to special-case here.
               useCanvasStore.getState().setSelected(id)
             }
           }
@@ -800,4 +796,4 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
   )
 }
 
-export const CanvasImageNode = makeCanvasNode<ImageObject, CanvasImageNodeProps>(CanvasImageNodeInner)
+export const CanvasImageNode = makeCanvasNode<ImageObject, CanvasImageNodeProps>(CanvasImageNodeInner, 'image')

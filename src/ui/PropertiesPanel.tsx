@@ -6,13 +6,14 @@ import { useExternalEdit } from '@/canvas/useExternalEdit'
 import { useSaveStatusStore } from '@/store'
 import type { BackgroundRemovalOperation } from '@/types/ai'
 import type { ImageObject, TextObject, ShapeObject, PathObject, VideoObject, GroupObject, GuidelineObject, CanvasObject } from '@/types/canvas'
-import { GRID_TEMPLATES } from '@/canvas/gridTemplates'
+import { computeGridChildPatches } from '@/canvas/gridTemplates'
 import Tooltip from './Tooltip'
 import './adjustments.css'
 import { ColorInput } from './ColorInput'
 import { NumericInput } from './NumericInput'
 
-import { rotateAroundCenter } from '@/canvas/geometry'
+import { rotateAroundCenter, canBecomeFrame } from '@/canvas/geometry'
+import { isFrameObject } from '@/canvas/frameModel'
 
 import { NumberField, sectionLabelStyle } from './properties/shared'
 import { AlignDistributeSection } from './properties/AlignDistributeSection'
@@ -21,24 +22,15 @@ import { EffectsSection } from './properties/EffectsSection'
 import { AdjustmentsSection } from './properties/AdjustmentsSection'
 import { VideoSection } from './properties/VideoSection'
 import { FrameSection } from './properties/FrameSection'
+import { AddClipRow } from './properties/AddClipRow'
 import { pickImageMedia, pickVideoMedia } from './properties/mediaPickers'
 
-// A media frame is an image/video object that owns clip/fill/stroke state
-// (clipShape) or is an empty placeholder awaiting media (isEmpty).
-function isFrameObject(obj: CanvasObject | null): obj is ImageObject | VideoObject {
-  if (obj == null || (obj.type !== 'image' && obj.type !== 'video')) return false
-  const f = obj as ImageObject | VideoObject
-  return f.clipShape != null || (obj.type === 'image' && (obj as ImageObject).isEmpty === true)
-}
-
-// Converts a rect/ellipse shape or closed path into a media frame in one
-// gesture, then inserts the picked media. Two sequential store calls =
-// two undo steps for v1 (see FrameSection deviation notes).
+// Converts a rect/ellipse shape or closed path into a media frame and inserts the
+// picked media. The store action does both in one set(), so this is one undo step.
 async function insertMediaIntoShape(id: string, mediaKind: 'image' | 'video'): Promise<void> {
   const media = mediaKind === 'image' ? await pickImageMedia() : await pickVideoMedia()
   if (!media) return
-  useCanvasStore.getState().convertShapeToFrame(id)
-  useCanvasStore.getState().insertMediaIntoFrame(id, media)
+  useCanvasStore.getState().insertMediaIntoShape(id, media)
 }
 
 const mediaFrameCtaButtonStyle: React.CSSProperties = {
@@ -258,7 +250,7 @@ export function PropertiesPanel(): React.ReactElement {
         {/* Video object */}
         {!isMultiSelect && selectedObj !== null && isVideo && selectedId !== null && (
           <>
-            {isFrameObject(selectedObj) && (
+            {isFrameObject(selectedObj) ? (
               <FrameSection
                 frameObj={selectedObj as VideoObject}
                 selectedId={selectedId}
@@ -266,6 +258,8 @@ export function PropertiesPanel(): React.ReactElement {
                 onUpdate={updateObject}
                 onCommit={commitUpdate}
               />
+            ) : (
+              <AddClipRow objectId={selectedId} />
             )}
             <VideoSection
               videoObj={selectedObj as VideoObject}
@@ -397,7 +391,7 @@ export function PropertiesPanel(): React.ReactElement {
               {shapeObj.kind === 'rect' && (
                 <NumberField label="Corner R." value={shapeObj.cornerRadius ?? 0} min={0} onChange={(val) => { commitUpdate(shapeObj.id, { cornerRadius: val }) }} />
               )}
-              {(shapeObj.kind === 'rect' || shapeObj.kind === 'ellipse') && (
+              {canBecomeFrame(shapeObj) && (
                 <div style={{ marginTop: 4, marginBottom: 8, padding: 8, border: '1px dashed #d4ccc2', borderRadius: 12 }}>
                   <div style={sectionLabelStyle}>Media Frame</div>
                   <div style={{ display: 'flex', gap: 6 }}>
@@ -474,7 +468,7 @@ export function PropertiesPanel(): React.ReactElement {
                 step={0.5}
                 onChange={(val) => { commitUpdate(pathObj.id, { strokeWidth: val }) }}
               />
-              {pathObj.closed && (
+              {canBecomeFrame(pathObj) && (
                 <div style={{ marginTop: 4, marginBottom: 8, padding: 8, border: '1px dashed #d4ccc2', borderRadius: 12 }}>
                   <div style={sectionLabelStyle}>Media Frame</div>
                   <div style={{ display: 'flex', gap: 6 }}>
@@ -520,21 +514,17 @@ export function PropertiesPanel(): React.ReactElement {
                   onChange={e => {
                     const newGap = Number(e.target.value)
                     updateObject(group.id, { gridGap: newGap })
-                    const template = GRID_TEMPLATES.find(t => t.id === group.gridTemplateId)
-                    if (template) {
-                      const cells = template.cells(group.width, group.height, newGap)
-                      group.childIds.forEach((childId, i) => {
-                        const cell = cells[i]
-                        if (!cell) return
-                        const child = useCanvasStore.getState().objects[childId]
-                        if (!child) return
-                        updateObject(childId, {
-                          frameX: group.x + cell.x, frameY: group.y + cell.y,
-                          frameWidth: cell.w, frameHeight: cell.h,
-                          x: group.x + cell.x, y: group.y + cell.y,
-                          width: cell.w, height: cell.h,
-                        } as Partial<CanvasObject>)
-                      })
+                    // Same relayout CanvasGroupNode uses. refitContent: true — a gap
+                    // change resizes every cell, so the media has to re-cover-fit or
+                    // it keeps the old size inside the new box (#69).
+                    const patches = computeGridChildPatches(
+                      { ...group, gridGap: newGap },
+                      useCanvasStore.getState().objects,
+                      { x: group.x, y: group.y, width: group.width, height: group.height },
+                      true,
+                    )
+                    for (const [childId, patch] of Object.entries(patches)) {
+                      updateObject(childId, patch as Partial<CanvasObject>)
                     }
                   }}
                   onMouseUp={() => commitUpdate(group.id, {})}
@@ -665,7 +655,7 @@ export function PropertiesPanel(): React.ReactElement {
                     onCommit={v => commitUpdate(imgObj.id, { opacity: v / 100 })}
                   />
                 </div>
-                {isFrameObject(imgObj) && (
+                {isFrameObject(imgObj) ? (
                   <FrameSection
                     frameObj={imgObj}
                     selectedId={selectedId!}
@@ -673,6 +663,10 @@ export function PropertiesPanel(): React.ReactElement {
                     onUpdate={updateObject}
                     onCommit={commitUpdate}
                   />
+                ) : (
+                  // isFrameObject is a type predicate, so it narrows imgObj to
+                  // never here — take the id from selection instead.
+                  <AddClipRow objectId={selectedId!} />
                 )}
                 {imgObj.parentGroupId && (
                   <div style={{ marginTop: 8, marginBottom: 4 }}>

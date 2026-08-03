@@ -1,6 +1,8 @@
 import React from 'react'
 import type { CanvasObject, ImageObject, VideoObject, ClipShape } from '@/types/canvas'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
+import { solidColorOf } from '@/canvas/frameClip'
+import { isEmptyFrame, isGridCell as isGridCellObject } from '@/canvas/frameModel'
 import Tooltip from '../Tooltip'
 import { ColorInput } from '../ColorInput'
 import { NumericInput } from '../NumericInput'
@@ -41,12 +43,15 @@ const destructiveButtonStyle: React.CSSProperties = {
   color: '#f94608',
 }
 
-function clipKindLabel(clipShape: ClipShape | undefined): string {
-  if (!clipShape) return 'Rect'
-  if (clipShape.kind === 'rect') return 'Rect'
-  if (clipShape.kind === 'ellipse') return 'Ellipse'
-  return 'Custom Path'
-}
+// Rect and Ellipse only. A clip can only ever SUBTRACT area — the bitmap stops at
+// the frame box — so dragging a path anchor outward produces no visible change at
+// all, which made panel-driven path editing a dead end. Custom silhouettes still
+// arrive the way they always did: draw a shape, then insert media into it.
+// `path` remains a valid ClipShape everywhere else; it just isn't authored here.
+const CLIP_KINDS: Array<{ kind: ClipShape['kind']; label: string; description: string }> = [
+  { kind: 'rect', label: 'Rect', description: 'Rectangular clip, optionally rounded' },
+  { kind: 'ellipse', label: 'Ellipse', description: 'Clips to an ellipse filling the frame' },
+]
 
 export function FrameSection({
   frameObj,
@@ -57,11 +62,13 @@ export function FrameSection({
 }: FrameSectionProps): React.ReactElement {
   const clipShape = frameObj.clipShape
   const clipKind = clipShape?.kind ?? 'rect'
-  const isEmpty = frameObj.type === 'image' && (frameObj as ImageObject).isEmpty === true
+  const isEmpty = isEmptyFrame(frameObj)
+  // Empty standalone frames no longer exist — they collapse to shapes — so an
+  // isEmpty frame reaching this panel is always a grid cell.
+  const isGridCell = isGridCellObject(frameObj)
   const cornerRadius = clipShape?.kind === 'rect' ? (clipShape.cornerRadius ?? 0) : 0
   const maxCorner = Math.max(0, Math.floor(Math.min(frameObj.frameWidth, frameObj.frameHeight) / 2))
-  const fillColor = frameObj.fill?.type === 'solid' ? frameObj.fill.color : undefined
-  const clipEditActive = frameObj.clipEditMode === true
+  const fillColor = solidColorOf(frameObj.fill)
 
   function setCornerRadius(value: number, commit: boolean): void {
     const nextClip: ClipShape = value > 0 ? { kind: 'rect', cornerRadius: value } : { kind: 'rect' }
@@ -69,12 +76,12 @@ export function FrameSection({
     else onUpdate(selectedId, { clipShape: nextClip })
   }
 
-  function toggleClipEdit(): void {
-    if (clipEditActive) {
-      useCanvasStore.getState().clearClipEditMode()
-    } else {
-      useCanvasStore.getState().enterClipEditMode(selectedId)
-    }
+  // The single writer for clip kind. Each switch is one commitUpdate, so undo
+  // steps back through shape changes — including replacing a custom path, which
+  // is why doing so needs no confirmation.
+  function setClipKind(kind: ClipShape['kind']): void {
+    if (kind === clipKind) return
+    onCommit(selectedId, { clipShape: kind === 'ellipse' ? { kind: 'ellipse' } : { kind: 'rect' } })
   }
 
   function setFillColor(color: string | undefined): void {
@@ -91,22 +98,64 @@ export function FrameSection({
     if (media) useCanvasStore.getState().insertMediaIntoFrame(selectedId, media)
   }
 
-  function handleRemoveMedia(): void {
-    useCanvasStore.getState().removeMediaFromFrame(selectedId)
+  // Clears ALL the frame state, not just the clip. Dropping clipShape alone flips
+  // isFrameObject false, which hides this whole section — stranding a fill and
+  // stroke that would still paint but could no longer be seen or edited.
+  function handleRemoveClip(): void {
+    onCommit(selectedId, {
+      clipShape: undefined,
+      fill: undefined,
+      frameStroke: undefined,
+      frameStrokeWidth: undefined,
+    })
   }
 
-  function handleConvertToShape(): void {
-    useCanvasStore.getState().convertFrameToShape(selectedId)
+  function handleRemoveMedia(): void {
+    useCanvasStore.getState().removeMediaFromFrame(selectedId)
   }
 
   return (
     <div style={{ padding: '12px 12px 0' }}>
       <div style={sectionLabelStyle}>Frame</div>
 
-      {/* Clip kind readout */}
+      {/* Clip kind picker */}
       <div style={rowStyle}>
-        <label style={labelStyle}>Shape</label>
-        <span style={{ color: '#111111', fontSize: 12 }}>{clipKindLabel(clipShape)}</span>
+        <label style={{ ...labelStyle, cursor: 'default' }}>Shape</label>
+        <div style={{ display: 'flex', gap: 4, flex: 1 }}>
+          {CLIP_KINDS.map(({ kind, label, description }) => (
+            <Tooltip key={kind} label={label} description={description}>
+              <button
+                onClick={() => setClipKind(kind)}
+                style={{
+                  ...iconBtnStyle(kind === clipKind),
+                  flex: 1,
+                  width: 'auto',
+                  height: 26,
+                  fontSize: 11,
+                }}
+              >
+                {label}
+              </button>
+            </Tooltip>
+          ))}
+          {/* A frame converted from a pen path carries a custom clip that neither
+              button represents. Shown as a read-only chip so the state is legible
+              and replacing it is still one click. */}
+          {clipKind === 'path' && (
+            <Tooltip label="Custom shape" description="From the shape this frame was made of. Pick Rect or Ellipse to replace it.">
+              <span
+                style={{
+                  ...iconBtnStyle(true),
+                  flex: 1, width: 'auto', height: 26, fontSize: 11,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'default',
+                }}
+              >
+                Custom
+              </span>
+            </Tooltip>
+          )}
+        </div>
       </div>
 
       {/* Rect: corner radius */}
@@ -134,20 +183,6 @@ export function FrameSection({
             onCommit={(v) => setCornerRadius(v, true)}
             onDoubleClick={() => setCornerRadius(0, true)}
           />
-        </div>
-      )}
-
-      {/* Path: edit shape toggle */}
-      {clipKind === 'path' && (
-        <div style={{ marginBottom: 8 }}>
-          <Tooltip label={clipEditActive ? 'Exit shape editing' : 'Edit clip shape anchors'}>
-            <button
-              style={{ ...iconBtnStyle(clipEditActive), width: '100%', height: 30, borderRadius: 999, fontSize: 12 }}
-              onClick={toggleClipEdit}
-            >
-              {clipEditActive ? 'Editing Shape…' : 'Edit Shape'}
-            </button>
-          </Tooltip>
         </div>
       )}
 
@@ -219,18 +254,30 @@ export function FrameSection({
               Replace with Video…
             </button>
           </Tooltip>
-          <Tooltip label="Remove media, keep the empty frame">
+          {/* Standalone frames collapse back to their shape; grid cells keep the
+              empty slot. There is no separate "Convert to Shape" — it was the
+              same action, which left two indistinguishable empty states. */}
+          <Tooltip
+            label="Remove Media"
+            description={isGridCell
+              ? 'Empties this grid cell, keeping the slot'
+              : 'Turns the frame back into a plain shape'}
+          >
             <button style={destructiveButtonStyle} onClick={handleRemoveMedia}>
               Remove Media
             </button>
           </Tooltip>
+          {/* The inverse of AddClipRow: back to a plain image, media intact. Not
+              offered for a grid cell, whose frame identity is what holds its slot. */}
+          {!isGridCell && (
+            <Tooltip label="Remove Clip" description="Back to a plain, unclipped image — keeps the media">
+              <button style={destructiveButtonStyle} onClick={handleRemoveClip}>
+                Remove Clip
+              </button>
+            </Tooltip>
+          )}
         </>
       )}
-      <Tooltip label="Convert frame back to a shape" description="Drops any media in the frame">
-        <button style={buttonStyle} onClick={handleConvertToShape}>
-          Convert to Shape
-        </button>
-      </Tooltip>
     </div>
   )
 }
