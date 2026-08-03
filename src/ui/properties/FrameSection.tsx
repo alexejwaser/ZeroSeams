@@ -1,7 +1,7 @@
 import React from 'react'
 import type { CanvasObject, ImageObject, VideoObject, ClipShape } from '@/types/canvas'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
-import { clipShapeToAnchors, solidColorOf } from '@/canvas/frameClip'
+import { solidColorOf } from '@/canvas/frameClip'
 import { isEmptyFrame, isGridCell as isGridCellObject } from '@/canvas/frameModel'
 import Tooltip from '../Tooltip'
 import { ColorInput } from '../ColorInput'
@@ -43,10 +43,14 @@ const destructiveButtonStyle: React.CSSProperties = {
   color: '#f94608',
 }
 
+// Rect and Ellipse only. A clip can only ever SUBTRACT area — the bitmap stops at
+// the frame box — so dragging a path anchor outward produces no visible change at
+// all, which made panel-driven path editing a dead end. Custom silhouettes still
+// arrive the way they always did: draw a shape, then insert media into it.
+// `path` remains a valid ClipShape everywhere else; it just isn't authored here.
 const CLIP_KINDS: Array<{ kind: ClipShape['kind']; label: string; description: string }> = [
   { kind: 'rect', label: 'Rect', description: 'Rectangular clip, optionally rounded' },
   { kind: 'ellipse', label: 'Ellipse', description: 'Clips to an ellipse filling the frame' },
-  { kind: 'path', label: 'Path', description: 'Editable anchors, seeded from the current shape' },
 ]
 
 export function FrameSection({
@@ -65,7 +69,6 @@ export function FrameSection({
   const cornerRadius = clipShape?.kind === 'rect' ? (clipShape.cornerRadius ?? 0) : 0
   const maxCorner = Math.max(0, Math.floor(Math.min(frameObj.frameWidth, frameObj.frameHeight) / 2))
   const fillColor = solidColorOf(frameObj.fill)
-  const clipEditActive = frameObj.clipEditMode === true
 
   function setCornerRadius(value: number, commit: boolean): void {
     const nextClip: ClipShape = value > 0 ? { kind: 'rect', cornerRadius: value } : { kind: 'rect' }
@@ -74,25 +77,11 @@ export function FrameSection({
   }
 
   // The single writer for clip kind. Each switch is one commitUpdate, so undo
-  // steps back through shape changes — which is why discarding a custom path
-  // needs no confirmation.
+  // steps back through shape changes — including replacing a custom path, which
+  // is why doing so needs no confirmation.
   function setClipKind(kind: ClipShape['kind']): void {
     if (kind === clipKind) return
-    const next: ClipShape =
-      kind === 'ellipse' ? { kind: 'ellipse' }
-      : kind === 'path' ? { kind: 'path', anchors: clipShapeToAnchors(clipShape) }
-      : { kind: 'rect' }
-    onCommit(selectedId, { clipShape: next })
-    // Seeded anchors are invisible until the overlay is up, so open it.
-    if (kind === 'path') useCanvasStore.getState().enterClipEditMode(selectedId)
-  }
-
-  function toggleClipEdit(): void {
-    if (clipEditActive) {
-      useCanvasStore.getState().clearClipEditMode()
-    } else {
-      useCanvasStore.getState().enterClipEditMode(selectedId)
-    }
+    onCommit(selectedId, { clipShape: kind === 'ellipse' ? { kind: 'ellipse' } : { kind: 'rect' } })
   }
 
   function setFillColor(color: string | undefined): void {
@@ -149,6 +138,23 @@ export function FrameSection({
               </button>
             </Tooltip>
           ))}
+          {/* A frame converted from a pen path carries a custom clip that neither
+              button represents. Shown as a read-only chip so the state is legible
+              and replacing it is still one click. */}
+          {clipKind === 'path' && (
+            <Tooltip label="Custom shape" description="From the shape this frame was made of. Pick Rect or Ellipse to replace it.">
+              <span
+                style={{
+                  ...iconBtnStyle(true),
+                  flex: 1, width: 'auto', height: 26, fontSize: 11,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'default',
+                }}
+              >
+                Custom
+              </span>
+            </Tooltip>
+          )}
         </div>
       </div>
 
@@ -177,20 +183,6 @@ export function FrameSection({
             onCommit={(v) => setCornerRadius(v, true)}
             onDoubleClick={() => setCornerRadius(0, true)}
           />
-        </div>
-      )}
-
-      {/* Path: edit shape toggle */}
-      {clipKind === 'path' && (
-        <div style={{ marginBottom: 8 }}>
-          <Tooltip label={clipEditActive ? 'Exit shape editing' : 'Edit clip shape anchors'}>
-            <button
-              style={{ ...iconBtnStyle(clipEditActive), width: '100%', height: 30, borderRadius: 999, fontSize: 12 }}
-              onClick={toggleClipEdit}
-            >
-              {clipEditActive ? 'Editing Shape…' : 'Edit Shape'}
-            </button>
-          </Tooltip>
         </div>
       )}
 

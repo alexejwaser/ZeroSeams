@@ -63,38 +63,6 @@ export function denormalizeAnchors(
   }))
 }
 
-/** Kappa — the bezier handle length that approximates a quarter circle, as a
- *  fraction of the radius. */
-const KAPPA = 0.5523
-
-/**
- * Seed anchors for a `path` clip from whatever shape the frame has now, so
- * switching to Custom Path in the Frame section starts from the current
- * silhouette rather than an empty (= everything-clipped-away) path.
- *
- * Returns NORMALIZED 0–1 anchors, like every other stored clip path. A rounded
- * rect seeds as four plain corners — re-expressing the radius as beziers buys
- * nothing the user can't drag back in.
- */
-export function clipShapeToAnchors(clipShape: ClipShape | undefined): AnchorPoint[] {
-  const zero = { dx: 0, dy: 0 }
-  const corner = (x: number, y: number): AnchorPoint => ({
-    x, y, handleIn: { ...zero }, handleOut: { ...zero },
-  })
-  if (clipShape?.kind === 'path') return clipShape.anchors
-  if (clipShape?.kind === 'ellipse') {
-    // Quadrant anchors, clockwise from the top; handles run along the tangent.
-    const k = KAPPA * 0.5
-    return [
-      { x: 0.5, y: 0, handleIn: { dx: -k, dy: 0 }, handleOut: { dx: k, dy: 0 } },
-      { x: 1, y: 0.5, handleIn: { dx: 0, dy: -k }, handleOut: { dx: 0, dy: k } },
-      { x: 0.5, y: 1, handleIn: { dx: k, dy: 0 }, handleOut: { dx: -k, dy: 0 } },
-      { x: 0, y: 0.5, handleIn: { dx: 0, dy: k }, handleOut: { dx: 0, dy: -k } },
-    ]
-  }
-  return [corner(0, 0), corner(1, 0), corner(1, 1), corner(0, 1)]
-}
-
 // ---------------------------------------------------------------------------
 // buildClipFunc — a Konva/Canvas clipFunc that traces the clip path.
 // Follows Konva convention: issue path commands only; the caller (Konva) runs

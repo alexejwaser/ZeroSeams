@@ -1,7 +1,7 @@
 import React from 'react'
 import type { ClipShape } from '@/types/canvas'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
-import { clipShapeToAnchors } from '@/canvas/frameClip'
+
 import Tooltip from '../Tooltip'
 import { sectionLabelStyle } from './shared'
 
@@ -30,20 +30,19 @@ const ctaButtonStyle: React.CSSProperties = {
   fontSize: 12,
 }
 
+// Rect and Ellipse only — see the note in FrameSection on why panel-authored
+// path clips were dropped. A custom silhouette comes from drawing a shape and
+// inserting media into it.
 const OPTIONS: Array<{ kind: ClipShape['kind']; label: string; description: string }> = [
   { kind: 'rect', label: 'Rect', description: 'Clip to a rectangle you can round' },
   { kind: 'ellipse', label: 'Ellipse', description: 'Clip to an ellipse filling the frame' },
-  { kind: 'path', label: 'Path', description: 'Clip to editable anchors' },
 ]
 
 export function AddClipRow({ objectId }: { objectId: string }): React.ReactElement {
   function addClip(kind: ClipShape['kind']): void {
-    const clipShape: ClipShape =
-      kind === 'ellipse' ? { kind: 'ellipse' }
-      : kind === 'path' ? { kind: 'path', anchors: clipShapeToAnchors(undefined) }
-      : { kind: 'rect' }
-    useCanvasStore.getState().commitUpdate(objectId, { clipShape })
-    if (kind === 'path') useCanvasStore.getState().enterClipEditMode(objectId)
+    useCanvasStore.getState().commitUpdate(objectId, {
+      clipShape: kind === 'ellipse' ? { kind: 'ellipse' } : { kind: 'rect' },
+    })
   }
 
   return (

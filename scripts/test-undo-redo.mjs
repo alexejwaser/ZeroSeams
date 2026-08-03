@@ -1293,8 +1293,10 @@ await page.evaluate((src) => { window.__zsImg__ = src }, TEST_IMG_SRC)
 
 {
   // L8 (#62 Phase C). The Frame section's shape picker is a plain commitUpdate per
-  // switch. That is the whole argument for discarding a custom path without a
+  // switch. That is the whole argument for replacing a custom path without a
   // confirmation dialog — so the undo step it relies on has to actually exist.
+  // The picker only authors rect/ellipse, but path clips still arrive via shape
+  // conversion, so the round trip below stays the behaviour that matters.
   const { groupId, cellIds } = await makeGrid()
   const cellId = cellIds[0]
   const before = await cellInfo(cellId, groupId)
