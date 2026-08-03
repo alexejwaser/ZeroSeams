@@ -726,4 +726,4 @@ function CanvasTextNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasTextNod
   )
 }
 
-export const CanvasTextNode = makeCanvasNode<TextObject, CanvasTextNodeProps>(CanvasTextNodeInner)
+export const CanvasTextNode = makeCanvasNode<TextObject, CanvasTextNodeProps>(CanvasTextNodeInner, 'text')

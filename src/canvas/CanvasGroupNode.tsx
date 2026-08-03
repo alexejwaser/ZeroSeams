@@ -3,10 +3,10 @@ import Konva from 'konva'
 import { Rect, Transformer } from 'react-konva'
 import { useCanvasStore } from './useCanvasStore'
 import { useViewportStore, selectScale } from './useViewportStore'
-import type { GroupObject, ImageObject, VideoObject } from '@/types/canvas'
+import type { GroupObject, ImageObject } from '@/types/canvas'
 import type { SnapGuide } from './useSnapGuides'
 import { useSnapGuides } from './useSnapGuides'
-import { GRID_TEMPLATES } from './gridTemplates'
+import { computeGridChildPatches } from './gridTemplates'
 
 // Returns the childId whose frame bounds contain the given logical canvas point.
 function hitTestCell(
@@ -40,7 +40,7 @@ export function CanvasGroupNode({ id, onGuidesChange }: CanvasGroupNodeProps) {
 }
 
 const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGuidesChange }: CanvasGroupNodeProps) {
-  const obj = useCanvasStore((s) => s.objects[id] as GroupObject)
+  const obj = useCanvasStore((s) => s.objects[id] as GroupObject | undefined)
   const commitMultipleUpdates = useCanvasStore((s) => s.commitMultipleUpdates)
   const updateObjects = useCanvasStore((s) => s.updateObjects)
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
@@ -53,7 +53,14 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
   // True when any child cell is individually selected (user has "entered" the grid).
   // In that state the group rect steps back (listening=false) so the cell's own
   // transformer and drag handles take over without interference.
-  const isCellSelected = useCanvasStore((s) => obj.childIds.includes(s.selectedId ?? ''))
+  // Re-read the group inside the selector rather than closing over `obj`. Zustand
+  // selectors run on every store notification, BEFORE React can unmount this node —
+  // so when the group leaves the store (undo of addGrid, group deletion) a closed-over
+  // `obj.childIds` throws past the Outer's null guard and into the ErrorBoundary.
+  const isCellSelected = useCanvasStore((s) => {
+    const g = s.objects[id] as GroupObject | undefined
+    return g ? g.childIds.includes(s.selectedId ?? '') : false
+  })
 
   const { computeSnap, computeSnapResize, startSnapSession, endSnapSession } = useSnapGuides()
 
@@ -76,58 +83,32 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
     tr.getLayer()?.batchDraw()
   }, [isSelected])
 
-  // Recompute child frame positions from template for a given group W/H/X/Y.
-  // Returns a patches record suitable for updateObjects / commitMultipleUpdates.
+  // Thin binding over the shared pure relayout in gridTemplates.ts — the Properties
+  // panel gap slider calls the same function, so cell geometry has one definition.
   const buildChildPatches = useCallback((
     newX: number, newY: number, newW: number, newH: number,
-    includeContentScale: boolean,
+    refitContent: boolean,
   ): Record<string, Partial<ImageObject>> => {
-    const patches: Record<string, Partial<ImageObject>> = {}
-    if (!obj.isGrid || !obj.gridTemplateId) return patches
-
-    const template = GRID_TEMPLATES.find((t) => t.id === obj.gridTemplateId)
-    if (!template) return patches
-
-    const gap = obj.gridGap ?? 8
-    const cells = template.cells(newW, newH, gap)
-    const scaleX = obj.width > 0 ? newW / obj.width : 1
-    const scaleY = obj.height > 0 ? newH / obj.height : 1
-
-    obj.childIds.forEach((childId, i) => {
-      const cell = cells[i]
-      if (!cell) return
-      const child = useCanvasStore.getState().objects[childId] as (ImageObject | VideoObject) | undefined
-      if (!child) return
-      const patch: Partial<ImageObject> = {
-        frameX: newX + cell.x,
-        frameY: newY + cell.y,
-        frameWidth: cell.w,
-        frameHeight: cell.h,
-        x: newX + cell.x,
-        y: newY + cell.y,
-        width: cell.w,
-        height: cell.h,
-      }
-      if (includeContentScale) {
-        patch.contentWidth = child.contentWidth * scaleX
-        patch.contentHeight = child.contentHeight * scaleY
-        patch.contentOffsetX = child.contentOffsetX * scaleX
-        patch.contentOffsetY = child.contentOffsetY * scaleY
-      }
-      patches[childId] = patch
-    })
-    return patches
+    if (!obj) return {}
+    return computeGridChildPatches(
+      obj,
+      useCanvasStore.getState().objects,
+      { x: newX, y: newY, width: newW, height: newH },
+      refitContent,
+    )
   }, [obj])
 
   // Drag start: capture pre-drag position for axis-lock and snap session.
   const handleDragStart = useCallback(() => {
+    if (!obj) return
     dragStartXRef.current = obj.x
     dragStartYRef.current = obj.y
     startSnapSession(id)
-  }, [obj.x, obj.y, id, startSnapSession])
+  }, [obj, id, startSnapSession])
 
   // Drag move: apply snap, update guides, shift children live (no history).
   const handleDragMove = useCallback((e: Konva.KonvaEventObject<DragEvent>) => {
+    if (!obj) return
     const node = e.target as Konva.Rect
     const rawX = node.x()
     const rawY = node.y()
@@ -152,6 +133,7 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
   const handleDragEnd = useCallback((e: Konva.KonvaEventObject<DragEvent>) => {
     endSnapSession()
     onGuidesChange([])
+    if (!obj) return
     const node = e.target
     const newX = node.x()
     const newY = node.y()
@@ -168,7 +150,11 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
     const newX = node.x()
     const newY = node.y()
     onGuidesChange(pendingGuidesRef.current)
-    const childPatches = buildChildPatches(newX, newY, newW, newH, false)
+    // Refit content live so the handles preview the real result. Safe to run every
+    // frame because the refit derives from naturalWidth/Height, not from the previous
+    // frame's output — the old proportional scaling compounded, which is why this
+    // used to skip content entirely (#69).
+    const childPatches = buildChildPatches(newX, newY, newW, newH, true)
     if (Object.keys(childPatches).length > 0) {
       updateObjects(childPatches)
     }
@@ -194,6 +180,13 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
       ...childPatches,
     })
   }, [id, buildChildPatches, commitMultipleUpdates, endSnapSession, onGuidesChange])
+
+  // Inner needs its own guard, not just Outer's: React re-renders this component
+  // with the group already gone from the store (undo of addGrid, group deletion)
+  // before Outer's null check unmounts it. Degrade to blank rather than throwing
+  // into the ErrorBoundary — same contract as makeCanvasNode's type-mismatch guard.
+  // Placed after every hook so hook order stays stable.
+  if (!obj) return null
 
   return (
     <>

@@ -12,8 +12,8 @@ import { useViewportStore, selectScale } from './useViewportStore'
 import { registerVideoElement, unregisterVideoElement } from './videoElementRegistry'
 import { buildFilterPipeline } from './adjustments/pipeline'
 import { buildEffectFilters } from './effects/buildEffectFilters'
-import { fitCover } from './geometry'
-import { buildClipFunc, clipShapeToPathData, isPlainRectClip } from './frameClip'
+import { fitCover, snapRectInRotatedFrame } from './geometry'
+import { buildClipFunc, clipShapeToPathData, isPlainRectClip, solidColorOf } from './frameClip'
 import { ClipEditOverlay } from './ClipEditOverlay'
 
 interface CanvasVideoNodeProps {
@@ -232,6 +232,8 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     [obj.frameWidth, obj.frameHeight],
   )
 
+  const frameFill = solidColorOf(obj.fill)
+
   // --- Media-frame clip geometry (see CanvasImageNode for the full contract) ---
   const plainRect = isPlainRectClip(obj.clipShape)
   const clipFunc = useMemo(
@@ -241,6 +243,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   const hitFunc = useMemo(() => {
     if (plainRect || !obj.clipShape) return undefined
     const trace = buildClipFunc(obj.clipShape, obj.frameWidth, obj.frameHeight)
+    if (!trace) return undefined
     return (ctx: Konva.Context, shape: Konva.Shape): void => {
       ctx.beginPath()
       trace(ctx)
@@ -260,7 +263,8 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   function syncFrameDecor(width: number, height: number): void {
     const group = groupRef.current
     if (group && !plainRect && obj.clipShape) {
-      group.clipFunc(buildClipFunc(obj.clipShape, width, height))
+      const trace = buildClipFunc(obj.clipShape, width, height)
+      if (trace) group.clipFunc(trace)
     }
     const fr = fillRectRef.current
     if (fr) { fr.width(width); fr.height(height) }
@@ -291,14 +295,25 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   // When filters change, reset the RAF frame-guard so the next tick re-caches
   // even if the video is paused (currentTime unchanged). When all filters are
   // removed, clear the cache immediately so the node reverts to live rendering.
+  //
+  // Content dimensions are dependencies too, and must be: `cache()` snapshots the
+  // node at its CURRENT size, and Konva then draws that bitmap scaled to whatever
+  // the node's box becomes. Re-fitting the content (inserting media, an auto-mode
+  // frame resize, a content transform) without re-caching therefore renders the
+  // video stretched. CanvasImageNode has always keyed on these — this node not
+  // doing so was the one place image and video fitting diverged.
   useEffect(() => {
+    const node = videoImageRef.current
+    if (!node) return
     if (allFilters.length === 0) {
-      videoImageRef.current?.clearCache()
-      videoImageRef.current?.getLayer()?.batchDraw()
+      node.clearCache()
+      node.getLayer()?.batchDraw()
     } else {
+      node.cache()
       lastCachedTimeRef.current = -1
+      node.getLayer()?.batchDraw()
     }
-  }, [allFilters])
+  }, [allFilters, videoEl, obj.contentWidth, obj.contentHeight])
 
   // Wire transformer to its target.
   useEffect(() => {
@@ -578,13 +593,19 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
       node.x(nx)
       node.y(ny)
     }
-    if (obj.rotation) { onGuidesChange([]); return }
-    const { x: sx, y: sy, guides } = computeSnap(
-      { x: obj.frameX + nx, y: obj.frameY + ny, width: obj.contentWidth, height: obj.contentHeight },
-      obj.id,
+    // Mirrors CanvasImageNode — see the note there on frame-local vs absolute space.
+    let guides: SnapGuide[] = []
+    const localSnap = snapRectInRotatedFrame(
+      { x: nx, y: ny, width: obj.contentWidth, height: obj.contentHeight },
+      obj.frameX, obj.frameY, obj.rotation,
+      (box) => {
+        const res = computeSnap(box, obj.id)
+        guides = res.guides
+        return res
+      },
     )
-    node.x(sx - obj.frameX)
-    node.y(sy - obj.frameY)
+    node.x(localSnap.x)
+    node.y(localSnap.y)
     onGuidesChange(guides)
   }
 
@@ -631,12 +652,12 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
         opacity={obj.opacity}
         listening={obj.contentEditMode}
       >
-        {obj.fill ? (
+        {frameFill != null ? (
           <Rect
             ref={fillRectRef}
             x={0} y={0}
             width={obj.frameWidth} height={obj.frameHeight}
-            fill={obj.fill.color}
+            fill={frameFill}
             listening={false}
           />
         ) : null}
@@ -803,4 +824,4 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
   )
 }
 
-export const CanvasVideoNode = makeCanvasNode<VideoObject, CanvasVideoNodeProps>(CanvasVideoNodeInner)
+export const CanvasVideoNode = makeCanvasNode<VideoObject, CanvasVideoNodeProps>(CanvasVideoNodeInner, 'video')

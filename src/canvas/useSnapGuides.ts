@@ -1,7 +1,9 @@
 import { useRef } from 'react'
-import type { CanvasObject, ImageObject, GuidelineObject } from '@/types/canvas'
+import type { CanvasObject, ImageObject, VideoObject, GuidelineObject } from '@/types/canvas'
 import { SNAP_THRESHOLD } from './constants'
 import { useCanvasStore } from './useCanvasStore'
+import { denormalizeAnchors } from './frameClip'
+import { computePathBBox } from './CanvasPathNode'
 
 export interface SnapGuide {
   orientation: 'h' | 'v'
@@ -17,6 +19,55 @@ interface DragBox {
 }
 
 type SnapTarget = { position: number; kind: 'frame' | 'object' }
+
+/**
+ * Axis-aligned bounding box a media frame should expose as a snap target.
+ *
+ * Two corrections over the raw frameX/Y/Width/Height:
+ *  - a `path` clip's visible silhouette can sit well inside the frame rect, so
+ *    snap to the silhouette, not the enclosing box (rect/ellipse clips have a
+ *    silhouette AABB identical to the frame, so they cost nothing here);
+ *  - a rotated frame's on-screen extent is the rotated corners' AABB. The frame
+ *    Group rotates about its top-left origin — same pivot rule as
+ *    buildFrameFromShape in useCanvasStore.
+ *
+ * Runs once per gesture: startSnapSession caches buildTargets for the drag.
+ */
+function frameSnapBox(f: ImageObject | VideoObject): {
+  x: number; y: number; width: number; height: number
+} {
+  let localX = 0
+  let localY = 0
+  let w = f.frameWidth
+  let h = f.frameHeight
+
+  if (f.clipShape?.kind === 'path') {
+    const bbox = computePathBBox(denormalizeAnchors(f.clipShape.anchors, w, h), true)
+    localX = bbox.x
+    localY = bbox.y
+    w = bbox.width
+    h = bbox.height
+  }
+
+  if (!f.rotation) {
+    return { x: f.frameX + localX, y: f.frameY + localY, width: w, height: h }
+  }
+
+  const rad = (f.rotation * Math.PI) / 180
+  const cos = Math.cos(rad)
+  const sin = Math.sin(rad)
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+  for (const [cx, cy] of [
+    [localX, localY], [localX + w, localY],
+    [localX + w, localY + h], [localX, localY + h],
+  ]) {
+    const rx = f.frameX + cx * cos - cy * sin
+    const ry = f.frameY + cx * sin + cy * cos
+    minX = Math.min(minX, rx); maxX = Math.max(maxX, rx)
+    minY = Math.min(minY, ry); maxY = Math.max(maxY, ry)
+  }
+  return { x: minX, y: minY, width: maxX - minX, height: maxY - minY }
+}
 
 function buildTargets(
   allObjects: CanvasObject[],
@@ -49,9 +100,11 @@ function buildTargets(
     }
 
     let objX: number, objY: number, objW: number, objH: number
-    if (obj.type === 'image') {
-      const img = obj as ImageObject
-      objX = img.frameX; objY = img.frameY; objW = img.frameWidth; objH = img.frameHeight
+    if (obj.type === 'image' || obj.type === 'video') {
+      // Video frames use the same frame model as images — don't rely on x/y/width
+      // /height mirroring frameX/Y/Width/Height, that's an unguarded invariant.
+      const box = frameSnapBox(obj as ImageObject | VideoObject)
+      objX = box.x; objY = box.y; objW = box.width; objH = box.height
     } else {
       objX = obj.x; objY = obj.y; objW = obj.width; objH = obj.height
     }

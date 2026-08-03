@@ -41,6 +41,49 @@ export function useImageDrop(containerRef: React.RefObject<HTMLDivElement>): voi
 
       const videoFiles = files.filter((f) => f.type.startsWith('video/'))
 
+      // Standalone placement — also the fallback when a drop target turns out not
+      // to be able to hold media (line/arrow, open path, degenerate bbox).
+      function addStandaloneImage(dataUrl: string, img: HTMLImageElement, name: string, index: number): void {
+        const MAX_SIZE = 600
+        const fit = Math.min(1, MAX_SIZE / Math.max(img.naturalWidth, img.naturalHeight))
+        const w = Math.round(img.naturalWidth * fit)
+        const h = Math.round(img.naturalHeight * fit)
+        const frameX = canvasX - w / 2 + index * 30
+        const frameY = canvasY - h / 2 + index * 30
+
+        addObject({
+          id: crypto.randomUUID(),
+          type: 'image',
+          scope: 'global',
+          name,
+          src: dataUrl,
+          backgroundRemoved: false,
+          frameX,
+          frameY,
+          frameWidth: w,
+          frameHeight: h,
+          contentOffsetX: 0,
+          contentOffsetY: 0,
+          contentWidth: w,
+          contentHeight: h,
+          naturalWidth: img.naturalWidth,
+          naturalHeight: img.naturalHeight,
+          contentEditMode: false,
+          // keep in sync with frame for compatibility
+          x: frameX,
+          y: frameY,
+          width: w,
+          height: h,
+          rotation: 0,
+          scaleX: 1,
+          scaleY: 1,
+          opacity: 1,
+          visible: true,
+          locked: false,
+          zIndex: objectOrder.length,
+        })
+      }
+
       if (targetId) {
         // Video wins on frames: if the drop contains ANY video, let useVideoDrop
         // own the target insertion. Bail before the image target-insert branch so
@@ -49,22 +92,23 @@ export function useImageDrop(containerRef: React.RefObject<HTMLDivElement>): voi
 
         const imageFile = files.find((f) => f.type.startsWith('image/'))
         if (imageFile) {
+          const rawName = imageFile.name.replace(/\.[^.]+$/, '')
           const reader = new FileReader()
           reader.onload = (readerEvent) => {
             const dataUrl = readerEvent.target?.result
             if (typeof dataUrl !== 'string') return
             const img = new Image()
             img.onload = () => {
-              const store = useCanvasStore.getState()
-              const t = store.objects[targetId]
-              if (!t) return
-              if (t.type === 'shape' || t.type === 'path') store.convertShapeToFrame(targetId)
-              useCanvasStore.getState().insertMediaIntoFrame(targetId, {
+              // One store call: converts the shape AND fills it, one undo step.
+              const inserted = useCanvasStore.getState().insertMediaIntoShape(targetId, {
                 kind: 'image',
                 src: dataUrl,
                 naturalWidth: img.naturalWidth,
                 naturalHeight: img.naturalHeight,
               })
+              // Target couldn't hold media — place it standalone rather than
+              // silently dropping the file on the floor.
+              if (!inserted) addStandaloneImage(dataUrl, img, rawName, 0)
             }
             img.src = dataUrl
           }
@@ -145,47 +189,7 @@ export function useImageDrop(containerRef: React.RefObject<HTMLDivElement>): voi
 
           // Load image to get natural dimensions before creating the object
           const img = new Image()
-          img.onload = () => {
-            const MAX_SIZE = 600
-            const scale = Math.min(1, MAX_SIZE / Math.max(img.naturalWidth, img.naturalHeight))
-            const w = Math.round(img.naturalWidth * scale)
-            const h = Math.round(img.naturalHeight * scale)
-
-            const frameX = canvasX - w / 2 + index * 30
-            const frameY = canvasY - h / 2 + index * 30
-
-            addObject({
-              id: crypto.randomUUID(),
-              type: 'image',
-              scope: 'global',
-              name: rawName,
-              src: dataUrl,
-              backgroundRemoved: false,
-              frameX,
-              frameY,
-              frameWidth: w,
-              frameHeight: h,
-              contentOffsetX: 0,
-              contentOffsetY: 0,
-              contentWidth: w,
-              contentHeight: h,
-              naturalWidth: img.naturalWidth,
-              naturalHeight: img.naturalHeight,
-              contentEditMode: false,
-              // keep in sync with frame for compatibility
-              x: frameX,
-              y: frameY,
-              width: w,
-              height: h,
-              rotation: 0,
-              scaleX: 1,
-              scaleY: 1,
-              opacity: 1,
-              visible: true,
-              locked: false,
-              zIndex: objectOrder.length,
-            })
-          }
+          img.onload = () => { addStandaloneImage(dataUrl, img, rawName, index) }
           img.src = dataUrl
         }
         reader.readAsDataURL(imageFile)

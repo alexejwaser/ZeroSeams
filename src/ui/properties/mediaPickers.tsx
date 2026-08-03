@@ -1,4 +1,5 @@
 import type { InsertMedia } from '@/canvas/useCanvasStore'
+import { loadVideoMetadataFromPath } from '@/canvas/videoMetadata'
 
 // ---------------------------------------------------------------------------
 // Shared file-picker helpers for the shape-based media frame feature.
@@ -27,24 +28,10 @@ export async function pickVideoMedia(): Promise<InsertMedia | null> {
   const filePath = result.filePath
   const rawName = filePath.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'video'
 
-  return new Promise<InsertMedia | null>((resolve) => {
-    const vid = document.createElement('video')
-    vid.preload = 'metadata'
-    const onMeta = (): void => {
-      if (!isFinite(vid.duration) || vid.duration <= 0) return
-      vid.removeEventListener('durationchange', onMeta)
-      vid.src = ''
-      resolve({
-        kind: 'video',
-        filePath,
-        naturalWidth: vid.videoWidth,
-        naturalHeight: vid.videoHeight,
-        naturalDuration: vid.duration,
-        name: rawName,
-      })
-    }
-    vid.addEventListener('durationchange', onMeta)
-    vid.onerror = () => resolve(null)
-    vid.src = `zeroseams-media://localhost${filePath}`
-  })
+  // Must carry real dimensions — a 0 here makes fitCover fall back to the frame
+  // size, which stretches the video instead of cover-cropping it.
+  const meta = await loadVideoMetadataFromPath(filePath)
+  if (!meta) return null
+
+  return { kind: 'video', filePath, name: rawName, ...meta }
 }

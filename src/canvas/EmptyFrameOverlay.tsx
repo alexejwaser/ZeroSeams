@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react'
 import { useCanvasStore } from './useCanvasStore'
 import { useViewportStore, selectScale } from './useViewportStore'
-import type { ImageObject } from '@/types/canvas'
+import { loadVideoMetadataFromPath } from './videoMetadata'
+import { isEmptyFrame } from './frameModel'
 
 /**
  * HTML overlay that renders "+ image" / "+ video" buttons centred over every
@@ -49,41 +50,30 @@ export function EmptyFrameOverlay() {
     const filePath = result.filePath
     const rawName = filePath.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'video'
 
-    await new Promise<void>((resolve) => {
-      const vid = document.createElement('video')
-      vid.preload = 'metadata'
-      const onMeta = () => {
-        if (!isFinite(vid.duration) || vid.duration <= 0) return
-        vid.removeEventListener('durationchange', onMeta)
-        useCanvasStore.getState().insertMediaIntoFrame(cellId, {
-          kind: 'video',
-          filePath,
-          naturalWidth: vid.videoWidth,
-          naturalHeight: vid.videoHeight,
-          naturalDuration: vid.duration,
-          name: rawName,
-        })
-        vid.src = ''
-        resolve()
-      }
-      vid.addEventListener('durationchange', onMeta)
-      vid.onerror = () => resolve()
-      vid.src = `zeroseams-media://localhost${filePath}`
+    // Real dimensions required — a 0 makes fitCover fall back to the frame size,
+    // stretching the video instead of cover-cropping it.
+    const meta = await loadVideoMetadataFromPath(filePath)
+    if (!meta) return
+    // The cell may have been deleted while metadata loaded.
+    if (!useCanvasStore.getState().objects[cellId]) return
+
+    useCanvasStore.getState().insertMediaIntoFrame(cellId, {
+      kind: 'video',
+      filePath,
+      name: rawName,
+      ...meta,
     })
   }, [])
 
   const emptyCells = objectOrder
     .map((id) => objects[id])
-    .filter((obj): obj is ImageObject =>
-      obj?.type === 'image' &&
-      (obj as ImageObject).isEmpty === true &&
-      // Hidden frames must not show floating +image/+video buttons.
-      obj.visible !== false &&
-      // The overlay is an axis-aligned HTML box; it can't track a rotated frame's
-      // corners, so hide the buttons for any rotated frame (simplest v1 — the frame
-      // stays fillable via drag-drop and the Properties panel).
-      !obj.rotation,
-    )
+    .filter(isEmptyFrame)
+    // Overlay policy, deliberately kept out of the shared predicate:
+    // hidden frames must not show floating +image/+video buttons, and the overlay
+    // is an axis-aligned HTML box that can't track a rotated frame's corners, so
+    // rotated frames get no buttons (simplest v1 — they stay fillable via
+    // drag-drop and the Properties panel).
+    .filter((obj) => obj.visible !== false && !obj.rotation)
 
   const btnStyle: React.CSSProperties = {
     background: 'rgba(255,255,255,0.9)',
