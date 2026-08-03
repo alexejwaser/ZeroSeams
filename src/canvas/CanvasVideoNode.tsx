@@ -324,7 +324,8 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     const imgNode = videoImageRef.current
     if (!tr || !frameRect) return
 
-    if (isInMultiSelectMode && !obj.contentEditMode) {
+    // Clip-edit mode owns the corners — see CanvasImageNode.
+    if ((isInMultiSelectMode && !obj.contentEditMode) || obj.clipEditMode) {
       tr.nodes([])
       tr.getLayer()?.draw()
       return
@@ -354,7 +355,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
       tr.nodes([])
       tr.getLayer()?.draw()
     }
-  }, [isSelected, isInMultiSelectMode, obj.contentEditMode, obj.locked, isGridCell, videoEl])
+  }, [isSelected, isInMultiSelectMode, obj.contentEditMode, obj.clipEditMode, obj.locked, isGridCell, videoEl])
 
   // Sync nodeRef to frameRectRef for group transformer bbox.
   useEffect(() => {

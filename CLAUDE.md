@@ -74,6 +74,8 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `isFrameObject` stays narrow on purpose: a plain image becomes a frame by *acquiring* a clip (`AddClipRow` → `commitUpdate({clipShape})`), never by widening the predicate — widening it would put clip/fill/stroke UI on every image ever dropped. "Remove Clip" is the inverse and clears clip **+ fill + stroke together**; clearing only the clip flips `isFrameObject` false and strands state that still paints but can no longer be seen or edited
 - `clipShapeToAnchors(clipShape)` seeds a `path` clip from the current silhouette (normalized 0–1). Every clip-kind switch is one `commitUpdate` — that undo step is why discarding a custom path needs no confirmation dialog
 - `isPointInClipShape` is for hit tests done in logical coords with no Konva node (entering a grid cell); on-canvas hit-testing already goes through the frame Rect's `hitFunc`
+- `clipEditMode` disarms the frame Transformer (`tr.nodes([])`, same branch as multi-select) in both node files — its resize anchors sit on the exact points as a path clip's corner anchors, so leaving it up makes those corners ungrabbable
+- Transformer `anchorStroke`/`borderStroke` are the accent `#f94608`, NOT Konva's default blue — a pixel hunt can't tell resize handles from clip anchors, so assert "is the transformer up?" on the scene graph (`find('Transformer')` + `nodes().length`), never by colour
 
 **Multi-Select:**
 - `selectedId` — Properties Panel; `selectedIds[]` — group transformer + align/distribute; `anchorId` — alignment reference (gold `#f5a623` border)

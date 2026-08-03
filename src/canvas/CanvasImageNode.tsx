@@ -199,7 +199,10 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
     // Empty frames have no image node; the frame Rect is still a valid transform target.
     if (!tr || !frameRect) return
 
-    if (isInMultiSelectMode && !obj.contentEditMode) {
+    // Clip-edit mode owns the corners: the frame transformer's anchors land on the
+    // exact same points as the clip path's corner anchors, so leaving it up makes
+    // those anchors unreachable — you grab a resize handle every time.
+    if ((isInMultiSelectMode && !obj.contentEditMode) || obj.clipEditMode) {
       tr.nodes([])
       tr.getLayer()?.draw()
       return
@@ -231,7 +234,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
       tr.nodes([])
       tr.getLayer()?.draw()
     }
-  }, [isSelected, isInMultiSelectMode, obj.contentEditMode, obj.locked, isGridCell, loadedImage])
+  }, [isSelected, isInMultiSelectMode, obj.contentEditMode, obj.clipEditMode, obj.locked, isGridCell, loadedImage])
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent): void {

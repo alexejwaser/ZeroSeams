@@ -55,7 +55,13 @@ const MEDIA   = [255, 0, 255]   // magenta fixture
 const BG      = [255, 255, 255] // frame background
 const EMPTY   = [217, 210, 199] // EMPTY_FRAME_FILL #d9d2c7
 const ANCHOR  = [249, 70, 8]    // ClipEditOverlay #f94608
-const TRANSF  = [0, 161, 255]   // Konva default Transformer anchorStroke
+// Transformer anchorStroke/borderStroke are set to the SAME accent (probed off a
+// live Transformer), not Konva's default blue — so a colour hunt cannot tell
+// resize handles from clip anchors. It only proves no accent-coloured selection
+// UI survives, which is why "is the transformer up?" is asserted on the scene
+// graph instead (Case 15). This constant previously held Konva's blue and matched
+// nothing, making every hunt using it pass vacuously.
+const TRANSF  = ANCHOR
 
 const hex = (rgb) => '#' + rgb.map(c => c.toString(16).padStart(2, '0')).join('')
 
@@ -213,6 +219,38 @@ await page.evaluate(() => {
           const py = Math.round(p.y * pixelRatio)
           out[p.name] = Array.from(ctx.getImageData(px, py, 1, 1).data)
         }
+        return out
+      } finally {
+        stage.width(orig.w); stage.height(orig.h)
+        stage.scaleX(orig.sx); stage.scaleY(orig.sy)
+        stage.x(orig.x); stage.y(orig.y)
+        stage.draw()
+      }
+    },
+
+    /**
+     * Count matching pixels across the LIVE scene (not an export). Selection UI
+     * is hidden during export by design, so anything about what the user sees
+     * while editing has to be scanned here.
+     * hunts: [{name, rgb, tol?}] → { name: pixelCount }.
+     */
+    huntStage(hunts) {
+      const stage = window.__getStage__()
+      const s = window.__canvasStore__.getState()
+      const orig = {
+        w: stage.width(), h: stage.height(),
+        sx: stage.scaleX(), sy: stage.scaleY(),
+        x: stage.x(), y: stage.y(),
+      }
+      try {
+        stage.width(s.frameCount * s.frameWidth)
+        stage.height(s.frameHeight)
+        stage.scaleX(1); stage.scaleY(1); stage.x(0); stage.y(0)
+        stage.draw()
+        const canvas = stage.toCanvas({ pixelRatio: 1 })
+        const d = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data
+        const out = {}
+        for (const h of hunts) out[h.name] = scanFor(d, h.rgb, h.tol ?? 24)
         return out
       } finally {
         stage.width(orig.w); stage.height(orig.h)
@@ -665,6 +703,64 @@ console.log('━━━ Part 2A: rendering ━━━\n')
 
   await select(null)
   await ss('cell-routing')
+}
+
+// Case 15: clip-edit mode owns the corners. The frame transformer's anchors land
+// on the same points as a path clip's corner anchors, so leaving it up while
+// editing the clip makes those anchors unreachable — every grab hits a resize
+// handle instead. Scanned on the LIVE scene: export hides selection UI anyway,
+// so an export-based check would pass no matter what.
+{
+  console.log('\nCase 15: the frame transformer yields to clip editing')
+  const id = await page.evaluate(async () => {
+    const z = window.__zs
+    const gs = () => window.__canvasStore__.getState()
+    z.reset(1)
+    const id = crypto.randomUUID()
+    gs().addObject({
+      id, type: 'image', scope: 'global',
+      x: 200, y: 200, width: 400, height: 400,
+      frameX: 200, frameY: 200, frameWidth: 400, frameHeight: 400,
+      contentOffsetX: 0, contentOffsetY: 0, contentWidth: 400, contentHeight: 400,
+      naturalWidth: 64, naturalHeight: 64,
+      src: z.solidSrc('#ff00ff'), backgroundRemoved: false,
+      contentEditMode: false, clipEditMode: false,
+      clipShape: { kind: 'path', anchors: [
+        { x: 0.5, y: 0, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
+        { x: 1, y: 0.5, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
+        { x: 0.5, y: 1, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
+        { x: 0, y: 0.5, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
+      ] },
+      opacity: 1, rotation: 0, visible: true, locked: false, zIndex: 0,
+      scaleX: 1, scaleY: 1,
+    })
+    gs().setSelected(id)
+    return id
+  })
+  await wait(600)
+
+  // Handles and clip anchors share the accent colour, so this is asserted on the
+  // scene graph: a Transformer with no attached nodes draws nothing.
+  const armedCount = () => page.evaluate(() =>
+    window.__getStage__().find('Transformer').filter(t => t.nodes().length > 0).length)
+
+  // Selected, not clip-editing: the transformer SHOULD be up. Without this the
+  // next assertion passes for an object that simply never had one.
+  eq(await armedCount(), 1, 'selected frame arms its resize transformer (CONTROL)')
+
+  await page.evaluate((id) => window.__canvasStore__.getState().enterClipEditMode(id), id)
+  await wait(600)
+  eq(await armedCount(), 0, 'clip-edit mode disarms the transformer, freeing the corners')
+
+  const anchorPixels = await page.evaluate((hunts) => window.__zs.huntStage(hunts), [
+    { name: 'anchor', rgb: ANCHOR, tol: 24 },
+  ])
+  ok(anchorPixels.anchor > 0, 'clip anchors are on screen and unobstructed')
+
+  await page.evaluate(() => window.__canvasStore__.getState().clearClipEditMode())
+  await wait(400)
+  eq(await armedCount(), 1, 'leaving clip-edit mode brings the resize transformer back')
+  await ss('clip-edit-transformer')
 }
 
 // Grid relayout (#69). computeGridChildPatches is the single source of truth for
