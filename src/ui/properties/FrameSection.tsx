@@ -109,6 +109,18 @@ export function FrameSection({
     if (media) useCanvasStore.getState().insertMediaIntoFrame(selectedId, media)
   }
 
+  // Clears ALL the frame state, not just the clip. Dropping clipShape alone flips
+  // isFrameObject false, which hides this whole section — stranding a fill and
+  // stroke that would still paint but could no longer be seen or edited.
+  function handleRemoveClip(): void {
+    onCommit(selectedId, {
+      clipShape: undefined,
+      fill: undefined,
+      frameStroke: undefined,
+      frameStrokeWidth: undefined,
+    })
+  }
+
   function handleRemoveMedia(): void {
     useCanvasStore.getState().removeMediaFromFrame(selectedId)
   }
@@ -263,6 +275,15 @@ export function FrameSection({
               Remove Media
             </button>
           </Tooltip>
+          {/* The inverse of AddClipRow: back to a plain image, media intact. Not
+              offered for a grid cell, whose frame identity is what holds its slot. */}
+          {!isGridCell && (
+            <Tooltip label="Remove Clip" description="Back to a plain, unclipped image — keeps the media">
+              <button style={destructiveButtonStyle} onClick={handleRemoveClip}>
+                Remove Clip
+              </button>
+            </Tooltip>
+          )}
         </>
       )}
     </div>

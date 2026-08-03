@@ -1277,6 +1277,70 @@ await page.evaluate((src) => { window.__zsImg__ = src }, TEST_IMG_SRC)
   await wait(120)
 }
 
+{
+  // L10 (#62 Phase C2). A plain dropped image is not a frame — isFrameObject
+  // requires a clipShape or isEmpty — so FrameSection is hidden and there was no
+  // way to give it a clip at all. AddClipRow makes it qualify by *acquiring* one,
+  // rather than by widening the predicate. Remove Clip is the inverse and must
+  // clear the whole frame state together.
+  const id = await addImage(TEST_IMG_SRC)
+  await wait(120)
+
+  const objInfo = (id) => page.evaluate((id) => {
+    const s = window.__canvasStore__.getState()
+    const o = s.objects[id]
+    return {
+      clipKind: o?.clipShape?.kind, isEmpty: o?.isEmpty,
+      fill: o?.fill, frameStroke: o?.frameStroke, frameStrokeWidth: o?.frameStrokeWidth,
+      pastLen: s.past.length,
+    }
+  }, id)
+
+  const plain = await objInfo(id)
+  // The two halves of isFrameObject, asserted directly — the script can't import it.
+  ok(plain.clipKind === undefined && plain.isEmpty !== true, 'L10: a plain image is not a frame')
+
+  await page.evaluate((id) => window.__canvasStore__.getState()
+    .commitUpdate(id, { clipShape: { kind: 'ellipse' } }), id)
+  await wait(80)
+  const clipped = await objInfo(id)
+  eq(clipped.clipKind, 'ellipse', 'L10: acquiring a clip makes it a frame')
+  eq(clipped.pastLen, plain.pastLen + 1, 'L10: adding a clip is one history entry')
+
+  // Give it fill + stroke so Remove Clip has something to strand if it clears
+  // only the clip.
+  await page.evaluate((id) => window.__canvasStore__.getState().commitUpdate(id, {
+    fill: { type: 'solid', color: '#123456' }, frameStroke: '#ff0000', frameStrokeWidth: 3,
+  }), id)
+  await wait(80)
+  const decorated = await objInfo(id)
+
+  await page.evaluate((id) => window.__canvasStore__.getState().commitUpdate(id, {
+    clipShape: undefined, fill: undefined, frameStroke: undefined, frameStrokeWidth: undefined,
+  }), id)
+  await wait(80)
+  const stripped = await objInfo(id)
+  ok(stripped.clipKind === undefined, 'L10: Remove Clip drops the clip')
+  ok(
+    stripped.fill === undefined && stripped.frameStroke === undefined && stripped.frameStrokeWidth === undefined,
+    'L10: …and the fill/stroke with it, so nothing is stranded behind a hidden panel',
+  )
+  eq(stripped.pastLen, decorated.pastLen + 1, 'L10: Remove Clip is one history entry')
+
+  await undo()
+  await wait(80)
+  const restored = await objInfo(id)
+  eq(restored.clipKind, 'ellipse', 'L10: one undo restores the clip')
+  eq(restored.frameStroke, '#ff0000', 'L10: …and the stroke, in the same step')
+
+  await page.evaluate((id) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    gs().removeObject(id)
+  }, id)
+  await wait(120)
+}
+
 // ─── Results ──────────────────────────────────────────────────────────────────
 console.log('\n' + '─'.repeat(50))
 console.log(`Results: ${passed} passed, ${failed} failed`)
