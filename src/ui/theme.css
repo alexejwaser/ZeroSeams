@@ -53,10 +53,13 @@ body {
    Scoped to interactive controls so the canvas container and the contenteditable
    text overlay never draw a ring mid-edit. Black rather than accent: the accent
    is also the *active* fill on toggles, and an orange ring on an orange button
-   is invisible. Chromium follows border-radius, so pills stay pills. */
+   is invisible. Chromium follows border-radius, so pills stay pills.
+   The one exception is NumericInput: its input sits inside a bordered wrapper,
+   so the ring is drawn on the wrapper instead (see .zs-num below) — the input is
+   excluded here rather than having its outline killed at the call site. */
 button:focus-visible,
 [role="button"]:focus-visible,
-input:focus-visible,
+input:not(.zs-num-input):focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 a[href]:focus-visible,
@@ -145,6 +148,88 @@ input[type="range"]::-webkit-slider-thumb {
 
 input[type="range"]:active::-webkit-slider-thumb {
   background: linear-gradient(145deg, #ffffff, #e8e0d5);
+}
+
+/* ─── Numeric fields (NumericInput) ────────────────────────────────────────────
+   The wrapper carries the border/background so the unit affix and the value read
+   as one box; the input goes transparent and borderless inside it. The affix is
+   also the scrub grip — drag it horizontally to change the value, which is what
+   replaced the range slider that used to sit beside every one of these. */
+.zs-num {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  background: var(--bg-surface);
+  border: 1px solid var(--stroke);
+  border-radius: 6px;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+
+.zs-num:focus-within {
+  border-color: var(--accent);
+}
+
+/* The ring targets the wrapper, not the input: an outline on the input would be
+   drawn inside the border, overlapping the affix. `:has` keeps it keyboard-only,
+   matching the :focus-visible behaviour of every other control. */
+.zs-num:has(input:focus-visible) {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
+.zs-num-unit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 15px;
+  height: 100%;
+  padding: 0 2px 0 5px;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+  cursor: ew-resize;
+  /* Stops Chromium from turning the horizontal drag into a scroll gesture. */
+  touch-action: none;
+}
+
+.zs-num[data-disabled] .zs-num-unit {
+  cursor: default;
+}
+
+.zs-num-input {
+  flex: 1;
+  /* Without this a flex item refuses to shrink below its content width and the
+     field overflows its row. */
+  min-width: 0;
+  height: 100%;
+  background: none;
+  border: none;
+  border-radius: inherit;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: var(--font);
+  padding: 0 6px;
+  box-sizing: border-box;
+}
+
+/* ─── Visually hidden ──────────────────────────────────────────────────────────
+   Present to assistive tech, absent from layout. Used for the aria-live region
+   that announces a scrub, which produces no keyboard event to announce itself. */
+.zs-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ─── Number inputs — hide browser spinners ────────────────────────────────── */

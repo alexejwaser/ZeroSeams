@@ -14,6 +14,7 @@ import type { SnapGuide } from './useSnapGuides'
 import { axisLock, ACCENT, ACCENT_GOLD } from './constants'
 import { useViewportStore, selectScale } from './useViewportStore'
 import { buildEffectFilters } from './effects/buildEffectFilters'
+import { konvaFillProps } from './fill'
 
 // ---------------------------------------------------------------------------
 // Path utilities — exported for use in CarouselStage pen tool
@@ -416,6 +417,15 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
   const pathData = anchorsToPathData(obj.anchors, obj.closed)
   const isInMultiSelect = isInMultiSelectMode && selectedIds.includes(obj.id)
 
+  // The KonvaPath carries no x/y — its `data` is in absolute canvas coordinates,
+  // so its local origin is the canvas origin and gradient geometry has to be
+  // resolved against the anchors' own bbox, not against 0,0. Derived from the
+  // anchors rather than obj.x/y so it can never lag a live anchor drag.
+  const fillBBox = computePathBBox(obj.anchors, obj.closed)
+  const fillProps = konvaFillProps(
+    obj.fill, fillBBox.width, fillBBox.height, fillBBox.x, fillBBox.y,
+  )
+
   if (!obj.pathEditMode) {
     return (
       <>
@@ -433,7 +443,7 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
         <KonvaPath
           ref={pathRef}
           data={pathData}
-          fill={obj.fill}
+          {...fillProps}
           stroke={obj.stroke}
           strokeWidth={obj.strokeWidth}
           strokeScaleEnabled={false}
@@ -493,7 +503,7 @@ function CanvasPathNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasPathNod
       <KonvaPath
         ref={pathRef}
         data={pathData}
-        fill={obj.fill}
+        {...fillProps}
         stroke={obj.stroke}
         strokeWidth={obj.strokeWidth}
         strokeScaleEnabled={false}

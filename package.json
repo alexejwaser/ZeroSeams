@@ -20,6 +20,17 @@
     "test:multiselect": "node scripts/test-multiselect-transform.mjs",
     "test:save-path": "node scripts/test-save-path.mjs"
   },
+  "build": {
+    "appId": "com.zeroseams.app",
+    "productName": "Zero Seams",
+    "fileAssociations": [
+      {
+        "ext": "zeroseams",
+        "name": "Zero Seams Project",
+        "role": "Editor"
+      }
+    ]
+  },
   "dependencies": {
     "@ffmpeg/core": "^0.12.10",
     "@ffmpeg/ffmpeg": "^0.12.15",

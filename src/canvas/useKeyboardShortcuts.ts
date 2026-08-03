@@ -1,32 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { useCanvasStore } from './useCanvasStore'
 import { useViewportStore } from './useViewportStore'
-import { useSaveStatusStore, trackSave } from '@/store'
-import type { CarouselProject } from '@/types/project'
+import * as fileManager from '@/io/fileManager'
 import type { ImageObject, PathObject, ShapeObject } from '@/types/canvas'
 import { computePathBBox } from './CanvasPathNode'
-import { relativizeVideoObjects } from './pathUtils'
-
-function buildProjectSnapshot(
-  state: ReturnType<typeof useCanvasStore.getState>,
-  saveStore: ReturnType<typeof useSaveStatusStore.getState>,
-): CarouselProject {
-  return {
-    id: saveStore.projectId,
-    name: saveStore.projectName,
-    platform: state.platform,
-    ratio: state.ratio,
-    dimensions: { width: state.frameWidth, height: state.frameHeight },
-    frameCount: state.frameCount,
-    frames: state.frames,
-    backgroundColor: state.backgroundColor,
-    objects: relativizeVideoObjects(state.objects, saveStore.currentFilePath),
-    objectOrder: state.objectOrder,
-    createdAt: saveStore.createdAt,
-    updatedAt: new Date().toISOString(),
-    version: 1,
-  }
-}
 
 export function useKeyboardShortcuts(): void {
   const setActiveTool = useCanvasStore((s) => s.setActiveTool)
@@ -247,39 +224,39 @@ export function useKeyboardShortcuts(): void {
           return
         }
 
-        if (e.key === 's' && !e.shiftKey) {
+        // File commands all delegate to src/io/fileManager — the same functions
+        // the TitleBar buttons and the native menu call. (With the app menu
+        // installed these accelerators are usually consumed by the menu; these
+        // handlers keep the shortcuts working if a window has no menu focus.)
+        if (e.key.toLowerCase() === 'n' && !e.shiftKey && !e.altKey) {
           e.preventDefault()
-          const saveStore = useSaveStatusStore.getState()
-          const currentState = useCanvasStore.getState()
-          const project = buildProjectSnapshot(currentState, saveStore)
-          if (saveStore.currentFilePath) {
-            const path = saveStore.currentFilePath
-            trackSave(() => window.electronAPI.saveProject(path, JSON.stringify(project)))
-              .catch(() => {})
-          } else {
-            trackSave(() => window.electronAPI.saveProjectAs(JSON.stringify(project)))
-              .then((result: { success: boolean; filePath?: string; error?: string }) => {
-                if (result.success && result.filePath) {
-                  saveStore.setCurrentFilePath(result.filePath)
-                }
-              })
-              .catch(() => {})
-          }
+          fileManager.requestNewDocument()
           return
         }
 
-        if (e.key === 's' && e.shiftKey) {
+        if (e.key.toLowerCase() === 'o' && !e.shiftKey && !e.altKey) {
           e.preventDefault()
-          const saveStore = useSaveStatusStore.getState()
-          const currentState = useCanvasStore.getState()
-          const project = buildProjectSnapshot(currentState, saveStore)
-          trackSave(() => window.electronAPI.saveProjectAs(JSON.stringify(project)))
-            .then((result: { success: boolean; filePath?: string; error?: string }) => {
-              if (result.success && result.filePath) {
-                saveStore.setCurrentFilePath(result.filePath)
-              }
-            })
-            .catch(() => {})
+          void fileManager.openFromDialog()
+          return
+        }
+
+        // e.code, not e.key: with Option held macOS reports the alternate
+        // character ('ß'), so a key comparison never matches ⌥⇧⌘S.
+        if (e.code === 'KeyS' && e.altKey && e.shiftKey) {
+          e.preventDefault()
+          void fileManager.saveCopy()
+          return
+        }
+
+        if (e.key.toLowerCase() === 's' && !e.shiftKey) {
+          e.preventDefault()
+          void fileManager.save()
+          return
+        }
+
+        if (e.key.toLowerCase() === 's' && e.shiftKey) {
+          e.preventDefault()
+          void fileManager.saveAs()
           return
         }
 

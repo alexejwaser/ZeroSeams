@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useMemo } from 'react'
 import { Group, Image as KonvaImage, Rect, Path as KonvaPath, Transformer } from 'react-konva'
 import useImage from 'use-image'
 import type Konva from 'konva'
-import type { ImageObject } from '@/types/canvas'
+import type { Fill, ImageObject } from '@/types/canvas'
 import { useCanvasStore } from './useCanvasStore'
 import { makeCanvasNode } from './makeCanvasNode'
 import { useSnapGuides } from './useSnapGuides'
@@ -13,7 +13,8 @@ import { buildFilterPipeline } from './adjustments/pipeline'
 import { DEFAULT_ADJUSTMENTS } from '@/types/canvas'
 import { buildEffectFilters } from './effects/buildEffectFilters'
 import { fitCover, snapRectInRotatedFrame } from './geometry'
-import { buildClipFunc, clipShapeToPathData, isPlainRectClip, solidColorOf, EMPTY_FRAME_ICON_PATH } from './frameClip'
+import { buildClipFunc, clipShapeToPathData, isPlainRectClip, EMPTY_FRAME_ICON_PATH } from './frameClip'
+import { normalizeFill, konvaFillProps } from './fill'
 import { EMPTY_FRAME_FILL } from './frameModel'
 import { ClipEditOverlay } from './ClipEditOverlay'
 
@@ -102,9 +103,9 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
     [obj.frameWidth, obj.frameHeight],
   )
 
-  // Always read `fill` through solidColorOf — the union grows (gradient next) and
-  // a bare fill.color would silently break.
-  const frameFill = solidColorOf(obj.fill)
+  // Always read `fill` through normalizeFill — it's a union (solid/linear/radial)
+  // and a bare fill.color would silently break.
+  const frameFill = normalizeFill(obj.fill)
 
   // --- Media-frame clip geometry ---
   // Plain rect / absent clip keeps the zero-cost `clip` rect prop. Ellipse/path
@@ -144,7 +145,17 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
       if (trace) group.clipFunc(trace)
     }
     const fr = fillRectRef.current
-    if (fr) { fr.width(width); fr.height(height) }
+    if (fr) {
+      fr.width(width)
+      fr.height(height)
+      // A gradient's Konva endpoints are absolute points in the node's local
+      // space, so resizing the Rect alone leaves the gradient frozen at the
+      // pre-drag size. Re-resolve it against the live box. (The empty-frame
+      // placeholder is only ever a gradient when frameFill is one.)
+      if (frameFill && frameFill.type !== 'solid') {
+        fr.setAttrs(konvaFillProps(frameFill, width, height))
+      }
+    }
     const fs = frameStrokeRef.current
     if (fs && obj.frameStroke && obj.frameStrokeWidth) {
       fs.data(clipShapeToPathData(obj.clipShape ?? { kind: 'rect' }, width, height))
@@ -562,7 +573,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
     })
   }
 
-  const emptyFill = frameFill ?? EMPTY_FRAME_FILL
+  const emptyFill: Fill = frameFill ?? { type: 'solid', color: EMPTY_FRAME_FILL }
   const emptyIconSize = Math.min(obj.frameWidth, obj.frameHeight) * 0.18
   const emptyIconScale = emptyIconSize / 24
   // Centered image-icon hint painted on empty frames — shared by the grid-cell
@@ -606,7 +617,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
               ref={fillRectRef}
               x={0} y={0}
               width={obj.frameWidth} height={obj.frameHeight}
-              fill={emptyFill}
+              {...konvaFillProps(emptyFill, obj.frameWidth, obj.frameHeight)}
               listening={false}
             />
             {emptyIcon}
@@ -618,7 +629,7 @@ function CanvasImageNodeInner({ id, obj, onGuidesChange, nodeRef, syncRef, syncG
                 ref={fillRectRef}
                 x={0} y={0}
                 width={obj.frameWidth} height={obj.frameHeight}
-                fill={frameFill}
+                {...konvaFillProps(frameFill, obj.frameWidth, obj.frameHeight)}
                 listening={false}
               />
             ) : null}

@@ -3,6 +3,16 @@ interface ExternalEditor {
   execPath: string
 }
 
+/** Structural mirror of `Swatch` in ./canvas.ts. This file is a *global*
+ *  declaration file — adding an `import` would turn it into a module and the
+ *  `Window` augmentation would stop applying. Same reason ExternalEditor is
+ *  duplicated above. Structurally identical, so the two are assignable. */
+interface SwatchDTO {
+  id: string
+  color: string
+  name?: string
+}
+
 interface Window {
   electronAPI: {
     platform: string
@@ -10,10 +20,22 @@ interface Window {
       filename: string,
       base64: string,
     ): Promise<{ success: boolean; error?: string }>
-    autosaveProject(
+    /** Writes <folderPath>/<filename>.zeroseams. Refuses to overwrite an
+     *  existing file — resolves { success:false, error } instead. */
+    createProjectFile(
+      folderPath: string,
       filename: string,
       json: string,
     ): Promise<{ success: boolean; filePath?: string; error?: string }>
+    getDefaultProjectDir(): Promise<{ folderPath: string }>
+    /** Mirror the dirty flag into main, which owns the close guard. */
+    setDirtyState(dirty: boolean): void
+    /** Tell main the save it asked for is done and the window may close. */
+    confirmClose(): Promise<{ success: boolean }>
+    /** A path the OS handed the app before the renderer mounted, or null. */
+    takePendingOpenFile(): Promise<{ filePath: string | null }>
+    onMenuAction(cb: (action: string) => void): () => void
+    onOpenFilePath(cb: (filePath: string) => void): () => void
     openProject(): Promise<{ success: boolean; json?: string; filePath?: string; error?: string }>
     listRecentProjects(): Promise<{
       files: Array<{ name: string; path: string; modifiedAt: string }>
@@ -27,6 +49,8 @@ interface Window {
     ): Promise<{ success: boolean; error?: string }>
     saveProjectCopy(json: string): Promise<{ success: boolean; filePath?: string; error?: string }>
     getSystemFonts(): Promise<string[]>
+    getGlobalSwatches(): Promise<SwatchDTO[]>
+    setGlobalSwatches(swatches: SwatchDTO[]): Promise<{ success: boolean; error?: string }>
     getExternalEditor(): Promise<ExternalEditor | null>
     setExternalEditor(): Promise<ExternalEditor | null>
     editInExternalApp(
@@ -47,7 +71,7 @@ interface Window {
     appendExportLog(line: string): Promise<void>
     clearExportLog(): Promise<void>
     getFileSize(filePath: string): Promise<{ size: number }>
-    showFolderDialog(): Promise<{ folderPath?: string; cancelled: boolean }>
+    showFolderDialog(options?: { title?: string; defaultPath?: string }): Promise<{ folderPath?: string; cancelled: boolean }>
     writeFileToFolder(folderPath: string, filename: string, base64: string): Promise<{ success: boolean; error?: string }>
     loadFileAtPath(filePath: string): Promise<{ success: boolean; json?: string; filePath?: string }>
   }

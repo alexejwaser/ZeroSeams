@@ -2,14 +2,14 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
 import { getStageInstance } from '@/canvas/CarouselStage'
 import { exportMixedFrames } from '@/canvas/exportFrames'
-import { useSaveStatusStore, trackSave, type SaveStatus } from '@/store'
-import type { CarouselProject } from '@/types/project'
+import { useSaveStatusStore, type SaveStatus } from '@/store'
+import * as fileManager from '@/io/fileManager'
+import { LAYER_PANEL_WIDTH, PROPERTIES_PANEL_WIDTH, TOOL_BAR_HEIGHT } from './panelConstants'
 import type { ShapeKind, VideoExportSettings, ImageExportSettings, ImageFormat } from '@/types/canvas'
 import { DEFAULT_VIDEO_EXPORT_SETTINGS, DEFAULT_IMAGE_EXPORT_SETTINGS } from '@/types/canvas'
-import { relativizeVideoObjects, resolveVideoObjects } from '@/canvas/pathUtils'
 import {
   MousePointer2, Type, Square, Circle, Minus, PenTool,
-  Undo2, Redo2, FolderOpen, Save, ImageDown,
+  Undo2, Redo2, FolderOpen, FilePlus, Save, ImageDown,
   ChevronDown, ChevronUp, Plus, LayoutTemplate, Check, AlertTriangle, Film, Eye, EyeOff, X,
 } from 'lucide-react'
 import Tooltip from './Tooltip'
@@ -128,28 +128,6 @@ async function blobToBase64(blob: Blob): Promise<string> {
   })
 }
 
-// ── buildProjectJson — module-level so both TitleBar and ToolBar can call it ──
-function buildProjectJson(): string {
-  const state = useCanvasStore.getState()
-  const saveStore = useSaveStatusStore.getState()
-  const project: CarouselProject = {
-    id: saveStore.projectId,
-    name: saveStore.projectName,
-    platform: state.platform,
-    ratio: state.ratio,
-    dimensions: { width: state.frameWidth, height: state.frameHeight },
-    frameCount: state.frameCount,
-    frames: state.frames,
-    backgroundColor: state.backgroundColor,
-    objects: relativizeVideoObjects(state.objects, saveStore.currentFilePath),
-    objectOrder: state.objectOrder,
-    createdAt: saveStore.createdAt,
-    updatedAt: new Date().toISOString(),
-    version: 1,
-  }
-  return JSON.stringify(project)
-}
-
 // ── VideoExportSettingsPanel ────────────────────────────────────────────────
 interface VideoExportSettingsPanelProps {
   platform: Platform
@@ -254,12 +232,12 @@ function VideoExportSettingsPanel({
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <NumericInput
                 value={settings.audioBitrate}
-                min={32} max={320}
-                width={52} align="center"
+                label="Audio bitrate" unit="kbps"
+                min={32} max={320} step={8}
+                width={96} align="right"
                 onChange={v => onSettingsChange(s => ({ ...s, audioBitrate: v }))}
                 onCommit={v => onSettingsChange(s => ({ ...s, audioBitrate: v }))}
               />
-              <span style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>kbps</span>
             </div>
           </div>
           {/* Frame rate */}
@@ -306,12 +284,9 @@ export function TitleBar(): React.ReactElement {
   const future = useCanvasStore((s) => s.future)
   const undo = useCanvasStore((s) => s.undo)
   const redo = useCanvasStore((s) => s.redo)
-  const loadProject = useCanvasStore((s) => s.loadProject)
   const saveStatus = useSaveStatusStore((s) => s.status)
-  const setProjectMeta = useSaveStatusStore((s) => s.setProjectMeta)
   const projectName = useSaveStatusStore((s) => s.projectName)
   const isDirty = useSaveStatusStore((s) => s.dirty)
-  const setCurrentFilePath = useSaveStatusStore((s) => s.setCurrentFilePath)
 
   const [loadingProject, setLoadingProject] = useState(false)
   const [recentOpen, setRecentOpen] = useState(false)
@@ -377,26 +352,9 @@ export function TitleBar(): React.ReactElement {
     return () => document.removeEventListener('mousedown', handler)
   }, [saveMenuOpen])
 
-  // Restore the last open file after a renderer reload (e.g. Vite HMR after sleep/wake).
-  useEffect(() => {
-    const lastFile = localStorage.getItem('zeroseams:lastFile')
-    if (!lastFile) return
-    void window.electronAPI.loadFileAtPath(lastFile).then((result) => {
-      if (!result.success || result.json == null) {
-        localStorage.removeItem('zeroseams:lastFile')
-        return
-      }
-      const project = JSON.parse(result.json) as CarouselProject
-      if (result.filePath) {
-        project.objects = resolveVideoObjects(project.objects, result.filePath)
-      }
-      loadProject(project)
-      const fname = project.name.toLowerCase().replace(/\s+/g, '-')
-      setProjectMeta(project.id, project.name, fname, project.createdAt)
-      setCurrentFilePath(result.filePath ?? null)
-    })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // Session restore moved to NewDocumentGate (src/main.tsx): it has to win over
+  // the New Document screen, so it can't run from a component that renders
+  // alongside it.
 
   // Keep exportTo in sync when frameCount changes
   useEffect(() => {
@@ -554,26 +512,12 @@ export function TitleBar(): React.ReactElement {
     whiteSpace: 'nowrap' as const,
   })
 
-  function loadProjectFromResult(result: { success: boolean; json?: string; filePath?: string }): void {
-    if (!result.success || result.json == null) return
-    const project = JSON.parse(result.json) as CarouselProject
-    if (result.filePath) {
-      project.objects = resolveVideoObjects(project.objects, result.filePath)
-      localStorage.setItem('zeroseams:lastFile', result.filePath)
-    }
-    loadProject(project)
-    const filename = project.name.toLowerCase().replace(/\s+/g, '-')
-    setProjectMeta(project.id, project.name, filename, project.createdAt)
-    setCurrentFilePath(result.filePath ?? null)
-  }
-
+  // Every file action below routes through src/io/fileManager — the same entry
+  // points the native menu and the keyboard shortcuts use.
   async function handleOpen(): Promise<void> {
     setLoadingProject(true)
     try {
-      const result = await window.electronAPI.openProject()
-      loadProjectFromResult(result)
-    } catch (err) {
-      console.error('[open]', err)
+      await fileManager.openFromDialog()
     } finally {
       setLoadingProject(false)
       setRecentOpen(false)
@@ -583,10 +527,7 @@ export function TitleBar(): React.ReactElement {
   async function handleOpenFromPath(filePath: string): Promise<void> {
     setLoadingProject(true)
     try {
-      const result = await window.electronAPI.loadFileAtPath(filePath)
-      loadProjectFromResult(result)
-    } catch (err) {
-      console.error('[open-path]', err)
+      await fileManager.openPath(filePath)
     } finally {
       setLoadingProject(false)
       setRecentOpen(false)
@@ -646,8 +587,18 @@ export function TitleBar(): React.ReactElement {
         )}
       </div>
 
+      {/* New document */}
+      <Tooltip label="New" shortcut="⌘N" description="Pick a size and location for a new document">
+        <button
+          onClick={fileManager.requestNewDocument}
+          {...iconBtnProps(false, false, { marginLeft: 12 })}
+        >
+          <FilePlus size={15} />
+        </button>
+      </Tooltip>
+
       {/* Open button + recent projects */}
-      <div ref={recentWrapperRef} style={{ position: 'relative', display: 'flex', marginLeft: 12, flex: '0 0 auto' }}>
+      <div ref={recentWrapperRef} style={{ position: 'relative', display: 'flex', flex: '0 0 auto' }}>
         <Tooltip label="Open" shortcut="⌘O">
           <button
             onClick={() => { void handleOpen() }}
@@ -743,23 +694,7 @@ export function TitleBar(): React.ReactElement {
       <div data-save-menu style={{ position: 'relative', display: 'flex', marginLeft: 6, flex: '0 0 auto' }}>
         <Tooltip label="Save" shortcut="⌘S">
           <button
-            onClick={() => {
-              const saveStore = useSaveStatusStore.getState()
-              const json = buildProjectJson()
-              if (saveStore.currentFilePath) {
-                const path = saveStore.currentFilePath
-                trackSave(() => window.electronAPI.saveProject(path, json))
-                  .catch((err: unknown) => console.error('[ZeroSeams] Save failed:', err))
-              } else {
-                trackSave(() => window.electronAPI.saveProjectAs(json))
-                  .then((result: { success: boolean; filePath?: string; error?: string }) => {
-                    if (result.success && result.filePath) {
-                      useSaveStatusStore.getState().setCurrentFilePath(result.filePath)
-                    }
-                  })
-                  .catch((err: unknown) => console.error('[ZeroSeams] Save failed:', err))
-              }
-            }}
+            onClick={() => { void fileManager.save() }}
             style={{
               padding: '4px 10px',
               height: 30,
@@ -816,14 +751,7 @@ export function TitleBar(): React.ReactElement {
             <button
               onClick={() => {
                 setSaveMenuOpen(false)
-                const json = buildProjectJson()
-                trackSave(() => window.electronAPI.saveProjectAs(json))
-                  .then((result: { success: boolean; filePath?: string; error?: string }) => {
-                    if (result.success && result.filePath) {
-                      useSaveStatusStore.getState().setCurrentFilePath(result.filePath)
-                    }
-                  })
-                  .catch((err: unknown) => console.error('[ZeroSeams] Save As failed:', err))
+                void fileManager.saveAs()
               }}
               style={{
                 display: 'block', width: '100%', textAlign: 'left',
@@ -839,9 +767,7 @@ export function TitleBar(): React.ReactElement {
             <button
               onClick={() => {
                 setSaveMenuOpen(false)
-                const json = buildProjectJson()
-                trackSave(() => window.electronAPI.saveProjectCopy(json))
-                  .catch((err: unknown) => console.error('[ZeroSeams] Save a Copy failed:', err))
+                void fileManager.saveCopy()
               }}
               style={{
                 display: 'block', width: '100%', textAlign: 'left',
@@ -1029,6 +955,7 @@ export function TitleBar(): React.ReactElement {
                 <label style={{ color: 'var(--text-secondary)', fontSize: 12, fontFamily: 'var(--font)' }}>Frame</label>
                 <NumericInput
                   value={exportSingle}
+                  label="Frame to export"
                   min={1} max={frameCount}
                   width={48} align="center"
                   onChange={setExportSingle}
@@ -1042,6 +969,7 @@ export function TitleBar(): React.ReactElement {
                 <label style={{ color: 'var(--text-secondary)', fontSize: 12, fontFamily: 'var(--font)' }}>From</label>
                 <NumericInput
                   value={exportFrom}
+                  label="First frame to export"
                   min={1} max={frameCount}
                   width={48} align="center"
                   onChange={setExportFrom}
@@ -1050,6 +978,7 @@ export function TitleBar(): React.ReactElement {
                 <label style={{ color: 'var(--text-secondary)', fontSize: 12, fontFamily: 'var(--font)' }}>To</label>
                 <NumericInput
                   value={exportTo}
+                  label="Last frame to export"
                   min={1} max={frameCount}
                   width={48} align="center"
                   onChange={setExportTo}
@@ -1139,8 +1068,9 @@ export function TitleBar(): React.ReactElement {
                         ? Math.round(imageSettings.maxFileSizeKB / 1024 * 10) / 10
                         : imageSettings.maxFileSizeKB
                       : undefined}
+                    label="Maximum file size"
                     min={1}
-                    width={70} align="left"
+                    width={70} align="right"
                     onChange={v => {
                       const kb = maxFileSizeUnit === 'MB' ? v * 1024 : v
                       setImageSettings(s => ({ ...s, maxFileSizeKB: kb }))
@@ -1455,10 +1385,10 @@ export function ToolBar(): React.ReactElement {
         alignItems: 'flex-end',
         position: 'absolute',
         top: 0,
-        left: 240,
-        right: 300,
+        left: LAYER_PANEL_WIDTH,
+        right: PROPERTIES_PANEL_WIDTH,
         zIndex: 10,
-        height: 62,
+        height: TOOL_BAR_HEIGHT,
         padding: '0 20px 10px',
         gap: 0,
         background: 'linear-gradient(to bottom, var(--bg-base) 0%, var(--bg-base) 50%, transparent 100%)',

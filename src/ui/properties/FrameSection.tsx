@@ -1,13 +1,14 @@
 import React from 'react'
 import type { CanvasObject, ImageObject, VideoObject, ClipShape } from '@/types/canvas'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
-import { solidColorOf } from '@/canvas/frameClip'
+import { normalizeFill } from '@/canvas/fill'
 import { isEmptyFrame, isGridCell as isGridCellObject } from '@/canvas/frameModel'
 import Tooltip from '../Tooltip'
 import { ColorInput } from '../ColorInput'
+import { FillEditor } from './FillEditor'
 import { NumericInput } from '../NumericInput'
 import { iconBtnProps } from '../iconBtnStyle'
-import { sectionLabelStyle } from './shared'
+import { Field, sectionLabelStyle, useScrubbedValue } from './shared'
 import { pickImageMedia, pickVideoMedia } from './mediaPickers'
 
 // ---------------------------------------------------------------------------
@@ -68,7 +69,12 @@ export function FrameSection({
   const isGridCell = isGridCellObject(frameObj)
   const cornerRadius = clipShape?.kind === 'rect' ? (clipShape.cornerRadius ?? 0) : 0
   const maxCorner = Math.max(0, Math.floor(Math.min(frameObj.frameWidth, frameObj.frameHeight) / 2))
-  const fillColor = solidColorOf(frameObj.fill)
+
+  const strokeWidthScrub = useScrubbedValue({
+    onLiveChange: (v) => onUpdate(selectedId, { frameStrokeWidth: v }),
+    onCommit: (v) => onCommit(selectedId, { frameStrokeWidth: v }),
+    onStartDrag,
+  })
 
   function setCornerRadius(value: number, commit: boolean): void {
     const nextClip: ClipShape = value > 0 ? { kind: 'rect', cornerRadius: value } : { kind: 'rect' }
@@ -82,10 +88,6 @@ export function FrameSection({
   function setClipKind(kind: ClipShape['kind']): void {
     if (kind === clipKind) return
     onCommit(selectedId, { clipShape: kind === 'ellipse' ? { kind: 'ellipse' } : { kind: 'rect' } })
-  }
-
-  function setFillColor(color: string | undefined): void {
-    onCommit(selectedId, { fill: color != null ? { type: 'solid', color } : undefined })
   }
 
   async function handleInsertImage(): Promise<void> {
@@ -160,55 +162,28 @@ export function FrameSection({
 
       {/* Rect: corner radius */}
       {clipKind === 'rect' && (
-        <div style={rowStyle}>
-          <label style={labelStyle} onDoubleClick={() => setCornerRadius(0, true)}>
-            Corner R.
-          </label>
-          <input
-            type="range"
-            min={0}
-            max={Math.max(1, maxCorner)}
-            step={1}
-            value={cornerRadius}
-            onMouseDown={onStartDrag}
-            onChange={(e) => setCornerRadius(Number(e.target.value), false)}
-            onMouseUp={(e) => setCornerRadius(Number((e.target as HTMLInputElement).value), true)}
-            style={{ flex: 1 }}
-          />
-          <NumericInput
-            value={cornerRadius}
-            min={0}
-            max={maxCorner}
-            width={48}
-            onCommit={(v) => setCornerRadius(v, true)}
-            onDoubleClick={() => setCornerRadius(0, true)}
-          />
-        </div>
+        <Field
+          label="Corner R."
+          unit="px"
+          value={cornerRadius}
+          min={0}
+          max={maxCorner}
+          onStartDrag={onStartDrag}
+          onLiveChange={(v) => setCornerRadius(v, false)}
+          onChange={(v) => setCornerRadius(v, true)}
+          onReset={() => setCornerRadius(0, true)}
+        />
       )}
 
-      {/* Fill */}
+      {/* Fill — solid or gradient. A frame may have no fill at all, so None stays. */}
       <div style={sectionLabelStyle}>Fill</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-        <ColorInput value={fillColor ?? 'var(--bg-surface)'} onChange={(color) => setFillColor(color)} fixed />
-        {fillColor != null && (
-          <Tooltip label="Clear fill">
-            <button
-              onClick={() => setFillColor(undefined)}
-              style={{
-                width: 20, height: 20, borderRadius: 999,
-                background: 'none', border: '1px solid var(--stroke)',
-                color: 'var(--text-secondary)', fontSize: 11, lineHeight: 1,
-                cursor: 'pointer', padding: 0,
-              }}
-            >
-              ✕
-            </button>
-          </Tooltip>
-        )}
-        {fillColor == null && (
-          <span style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>None</span>
-        )}
-      </div>
+      <FillEditor
+        value={frameObj.fill}
+        onStartDrag={onStartDrag}
+        onChange={(f) => onUpdate(selectedId, { fill: normalizeFill(f) })}
+        onCommit={(f) => onCommit(selectedId, { fill: normalizeFill(f) })}
+        allowNone
+      />
 
       {/* Frame stroke */}
       <div style={sectionLabelStyle}>Frame Stroke</div>
@@ -220,9 +195,11 @@ export function FrameSection({
         />
         <NumericInput
           value={frameObj.frameStrokeWidth ?? 0}
+          label="Frame stroke width"
+          unit="px"
           min={0}
-          width={48}
-          onCommit={(v) => onCommit(selectedId, { frameStrokeWidth: v })}
+          width={72}
+          {...strokeWidthScrub}
           onDoubleClick={() => onCommit(selectedId, { frameStrokeWidth: 0 })}
         />
       </div>

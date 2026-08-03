@@ -3,7 +3,11 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { CarouselStage } from '@/canvas'
 import { TitleBar, ToolBar, LayerPanel, PropertiesPanel, ContextMenu } from '@/ui'
-import { useExportStore } from '@/store'
+import { NewDocumentScreen, type NewDocumentSpec, type RecentFile } from '@/ui/NewDocumentScreen'
+import { useExportStore, useSaveStatusStore } from '@/store'
+import {
+  cancelNewDocument, createNew, initFileBridges, openFromDialog, openPath, restoreLastFile,
+} from '@/io/fileManager'
 import { PreviewShell } from '@/ui/preview/PreviewShell'
 import { ShortcutOverlay } from '@/ui/ShortcutOverlay'
 import { CanvasHud } from '@/ui/CanvasHud'
@@ -39,6 +43,86 @@ class ErrorBoundary extends React.Component<
     }
     return this.props.children
   }
+}
+
+/**
+ * Container for the New Document screen: owns every store/IPC touch so the
+ * screen itself stays presentational.
+ *
+ * Startup order matters. A file handed over by the OS wins, then the session's
+ * last file, and only if neither restores does the screen appear — restoring a
+ * document must never flash a "pick a document" prompt at the user.
+ */
+function NewDocumentGate(): React.ReactElement | null {
+  const documentReady = useSaveStatusStore((s) => s.documentReady)
+  const hasOpenDocument = useSaveStatusStore((s) => s.currentFilePath !== null)
+  const [defaultFolder, setDefaultFolder] = React.useState('')
+  const [recentFiles, setRecentFiles] = React.useState<RecentFile[]>([])
+  const [creating, setCreating] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
+  const [booting, setBooting] = React.useState(true)
+
+  React.useEffect(() => {
+    const teardown = initFileBridges()
+    void (async () => {
+      const pending = await window.electronAPI.takePendingOpenFile()
+      const opened = pending.filePath
+        ? (await openPath(pending.filePath)).success
+        : false
+      if (!opened) await restoreLastFile()
+      setBooting(false)
+    })()
+    return teardown
+  }, [])
+
+  // Only fetched while the screen is actually up — no cost on the normal path.
+  React.useEffect(() => {
+    if (documentReady || booting) return
+    void window.electronAPI.getDefaultProjectDir().then((r) => { setDefaultFolder(r.folderPath) })
+    void window.electronAPI.listRecentProjects().then((r) => { setRecentFiles(r.files) })
+    setError(null)
+  }, [documentReady, booting])
+
+  React.useEffect(() => {
+    if (documentReady || booting) return
+    function onKeyDown(e: KeyboardEvent): void {
+      if (e.key === 'Escape') cancelNewDocument()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => { window.removeEventListener('keydown', onKeyDown) }
+  }, [documentReady, booting])
+
+  if (documentReady || booting) return null
+
+  return (
+    <NewDocumentScreen
+      defaultFolder={defaultFolder}
+      recentFiles={recentFiles}
+      creating={creating}
+      error={error}
+      onCreate={(spec: NewDocumentSpec) => {
+        setCreating(true)
+        setError(null)
+        void createNew(spec)
+          .then((r) => { if (!r.success) setError(r.error ?? 'Could not create the document.') })
+          .finally(() => { setCreating(false) })
+      }}
+      onChooseFolder={async () => {
+        const r = await window.electronAPI.showFolderDialog({
+          title: 'Choose where to save the document',
+          defaultPath: defaultFolder || undefined,
+        })
+        return r.cancelled || !r.folderPath ? null : r.folderPath
+      }}
+      onOpen={() => {
+        void openFromDialog().then((r) => { if (!r.success && r.error) setError(r.error) })
+      }}
+      onOpenPath={(path) => {
+        void openPath(path).then((r) => { if (!r.success && r.error) setError(r.error) })
+      }}
+      onCancel={hasOpenDocument ? () => { cancelNewDocument() } : undefined}
+    />
+  )
 }
 
 function App(): React.ReactElement {
@@ -102,7 +186,6 @@ function App(): React.ReactElement {
             }}
           >
             <CarouselStage />
-            <CanvasHud />
 
             {exporting && (
               <div
@@ -141,7 +224,13 @@ function App(): React.ReactElement {
         </div>
       </div>
 
+      {/* Root level, not inside the canvas area: that div is `position:relative;
+          zIndex:0`, which opens a stacking context the HUD could never escape —
+          it painted under the panels no matter how high its own z-index went. */}
+      <CanvasHud />
+
       {/* Full-screen overlays at root level so they paint above panels/toolbar */}
+      <NewDocumentGate />
       <PreviewShell />
       <ShortcutOverlay />
       {/* Portal-based context menu — renders to document.body */}

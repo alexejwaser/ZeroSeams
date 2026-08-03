@@ -3,6 +3,7 @@ import { useCanvasStore } from '@/canvas/useCanvasStore'
 import { useViewportStore, scaleForZoom } from '@/canvas/useViewportStore'
 import { getStageInstance } from '@/canvas/CarouselStage'
 import Tooltip from './Tooltip'
+import { LAYER_PANEL_WIDTH, PROPERTIES_PANEL_WIDTH, TOOL_BAR_HEIGHT, HUD_LANE } from './panelConstants'
 
 const hudBtnStyle: React.CSSProperties = {
   background: 'none',
@@ -37,28 +38,38 @@ export function CanvasHud(): React.ReactElement | null {
     if (!container) return
     const { frameCount, frameWidth, frameHeight } = useCanvasStore.getState()
     const pad = 48
-    const availW = container.clientWidth - pad * 2
-    const availH = container.clientHeight - pad * 2
+    // The stage container spans the whole canvas area, but the panels, toolbar and
+    // this HUD float on top of it. Fitting to the raw container size centred the
+    // strip underneath them; fit to the genuinely visible rectangle instead.
+    const visibleLeft = LAYER_PANEL_WIDTH
+    const visibleTop = TOOL_BAR_HEIGHT
+    const visibleW = container.clientWidth - LAYER_PANEL_WIDTH - PROPERTIES_PANEL_WIDTH
+    const visibleH = container.clientHeight - TOOL_BAR_HEIGHT - HUD_LANE
+    const availW = visibleW - pad * 2
+    const availH = visibleH - pad * 2
     if (availW <= 0 || availH <= 0) return
     const targetScale = Math.min(availW / (frameCount * frameWidth), availH / frameHeight)
     const newZoom = targetScale / scaleForZoom(1)
     const vp = useViewportStore.getState()
     vp.setZoom(newZoom)
-    // Center the frame strip in the container (setZoom clamps, so re-read).
+    // Center the frame strip in the visible rectangle (setZoom clamps, so re-read).
     const applied = scaleForZoom(useViewportStore.getState().zoom)
     vp.setPan(
-      (container.clientWidth - frameCount * frameWidth * applied) / 2,
-      (container.clientHeight - frameHeight * applied) / 2,
+      visibleLeft + (visibleW - frameCount * frameWidth * applied) / 2,
+      visibleTop + (visibleH - frameHeight * applied) / 2,
     )
   }
 
   return (
     <div
       style={{
-        position: 'absolute',
+        // `fixed`, not `absolute`: this renders at the App root (see main.tsx) so
+        // it sits above the floating panels rather than inside the canvas area's
+        // stacking context.
+        position: 'fixed',
         right: 16,
         bottom: 16,
-        zIndex: 15,
+        zIndex: 30,
         display: 'flex',
         alignItems: 'center',
         gap: 2,

@@ -69,9 +69,15 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
 
   useEffect(() => {
     function handleMouseDown(e: MouseEvent): void {
-      if (popoverRef.current != null && !popoverRef.current.contains(e.target as Node)) {
-        onClose()
-      }
+      if (popoverRef.current == null) return
+      const target = e.target as Node
+      if (popoverRef.current.contains(target)) return
+      // The colour popover portals into document.body (ColorInput's `fixed`
+      // prop), so it is NOT inside our subtree — a plain contains() check read
+      // every click on the picker as an outside click and closed this popover,
+      // unmounting the picker mid-interaction.
+      if (target instanceof Element && target.closest('.zs-color-popover') != null) return
+      onClose()
     }
     document.addEventListener('mousedown', handleMouseDown)
     return () => { document.removeEventListener('mousedown', handleMouseDown) }
@@ -152,8 +158,9 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <NumericInput
               value={customW}
+              label="Frame width" unit="px"
               min={100} max={8000}
-              width={56} align="center"
+              width={84} align="right"
               onChange={setCustomW}
               onCommit={w => {
                 setCustomW(w)
@@ -163,8 +170,9 @@ export function FrameSettingsPopover({ onClose }: FrameSettingsPopoverProps): Re
             <span style={{ color: 'var(--text-tertiary)', fontSize: 12 }}>×</span>
             <NumericInput
               value={customH}
+              label="Frame height" unit="px"
               min={100} max={8000}
-              width={56} align="center"
+              width={84} align="right"
               onChange={setCustomH}
               onCommit={h => {
                 setCustomH(h)

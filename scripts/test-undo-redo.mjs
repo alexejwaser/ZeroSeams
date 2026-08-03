@@ -10,6 +10,7 @@ import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import fs from 'node:fs'
+import { terminateElectron } from './terminateElectron.mjs'
 
 const ROOT = path.resolve(fileURLToPath(import.meta.url), '../..')
 const ELECTRON_BIN = path.join(ROOT, 'node_modules/electron/dist/Electron.app/Contents/MacOS/Electron')
@@ -49,7 +50,7 @@ await new Promise(r => setTimeout(r, 3000)) // wait for renderer to load
 
 const browser = await chromium.connectOverCDP(`http://localhost:${CDP_PORT}`)
 const app = {
-  close: async () => { await browser.close(); electronProc.kill() },
+  close: async () => { await browser.close(); await terminateElectron(electronProc) },
 }
 const page = browser.contexts()[0].pages()[0]
 page.on('console', m => { if (m.type() === 'error') console.error(`  [renderer error] ${m.text()}`) })
@@ -154,40 +155,41 @@ const selectObj = (id) => page.evaluate((id) => {
   window.__canvasStore__.getState().setSelected(id)
 }, id)
 
-// Simulate opacity range slider: mousedown + N input events + mouseup.
-// Returns { inputDelta, mouseupDelta } — change in pastLen at each point.
-const simulateOpacitySlider = (targetVal) => page.evaluate((tv) => {
-  function findOpacitySlider() {
-    const labels = [...document.querySelectorAll('label')]
-    const lbl = labels.find(l => l.textContent.trim() === 'Opacity')
+const pastLen = () => page.evaluate(() => window.__canvasStore__.getState().past.length)
+
+// Drag the unit affix of the property row labelled `labelText` by `dx` pixels
+// (issue #68 replaced every paired range slider with this gesture). Driven with
+// the real mouse, not synthetic events: the affix calls setPointerCapture, which
+// only works for a pointer the browser actually believes is down.
+// Returns { downDelta, moveDelta, upDelta } — change in pastLen at each phase.
+// The contract is 0 / 0 / 1: nothing on press, nothing per pixel, ONE on release.
+const scrubField = async (labelText, dx) => {
+  const pos = await page.evaluate((lt) => {
+    const lbl = [...document.querySelectorAll('label')].find(l => l.textContent.trim() === lt)
     if (!lbl) return null
-    return lbl.parentElement?.querySelector('input[type="range"]') ?? null
-  }
-  const slider = findOpacitySlider()
-  if (!slider) return { error: 'opacity slider not found' }
+    const affix = lbl.parentElement?.querySelector('.zs-num-unit')
+    if (!affix) return null
+    const r = affix.getBoundingClientRect()
+    if (r.width === 0) return null
+    return { x: r.x + r.width / 2, y: r.y + r.height / 2 }
+  }, labelText)
+  if (!pos) return { error: `no scrub affix for "${labelText}"` }
 
-  const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set
-
-  // Simulate mousedown (triggers onMouseDown=startDrag, capturing pre-drag state)
-  slider.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
-  const before = window.__canvasStore__.getState().past.length
-
-  // Simulate 3 incremental input events (drag in progress)
-  for (const v of [tv - 20, tv - 10, tv]) {
-    setter.call(slider, String(Math.max(0, v)))
-    slider.dispatchEvent(new Event('input', { bubbles: true }))
-  }
-  const afterInputs = window.__canvasStore__.getState().past.length
-
-  // Simulate mouseup (end of drag — triggers commitUpdate with pre-drag snapshot)
-  slider.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
-  const afterMouseup = window.__canvasStore__.getState().past.length
+  const before = await pastLen()
+  await page.mouse.move(pos.x, pos.y)
+  await page.mouse.down()
+  const afterDown = await pastLen()
+  for (let i = 1; i <= 5; i++) await page.mouse.move(pos.x + (dx * i) / 5, pos.y)
+  const afterMoves = await pastLen()
+  await page.mouse.up()
+  const afterUp = await pastLen()
 
   return {
-    inputDelta: afterInputs - before,
-    mouseupDelta: afterMouseup - before,
+    downDelta: afterDown - before,
+    moveDelta: afterMoves - before,
+    upDelta: afterUp - before,
   }
-}, targetVal)
+}
 
 // ─── Baseline: clear any leftover objects ────────────────────────────────────
 await page.evaluate(() => {
@@ -314,8 +316,8 @@ console.log('\n── B. Z-order ──')
   await wait(100)
 }
 
-// ── C. Opacity sliders ────────────────────────────────────────────────────────
-console.log('\n── C. Opacity sliders ──')
+// ── C. Opacity scrub ──────────────────────────────────────────────────────────
+console.log('\n── C. Opacity scrub ──')
 
 for (const [label, addFn] of [
   ['shape', addShape],
@@ -328,13 +330,16 @@ for (const [label, addFn] of [
   await selectObj(id)
   await wait(400) // wait for PropertiesPanel to render
 
-  const result = await simulateOpacitySlider(60)
+  const result = await scrubField('Opacity', -80)
 
   if (result.error) {
-    ok(false, `${label}: opacity slider found in PropertiesPanel`)
+    ok(false, `${label}: opacity scrub affix found in PropertiesPanel — ${result.error}`)
   } else {
-    eq(result.inputDelta, 0, `${label}: input events don't flood history (delta=${result.inputDelta})`)
-    eq(result.mouseupDelta, 1, `${label}: mouseup commits exactly 1 history entry (delta=${result.mouseupDelta})`)
+    eq(result.downDelta, 0, `${label}: pointerdown pushes no history (delta=${result.downDelta})`)
+    eq(result.moveDelta, 0, `${label}: pointer moves don't flood history (delta=${result.moveDelta})`)
+    eq(result.upDelta, 1, `${label}: release commits exactly 1 history entry (delta=${result.upDelta})`)
+    const mid = await getState()
+    ok((mid.objects[id]?.opacity ?? 1) < 0.95, `${label}: the scrub actually changed opacity`)
   }
 
   // Undo should revert opacity back to 1
@@ -530,8 +535,11 @@ console.log('\n── F. Media Frames ──')
   eq(s8.objects[id]?.kind, preRemoveClipKind, 'F3: clip kind becomes the shape kind')
   ok(s8.objects[id]?.isEmpty === undefined, 'F3: no lingering isEmpty frame state')
   ok(s8.objects[id]?.clipShape === undefined, 'F3: no lingering clipShape')
-  // ShapeObject.fill is a plain colour string, not the frame's Fill union.
-  eq(s8.objects[id]?.fill, preRemoveFillColor, 'F3: fill colour preserved after media removal')
+  // ShapeObject.fill is `string | Fill`. A SOLID frame fill collapses back to
+  // the bare colour string (denormalizeFill) — that canonical form is what keeps
+  // a shape→frame→shape round-trip value-identical. Gradients stay Fill objects;
+  // F7 covers those.
+  eq(s8.objects[id]?.fill, preRemoveFillColor, 'F3: solid fill collapses back to a bare colour string')
   eq(s8.objects[id]?.x, preRemoveX, 'F3: geometry preserved (x)')
   eq(s8.objects[id]?.width, preRemoveW, 'F3: geometry preserved (width)')
 
@@ -667,6 +675,99 @@ console.log('\n── F. Media Frames ──')
     while (gs().past.length > 0) gs().undo()
     gs().removeObject(id)
   }, shapeId)
+  await wait(100)
+}
+
+{
+  // F7. Gradient fills (#61). Fill geometry is stored NORMALIZED (angle in
+  // degrees, cx/cy/r in 0–1 object units) for the same reason ClipShape anchors
+  // are: display px do not survive a resize or a type conversion. These two
+  // round-trips are what prove the value is never rewritten in transit.
+  const LINEAR = { type: 'linear', angle: 45, stops: [{ offset: 0, color: '#ff0000' }, { offset: 1, color: '#0000ff' }] }
+  const RADIAL = { type: 'radial', cx: 0.25, cy: 0.75, r: 0.4, stops: [{ offset: 0, color: '#00ff00' }, { offset: 0.5, color: '#ffff00' }, { offset: 1, color: '#000000' }] }
+
+  // F7a. shape → frame → shape keeps the gradient intact.
+  const id = await addShape()
+  await wait(100)
+  await page.evaluate(([id, fill]) => window.__canvasStore__.getState().commitUpdate(id, { fill }), [id, LINEAR])
+  await wait(100)
+  const g0 = await getState()
+  eq(JSON.stringify(g0.objects[id]?.fill), JSON.stringify(LINEAR), 'F7a: a ShapeObject accepts a gradient Fill')
+
+  await page.evaluate((id) => window.__canvasStore__.getState().convertShapeToFrame(id), id)
+  await wait(100)
+  const g1 = await getState()
+  eq(g1.objects[id]?.type, 'image', 'F7a: shape converted to a frame')
+  eq(JSON.stringify(g1.objects[id]?.fill), JSON.stringify(LINEAR), 'F7a: gradient survives shape → frame')
+
+  await page.evaluate((id) => window.__canvasStore__.getState().convertFrameToShape(id), id)
+  await wait(100)
+  const g2 = await getState()
+  eq(g2.objects[id]?.type, 'shape', 'F7a: frame converted back to a shape')
+  eq(JSON.stringify(g2.objects[id]?.fill), JSON.stringify(LINEAR), 'F7a: gradient survives frame → shape')
+
+  // F7b. A radial gradient on a frame survives a JSON save → load round-trip
+  // (loadProject is the real reader used by every open path).
+  await page.evaluate(([id, fill]) => {
+    const gs = () => window.__canvasStore__.getState()
+    gs().convertShapeToFrame(id)
+    gs().commitUpdate(id, { fill })
+  }, [id, RADIAL])
+  await wait(100)
+
+  const roundTripped = await page.evaluate(() => {
+    const gs = () => window.__canvasStore__.getState()
+    const st = gs()
+    // Same shape as io/projectFile.ts buildProject(), through real JSON.
+    const json = JSON.stringify({
+      id: 'test', name: 'test', schemaVersion: 2,
+      platform: st.platform, ratio: st.ratio,
+      dimensions: { width: st.frameWidth, height: st.frameHeight },
+      frameCount: st.frameCount, frames: st.frames,
+      backgroundColor: st.backgroundColor,
+      objects: st.objects, objectOrder: st.objectOrder,
+      createdAt: '', updatedAt: '', version: 1,
+    })
+    gs().loadProject(JSON.parse(json))
+    return true
+  })
+  ok(roundTripped, 'F7b: project serialized and reloaded')
+  await wait(150)
+  const g3 = await getState()
+  eq(JSON.stringify(g3.objects[id]?.fill), JSON.stringify(RADIAL), 'F7b: radial gradient survives save → load')
+  eq(g3.objects[id]?.fill?.cx, 0.25, 'F7b: cx stayed normalized 0–1 (never rewritten to display px)')
+  eq(g3.objects[id]?.fill?.stops?.length, 3, 'F7b: all three stops survive')
+
+  // F7c. A bare colour string is still legal on a shape — old projects need no
+  // migration, which is the whole reason ShapeObject.fill is `string | Fill`.
+  const legacyId = await page.evaluate(() => {
+    const id = crypto.randomUUID()
+    window.__canvasStore__.getState().addObject({
+      id, type: 'shape', kind: 'rect', scope: 'global',
+      x: 10, y: 10, width: 50, height: 50,
+      fill: '#abcdef', stroke: '#000000', strokeWidth: 1,
+      opacity: 1, rotation: 0, visible: true, locked: false, zIndex: 0,
+      scaleX: 1, scaleY: 1,
+    })
+    return id
+  })
+  await wait(100)
+  await page.evaluate((id) => window.__canvasStore__.getState().convertShapeToFrame(id), legacyId)
+  await wait(100)
+  const g4 = await getState()
+  eq(g4.objects[legacyId]?.fill?.type, 'solid', 'F7c: a bare string becomes a solid Fill on the frame')
+  eq(g4.objects[legacyId]?.fill?.color, '#abcdef', 'F7c: the colour is carried through unchanged')
+  await page.evaluate((id) => window.__canvasStore__.getState().convertFrameToShape(id), legacyId)
+  await wait(100)
+  const g5 = await getState()
+  eq(g5.objects[legacyId]?.fill, '#abcdef', 'F7c: and collapses back to the same bare string')
+
+  // Cleanup — loadProject reset history, so just remove.
+  await page.evaluate(([a, b]) => {
+    const gs = () => window.__canvasStore__.getState()
+    gs().removeObject(a)
+    gs().removeObject(b)
+  }, [id, legacyId])
   await wait(100)
 }
 
@@ -819,48 +920,25 @@ console.log('\n── I. Edge cases ──')
   await wait(100)
 }
 
-// ── J. Rotation slider coalescing ────────────────────────────────────────────
-console.log('\n── J. Rotation slider coalescing ──')
+// ── J. Rotation scrub coalescing ─────────────────────────────────────────────
+console.log('\n── J. Rotation scrub coalescing ──')
 
 {
   const id = await addShape()
   await selectObj(id)
-  await wait(200)
+  await wait(400)
 
-  // Find the rotation range slider (first range input whose sibling label says "Rotation")
-  const result = await page.evaluate(() => {
-    const labels = [...document.querySelectorAll('label')]
-    const lbl = labels.find(l => l.textContent.trim() === 'Rotation')
-    if (!lbl) return { error: 'rotation label not found' }
-    const slider = lbl.parentElement?.querySelector('input[type="range"]') ?? null
-    if (!slider) return { error: 'rotation slider not found' }
-
-    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set
-    const store = window.__canvasStore__.getState()
-
-    // mousedown — triggers startDrag (captures pre-drag snapshot)
-    slider.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
-    const before = store.past.length
-
-    // Several intermediate onChange events — should NOT push history
-    for (const v of [10, 20, 30, 45]) {
-      setter.call(slider, String(v))
-      slider.dispatchEvent(new Event('input', { bubbles: true }))
-    }
-    const afterInputs = window.__canvasStore__.getState().past.length
-
-    // mouseup — triggers commitUpdate (single history entry)
-    slider.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
-    const afterMouseup = window.__canvasStore__.getState().past.length
-
-    return { before, inputDelta: afterInputs - before, mouseupDelta: afterMouseup - before }
-  })
+  const result = await scrubField('Rotation', 90)
 
   if (result.error) {
-    ok(false, `rotation slider found — ${result.error}`)
+    ok(false, `rotation scrub affix found — ${result.error}`)
   } else {
-    eq(result.inputDelta, 0, 'rotation onChange does not push history (drag pattern)')
-    eq(result.mouseupDelta, 1, 'rotation mouseup pushes exactly 1 history entry')
+    eq(result.downDelta, 0, 'rotation pointerdown pushes no history')
+    eq(result.moveDelta, 0, 'rotation pointer moves do not push history (drag pattern)')
+    eq(result.upDelta, 1, 'rotation release pushes exactly 1 history entry')
+
+    const mid = await getState()
+    ok((mid.objects[id]?.rotation ?? 0) > 0, `the scrub actually rotated (got ${mid.objects[id]?.rotation})`)
 
     // Undo restores pre-rotation state
     const beforeUndo = await getState()

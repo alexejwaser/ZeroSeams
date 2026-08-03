@@ -40,9 +40,34 @@ export interface BaseCanvasObject {
   effects?: LayerEffect[]
 }
 
-/** Universal fill for media frames. Gradient will be added later as
- *  another union member — always switch on fill.type. */
-export type Fill = { type: 'solid'; color: string }
+/** One colour stop of a gradient. `offset` is 0–1 along the gradient axis. */
+export interface GradientStop {
+  offset: number
+  color: string
+}
+
+/** Universal fill — media frames, shapes and paths all read it.
+ *  Always switch on `fill.type`; never touch `fill.color` unguarded.
+ *
+ *  Geometry is stored NORMALIZED, exactly like ClipShape path anchors:
+ *  - `angle` is degrees, 0 = left→right, increasing clockwise (canvas y is down).
+ *  - `cx`/`cy`/`r` are 0–1 units of the object's own width/height (`r` scales
+ *    against the larger side).
+ *  Storing display pixels here is the bug that killed the old mask system —
+ *  pixel geometry does not survive a frame resize, a template change or a
+ *  shape→frame→shape round-trip. Normalized geometry needs no rewrite ever. */
+export type Fill =
+  | { type: 'solid'; color: string }
+  | { type: 'linear'; angle: number; stops: GradientStop[] }
+  | { type: 'radial'; cx: number; cy: number; r: number; stops: GradientStop[] }
+
+/** A saved colour. Lives either in the project file (File scope) or in
+ *  userData/swatches.json (Global scope) — see src/store/useSwatchStore.ts. */
+export interface Swatch {
+  id: string
+  color: string
+  name?: string
+}
 
 /** Clip geometry of a media frame. Path anchors are NORMALIZED:
  *  x/y and handle dx/dy in 0–1 units of frameWidth/frameHeight.
@@ -174,7 +199,9 @@ export type ShapeKind = 'rect' | 'ellipse' | 'line' | 'arrow'
 export interface ShapeObject extends BaseCanvasObject {
   type: 'shape'
   kind: ShapeKind
-  fill: string
+  /** Plain colour string OR a Fill. A bare string is the canonical form for a
+   *  solid fill, which is why projects saved before gradients load unchanged. */
+  fill: string | Fill
   stroke: string
   strokeWidth: number
   cornerRadius?: number   // rect only
@@ -193,7 +220,8 @@ export interface PathObject extends BaseCanvasObject {
   type: 'path'
   anchors: AnchorPoint[]
   closed: boolean
-  fill: string
+  /** Plain colour string OR a Fill — see ShapeObject.fill. */
+  fill: string | Fill
   stroke: string
   strokeWidth: number
   pathEditMode: boolean

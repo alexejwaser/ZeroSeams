@@ -55,8 +55,11 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
   {
     title: 'File & view',
     entries: [
+      { keys: '⌘ N', label: 'New document' },
+      { keys: '⌘ O', label: 'Open' },
       { keys: '⌘ S', label: 'Save' },
       { keys: '⌘ ⇧ S', label: 'Save as' },
+      { keys: '⌥ ⇧ ⌘ S', label: 'Save a copy' },
       { keys: '⌘ E', label: 'Export' },
       { keys: '⌘ Z', label: 'Undo' },
       { keys: '⌘ ⇧ Z', label: 'Redo' },

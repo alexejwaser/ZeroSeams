@@ -1,39 +1,18 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { useCanvasStore } from '@/canvas/useCanvasStore'
 import { useThumbnailStore } from '@/canvas/useThumbnailStore'
-import { solidColorOf } from '@/canvas/frameClip'
 import { isEmptyFrame } from '@/canvas/frameModel'
-import type { CanvasObject, CanvasObjectType, GroupObject, GuidelineObject, VideoObject, ImageObject } from '@/types/canvas'
+import type { CanvasObject, CanvasObjectType, GroupObject, GuidelineObject, VideoObject } from '@/types/canvas'
 import Tooltip from './Tooltip'
 import { iconBtnProps } from './iconBtnStyle'
+import { LAYER_PANEL_WIDTH, TITLE_BAR_HEIGHT } from './panelConstants'
 import { GUIDELINE } from '@/canvas/constants'
 import { Star, Lock, LockOpen, Eye, EyeOff, Volume2, VolumeX, ChevronDown, ChevronRight, Layers } from 'lucide-react'
 
-// Fill-color swatch + shape glyph for empty media frames — a broken <img>
-// thumbnail would otherwise render since isEmpty frames have no src.
-function EmptyFrameThumb({ obj }: { obj: ImageObject }): React.ReactElement {
-  const fillColor = solidColorOf(obj.fill) ?? 'var(--bg-panel)'
-  const kind = obj.clipShape?.kind ?? 'rect'
-  return (
-    <div
-      style={{
-        width: 26, height: 26, flexShrink: 0, borderRadius: 4,
-        overflow: 'hidden', background: fillColor, border: '1px solid var(--border)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}
-    >
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-        {kind === 'ellipse' ? (
-          <ellipse cx="7" cy="7" rx="5.5" ry="4" stroke="var(--text-tertiary)" strokeWidth="1.2" />
-        ) : kind === 'path' ? (
-          <path d="M2 10 L5 3 L9 7 L12 2" stroke="var(--text-tertiary)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-        ) : (
-          <rect x="2" y="2" width="10" height="10" rx="1.5" stroke="var(--text-tertiary)" strokeWidth="1.2" />
-        )}
-      </svg>
-    </div>
-  )
-}
+// (EmptyFrameThumb used to live here — a hand-drawn swatch that existed only
+// because generateThumbnail bailed on an isEmpty frame's `src: ''`. The image
+// branch now paints fill + clip silhouette for empty frames, so the generic
+// thumbnail path covers them and a gradient fill shows up in the panel too.)
 
 function typeLabel(type: CanvasObjectType): string {
   switch (type) {
@@ -139,7 +118,7 @@ export function LayerPanel(): React.ReactElement {
         left: 0,
         top: 0,
         zIndex: 20,
-        width: 240,
+        width: LAYER_PANEL_WIDTH,
         boxSizing: 'border-box',
         background: 'var(--bg-panel)',
         borderRight: '1px solid var(--border)',
@@ -152,7 +131,7 @@ export function LayerPanel(): React.ReactElement {
     >
       <div
         ref={innerRef}
-        style={{ maxHeight: 'calc(100vh - 52px)', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}
+        style={{ maxHeight: `calc(100vh - ${TITLE_BAR_HEIGHT}px)`, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}
         className="panel-scroll"
       >
         {/* Title */}
@@ -344,8 +323,6 @@ export function LayerPanel(): React.ReactElement {
                       )}
                     </svg>
                   </div>
-                ) : isEmptyFrame(obj) ? (
-                  <EmptyFrameThumb obj={obj} />
                 ) : (
                   <div
                     style={{
@@ -535,22 +512,18 @@ export function LayerPanel(): React.ReactElement {
                     }}
                   >
                     {/* Thumbnail */}
-                    {isEmptyFrame(childObj) ? (
-                      <EmptyFrameThumb obj={childObj} />
-                    ) : (
-                      <div
-                        style={{
-                          width: 26, height: 26, flexShrink: 0, borderRadius: 4,
-                          overflow: 'hidden', background: 'var(--bg-panel)', border: '1px solid var(--border)',
-                        }}
-                      >
-                        {thumbnails[childId] != null ? (
-                          <img src={thumbnails[childId]} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="" draggable={false} />
-                        ) : (
-                          <div style={{ width: '100%', height: '100%', background: 'var(--border)' }} />
-                        )}
-                      </div>
-                    )}
+                    <div
+                      style={{
+                        width: 26, height: 26, flexShrink: 0, borderRadius: 4,
+                        overflow: 'hidden', background: 'var(--bg-panel)', border: '1px solid var(--border)',
+                      }}
+                    >
+                      {thumbnails[childId] != null ? (
+                        <img src={thumbnails[childId]} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="" draggable={false} />
+                      ) : (
+                        <div style={{ width: '100%', height: '100%', background: 'var(--border)' }} />
+                      )}
+                    </div>
 
                     {/* Name */}
                     <span

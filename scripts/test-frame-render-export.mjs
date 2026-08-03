@@ -25,6 +25,7 @@ import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import fs from 'node:fs'
+import { terminateElectron } from './terminateElectron.mjs'
 
 const ROOT = path.resolve(fileURLToPath(import.meta.url), '../..')
 const ELECTRON_BIN = path.join(ROOT, 'node_modules/electron/dist/Electron.app/Contents/MacOS/Electron')
@@ -156,7 +157,7 @@ await new Promise((resolve, reject) => {
 await new Promise(r => setTimeout(r, 3000)) // wait for renderer to load
 
 const browser = await chromium.connectOverCDP(`http://localhost:${CDP_PORT}`)
-const app = { close: async () => { await browser.close(); electronProc.kill() } }
+const app = { close: async () => { await browser.close(); await terminateElectron(electronProc) } }
 const page = browser.contexts()[0].pages()[0]
 page.on('console', m => { if (m.type() === 'error') console.error(`  [renderer error] ${m.text()}`) })
 
@@ -865,6 +866,140 @@ console.log('━━━ Part 2A: rendering ━━━\n')
   s = await page.evaluate((p) => window.__zs.sampleStage(p), centre)
   nearColor(s.c, MEDIA, 'canvas repaints as media after the in-place type swap (#65)')
   await ss('type-swap')
+}
+
+// Case 16 (#61): gradient fills reach the pixels. Fill geometry is stored
+// NORMALIZED, so these assertions are really about konvaFillProps resolving it
+// against each node's own local box — a Rect's origin is 0,0, but a Konva
+// Ellipse is positioned by its CENTRE and a Path by absolute anchors.
+{
+  console.log('\nCase 16: gradient fills (#61)')
+
+  // 16a. A linear gradient on a shape: 0° runs left→right, so the left edge is
+  // the first stop and the right edge is the last.
+  const r = await page.evaluate(async () => {
+    const z = window.__zs
+    const gs = () => window.__canvasStore__.getState()
+    z.reset(2)
+    const id = crypto.randomUUID()
+    const fx = 140, fy = 140, size = 800
+    gs().addObject({
+      id, type: 'shape', kind: 'rect', scope: 'global',
+      x: fx, y: fy, width: size, height: size,
+      fill: { type: 'linear', angle: 0, stops: [
+        { offset: 0, color: '#ff0000' },
+        { offset: 1, color: '#0000ff' },
+      ] },
+      stroke: '#000000', strokeWidth: 0,
+      opacity: 1, rotation: 0, visible: true, locked: false, zIndex: 0,
+      scaleX: 1, scaleY: 1,
+    })
+    return { id, fx, fy, size }
+  })
+  await wait(500)
+
+  let s = await page.evaluate((p) => window.__zs.sampleStage(p), [
+    { name: 'left',  x: r.fx + 6,             y: r.fy + r.size / 2 },
+    { name: 'right', x: r.fx + r.size - 6,    y: r.fy + r.size / 2 },
+    { name: 'mid',   x: r.fx + r.size / 2,    y: r.fy + r.size / 2 },
+  ])
+  nearColor(s.left,  [255, 0, 0], 'linear 0°: left edge is the first stop', 12)
+  nearColor(s.right, [0, 0, 255], 'linear 0°: right edge is the last stop', 12)
+  ok(s.mid[0] > 60 && s.mid[0] < 200 && s.mid[2] > 60 && s.mid[2] < 200,
+    `linear 0°: midpoint is a genuine blend (got rgb(${s.mid.slice(0, 3)}))`)
+
+  // 16b. Rotating the SAME normalized angle by 90° must swap the axis to
+  // top→bottom without any stored geometry changing — that is the whole point
+  // of storing degrees rather than endpoints.
+  await page.evaluate(({ id }) => window.__canvasStore__.getState().commitUpdate(id, {
+    fill: { type: 'linear', angle: 90, stops: [
+      { offset: 0, color: '#ff0000' },
+      { offset: 1, color: '#0000ff' },
+    ] },
+  }), { id: r.id })
+  await wait(400)
+  s = await page.evaluate((p) => window.__zs.sampleStage(p), [
+    { name: 'top',    x: r.fx + r.size / 2, y: r.fy + 6 },
+    { name: 'bottom', x: r.fx + r.size / 2, y: r.fy + r.size - 6 },
+  ])
+  nearColor(s.top,    [255, 0, 0], 'linear 90°: axis rotated to top→bottom', 12)
+  nearColor(s.bottom, [0, 0, 255], 'linear 90°: bottom edge is the last stop', 12)
+
+  // 16c. A radial gradient on an EMPTY media frame — the empty-frame Rect is a
+  // separate render site from the filled one, and it used to hardcode a colour.
+  const f = await page.evaluate(async ({ FW }) => {
+    const z = window.__zs
+    const gs = () => window.__canvasStore__.getState()
+    z.reset(2)
+    const frame = z.addFrame({ frameIndex: 0, frameWidth: FW, src: z.solidSrc('#ff00ff') })
+    gs().commitUpdate(frame.id, {
+      isEmpty: true, src: '',
+      fill: { type: 'radial', cx: 0.5, cy: 0.5, r: 0.5, stops: [
+        { offset: 0, color: '#00ff00' },
+        { offset: 1, color: '#0000ff' },
+      ] },
+    })
+    return frame
+  }, { FW })
+  await wait(600)
+  s = await page.evaluate((p) => window.__zs.sampleStage(p), [
+    { name: 'centre', x: f.fx + f.size / 2, y: f.fy + f.size / 2 },
+    { name: 'corner', x: f.fx + 6,          y: f.fy + 6 },
+  ])
+  // Channel dominance, not an exact match: the empty-frame placeholder glyph is
+  // stroked near the centre, so an exact hit would be brittle for reasons that
+  // have nothing to do with the gradient.
+  ok(s.centre[1] > 200 && s.centre[1] > s.centre[2] + 100,
+    `radial: centre is dominated by the inner stop (got rgb(${s.centre.slice(0, 3)}))`)
+  ok(s.corner[2] > s.corner[1] + 100,
+    `radial: the far corner has reached the outer stop (got rgb(${s.corner.slice(0, 3)}))`)
+
+  // 16d. THE LIVE-TRANSFORM GUARD. syncFrameDecor resizes the fill Rect
+  // imperatively mid-drag, but a gradient's Konva endpoints are ABSOLUTE points
+  // in the node's local space — resizing the Rect alone leaves the gradient
+  // frozen at its pre-drag extent. Doubling the width and firing 'transform'
+  // (the same event react-konva bound the handler to) reproduces a live drag
+  // without synthesising pointer events.
+  //
+  // The discriminator is the MIDPOINT of the new box: if the gradient tracked,
+  // it is a 50% blend; if it stayed frozen at the old 800px extent, that x is
+  // the gradient's clamped END and reads as the pure last stop.
+  const lt = await page.evaluate(async ({ FW }) => {
+    const z = window.__zs
+    const gs = () => window.__canvasStore__.getState()
+    z.reset(2)
+    const frame = z.addFrame({ frameIndex: 0, frameWidth: FW, src: z.solidSrc('#ff00ff') })
+    gs().commitUpdate(frame.id, {
+      isEmpty: true, src: '',
+      fill: { type: 'linear', angle: 0, stops: [
+        { offset: 0, color: '#ff0000' },
+        { offset: 1, color: '#0000ff' },
+      ] },
+    })
+    return frame
+  }, { FW })
+  await wait(600)
+
+  const scaled = await page.evaluate(({ id }) => {
+    const rect = window.__getStage__().findOne(`.frame-rect-${id}`)
+    if (!rect) return false
+    rect.scaleX(2)
+    rect.fire('transform')   // runs the bound onTransform → syncGroupOnTransform
+    return true
+  }, { id: lt.id })
+  ok(scaled, '16d: found the frame rect and fired a live transform')
+  await wait(120)
+
+  s = await page.evaluate((p) => window.__zs.sampleStage(p), [
+    // Midpoint of the DOUBLED box, well clear of the centred placeholder glyph.
+    { name: 'mid',  x: lt.fx + lt.size,           y: lt.fy + lt.size * 0.15 },
+    { name: 'far',  x: lt.fx + lt.size * 2 - 8,   y: lt.fy + lt.size * 0.15 },
+  ])
+  ok(s.mid[0] > 60 && s.mid[2] > 60,
+    `16d: gradient tracks the live resize — box midpoint is a blend (got rgb(${s.mid.slice(0, 3)}))`)
+  nearColor(s.far, [0, 0, 255], '16d: the widened box still ends on the last stop', 12)
+
+  await ss('gradient-fills')
 }
 
 // Case 9: rotation. Only the centre — corner geometry under rotation is fiddly and

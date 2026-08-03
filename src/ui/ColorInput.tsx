@@ -1,8 +1,9 @@
 import React from 'react'
 import { createPortal } from 'react-dom'
 import { HexColorPicker } from 'react-colorful'
-import { Pipette } from 'lucide-react'
+import { Pipette, Plus, X } from 'lucide-react'
 import Tooltip from './Tooltip'
+import { useSwatchStore } from '@/store'
 import { clamp, hexToRgb, rgbToHex, hexToHsl, hslToHex } from '@/utils/color'
 import './ColorInput.css'
 
@@ -38,6 +39,46 @@ function clampInt(v: number, lo = 0, hi = 255): number {
   return clamp(Math.round(v), lo, hi)
 }
 
+// ─── Popover placement ────────────────────────────────────────────────────────
+
+/** The popover has a fixed width but a *variable* height — the swatch grid
+ *  grows a row per six saved colours. Height is therefore measured after mount
+ *  (see the layout effect in useColorPopover) and never assumed. */
+const POPOVER_WIDTH = 236
+/** Only used for the very first frame, before the real height is known; the
+ *  layout effect corrects the position before the browser paints. */
+const POPOVER_HEIGHT_ESTIMATE = 380
+const VIEWPORT_MARGIN = 8
+const ANCHOR_GAP = 6
+
+/** `below`/`above` are the y coordinates the popover's top / bottom edge should
+ *  take when it opens downward / flips upward. Both are precomputed at open
+ *  time so the flip decision doesn't need the trigger element again. */
+interface PopoverAnchor {
+  below: number
+  above: number
+  left: number
+}
+
+function placePopover(anchor: PopoverAnchor, height: number): { top: number; left: number } {
+  let top = anchor.below
+  // Flip above the trigger when the real height doesn't fit below it…
+  if (top + height > window.innerHeight - VIEWPORT_MARGIN) top = anchor.above - height
+  // …and if it doesn't fit above either, pin to the bottom edge.
+  if (top + height > window.innerHeight - VIEWPORT_MARGIN) {
+    top = window.innerHeight - height - VIEWPORT_MARGIN
+  }
+  if (top < VIEWPORT_MARGIN) top = VIEWPORT_MARGIN
+
+  let left = anchor.left
+  if (left + POPOVER_WIDTH > window.innerWidth - VIEWPORT_MARGIN) {
+    left = window.innerWidth - POPOVER_WIDTH - VIEWPORT_MARGIN
+  }
+  if (left < VIEWPORT_MARGIN) left = VIEWPORT_MARGIN
+
+  return { top, left }
+}
+
 // ─── Shared popover hook ──────────────────────────────────────────────────────
 
 type ColorMode = 'hex' | 'rgb' | 'hsl'
@@ -59,6 +100,7 @@ function useColorPopover({ value, onChange, onCommit, popoverAnchorFn }: UseColo
   const popoverRef = React.useRef<HTMLDivElement>(null)
   const hexInputRef = React.useRef<HTMLInputElement>(null)
   const swatchRef = React.useRef<HTMLButtonElement>(null)
+  const anchorRef = React.useRef<PopoverAnchor | null>(null)
   const [popoverPos, setPopoverPos] = React.useState<{ top: number; left: number } | null>(null)
 
   // sync draft fields when value changes externally
@@ -103,35 +145,52 @@ function useColorPopover({ value, onChange, onCommit, popoverAnchorFn }: UseColo
   }
 
   function handleOpen(_fixed: boolean) {
-    const popoverW = 236
-    const popoverH = 370
-    let top: number | null = null
-    let left: number | null = null
+    let anchor: PopoverAnchor | null = null
 
     if (popoverAnchorFn) {
       const pos = popoverAnchorFn()
-      top = pos.top
-      left = pos.left
+      // A caller-supplied anchor is already the final top-left; flipping it
+      // means putting the popover's bottom edge on that same y.
+      anchor = { below: pos.top, above: pos.top, left: pos.left }
     } else if (swatchRef.current != null) {
       const rect = swatchRef.current.getBoundingClientRect()
-      top = rect.bottom + 6
-      left = rect.left
-      // Flip above swatch if not enough space below
-      if (top + popoverH > window.innerHeight - 8) {
-        top = rect.top - popoverH - 6
-      }
+      anchor = { below: rect.bottom + ANCHOR_GAP, above: rect.top - ANCHOR_GAP, left: rect.left }
     }
 
-    if (top !== null && left !== null) {
-      if (top + popoverH > window.innerHeight - 8) top = window.innerHeight - popoverH - 8
-      if (top < 8) top = 8
-      if (left + popoverW > window.innerWidth - 8) left = window.innerWidth - popoverW - 8
-      if (left < 8) left = 8
-      setPopoverPos({ top, left })
+    anchorRef.current = anchor
+    if (anchor != null) {
+      // Optimistic — corrected against the measured height before paint.
+      setPopoverPos(placePopover(anchor, POPOVER_HEIGHT_ESTIMATE))
     }
     setRecentColors(loadRecentColors())
     setOpen(true)
   }
+
+  // Correct the position against the popover's *actual* height. The swatch grid
+  // makes that height variable (a row per six colours, plus the empty state), so
+  // any hardcoded constant flips the wrong way near a screen edge. Runs before
+  // paint; the ResizeObserver keeps it right when the grid grows or the scope
+  // segment switches to a longer palette while the popover is open.
+  React.useLayoutEffect(() => {
+    if (!open) return
+    const el = popoverRef.current
+    const anchor = anchorRef.current
+    if (el == null || anchor == null) return
+
+    const reposition = () => {
+      const height = el.getBoundingClientRect().height
+      if (height === 0) return
+      const next = placePopover(anchor, height)
+      setPopoverPos(prev =>
+        prev != null && prev.top === next.top && prev.left === next.left ? prev : next,
+      )
+    }
+
+    reposition()
+    const ro = new ResizeObserver(reposition)
+    ro.observe(el)
+    return () => { ro.disconnect() }
+  }, [open])
 
   function handleClose() {
     doClose(value)
@@ -205,6 +264,107 @@ function useColorPopover({ value, onChange, onCommit, popoverAnchorFn }: UseColo
   }
 }
 
+// ─── Swatches ─────────────────────────────────────────────────────────────────
+
+const SCOPES = [
+  { key: 'file', label: 'File', description: 'Saved inside this project file' },
+  { key: 'global', label: 'Global', description: 'Shared by every project on this machine' },
+] as const
+
+/** Saved-colour palettes, File or Global. Mounted only while the popover is
+ *  open, which is what makes the loadGlobal() effect below a per-open lazy
+ *  read rather than app-start work. */
+function SwatchesSection({ value, onPick }: { value: string; onPick: (color: string) => void }) {
+  const scope = useSwatchStore(s => s.scope)
+  const setScope = useSwatchStore(s => s.setScope)
+  const swatches = useSwatchStore(s => (s.scope === 'file' ? s.file : s.global))
+  const addSwatch = useSwatchStore(s => s.addSwatch)
+  const removeSwatch = useSwatchStore(s => s.removeSwatch)
+
+  React.useEffect(() => { void useSwatchStore.getState().loadGlobal() }, [])
+
+  const normalized = value.trim().toLowerCase()
+  const alreadySaved = swatches.some(s => s.color.trim().toLowerCase() === normalized)
+
+  return (
+    <>
+      <div className="zs-swatch-header">
+        <span className="zs-swatch-title">Swatches</span>
+        <div className="zs-scope-seg">
+          {SCOPES.map(s => (
+            <Tooltip key={s.key} label={s.label} description={s.description}>
+              <button
+                className="zs-scope-btn"
+                data-active={scope === s.key}
+                aria-pressed={scope === s.key}
+                // mousedown + preventDefault, like the mode buttons: a plain
+                // click would blur the hex input first and commit a half-typed
+                // value before this handler ever runs.
+                onMouseDown={e => { e.preventDefault(); setScope(s.key) }}
+              >
+                {s.label}
+              </button>
+            </Tooltip>
+          ))}
+        </div>
+      </div>
+
+      {swatches.length === 0 && <span className="zs-swatch-empty">No swatches yet</span>}
+
+      <div className="zs-swatch-grid">
+        {swatches.map(sw => (
+          <div key={sw.id} className="zs-swatch-cell">
+            <Tooltip
+              label={sw.name != null && sw.name !== '' ? sw.name : sw.color.toUpperCase()}
+              description={sw.name != null && sw.name !== '' ? sw.color.toUpperCase() : undefined}
+            >
+              <button
+                className="zs-swatch-tile"
+                style={{ background: sw.color }}
+                aria-label={`Apply ${sw.name != null && sw.name !== '' ? sw.name : sw.color}`}
+                onMouseDown={e => { e.preventDefault(); onPick(sw.color) }}
+                // The pick lives on mousedown, so Enter/Space needs its own path.
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPick(sw.color) }
+                }}
+              />
+            </Tooltip>
+            <Tooltip label="Remove swatch">
+              <button
+                className="zs-swatch-remove"
+                aria-label={`Remove ${sw.color}`}
+                onMouseDown={e => { e.preventDefault(); e.stopPropagation(); removeSwatch(sw.id) }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); removeSwatch(sw.id) }
+                }}
+              >
+                <X size={9} strokeWidth={3} />
+              </button>
+            </Tooltip>
+          </div>
+        ))}
+
+        <Tooltip
+          label={alreadySaved ? 'Already saved' : 'Save color'}
+          description={alreadySaved ? undefined : `Add ${value.toUpperCase()} to ${scope === 'file' ? 'this file' : 'the global palette'}`}
+        >
+          <button
+            className="zs-swatch-add"
+            disabled={alreadySaved}
+            aria-label="Save current color as a swatch"
+            onMouseDown={e => { e.preventDefault(); if (!alreadySaved) addSwatch(value) }}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); addSwatch(value) }
+            }}
+          >
+            <Plus size={11} strokeWidth={2.5} />
+          </button>
+        </Tooltip>
+      </div>
+    </>
+  )
+}
+
 // ─── Popover component ────────────────────────────────────────────────────────
 
 interface PopoverProps {
@@ -227,7 +387,8 @@ interface PopoverProps {
   commitHex: () => void
   commitRgb: () => void
   commitHsl: () => void
-  onRecentClick: (color: string) => void
+  /** Apply a saved colour (swatch or recent) and close. */
+  onPickColor: (color: string) => void
   onClose: () => void
   onEyedropper: () => void
 }
@@ -241,7 +402,7 @@ function ColorPopover({
   recentColors,
   popoverRef, hexInputRef,
   onPickerChange, commitHex, commitRgb, commitHsl,
-  onRecentClick, onClose, onEyedropper,
+  onPickColor, onClose, onEyedropper,
 }: PopoverProps) {
   if (!open) return null
 
@@ -269,10 +430,13 @@ function ColorPopover({
   return wrap(
     <div
       ref={popoverRef}
+      // Class carries no styling — it's the handle tests use to find the
+      // popover and assert its measured on-screen position.
+      className="zs-color-popover"
       style={{
         ...posStyle,
         zIndex: 2000,
-        width: 236,
+        width: POPOVER_WIDTH,
         background: 'var(--bg-panel)',
         border: '1px solid var(--border)',
         borderRadius: 16,
@@ -382,6 +546,9 @@ function ColorPopover({
         </div>
       )}
 
+      {/* Saved swatches (persistent) — distinct from Recent (an MRU log) */}
+      <SwatchesSection value={value} onPick={onPickColor} />
+
       {/* Recent colors */}
       <span className="zs-recent-label">Recent</span>
       <div style={{ display: 'flex', gap: 6, padding: '0 12px' }}>
@@ -390,7 +557,7 @@ function ColorPopover({
           return (
             <button
               key={i}
-              onMouseDown={c != null ? () => { onRecentClick(c) } : undefined}
+              onMouseDown={c != null ? e => { e.preventDefault(); onPickColor(c) } : undefined}
               style={{
                 width: 20, height: 20,
                 borderRadius: 999,
@@ -422,7 +589,7 @@ export interface ColorInputProps {
 export function ColorInput({ value, onChange, onCommit, size = 20, fixed = false, popoverAnchorFn }: ColorInputProps) {
   const popover = useColorPopover({ value, onChange, onCommit, popoverAnchorFn })
 
-  function handleRecentClick(color: string) {
+  function handlePickColor(color: string) {
     onChange(color)
     popover.doClose(color)
   }
@@ -431,6 +598,7 @@ export function ColorInput({ value, onChange, onCommit, size = 20, fixed = false
     <div style={{ position: 'relative', display: 'inline-block' }}>
       <button
         ref={popover.swatchRef}
+        className="zs-color-trigger"
         onClick={() => { popover.open ? popover.handleClose() : popover.handleOpen(fixed) }}
         style={{
           width: size, height: size,
@@ -463,7 +631,7 @@ export function ColorInput({ value, onChange, onCommit, size = 20, fixed = false
         commitHex={popover.commitHex}
         commitRgb={popover.commitRgb}
         commitHsl={popover.commitHsl}
-        onRecentClick={handleRecentClick}
+        onPickColor={handlePickColor}
         onClose={popover.handleClose}
         onEyedropper={popover.openEyedropper}
       />
@@ -486,7 +654,7 @@ export function MixedColorInput({ value, onChange, onCommit, size = 20, fixed = 
   const popover = useColorPopover({ value: effectiveValue, onChange, onCommit })
   const isMixed = value == null
 
-  function handleRecentClick(color: string) {
+  function handlePickColor(color: string) {
     onChange(color)
     popover.doClose(color)
   }
@@ -495,6 +663,7 @@ export function MixedColorInput({ value, onChange, onCommit, size = 20, fixed = 
     <div style={{ position: 'relative', display: 'inline-block' }}>
       <button
         ref={popover.swatchRef}
+        className="zs-color-trigger"
         onClick={() => { popover.open ? popover.handleClose() : popover.handleOpen(fixed) }}
         style={{
           width: size, height: size,
@@ -538,7 +707,7 @@ export function MixedColorInput({ value, onChange, onCommit, size = 20, fixed = 
         commitHex={popover.commitHex}
         commitRgb={popover.commitRgb}
         commitHsl={popover.commitHsl}
-        onRecentClick={handleRecentClick}
+        onPickColor={handlePickColor}
         onClose={popover.handleClose}
         onEyedropper={popover.openEyedropper}
       />

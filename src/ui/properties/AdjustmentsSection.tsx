@@ -7,7 +7,7 @@ import { Power } from 'lucide-react'
 import '../adjustments.css'
 import { NumericInput } from '../NumericInput'
 
-import { sectionLabelStyle } from './shared'
+import { sectionLabelStyle, useScrubbedValue } from './shared'
 
 
 // ---------------------------------------------------------------------------
@@ -49,15 +49,54 @@ const TRACK_GRADIENT: Record<keyof PhotoAdjustments, string> = {
   dehaze:      'linear-gradient(to right, #6080a8 0%, #e8c060 100%)',
 }
 
+/** The numeric half of an adjustment row. A component rather than inline JSX so
+ *  it can own the useScrubbedValue hook — makeSlider is a plain function called
+ *  twelve times per render, which is no place for a hook. */
+function AdjustmentValue({
+  value, label, unit, decimals, step, min, max, onStartDrag, onLiveChange, onCommit, onReset,
+}: {
+  value: number
+  label: string
+  unit?: string
+  decimals: number
+  step: number
+  min: number
+  max: number
+  onStartDrag: () => void
+  onLiveChange: (v: number) => void
+  onCommit: (v: number) => void
+  onReset: () => void
+}): React.ReactElement {
+  const scrub = useScrubbedValue({ onCommit, onLiveChange, onStartDrag })
+  return (
+    <NumericInput
+      value={value}
+      label={label}
+      unit={unit}
+      decimals={decimals}
+      step={step}
+      min={min}
+      max={max}
+      width={unit === undefined ? 44 : 62}
+      {...scrub}
+      onDoubleClick={onReset}
+    />
+  )
+}
+
 export function AdjustmentsSection({ imgObj, selectedId: _selectedId, bypass, onToggleBypass, onStartDrag, onUpdate, onCommit }: AdjustmentsSectionProps): React.ReactElement {
   const adj = imgObj.adjustments ?? DEFAULT_ADJUSTMENTS
 
+  // The .adj-slider gradient tracks stay: the track itself carries the meaning
+  // (which way is warmer, which way is more saturated), so this is the one place
+  // a range input is doing something a scrubbable number can't.
   function makeSlider(
     label: string,
     key: keyof PhotoAdjustments,
     min: number,
     max: number,
     step: number,
+    unit?: string,
   ): React.ReactElement {
     const value = adj[key]
     const decimals = step < 1 ? 1 : 0
@@ -82,13 +121,17 @@ export function AdjustmentsSection({ imgObj, selectedId: _selectedId, bypass, on
           onDoubleClick={() => onCommit({ ...adj, [key]: 0 })}
           style={{ flex: 1, background: TRACK_GRADIENT[key] }}
         />
-        <NumericInput
+        <AdjustmentValue
           value={value}
+          label={label}
+          unit={unit}
           decimals={decimals}
+          step={step}
           min={min} max={max}
-          width={44}
+          onStartDrag={onStartDrag}
+          onLiveChange={v => onUpdate({ ...adj, [key]: v })}
           onCommit={v => onCommit({ ...adj, [key]: v })}
-          onDoubleClick={() => onCommit({ ...adj, [key]: 0 })}
+          onReset={() => onCommit({ ...adj, [key]: 0 })}
         />
       </div>
     )
@@ -110,7 +153,9 @@ export function AdjustmentsSection({ imgObj, selectedId: _selectedId, bypass, on
 
       <div style={{ opacity: bypass ? 0.35 : 1, pointerEvents: bypass ? 'none' : 'auto' }}>
       <div style={subGroupLabelStyle}>Light</div>
-      {makeSlider('Exposure', 'exposure', -5, 5, 0.1)}
+      {/* Exposure is the one adjustment with a real unit — stops. The rest are
+          unitless −100…100 scales; inventing a unit for them would misstate them. */}
+      {makeSlider('Exposure', 'exposure', -5, 5, 0.1, 'EV')}
       {makeSlider('Contrast', 'contrast', -100, 100, 1)}
       {makeSlider('Highlights', 'highlights', -100, 100, 1)}
       {makeSlider('Shadows', 'shadows', -100, 100, 1)}

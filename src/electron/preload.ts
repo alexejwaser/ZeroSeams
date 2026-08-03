@@ -4,11 +4,28 @@ contextBridge.exposeInMainWorld('electronAPI', {
   platform: process.platform,
   saveFile: (filename: string, base64: string): Promise<{ success: boolean; error?: string }> =>
     ipcRenderer.invoke('save-file', { filename, base64 }),
-  autosaveProject: (
+  createProjectFile: (
+    folderPath: string,
     filename: string,
     json: string,
   ): Promise<{ success: boolean; filePath?: string; error?: string }> =>
-    ipcRenderer.invoke('autosave-project', { filename, json }),
+    ipcRenderer.invoke('create-project-file', { folderPath, filename, json }),
+  getDefaultProjectDir: (): Promise<{ folderPath: string }> =>
+    ipcRenderer.invoke('get-default-project-dir'),
+  setDirtyState: (dirty: boolean): void => { ipcRenderer.send('set-dirty-state', dirty) },
+  confirmClose: (): Promise<{ success: boolean }> => ipcRenderer.invoke('confirm-close'),
+  takePendingOpenFile: (): Promise<{ filePath: string | null }> =>
+    ipcRenderer.invoke('take-pending-open-file'),
+  onMenuAction: (cb: (action: string) => void): (() => void) => {
+    const handler = (_e: Electron.IpcRendererEvent, action: string) => { cb(action) }
+    ipcRenderer.on('menu-action', handler)
+    return () => { ipcRenderer.removeListener('menu-action', handler) }
+  },
+  onOpenFilePath: (cb: (filePath: string) => void): (() => void) => {
+    const handler = (_e: Electron.IpcRendererEvent, filePath: string) => { cb(filePath) }
+    ipcRenderer.on('open-file-path', handler)
+    return () => { ipcRenderer.removeListener('open-file-path', handler) }
+  },
   openProject: (): Promise<{ success: boolean; json?: string; error?: string }> =>
     ipcRenderer.invoke('open-project'),
   listRecentProjects: (): Promise<{
@@ -22,6 +39,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('save-project-copy', { json }),
   getSystemFonts: (): Promise<string[]> =>
     ipcRenderer.invoke('get-system-fonts'),
+  getGlobalSwatches: (): Promise<Array<{ id: string; color: string; name?: string }>> =>
+    ipcRenderer.invoke('get-global-swatches'),
+  setGlobalSwatches: (
+    swatches: Array<{ id: string; color: string; name?: string }>,
+  ): Promise<{ success: boolean; error?: string }> =>
+    ipcRenderer.invoke('set-global-swatches', { swatches }),
   getExternalEditor: (): Promise<{ name: string; execPath: string } | null> =>
     ipcRenderer.invoke('get-external-editor'),
   setExternalEditor: (): Promise<{ name: string; execPath: string } | null> =>
@@ -59,8 +82,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('make-relative-path', { fromDir, toPath }),
   getFileSize: (filePath: string): Promise<{ size: number }> =>
     ipcRenderer.invoke('get-file-size', { filePath }),
-  showFolderDialog: (): Promise<{ folderPath?: string; cancelled: boolean }> =>
-    ipcRenderer.invoke('show-folder-dialog'),
+  showFolderDialog: (options?: { title?: string; defaultPath?: string }): Promise<{ folderPath?: string; cancelled: boolean }> =>
+    ipcRenderer.invoke('show-folder-dialog', options),
   writeFileToFolder: (folderPath: string, filename: string, base64: string): Promise<{ success: boolean; error?: string }> =>
     ipcRenderer.invoke('write-file-to-folder', folderPath, filename, base64),
   loadFileAtPath: (filePath: string): Promise<{ success: boolean; json?: string; filePath?: string }> =>

@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react'
 import type { LayerEffect } from '@/types/canvas'
+import type { EffectControlDescriptor } from '@/canvas/effects'
 import { getAllEffectDefinitions, getEffectDefinition } from '@/canvas/effects'
 import Tooltip from '../Tooltip'
 import { iconBtnProps } from '../iconBtnStyle'
-import { Eye, EyeOff, Plus, X, ChevronDown, ChevronRight } from 'lucide-react'
+import { Eye, EyeOff, Plus, X, ChevronDown, ChevronRight, MoveHorizontal } from 'lucide-react'
 import { ColorInput } from '../ColorInput'
-import { NumericInput } from '../NumericInput'
 
-import { sectionLabelStyle } from './shared'
+import { Field, sectionLabelStyle } from './shared'
 
 
 // ---------------------------------------------------------------------------
@@ -18,6 +18,51 @@ interface EffectsSectionProps {
   effects: LayerEffect[] | undefined
   onUpdate: (effects: LayerEffect[]) => void
   onCommit: (effects: LayerEffect[]) => void
+}
+
+// EffectControlDescriptor lives in canvas/effects and has no `unit` field, so the
+// mapping lives here instead. Keyed by `type.key`, not by key alone: `radius` is a
+// normalized 0–1 fraction on the vignette and a pixel blur radius on the halation.
+// Everything unlisted is a 0–1 fraction — a fraction is not a percentage, so it
+// gets no unit rather than an invented one, and falls back to the scrub glyph.
+const EFFECT_PARAM_UNITS: Record<string, string> = {
+  'halation.radius': 'px',
+  'filmGrain.size': 'px',
+}
+
+interface EffectSliderRowProps {
+  effectType: string
+  ctrl: EffectControlDescriptor
+  value: number
+  onLiveChange: (v: number) => void
+  onChange: (v: number) => void
+  onReset: () => void
+}
+
+function EffectSliderRow({
+  effectType, ctrl, value, onLiveChange, onChange, onReset,
+}: EffectSliderRowProps): React.ReactElement {
+  const step = ctrl.step ?? 0.01
+  const unit = EFFECT_PARAM_UNITS[`${effectType}.${ctrl.key}`]
+  return (
+    <Field
+      label={ctrl.label}
+      unit={unit}
+      // No unit means no affix, and the affix is the scrub grip — so unitless
+      // params get an explicit one instead of silently losing the gesture.
+      icon={unit === undefined ? <MoveHorizontal size={10} /> : undefined}
+      labelWidth={68}
+      marginBottom={5}
+      value={value}
+      min={ctrl.min ?? 0}
+      max={ctrl.max ?? 1}
+      step={step}
+      decimals={step < 1 ? 2 : 0}
+      onLiveChange={onLiveChange}
+      onChange={onChange}
+      onReset={onReset}
+    />
+  )
 }
 
 export function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionProps): React.ReactElement {
@@ -162,35 +207,16 @@ export function EffectsSection({ effects, onUpdate, onCommit }: EffectsSectionPr
                 {def.controls.map(ctrl => {
                   const val = effect.params[ctrl.key]
                   if (ctrl.type === 'slider') {
-                    const numVal = val as number
-                    const decimals = (ctrl.step ?? 1) < 1 ? 2 : 0
                     return (
-                      <div key={ctrl.key} style={{ display: 'flex', alignItems: 'center', marginBottom: 5, gap: 6 }}>
-                        <label
-                          style={{ color: 'var(--text-secondary)', fontSize: 11, width: 68, flexShrink: 0, cursor: 'pointer' }}
-                          onDoubleClick={() => resetParam(effect.id, ctrl.key)}
-                        >
-                          {ctrl.label}
-                        </label>
-                        <input
-                          type="range"
-                          min={ctrl.min ?? 0}
-                          max={ctrl.max ?? 1}
-                          step={ctrl.step ?? 0.01}
-                          value={numVal}
-                          onChange={e => updateParam(effect.id, ctrl.key, Number(e.target.value), false)}
-                          onMouseUp={e => updateParam(effect.id, ctrl.key, Number((e.target as HTMLInputElement).value), true)}
-                          style={{ flex: 1 }}
-                        />
-                        <NumericInput
-                          value={numVal}
-                          decimals={decimals}
-                          min={ctrl.min ?? 0}
-                          max={ctrl.max ?? 1}
-                          width={44}
-                          onCommit={v => updateParam(effect.id, ctrl.key, v, true)}
-                        />
-                      </div>
+                      <EffectSliderRow
+                        key={ctrl.key}
+                        effectType={effect.type}
+                        ctrl={ctrl}
+                        value={val as number}
+                        onLiveChange={v => updateParam(effect.id, ctrl.key, v, false)}
+                        onChange={v => updateParam(effect.id, ctrl.key, v, true)}
+                        onReset={() => resetParam(effect.id, ctrl.key)}
+                      />
                     )
                   }
                   if (ctrl.type === 'toggle') {

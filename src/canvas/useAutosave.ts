@@ -1,8 +1,52 @@
 import { useEffect, useRef, useState } from 'react'
 import { useCanvasStore } from './useCanvasStore'
-import type { CarouselProject } from '@/types/project'
-import { useSaveStatusStore, type SaveStatus } from '@/store'
-import { relativizeVideoObjects } from './pathUtils'
+import { useSaveStatusStore, useSwatchStore, type SaveStatus } from '@/store'
+import { serializeProject } from '@/io/projectFile'
+
+/** The parts of the canvas store that actually end up in the file. Everything
+ *  else the store holds — selection, active tool, snap toggle, preview mode,
+ *  undo stacks — is session state and must not trigger a save. */
+interface ContentSignature {
+  objects: unknown
+  objectOrder: unknown
+  frames: unknown
+  frameCount: number
+  frameWidth: number
+  frameHeight: number
+  ratio: unknown
+  platform: unknown
+  backgroundColor: string
+}
+
+function contentSignature(s: ReturnType<typeof useCanvasStore.getState>): ContentSignature {
+  return {
+    objects: s.objects,
+    objectOrder: s.objectOrder,
+    frames: s.frames,
+    frameCount: s.frameCount,
+    frameWidth: s.frameWidth,
+    frameHeight: s.frameHeight,
+    ratio: s.ratio,
+    platform: s.platform,
+    backgroundColor: s.backgroundColor,
+  }
+}
+
+/** Reference comparison is enough: the store replaces these immutably on every
+ *  real edit (CLAUDE.md forbids mutating a CanvasObject in place). */
+function contentChanged(a: ContentSignature, b: ContentSignature): boolean {
+  return (
+    a.objects !== b.objects ||
+    a.objectOrder !== b.objectOrder ||
+    a.frames !== b.frames ||
+    a.frameCount !== b.frameCount ||
+    a.frameWidth !== b.frameWidth ||
+    a.frameHeight !== b.frameHeight ||
+    a.ratio !== b.ratio ||
+    a.platform !== b.platform ||
+    a.backgroundColor !== b.backgroundColor
+  )
+}
 
 export function useAutosave(): { status: SaveStatus; lastSavedAt: string | null } {
   const setStoreStatus = useSaveStatusStore((s) => s.setStatus)
@@ -12,8 +56,6 @@ export function useAutosave(): { status: SaveStatus; lastSavedAt: string | null 
   const [status, setStatus] = useState<SaveStatus>('idle')
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null)
 
-  // versionRef is a local increment counter — stays in the hook
-  const versionRef = useRef<number>(0)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Keep local state in sync with the shared store so callers of this hook
@@ -28,10 +70,20 @@ export function useAutosave(): { status: SaveStatus; lastSavedAt: string | null 
     setStoreLastSavedAt(at)
   }
 
+  const lastContentRef = useRef<ContentSignature | null>(null)
+
   useEffect(() => {
-    const unsubscribe = useCanvasStore.subscribe(() => {
+    lastContentRef.current = contentSignature(useCanvasStore.getState())
+
+    function markDirtyAndSchedule(): void {
       const save = useSaveStatusStore.getState()
       if (!save.dirty) save.setDirty(true)
+
+      // No document, no file: never invent one. This is the path that used to
+      // create ~/Documents/ZeroSeams/untitled.zeroseams on the first mouse move
+      // after a cold start, clobbering whatever was there before.
+      if (!save.documentReady || !save.currentFilePath) return
+
       if (debounceRef.current !== null) {
         clearTimeout(debounceRef.current)
       }
@@ -39,41 +91,14 @@ export function useAutosave(): { status: SaveStatus; lastSavedAt: string | null 
       debounceRef.current = setTimeout(() => {
         debounceRef.current = null
 
+        const saveStore = useSaveStatusStore.getState()
+        const currentFilePath = saveStore.currentFilePath
+        if (!saveStore.documentReady || !currentFilePath) return
+
         applyStatus('saving')
 
-        const state = useCanvasStore.getState()
-        const { frameCount, objects, objectOrder } = state
-
-        const saveStore = useSaveStatusStore.getState()
-
-        versionRef.current += 1
-
-        const project: CarouselProject = {
-          id: saveStore.projectId,
-          name: saveStore.projectName,
-          platform: state.platform,
-          ratio: state.ratio,
-          dimensions: { width: state.frameWidth, height: state.frameHeight },
-          frameCount,
-          frames: state.frames,
-          backgroundColor: state.backgroundColor,
-          objects: relativizeVideoObjects(objects, saveStore.currentFilePath),
-          objectOrder,
-          createdAt: saveStore.createdAt,
-          updatedAt: new Date().toISOString(),
-          version: versionRef.current,
-        }
-
-        const currentFilePath = saveStore.currentFilePath
-        const savePromise = currentFilePath
-          ? window.electronAPI.saveProject(currentFilePath, JSON.stringify(project))
-          : window.electronAPI.autosaveProject(saveStore.projectFilename, JSON.stringify(project))
-
-        savePromise
-          .then((result) => {
-            if (!currentFilePath && 'filePath' in result && typeof result.filePath === 'string' && result.filePath) {
-              useSaveStatusStore.getState().setAutosaveFilePath(result.filePath)
-            }
+        window.electronAPI.saveProject(currentFilePath, serializeProject())
+          .then(() => {
             applyStatus('saved')
             useSaveStatusStore.getState().setDirty(false)
             const savedAt = new Date().toISOString()
@@ -87,10 +112,29 @@ export function useAutosave(): { status: SaveStatus; lastSavedAt: string | null 
             applyStatus('error')
           })
       }, 2000)
+    }
+
+    const unsubscribeCanvas = useCanvasStore.subscribe(() => {
+      // The store fires on selection, tool switches and viewport-ish flags too.
+      // Treating those as edits marked the document dirty and rewrote the file
+      // when nothing about it had actually changed.
+      const next = contentSignature(useCanvasStore.getState())
+      if (lastContentRef.current !== null && !contentChanged(lastContentRef.current, next)) return
+      lastContentRef.current = next
+      markDirtyAndSchedule()
+    })
+
+    // File swatches live outside useCanvasStore (they must not enter the undo
+    // stack), so the canvas subscription above can't see them — without this a
+    // swatch saved as the last action before quitting would be lost.
+    const unsubscribeSwatches = useSwatchStore.subscribe((state, prev) => {
+      if (state.file === prev.file) return
+      markDirtyAndSchedule()
     })
 
     return () => {
-      unsubscribe()
+      unsubscribeCanvas()
+      unsubscribeSwatches()
       if (debounceRef.current !== null) {
         clearTimeout(debounceRef.current)
       }

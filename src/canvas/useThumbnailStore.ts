@@ -1,8 +1,12 @@
 import { create } from 'zustand'
 import { useEffect, useRef } from 'react'
-import type { AnchorPoint, CanvasObject, ImageObject, PathObject, ShapeObject, TextObject } from '@/types/canvas'
+import type { AnchorPoint, CanvasObject, ClipShape, ImageObject, PathObject, ShapeObject, TextObject, VideoObject } from '@/types/canvas'
 import { useCanvasStore } from './useCanvasStore'
 import { spanText } from './textSpans'
+import { apply2dFill } from './fill'
+import { clipShapeToPathData, solidColorOf } from './frameClip'
+import { EMPTY_FRAME_FILL } from './frameModel'
+import { getVideoElement } from './videoElementRegistry'
 
 const THUMBNAIL_CONCURRENCY = 3
 
@@ -100,6 +104,86 @@ function anchorsToPathData(anchors: AnchorPoint[], closed: boolean): string {
 }
 
 // ---------------------------------------------------------------------------
+// Media-frame thumbnail helpers — shared by the image and video branches.
+// Both draw the same three layers in the same order as the canvas nodes do:
+// clip silhouette → frame fill → media → frame stroke.
+// ---------------------------------------------------------------------------
+
+interface FrameThumbGeom {
+  /** Top-left of the frame box inside the SIZE×SIZE thumbnail. */
+  offsetX: number
+  offsetY: number
+  /** Size of the frame box inside the thumbnail. */
+  drawW: number
+  drawH: number
+  /** Frame space → thumbnail space. */
+  scaleX: number
+  scaleY: number
+}
+
+/** Fit a frame's aspect ratio proportionally into a SIZE×SIZE thumbnail. */
+function frameThumbGeom(frameW: number, frameH: number, size: number): FrameThumbGeom {
+  const aspect = frameW > 0 && frameH > 0 ? frameW / frameH : 1
+  const drawW = aspect > 1 ? size : size * aspect
+  const drawH = aspect > 1 ? size / aspect : size
+  return {
+    offsetX: (size - drawW) / 2,
+    offsetY: (size - drawH) / 2,
+    drawW,
+    drawH,
+    scaleX: frameW > 0 ? drawW / frameW : 1,
+    scaleY: frameH > 0 ? drawH / frameH : 1,
+  }
+}
+
+/**
+ * Enter frame-local thumbnail space with the frame's real clip silhouette
+ * applied, paint the fill, and hand control back to `paintMedia` (which draws in
+ * that same space, origin 0,0, extent drawW×drawH). Always balanced by a restore.
+ *
+ * The clip geometry comes from `clipShapeToPathData` — the same function the
+ * export path and the frame stroke use — rather than a re-derived rect, so a
+ * rounded / elliptical / custom-path frame thumbnails as the shape it actually is.
+ */
+function paintFrameThumb(
+  ctx: CanvasRenderingContext2D,
+  g: FrameThumbGeom,
+  frame: { clipShape?: ClipShape; fill?: ImageObject['fill']; frameStroke?: string; frameStrokeWidth?: number },
+  isEmpty: boolean,
+  paintMedia: (() => void) | null,
+): void {
+  const d = clipShapeToPathData(frame.clipShape ?? { kind: 'rect' }, g.drawW, g.drawH)
+  if (!d) return
+  const silhouette = new Path2D(d)
+
+  ctx.save()
+  ctx.translate(g.offsetX, g.offsetY)
+  ctx.save()
+  ctx.clip(silhouette)
+
+  // An empty frame is a fill swatch and nothing else, so it falls back to the
+  // same placeholder colour CanvasImageNode paints rather than staying blank.
+  const fill = frame.fill ?? (isEmpty ? { type: 'solid' as const, color: EMPTY_FRAME_FILL } : undefined)
+  if (apply2dFill(ctx, fill, 0, 0, g.drawW, g.drawH)) {
+    ctx.fillRect(0, 0, g.drawW, g.drawH)
+  }
+  paintMedia?.()
+  ctx.restore()
+
+  // Outline: the object's own frame stroke when it has one, otherwise a hairline
+  // so a pale or unfilled frame still reads as a shape against the panel.
+  if (frame.frameStroke && frame.frameStrokeWidth) {
+    ctx.strokeStyle = frame.frameStroke
+    ctx.lineWidth = Math.max(1, Math.min(frame.frameStrokeWidth * g.scaleX, 3))
+  } else {
+    ctx.strokeStyle = 'rgba(0,0,0,0.18)'
+    ctx.lineWidth = 1
+  }
+  ctx.stroke(silhouette)
+  ctx.restore()
+}
+
+// ---------------------------------------------------------------------------
 // generateThumbnail — pure HTML Canvas 2D, no Konva dependency
 // ---------------------------------------------------------------------------
 
@@ -113,44 +197,77 @@ export async function generateThumbnail(obj: CanvasObject): Promise<string> {
 
   if (obj.type === 'image') {
     const img = obj as ImageObject
+    const g = frameThumbGeom(img.frameWidth, img.frameHeight, SIZE)
+
+    // Empty frames (grid cells) have src: '' — there is no bitmap to await, and
+    // routing them through Image() would only ever hit onerror and produce a
+    // blank thumbnail. This is the path that replaced LayerPanel's EmptyFrameThumb.
+    if (img.isEmpty || !img.src) {
+      paintFrameThumb(ctx, g, img, true, null)
+      return canvas.toDataURL('image/png')
+    }
+
     return await new Promise<string>((resolve) => {
       const el = new Image()
       el.onload = () => {
-        // Determine scale to fit the frame (proportional) into SIZE×SIZE
-        const frameAspect = img.frameWidth / img.frameHeight
-        let drawW = SIZE
-        let drawH = SIZE
-        if (frameAspect > 1) {
-          drawH = SIZE / frameAspect
-        } else {
-          drawW = SIZE * frameAspect
-        }
-        const offsetX = (SIZE - drawW) / 2
-        const offsetY = (SIZE - drawH) / 2
-
-        // Scale factors from frame space to thumbnail draw space
-        const scaleX = drawW / img.frameWidth
-        const scaleY = drawH / img.frameHeight
-
-        ctx.save()
-        // Clip to the frame area within the thumbnail
-        ctx.beginPath()
-        ctx.rect(offsetX, offsetY, drawW, drawH)
-        ctx.clip()
-
-        // Draw the content image offset into the clipped region
-        const contentX = offsetX + img.contentOffsetX * scaleX
-        const contentY = offsetY + img.contentOffsetY * scaleY
-        const contentW = img.contentWidth * scaleX
-        const contentH = img.contentHeight * scaleY
-        ctx.drawImage(el, contentX, contentY, contentW, contentH)
-        ctx.restore()
-
+        paintFrameThumb(ctx, g, img, false, () => {
+          ctx.drawImage(
+            el,
+            img.contentOffsetX * g.scaleX,
+            img.contentOffsetY * g.scaleY,
+            img.contentWidth * g.scaleX,
+            img.contentHeight * g.scaleY,
+          )
+        })
         resolve(canvas.toDataURL('image/png'))
       }
-      el.onerror = () => resolve('')
+      // A frame whose bitmap fails to decode still has fill + silhouette worth
+      // showing — better than the blank the old empty-string return produced.
+      el.onerror = () => {
+        paintFrameThumb(ctx, g, img, false, null)
+        resolve(canvas.toDataURL('image/png'))
+      }
       el.src = obj.src
     })
+  }
+
+  if (obj.type === 'video') {
+    // Video objects used to fall through to a blank canvas — they had no branch
+    // at all, so every video layer rendered an empty swatch in the panel.
+    const vid = obj as VideoObject
+    const g = frameThumbGeom(vid.frameWidth, vid.frameHeight, SIZE)
+    // The live <video> is the only decoded pixel source available synchronously;
+    // CanvasVideoNode seeks it to trimStart on canplay, so an idle video already
+    // holds its poster frame.
+    const el = getVideoElement(vid.id)
+    const decoded = el != null && el.readyState >= 2 && el.videoWidth > 0
+
+    paintFrameThumb(ctx, g, vid, false, decoded
+      ? () => {
+          ctx.drawImage(
+            el,
+            vid.contentOffsetX * g.scaleX,
+            vid.contentOffsetY * g.scaleY,
+            vid.contentWidth * g.scaleX,
+            vid.contentHeight * g.scaleY,
+          )
+        }
+      : () => {
+          // Not decoded yet (project just loaded, or the element was unmounted):
+          // a neutral plate with a play glyph, never nothing.
+          ctx.fillStyle = '#3a3a3a'
+          ctx.fillRect(0, 0, g.drawW, g.drawH)
+          ctx.fillStyle = 'rgba(255,255,255,0.75)'
+          const r = Math.min(g.drawW, g.drawH) * 0.18
+          const cx = g.drawW / 2, cy = g.drawH / 2
+          ctx.beginPath()
+          ctx.moveTo(cx - r * 0.6, cy - r)
+          ctx.lineTo(cx + r, cy)
+          ctx.lineTo(cx - r * 0.6, cy + r)
+          ctx.closePath()
+          ctx.fill()
+        })
+    return canvas.toDataURL('image/png')
   }
 
   if (obj.type === 'text') {
@@ -170,7 +287,10 @@ export async function generateThumbnail(obj: CanvasObject): Promise<string> {
 
   if (obj.type === 'shape') {
     const shape = obj as ShapeObject
-    ctx.fillStyle = shape.fill || '#888888'
+    // The gradient is resolved against the thumbnail box, not the object's real
+    // size — fill geometry is normalized, so it re-scales to any box for free.
+    const hasFill = apply2dFill(ctx, shape.fill, 2, 2, SIZE - 4, SIZE - 4)
+    if (!hasFill) ctx.fillStyle = '#888888'
     ctx.strokeStyle = shape.stroke || 'transparent'
     ctx.lineWidth = Math.min(shape.strokeWidth || 0, 2)
 
@@ -180,7 +300,9 @@ export async function generateThumbnail(obj: CanvasObject): Promise<string> {
       ctx.fill()
       if (ctx.lineWidth > 0) ctx.stroke()
     } else if (shape.kind === 'line' || shape.kind === 'arrow') {
-      ctx.strokeStyle = shape.fill || '#888888'
+      // A line has no interior — solidColorOf answers undefined for a gradient
+      // rather than guessing one, matching CanvasShapeNode.
+      ctx.strokeStyle = solidColorOf(shape.fill) ?? '#888888'
       ctx.lineWidth = Math.max(ctx.lineWidth, 2)
       ctx.beginPath()
       ctx.moveTo(2, SIZE / 2)
@@ -222,8 +344,9 @@ export async function generateThumbnail(obj: CanvasObject): Promise<string> {
     const p2d = new Path2D(svgPath)
     ctx.strokeStyle = path.stroke || '#4488ff'
     ctx.lineWidth = Math.max(1, path.strokeWidth * scale)
-    if (path.fill && path.fill !== 'transparent') {
-      ctx.fillStyle = path.fill
+    // Resolved against the scaled bbox the path actually occupies in the
+    // thumbnail, so a gradient lines up with the silhouette.
+    if (apply2dFill(ctx, path.fill, offX, offY, bbox.width * scale, bbox.height * scale)) {
       ctx.fill(p2d)
     }
     ctx.stroke(p2d)

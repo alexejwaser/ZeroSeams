@@ -10,12 +10,11 @@ import { computeGridChildPatches } from '@/canvas/gridTemplates'
 import Tooltip from './Tooltip'
 import './adjustments.css'
 import { ColorInput } from './ColorInput'
-import { NumericInput } from './NumericInput'
 
 import { rotateAroundCenter, canBecomeFrame } from '@/canvas/geometry'
 import { isFrameObject } from '@/canvas/frameModel'
 
-import { NumberField, sectionLabelStyle } from './properties/shared'
+import { Field, NumberField, sectionLabelStyle } from './properties/shared'
 import { AlignDistributeSection } from './properties/AlignDistributeSection'
 import { TextSection } from './properties/TextSection'
 import { EffectsSection } from './properties/EffectsSection'
@@ -23,7 +22,9 @@ import { AdjustmentsSection } from './properties/AdjustmentsSection'
 import { VideoSection } from './properties/VideoSection'
 import { FrameSection } from './properties/FrameSection'
 import { AddClipRow } from './properties/AddClipRow'
+import { FillEditor } from './properties/FillEditor'
 import { pickImageMedia, pickVideoMedia } from './properties/mediaPickers'
+import { PROPERTIES_PANEL_WIDTH, TITLE_BAR_HEIGHT, HUD_LANE } from './panelConstants'
 
 // Converts a rect/ellipse shape or closed path into a media frame and inserts the
 // picked media. The store action does both in one set(), so this is one undo step.
@@ -170,7 +171,7 @@ export function PropertiesPanel(): React.ReactElement {
         right: 0,
         top: 0,
         zIndex: 20,
-        width: 300,
+        width: PROPERTIES_PANEL_WIDTH,
         boxSizing: 'border-box',
         background: 'var(--bg-panel)',
         borderLeft: '1px solid var(--border)',
@@ -183,7 +184,10 @@ export function PropertiesPanel(): React.ReactElement {
     >
       <div
         ref={innerRef}
-        style={{ maxHeight: 'calc(100vh - 52px)', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}
+        // Stop short of the viewport floor: CanvasHud lives in that strip, and a
+        // full-height panel buried the zoom/fit controls (#74). The panel scrolls
+        // internally instead.
+        style={{ maxHeight: `calc(100vh - ${TITLE_BAR_HEIGHT + HUD_LANE}px)`, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}
         className="panel-scroll"
       >
       {/* Title */}
@@ -316,80 +320,70 @@ export function PropertiesPanel(): React.ReactElement {
         {/* Shape object */}
         {!isMultiSelect && selectedObj !== null && isShape && (() => {
           const shapeObj = selectedObj as ShapeObject
+          // An ellipse stores its own centre, so rotating it is a plain field
+          // write; every other shape stores a top-left and has to be spun about
+          // its centre or it swings away from the cursor.
+          const writeRotation = (newRot: number, commit: boolean): void => {
+            const write = commit ? commitUpdate : updateObject
+            if (shapeObj.kind === 'ellipse') {
+              write(shapeObj.id, { rotation: newRot })
+            } else {
+              write(shapeObj.id, rotateAroundCenter(
+                shapeObj.x, shapeObj.y, shapeObj.width, shapeObj.height,
+                shapeObj.rotation ?? 0, newRot,
+              ))
+            }
+          }
           return (
             <div style={{ padding: '12px 12px 0' }}>
-              {/* Rotation slider + numeric input */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
-                <input
-                  type="range" min={-360} max={360} step={1}
-                  value={Math.round(shapeObj.rotation ?? 0)}
-                  onMouseDown={startDrag}
-                  onChange={e => {
-                    const newRot = Number(e.target.value)
-                    if (shapeObj.kind === 'ellipse') {
-                      updateObject(shapeObj.id, { rotation: newRot })
-                    } else {
-                      updateObject(shapeObj.id, rotateAroundCenter(
-                        shapeObj.x, shapeObj.y, shapeObj.width, shapeObj.height,
-                        shapeObj.rotation ?? 0, newRot,
-                      ))
-                    }
-                  }}
-                  onMouseUp={e => {
-                    const newRot = Number((e.target as HTMLInputElement).value)
-                    if (shapeObj.kind === 'ellipse') {
-                      commitUpdate(shapeObj.id, { rotation: newRot })
-                    } else {
-                      commitUpdate(shapeObj.id, rotateAroundCenter(
-                        shapeObj.x, shapeObj.y, shapeObj.width, shapeObj.height,
-                        shapeObj.rotation ?? 0, newRot,
-                      ))
-                    }
-                  }}
-                  style={{ flex: 1 }}
-                />
-                <NumericInput
-                  value={Math.round(shapeObj.rotation ?? 0)}
-                  min={-360} max={360}
-                  width={48}
-                  onCommit={newRot => {
-                    if (shapeObj.kind === 'ellipse') {
-                      commitUpdate(shapeObj.id, { rotation: newRot })
-                    } else {
-                      commitUpdate(shapeObj.id, rotateAroundCenter(
-                        shapeObj.x, shapeObj.y, shapeObj.width, shapeObj.height,
-                        shapeObj.rotation ?? 0, newRot,
-                      ))
-                    }
-                  }}
-                />
-              </div>
-              {/* Opacity slider + numeric input */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
-                <input
-                  type="range" min={0} max={100} step={1}
-                  value={Math.round((shapeObj.opacity ?? 1) * 100)}
-                  onMouseDown={startDrag}
-                  onChange={e => patch({ opacity: Number(e.target.value) / 100 })}
-                  onMouseUp={e => commitUpdate(shapeObj.id, { opacity: Number((e.target as HTMLInputElement).value) / 100 })}
-                  style={{ flex: 1 }}
-                />
-                <NumericInput
-                  value={Math.round((shapeObj.opacity ?? 1) * 100)}
-                  min={0} max={100}
-                  width={44}
-                  onCommit={v => commitUpdate(shapeObj.id, { opacity: v / 100 })}
-                />
-              </div>
+              <Field
+                label="Rotation"
+                unit="°"
+                value={Math.round(shapeObj.rotation ?? 0)}
+                min={-360} max={360}
+                onStartDrag={startDrag}
+                onLiveChange={(v) => writeRotation(v, false)}
+                onChange={(v) => writeRotation(v, true)}
+                onReset={() => writeRotation(0, true)}
+              />
+              <Field
+                label="Opacity"
+                unit="%"
+                value={Math.round((shapeObj.opacity ?? 1) * 100)}
+                min={0} max={100}
+                onStartDrag={startDrag}
+                onLiveChange={(v) => patch({ opacity: v / 100 })}
+                onChange={(v) => commitUpdate(shapeObj.id, { opacity: v / 100 })}
+                onReset={() => commitUpdate(shapeObj.id, { opacity: 1 })}
+              />
               <div style={sectionLabelStyle}>Fill</div>
-              <ColorInput value={shapeObj.fill || '#000000'} onChange={(color) => { commitUpdate(shapeObj.id, { fill: color }) }} fixed />
+              {/* A shape always paints something, so it gets no None segment.
+                  The stroke below stays a plain ColorInput — a stroke has no
+                  interior for a gradient to grade across. */}
+              <FillEditor
+                value={shapeObj.fill}
+                onStartDrag={startDrag}
+                onChange={(f) => { patch({ fill: f ?? '#000000' }) }}
+                onCommit={(f) => { commitUpdate(shapeObj.id, { fill: f ?? '#000000' }) }}
+              />
               <div style={sectionLabelStyle}>Stroke</div>
               <ColorInput value={shapeObj.stroke || '#000000'} onChange={(color) => { commitUpdate(shapeObj.id, { stroke: color }) }} fixed />
-              <NumberField label="Stroke W." value={shapeObj.strokeWidth} min={0} step={0.5} onChange={(val) => { commitUpdate(shapeObj.id, { strokeWidth: val }) }} />
+              <NumberField
+                label="Stroke W." unit="px"
+                value={shapeObj.strokeWidth} min={0} step={0.5}
+                onStartDrag={startDrag}
+                onLiveChange={(val) => { patch({ strokeWidth: val }) }}
+                onChange={(val) => { commitUpdate(shapeObj.id, { strokeWidth: val }) }}
+              />
               {shapeObj.kind === 'rect' && (
-                <NumberField label="Corner R." value={shapeObj.cornerRadius ?? 0} min={0} onChange={(val) => { commitUpdate(shapeObj.id, { cornerRadius: val }) }} />
+                <NumberField
+                  label="Corner R." unit="px"
+                  value={shapeObj.cornerRadius ?? 0} min={0}
+                  onStartDrag={startDrag}
+                  onLiveChange={(val) => { patch({ cornerRadius: val }) }}
+                  onChange={(val) => { commitUpdate(shapeObj.id, { cornerRadius: val }) }}
+                  onReset={() => { commitUpdate(shapeObj.id, { cornerRadius: 0 }) }}
+                />
               )}
               {canBecomeFrame(shapeObj) && (
                 <div style={{ marginTop: 4, marginBottom: 8, padding: 8, border: '1px dashed var(--stroke)', borderRadius: 12 }}>
@@ -435,25 +429,22 @@ export function PropertiesPanel(): React.ReactElement {
                   Path edit mode — drag anchors and handles
                 </div>
               )}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
-                <input
-                  type="range" min={0} max={100} step={1}
-                  value={Math.round((pathObj.opacity ?? 1) * 100)}
-                  onMouseDown={startDrag}
-                  onChange={e => patch({ opacity: Number(e.target.value) / 100 })}
-                  onMouseUp={e => commitUpdate(pathObj.id, { opacity: Number((e.target as HTMLInputElement).value) / 100 })}
-                  style={{ flex: 1 }}
-                />
-                <span style={{ minWidth: 32, textAlign: 'right', fontSize: 11, color: 'var(--text-secondary)' }}>
-                  {Math.round((pathObj.opacity ?? 1) * 100)}%
-                </span>
-              </div>
+              <Field
+                label="Opacity"
+                unit="%"
+                value={Math.round((pathObj.opacity ?? 1) * 100)}
+                min={0} max={100}
+                onStartDrag={startDrag}
+                onLiveChange={(v) => patch({ opacity: v / 100 })}
+                onChange={(v) => commitUpdate(pathObj.id, { opacity: v / 100 })}
+                onReset={() => commitUpdate(pathObj.id, { opacity: 1 })}
+              />
               <div style={sectionLabelStyle}>Fill</div>
-              <ColorInput
-                value={pathObj.fill || '#000000'}
-                onChange={(color) => { commitUpdate(pathObj.id, { fill: color }) }}
-                fixed
+              <FillEditor
+                value={pathObj.fill}
+                onStartDrag={startDrag}
+                onChange={(f) => { patch({ fill: f ?? '#000000' }) }}
+                onCommit={(f) => { commitUpdate(pathObj.id, { fill: f ?? '#000000' }) }}
               />
               <div style={sectionLabelStyle}>Stroke</div>
               <ColorInput
@@ -463,9 +454,12 @@ export function PropertiesPanel(): React.ReactElement {
               />
               <NumberField
                 label="Stroke W."
+                unit="px"
                 value={pathObj.strokeWidth}
                 min={0}
                 step={0.5}
+                onStartDrag={startDrag}
+                onLiveChange={(val) => { patch({ strokeWidth: val }) }}
                 onChange={(val) => { commitUpdate(pathObj.id, { strokeWidth: val }) }}
               />
               {canBecomeFrame(pathObj) && (
@@ -499,41 +493,41 @@ export function PropertiesPanel(): React.ReactElement {
         {!isMultiSelect && selectedObj !== null && isGroup && (() => {
           const group = selectedObj as GroupObject
           if (!group.isGrid) return null
+          const relayout = (newGap: number): void => {
+            updateObject(group.id, { gridGap: newGap })
+            // Same relayout CanvasGroupNode uses. refitContent: true — a gap
+            // change resizes every cell, so the media has to re-cover-fit or
+            // it keeps the old size inside the new box (#69).
+            const patches = computeGridChildPatches(
+              { ...group, gridGap: newGap },
+              useCanvasStore.getState().objects,
+              { x: group.x, y: group.y, width: group.width, height: group.height },
+              true,
+            )
+            for (const [childId, childPatch] of Object.entries(patches)) {
+              updateObject(childId, childPatch as Partial<CanvasObject>)
+            }
+          }
           return (
             <div style={{ padding: '0 16px 16px' }}>
               <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Grid
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 12, color: 'var(--text-secondary)', minWidth: 32 }}>Gap</span>
-                <input
-                  type="range"
-                  min={0} max={40} step={1}
-                  value={group.gridGap ?? 8}
-                  onMouseDown={() => startDrag()}
-                  onChange={e => {
-                    const newGap = Number(e.target.value)
-                    updateObject(group.id, { gridGap: newGap })
-                    // Same relayout CanvasGroupNode uses. refitContent: true — a gap
-                    // change resizes every cell, so the media has to re-cover-fit or
-                    // it keeps the old size inside the new box (#69).
-                    const patches = computeGridChildPatches(
-                      { ...group, gridGap: newGap },
-                      useCanvasStore.getState().objects,
-                      { x: group.x, y: group.y, width: group.width, height: group.height },
-                      true,
-                    )
-                    for (const [childId, patch] of Object.entries(patches)) {
-                      updateObject(childId, patch as Partial<CanvasObject>)
-                    }
-                  }}
-                  onMouseUp={() => commitUpdate(group.id, {})}
-                  style={{ flex: 1 }}
-                />
-                <span style={{ fontSize: 12, color: 'var(--text-secondary)', minWidth: 24, textAlign: 'right' }}>
-                  {group.gridGap ?? 8}
-                </span>
-              </div>
+              <Field
+                label="Gap"
+                unit="px"
+                value={group.gridGap ?? 8}
+                min={0} max={40}
+                labelWidth={32}
+                marginBottom={0}
+                onStartDrag={startDrag}
+                onLiveChange={relayout}
+                // relayout() writes every cell; commitUpdate then closes the one
+                // history entry using the snapshot Field armed on the first live
+                // write. A bare `commitUpdate(group.id, {gridGap})` would miss the
+                // cells, which is why the relayout runs here too.
+                onChange={(v) => { relayout(v); commitUpdate(group.id, {}) }}
+              />
             </div>
           )
         })()}
@@ -548,8 +542,11 @@ export function PropertiesPanel(): React.ReactElement {
               </div>
               <NumberField
                 label={g.orientation === 'horizontal' ? 'Y Position' : 'X Position'}
+                unit="px"
                 value={Math.round(g.position)}
                 step={1}
+                onStartDrag={startDrag}
+                onLiveChange={(val) => updateObject(g.id, { position: val })}
                 onChange={(val) => commitUpdate(g.id, { position: val })}
               />
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
@@ -595,66 +592,41 @@ export function PropertiesPanel(): React.ReactElement {
           const imgObj = selectedObj as ImageObject
           const isContentMode = imgObj.contentEditMode === true
 
+          // A media frame rotates about the FRAME box, not the object box — the
+          // content floats inside it, so spinning around x/y would swing the crop.
+          const writeImgRotation = (newRot: number, commit: boolean): void => {
+            const { x: fx, y: fy, rotation } = rotateAroundCenter(
+              imgObj.frameX, imgObj.frameY, imgObj.frameWidth, imgObj.frameHeight,
+              imgObj.rotation ?? 0, newRot,
+            )
+            const write = commit ? commitUpdate : updateObject
+            write(imgObj.id, { rotation, frameX: fx, frameY: fy, x: fx, y: fy })
+          }
+
           if (!isContentMode) {
             // FRAME MODE
             return (
               <div style={{ padding: '12px 12px 0' }}>
-                {/* Rotation slider + numeric input */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                  <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
-                  <input
-                    type="range" min={-360} max={360} step={1}
-                    value={Math.round(imgObj.rotation ?? 0)}
-                    onMouseDown={startDrag}
-                    onChange={e => {
-                      const newRot = Number(e.target.value)
-                      const { x: fx, y: fy, rotation } = rotateAroundCenter(
-                        imgObj.frameX, imgObj.frameY, imgObj.frameWidth, imgObj.frameHeight,
-                        imgObj.rotation ?? 0, newRot,
-                      )
-                      updateObject(imgObj.id, { rotation, frameX: fx, frameY: fy, x: fx, y: fy })
-                    }}
-                    onMouseUp={e => {
-                      const newRot = Number((e.target as HTMLInputElement).value)
-                      const { x: fx, y: fy, rotation } = rotateAroundCenter(
-                        imgObj.frameX, imgObj.frameY, imgObj.frameWidth, imgObj.frameHeight,
-                        imgObj.rotation ?? 0, newRot,
-                      )
-                      commitUpdate(imgObj.id, { rotation, frameX: fx, frameY: fy, x: fx, y: fy })
-                    }}
-                    style={{ flex: 1 }}
-                  />
-                  <NumericInput
-                    value={Math.round(imgObj.rotation ?? 0)}
-                    min={-360} max={360}
-                    width={48}
-                    onCommit={newRot => {
-                      const { x: fx, y: fy, rotation } = rotateAroundCenter(
-                        imgObj.frameX, imgObj.frameY, imgObj.frameWidth, imgObj.frameHeight,
-                        imgObj.rotation ?? 0, newRot,
-                      )
-                      commitUpdate(imgObj.id, { rotation, frameX: fx, frameY: fy, x: fx, y: fy })
-                    }}
-                  />
-                </div>
-                {/* Opacity slider + numeric input */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                  <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
-                  <input
-                    type="range" min={0} max={100} step={1}
-                    value={Math.round((imgObj.opacity ?? 1) * 100)}
-                    onMouseDown={startDrag}
-                    onChange={e => patch({ opacity: Number(e.target.value) / 100 })}
-                    onMouseUp={e => commitUpdate(imgObj.id, { opacity: Number((e.target as HTMLInputElement).value) / 100 })}
-                    style={{ flex: 1 }}
-                  />
-                  <NumericInput
-                    value={Math.round((imgObj.opacity ?? 1) * 100)}
-                    min={0} max={100}
-                    width={44}
-                    onCommit={v => commitUpdate(imgObj.id, { opacity: v / 100 })}
-                  />
-                </div>
+                <Field
+                  label="Rotation"
+                  unit="°"
+                  value={Math.round(imgObj.rotation ?? 0)}
+                  min={-360} max={360}
+                  onStartDrag={startDrag}
+                  onLiveChange={(v) => writeImgRotation(v, false)}
+                  onChange={(v) => writeImgRotation(v, true)}
+                  onReset={() => writeImgRotation(0, true)}
+                />
+                <Field
+                  label="Opacity"
+                  unit="%"
+                  value={Math.round((imgObj.opacity ?? 1) * 100)}
+                  min={0} max={100}
+                  onStartDrag={startDrag}
+                  onLiveChange={(v) => patch({ opacity: v / 100 })}
+                  onChange={(v) => commitUpdate(imgObj.id, { opacity: v / 100 })}
+                  onReset={() => commitUpdate(imgObj.id, { opacity: 1 })}
+                />
                 {isFrameObject(imgObj) ? (
                   <FrameSection
                     frameObj={imgObj}
@@ -735,26 +707,34 @@ export function PropertiesPanel(): React.ReactElement {
               <div style={{ color: 'var(--text-secondary)', fontSize: 9, fontWeight: 700, letterSpacing: '1.5px',
                 textTransform: 'uppercase' as const, fontFamily: 'var(--font)', marginBottom: 6 }}>Content</div>
               <NumberField
-                label="Offset X"
+                label="Offset X" unit="px"
                 value={imgObj.contentOffsetX}
-                onChange={(val) => patch({ contentOffsetX: val })}
+                onStartDrag={startDrag}
+                onLiveChange={(val) => patch({ contentOffsetX: val })}
+                onChange={(val) => commitUpdate(imgObj.id, { contentOffsetX: val })}
               />
               <NumberField
-                label="Offset Y"
+                label="Offset Y" unit="px"
                 value={imgObj.contentOffsetY}
-                onChange={(val) => patch({ contentOffsetY: val })}
+                onStartDrag={startDrag}
+                onLiveChange={(val) => patch({ contentOffsetY: val })}
+                onChange={(val) => commitUpdate(imgObj.id, { contentOffsetY: val })}
               />
               <NumberField
-                label="Width"
+                label="Width" unit="px"
                 value={imgObj.contentWidth}
                 min={1}
-                onChange={(val) => patch({ contentWidth: val })}
+                onStartDrag={startDrag}
+                onLiveChange={(val) => patch({ contentWidth: val })}
+                onChange={(val) => commitUpdate(imgObj.id, { contentWidth: val })}
               />
               <NumberField
-                label="Height"
+                label="Height" unit="px"
                 value={imgObj.contentHeight}
                 min={1}
-                onChange={(val) => patch({ contentHeight: val })}
+                onStartDrag={startDrag}
+                onLiveChange={(val) => patch({ contentHeight: val })}
+                onChange={(val) => commitUpdate(imgObj.id, { contentHeight: val })}
               />
 
               <Tooltip label="Reset aspect ratio">

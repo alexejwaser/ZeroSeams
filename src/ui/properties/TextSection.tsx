@@ -9,10 +9,9 @@ import { FontPicker } from '../FontPicker'
 import Tooltip from '../Tooltip'
 import { AlignLeft, AlignCenter, AlignRight } from 'lucide-react'
 import { MixedColorInput } from '../ColorInput'
-import { NumericInput } from '../NumericInput'
 
 import { rotateAroundCenter } from '@/canvas/geometry'
-import { NumberField, MixedNumberField, sectionLabelStyle } from './shared'
+import { Field, NumberField, MixedNumberField, sectionLabelStyle } from './shared'
 
 
 // ---------------------------------------------------------------------------
@@ -113,69 +112,43 @@ export function TextSection({
   const currentFill = effectiveFill()
   const currentLetterSpacing = effectiveLetterSpacing()
 
+  // A textbox stores its top-left, so rotation has to be applied about the box
+  // centre or the layer swings away from the handle that is driving it.
+  function writeRotation(newRot: number, commit: boolean): void {
+    const { x, y, rotation } = rotateAroundCenter(
+      textObj.x, textObj.y, textObj.width, textObj.height,
+      textObj.rotation ?? 0, newRot,
+    )
+    const write = commit ? onCommit : onUpdate
+    write(selectedId, { rotation, x, y } as Partial<TextObject>)
+  }
+
   // Bold/italic active state — false when mixed (undefined).
   const boldActive = currentFontStyle !== undefined && currentFontStyle.includes('bold')
   const italicActive = currentFontStyle !== undefined && currentFontStyle.includes('italic')
 
   return (
     <div style={{ padding: '12px 12px 0' }}>
-      {/* Rotation slider + numeric input */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
-        <input
-          type="range" min={-360} max={360} step={1}
-          value={Math.round(textObj.rotation ?? 0)}
-          onMouseDown={onStartDrag}
-          onChange={e => {
-            const newRot = Number(e.target.value)
-            const { x, y, rotation } = rotateAroundCenter(
-              textObj.x, textObj.y, textObj.width, textObj.height,
-              textObj.rotation ?? 0, newRot,
-            )
-            onUpdate(selectedId, { rotation, x, y } as Partial<TextObject>)
-          }}
-          onMouseUp={e => {
-            const newRot = Number((e.target as HTMLInputElement).value)
-            const { x, y, rotation } = rotateAroundCenter(
-              textObj.x, textObj.y, textObj.width, textObj.height,
-              textObj.rotation ?? 0, newRot,
-            )
-            onCommit(selectedId, { rotation, x, y } as Partial<TextObject>)
-          }}
-          style={{ flex: 1 }}
-        />
-        <NumericInput
-          value={Math.round(textObj.rotation ?? 0)}
-          min={-360} max={360}
-          width={48}
-          onCommit={newRot => {
-            const { x, y, rotation } = rotateAroundCenter(
-              textObj.x, textObj.y, textObj.width, textObj.height,
-              textObj.rotation ?? 0, newRot,
-            )
-            onCommit(selectedId, { rotation, x, y } as Partial<TextObject>)
-          }}
-        />
-      </div>
-
-      {/* Opacity slider + numeric input */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
-        <input
-          type="range" min={0} max={100} step={1}
-          value={Math.round((textObj.opacity ?? 1) * 100)}
-          onMouseDown={onStartDrag}
-          onChange={e => onUpdate(selectedId, { opacity: Number(e.target.value) / 100 } as Partial<TextObject>)}
-          onMouseUp={e => onCommit(selectedId, { opacity: Number((e.target as HTMLInputElement).value) / 100 } as Partial<TextObject>)}
-          style={{ flex: 1 }}
-        />
-        <NumericInput
-          value={Math.round((textObj.opacity ?? 1) * 100)}
-          min={0} max={100}
-          width={44}
-          onCommit={v => onCommit(selectedId, { opacity: v / 100 } as Partial<TextObject>)}
-        />
-      </div>
+      <Field
+        label="Rotation"
+        unit="°"
+        value={Math.round(textObj.rotation ?? 0)}
+        min={-360} max={360}
+        onStartDrag={onStartDrag}
+        onLiveChange={(v) => writeRotation(v, false)}
+        onChange={(v) => writeRotation(v, true)}
+        onReset={() => writeRotation(0, true)}
+      />
+      <Field
+        label="Opacity"
+        unit="%"
+        value={Math.round((textObj.opacity ?? 1) * 100)}
+        min={0} max={100}
+        onStartDrag={onStartDrag}
+        onLiveChange={(v) => onUpdate(selectedId, { opacity: v / 100 } as Partial<TextObject>)}
+        onChange={(v) => onCommit(selectedId, { opacity: v / 100 } as Partial<TextObject>)}
+        onReset={() => onCommit(selectedId, { opacity: 1 } as Partial<TextObject>)}
+      />
 
       {/* Inline edit mode banner / hint */}
       {isInEditMode ? (
@@ -222,9 +195,11 @@ export function TextSection({
       {/* Font size */}
       <MixedNumberField
         label="Size"
+        unit="px"
         value={currentFontSize}
         min={8}
         max={400}
+        onStartDrag={onStartDrag}
         onChange={(val) => applySpanField({ fontSize: val })}
       />
 
@@ -305,17 +280,23 @@ export function TextSection({
       <div style={{ ...sectionLabelStyle }}>Spacing</div>
       <MixedNumberField
         label="Letter Sp."
+        unit="px"
         value={currentLetterSpacing}
         step={0.5}
+        onStartDrag={onStartDrag}
         onChange={(val) => applySpanField({ letterSpacing: val })}
       />
-      {/* Line height is always layer-level */}
+      {/* Line height is always layer-level. Unitless multiplier, hence ×. */}
       <NumberField
         label="Line H."
+        unit="×"
         value={textObj.lineHeight}
         step={0.1}
+        decimals={1}
         min={0.5}
         max={4}
+        onStartDrag={onStartDrag}
+        onLiveChange={(val) => onUpdate(selectedId, { lineHeight: val } as Partial<TextObject>)}
         onChange={(val) => onCommit(selectedId, { lineHeight: val } as Partial<TextObject>)}
       />
     </div>

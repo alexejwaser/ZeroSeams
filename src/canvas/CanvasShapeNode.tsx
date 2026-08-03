@@ -16,6 +16,8 @@ import type { SnapGuide } from './useSnapGuides'
 import { axisLock, ACCENT, ACCENT_GOLD } from './constants'
 import { useViewportStore, selectScale } from './useViewportStore'
 import { buildEffectFilters } from './effects/buildEffectFilters'
+import { konvaFillProps } from './fill'
+import { solidColorOf } from './frameClip'
 
 interface CanvasShapeNodeProps {
   id: string
@@ -383,7 +385,8 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
           width={obj.width}
           height={obj.height}
           cornerRadius={obj.cornerRadius ?? 0}
-          fill={obj.fill}
+          // A Konva Rect placed at the object's x/y has its local origin at 0,0.
+          {...konvaFillProps(obj.fill, obj.width, obj.height)}
           stroke={obj.stroke}
           strokeWidth={obj.strokeWidth}
           strokeScaleEnabled={false}
@@ -410,7 +413,9 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
           y={obj.y + obj.height / 2}
           radiusX={obj.width / 2}
           radiusY={obj.height / 2}
-          fill={obj.fill}
+          // A Konva Ellipse is positioned by its CENTRE, so its local box starts
+          // at (-w/2, -h/2) — gradient geometry must be offset to match.
+          {...konvaFillProps(obj.fill, obj.width, obj.height, -obj.width / 2, -obj.height / 2)}
           stroke={obj.stroke}
           strokeWidth={obj.strokeWidth}
           strokeScaleEnabled={false}
@@ -434,7 +439,11 @@ function CanvasShapeNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasShapeN
         const x1 = obj.x; const y1 = obj.y
         const x2 = obj.x2 ?? obj.x + obj.width
         const y2 = obj.y2 ?? obj.y + obj.height
-        const color = (obj.stroke && obj.stroke !== 'transparent') ? obj.stroke : obj.fill
+        // A line has no interior, so it can only ever take a single colour —
+        // solidColorOf answers undefined for a gradient rather than guessing.
+        const color = (obj.stroke && obj.stroke !== 'transparent')
+          ? obj.stroke
+          : (solidColorOf(obj.fill) ?? '#000000')
         const lw = Math.max(obj.strokeWidth, 2)
         return (
           <>

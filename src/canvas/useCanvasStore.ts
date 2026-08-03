@@ -1,9 +1,10 @@
 import { create } from 'zustand'
-import type { CanvasObject, ImageObject, GroupObject, ShapeObject, PathObject, ShapeKind, TextObject, VideoObject, GuidelineObject, ClipShape } from '@/types/canvas'
+import type { CanvasObject, ImageObject, GroupObject, ShapeObject, PathObject, ShapeKind, TextObject, VideoObject, GuidelineObject, ClipShape, Fill } from '@/types/canvas'
 import type { GridTemplate } from './gridTemplates'
 import type { Frame, FrameRatio, Platform, CarouselProject } from '@/types/project'
 import { fitCover } from './geometry'
-import { normalizeAnchors, denormalizeAnchors, solidColorOf } from './frameClip'
+import { normalizeAnchors, denormalizeAnchors } from './frameClip'
+import { normalizeFill, denormalizeFill } from './fill'
 import { buildEmptyFrameImage, frameToEmptyImage, isEmptyFrame, makeEmptyCell } from './frameModel'
 import { computePathBBox } from './CanvasPathNode'
 
@@ -31,7 +32,9 @@ const MIN_FRAME_SIZE = 1
 function buildFrameFromShape(obj: CanvasObject, id: string): ImageObject | null {
   let frameRect: { x: number; y: number; width: number; height: number }
   let clipShape: ClipShape
-  let fillColor: string
+  // Shapes/paths store `string | Fill`; frames store `Fill`. Carried straight
+  // through (via normalizeFill) so a gradient survives the conversion.
+  let fillValue: string | Fill
   let stroke: string
   let strokeWidth: number
   let rotation: number
@@ -58,7 +61,7 @@ function buildFrameFromShape(obj: CanvasObject, id: string): ImageObject | null 
     clipShape = s.kind === 'rect'
       ? { kind: 'rect', ...(s.cornerRadius ? { cornerRadius: s.cornerRadius } : {}) }
       : { kind: 'ellipse' }
-    fillColor = s.fill
+    fillValue = s.fill
     stroke = s.stroke
     strokeWidth = s.strokeWidth
     rotation = s.rotation
@@ -68,7 +71,7 @@ function buildFrameFromShape(obj: CanvasObject, id: string): ImageObject | null 
     const bbox = computePathBBox(p.anchors, true)
     frameRect = { x: bbox.x, y: bbox.y, width: bbox.width, height: bbox.height }
     clipShape = { kind: 'path', anchors: normalizeAnchors(p.anchors, bbox) }
-    fillColor = p.fill
+    fillValue = p.fill
     stroke = p.stroke
     strokeWidth = p.strokeWidth
     rotation = p.rotation
@@ -90,7 +93,7 @@ function buildFrameFromShape(obj: CanvasObject, id: string): ImageObject | null 
     parentGroupId: obj.parentGroupId,
     name: obj.name,
     clipShape,
-    fill: { type: 'solid', color: fillColor },
+    fill: normalizeFill(fillValue),
     frameStroke: stroke,
     frameStrokeWidth: strokeWidth,
     effects: obj.effects,
@@ -170,7 +173,11 @@ function buildFilledFrame(
  *  bakes frame rotation into path anchors. Drops any media. Pure. */
 function buildShapeFromFrame(f: ImageObject | VideoObject, id: string): CanvasObject {
       const clip: ClipShape = f.clipShape ?? { kind: 'rect' }
-      const fillColor = solidColorOf(f.fill) ?? '#ffffff'
+      // Straight pass-through so a gradient survives shape→frame→shape.
+      // denormalizeFill collapses a solid back to its bare colour string — the
+      // canonical ShapeObject/PathObject form — which is what makes the
+      // round-trip value-identical for every project that has no gradient.
+      const fillValue = denormalizeFill(f.fill) ?? '#ffffff'
       const stroke = f.frameStroke ?? '#000000'
       const strokeWidth = f.frameStrokeWidth ?? 0
 
@@ -212,7 +219,7 @@ function buildShapeFromFrame(f: ImageObject | VideoObject, id: string): CanvasOb
           type: 'path',
           anchors: denorm,
           closed: true,
-          fill: fillColor,
+          fill: fillValue,
           stroke,
           strokeWidth,
           pathEditMode: false,
@@ -233,7 +240,7 @@ function buildShapeFromFrame(f: ImageObject | VideoObject, id: string): CanvasOb
           ...common,
           type: 'shape',
           kind: clip.kind === 'ellipse' ? 'ellipse' : 'rect',
-          fill: fillColor,
+          fill: fillValue,
           stroke,
           strokeWidth,
           ...(clip.kind === 'rect' && clip.cornerRadius ? { cornerRadius: clip.cornerRadius } : {}),
@@ -298,6 +305,16 @@ export const PLATFORM_PRESETS: Record<Platform, Array<{ ratio: FrameRatio; label
   ],
 }
 
+/** What the New Document screen picks. Declared canvas-side (not in src/ui) so
+ *  the store never has to import from the UI layer. */
+export interface NewProjectSpec {
+  platform: Platform
+  ratio: FrameRatio
+  width: number
+  height: number
+  frameCount: number
+}
+
 type HistorySnapshot = Pick<
   CanvasState,
   'objects' | 'objectOrder' | 'ratio' | 'frameWidth' | 'frameHeight' | 'frames' | 'backgroundColor' | 'frameCount'
@@ -305,7 +322,10 @@ type HistorySnapshot = Pick<
 
 const MAX_HISTORY = 50
 
-function makeFrames(count: number): Frame[] {
+/** Exported so src/io/projectFile.ts can build a brand-new project payload with
+ *  the same frame shape `newProject` will apply — the file on disk and the store
+ *  must not describe the same new document differently. */
+export function makeFrames(count: number): Frame[] {
   return Array.from({ length: count }, (_, i) => ({
     index: i,
     label: `Slide ${i + 1}`,
@@ -425,6 +445,10 @@ interface CanvasState {
   setTextSelection: (range: { start: number; end: number } | null) => void
   setCaptureTextSelection: (fn: (() => void) | null) => void
   loadProject: (project: CarouselProject) => void
+  /** Reset to a blank document with the given size/frame settings. Mirrors
+   *  loadProject's reset block — every field loadProject clears is cleared here
+   *  too, or the new document inherits debris from the previous one. */
+  newProject: (spec: NewProjectSpec) => void
   // actions
   addObject: (obj: CanvasObject) => void
   updateObject: (id: string, patch: Partial<CanvasObject>) => void
@@ -1673,6 +1697,32 @@ export const useCanvasStore = create<CanvasState>((set) => {
           _openEditModeCount: 0,
         }
       }),
+
+    newProject: (spec) =>
+      set(() => ({
+        objects: {},
+        objectOrder: [],
+        frameCount: spec.frameCount,
+        platform: spec.platform,
+        ratio: spec.ratio,
+        frameWidth: spec.width,
+        frameHeight: spec.height,
+        frames: makeFrames(spec.frameCount),
+        backgroundColor: '#ffffff',
+        selectedId: null,
+        selectedIds: [],
+        anchorId: null,
+        contextMenu: null,
+        activeTool: 'select',
+        penDrawingId: null,
+        textEditingId: null,
+        textSelection: null,
+        past: [],
+        future: [],
+        _dragStartObjects: null,
+        _srcVault: new Map(),
+        _openEditModeCount: 0,
+      })),
 
     selectAll: () =>
       set((state) => {

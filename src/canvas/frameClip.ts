@@ -6,15 +6,19 @@
 import type Konva from 'konva'
 import type { AnchorPoint, ClipShape, Fill } from '@/types/canvas'
 import { anchorsToPathData } from './CanvasPathNode'
+import { normalizeFill } from './fill'
 
 type PathCtx = CanvasRenderingContext2D | Konva.Context
 
-/** Solid colour of a Fill, or undefined for fill kinds that have none.
- *  Always read `fill` through this — the union grows (gradient) and an unguarded
- *  `fill.color` would silently break. */
-export function solidColorOf(fill: Fill | undefined): string | undefined {
-  if (!fill) return undefined
-  return fill.type === 'solid' ? fill.color : undefined
+/** Solid colour of a fill, or undefined for fill kinds that have none — a
+ *  gradient answers undefined, it has no single colour.
+ *  Accepts the bare colour string form that ShapeObject/PathObject use.
+ *  Use this only where a single colour is genuinely all that can be rendered
+ *  (a line's stroke); anything with an interior goes through `konvaFillProps`
+ *  / `apply2dFill` / `fillPreviewCss` in `fill.ts` instead. */
+export function solidColorOf(fill: string | Fill | undefined): string | undefined {
+  const f = normalizeFill(fill)
+  return f && f.type === 'solid' ? f.color : undefined
 }
 
 /** Feather-style "image" glyph in a 24×24 box — centered hint on empty frames. */

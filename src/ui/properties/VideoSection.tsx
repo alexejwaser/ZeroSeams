@@ -5,12 +5,11 @@ import Tooltip from '../Tooltip'
 import { iconBtnProps } from '../iconBtnStyle'
 import { Volume2, VolumeX, Play, Pause, Repeat } from 'lucide-react'
 import { videoElementRegistry } from '@/canvas/videoElementRegistry'
-import { NumericInput } from '../NumericInput'
 
 import { rotateAroundCenter } from '@/canvas/geometry'
 import { AdjustmentsSection } from './AdjustmentsSection'
 import { EffectsSection } from './EffectsSection'
-import { sectionLabelStyle } from './shared'
+import { Field, sectionLabelStyle } from './shared'
 
 
 // ---------------------------------------------------------------------------
@@ -74,6 +73,17 @@ export function VideoSection({
     }).catch(() => setFileSize(null))
   }, [videoObj.filePath])
 
+  // Rotates about the FRAME box, not the object box — the content floats inside
+  // the frame, so spinning around x/y would swing the crop with it.
+  function writeRotation(newRot: number, commit: boolean): void {
+    const { x: fx, y: fy, rotation } = rotateAroundCenter(
+      videoObj.frameX, videoObj.frameY, videoObj.frameWidth, videoObj.frameHeight,
+      videoObj.rotation ?? 0, newRot,
+    )
+    const write = commit ? onCommit : onUpdate
+    write(selectedId, { rotation, frameX: fx, frameY: fy, x: fx, y: fy })
+  }
+
   return (
     <div style={{ padding: '12px 12px 0' }}>
       {/* Read-only info */}
@@ -93,9 +103,20 @@ export function VideoSection({
         </div>
       )}
 
-      {/* Audio: mute toggle + volume slider */}
+      {/* Audio: volume + mute toggle */}
       <div style={sectionLabelStyle}>Audio</div>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6, gap: 6 }}>
+      <Field
+        label="Volume"
+        unit="%"
+        marginBottom={6}
+        value={Math.round((videoObj.volume ?? 1) * 100)}
+        min={0} max={100}
+        disabled={videoObj.muted}
+        onStartDrag={onStartDrag}
+        onLiveChange={v => onUpdate(selectedId, { volume: v / 100 })}
+        onChange={v => onCommit(selectedId, { volume: v / 100 })}
+        onReset={() => onCommit(selectedId, { volume: 1 })}
+      >
         <Tooltip label={videoObj.muted ? 'Unmute' : 'Mute'}>
           <button
             {...iconBtnProps(!videoObj.muted)}
@@ -104,25 +125,7 @@ export function VideoSection({
             {videoObj.muted ? <VolumeX size={14} /> : <Volume2 size={14} />}
           </button>
         </Tooltip>
-        <input
-          type="range" min={0} max={100} step={1}
-          value={Math.round((videoObj.volume ?? 1) * 100)}
-          disabled={videoObj.muted}
-          onMouseDown={onStartDrag}
-          onChange={e => onUpdate(selectedId, { volume: Number(e.target.value) / 100 })}
-          onMouseUp={e => onCommit(selectedId, { volume: Number((e.target as HTMLInputElement).value) / 100 })}
-          style={{ flex: 1, opacity: videoObj.muted ? 0.35 : 1, pointerEvents: videoObj.muted ? 'none' : 'auto' }}
-        />
-        <NumericInput
-          value={Math.round((videoObj.volume ?? 1) * 100)}
-          min={0} max={100}
-          width={44}
-          disabled={videoObj.muted}
-          onCommit={v => onCommit(selectedId, { volume: v / 100 })}
-          onDoubleClick={() => onCommit(selectedId, { volume: 1 })}
-          style={videoObj.muted ? { opacity: 0.35 } : undefined}
-        />
-      </div>
+      </Field>
 
       {/* Playback controls */}
       <div style={sectionLabelStyle}>Playback</div>
@@ -205,15 +208,19 @@ export function VideoSection({
       {/* Trim section */}
       <div style={sectionLabelStyle}>Trim</div>
       {/* In point */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-        <span style={trimLabelStyle}>In</span>
-        <NumericInput
-          value={videoObj.trimStart ?? 0}
-          decimals={2}
-          min={0} max={videoObj.naturalDuration}
-          width={60}
-          onCommit={v => onCommit(selectedId, { trimStart: v })}
-        />
+      <Field
+        label="In"
+        unit="s"
+        labelWidth={32}
+        marginBottom={6}
+        step={0.1}
+        decimals={2}
+        value={videoObj.trimStart ?? 0}
+        min={0} max={videoObj.naturalDuration}
+        onStartDrag={onStartDrag}
+        onLiveChange={v => onUpdate(selectedId, { trimStart: v })}
+        onChange={v => onCommit(selectedId, { trimStart: v })}
+      >
         <Tooltip label="Set In to current time">
           <button
             {...iconBtnProps(false, false, { fontSize: 11, padding: '2px 6px', width: 'auto' })}
@@ -222,17 +229,21 @@ export function VideoSection({
             Set In
           </button>
         </Tooltip>
-      </div>
+      </Field>
       {/* Out point */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-        <span style={trimLabelStyle}>Out</span>
-        <NumericInput
-          value={videoObj.trimEnd ?? videoObj.naturalDuration}
-          decimals={2}
-          min={0} max={videoObj.naturalDuration}
-          width={60}
-          onCommit={v => onCommit(selectedId, { trimEnd: v })}
-        />
+      <Field
+        label="Out"
+        unit="s"
+        labelWidth={32}
+        marginBottom={6}
+        step={0.1}
+        decimals={2}
+        value={videoObj.trimEnd ?? videoObj.naturalDuration}
+        min={0} max={videoObj.naturalDuration}
+        onStartDrag={onStartDrag}
+        onLiveChange={v => onUpdate(selectedId, { trimEnd: v })}
+        onChange={v => onCommit(selectedId, { trimEnd: v })}
+      >
         <Tooltip label="Set Out to current time">
           <button
             {...iconBtnProps(false, false, { fontSize: 11, padding: '2px 6px', width: 'auto' })}
@@ -241,7 +252,7 @@ export function VideoSection({
             Set Out
           </button>
         </Tooltip>
-      </div>
+      </Field>
       {/* Reset trim */}
       <div style={{ marginBottom: 10 }}>
         <button
@@ -251,77 +262,43 @@ export function VideoSection({
           Reset Trim
         </button>
       </div>
-      {/* Start delay */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-        <span style={trimLabelStyle}>Delay</span>
-        <NumericInput
-          value={videoObj.startOffset ?? 0}
-          decimals={1}
-          min={0} max={30}
-          width={60}
-          onCommit={v => onCommit(selectedId, { startOffset: v })}
-        />
-        <span style={{ color: '#666', fontSize: 11 }}>s before play</span>
-      </div>
+      {/* Start delay — the unit lives inside the field now, so the trailing
+          "s before play" caption that used to carry it is gone. */}
+      <Field
+        label="Delay"
+        unit="s"
+        labelWidth={32}
+        marginBottom={10}
+        step={0.1}
+        decimals={1}
+        value={videoObj.startOffset ?? 0}
+        min={0} max={30}
+        onStartDrag={onStartDrag}
+        onLiveChange={v => onUpdate(selectedId, { startOffset: v })}
+        onChange={v => onCommit(selectedId, { startOffset: v })}
+      />
 
-      {/* Rotation slider + numeric input */}
       <div style={sectionLabelStyle}>Transform</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Rotation</label>
-        <input
-          type="range" min={-360} max={360} step={1}
-          value={Math.round(videoObj.rotation ?? 0)}
-          onMouseDown={onStartDrag}
-          onChange={e => {
-            const newRot = Number(e.target.value)
-            const { x: fx, y: fy, rotation } = rotateAroundCenter(
-              videoObj.frameX, videoObj.frameY, videoObj.frameWidth, videoObj.frameHeight,
-              videoObj.rotation ?? 0, newRot,
-            )
-            onUpdate(selectedId, { rotation, frameX: fx, frameY: fy, x: fx, y: fy })
-          }}
-          onMouseUp={e => {
-            const newRot = Number((e.target as HTMLInputElement).value)
-            const { x: fx, y: fy, rotation } = rotateAroundCenter(
-              videoObj.frameX, videoObj.frameY, videoObj.frameWidth, videoObj.frameHeight,
-              videoObj.rotation ?? 0, newRot,
-            )
-            onCommit(selectedId, { rotation, frameX: fx, frameY: fy, x: fx, y: fy })
-          }}
-          style={{ flex: 1 }}
-        />
-        <NumericInput
-          value={Math.round(videoObj.rotation ?? 0)}
-          min={-360} max={360}
-          width={48}
-          onCommit={newRot => {
-            const { x: fx, y: fy, rotation } = rotateAroundCenter(
-              videoObj.frameX, videoObj.frameY, videoObj.frameWidth, videoObj.frameHeight,
-              videoObj.rotation ?? 0, newRot,
-            )
-            onCommit(selectedId, { rotation, frameX: fx, frameY: fy, x: fx, y: fy })
-          }}
-        />
-      </div>
-
-      {/* Opacity slider + numeric input */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <label style={{ color: 'var(--text-secondary)', fontSize: 12, width: 64, flexShrink: 0 }}>Opacity</label>
-        <input
-          type="range" min={0} max={100} step={1}
-          value={Math.round((videoObj.opacity ?? 1) * 100)}
-          onMouseDown={onStartDrag}
-          onChange={e => onUpdate(selectedId, { opacity: Number(e.target.value) / 100 })}
-          onMouseUp={e => onCommit(selectedId, { opacity: Number((e.target as HTMLInputElement).value) / 100 })}
-          style={{ flex: 1 }}
-        />
-        <NumericInput
-          value={Math.round((videoObj.opacity ?? 1) * 100)}
-          min={0} max={100}
-          width={44}
-          onCommit={v => onCommit(selectedId, { opacity: v / 100 })}
-        />
-      </div>
+      <Field
+        label="Rotation"
+        unit="°"
+        value={Math.round(videoObj.rotation ?? 0)}
+        min={-360} max={360}
+        onStartDrag={onStartDrag}
+        onLiveChange={(v) => writeRotation(v, false)}
+        onChange={(v) => writeRotation(v, true)}
+        onReset={() => writeRotation(0, true)}
+      />
+      <Field
+        label="Opacity"
+        unit="%"
+        value={Math.round((videoObj.opacity ?? 1) * 100)}
+        min={0} max={100}
+        onStartDrag={onStartDrag}
+        onLiveChange={v => onUpdate(selectedId, { opacity: v / 100 })}
+        onChange={v => onCommit(selectedId, { opacity: v / 100 })}
+        onReset={() => onCommit(selectedId, { opacity: 1 })}
+      />
 
       {/* Adjustments */}
       <AdjustmentsSection

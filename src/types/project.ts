@@ -1,4 +1,4 @@
-import type { CanvasObject } from './canvas'
+import type { CanvasObject, Swatch } from './canvas'
 
 // CarouselProject — the top-level save/load unit for a Zero Seams project.
 
@@ -35,6 +35,10 @@ export interface CarouselProject {
   id: string
   name: string
 
+  /** On-disk shape version (see SCHEMA_VERSION in src/io/projectFile.ts).
+   *  Optional: files written before it existed simply lack it. */
+  schemaVersion?: number
+
   // --- Canvas layout ---
   platform?: Platform
   ratio: FrameRatio
@@ -50,6 +54,10 @@ export interface CarouselProject {
   objects: Record<string, CanvasObject>
   /** Render order (bottom → top) */
   objectOrder: string[]
+
+  /** Colour swatches that travel with this project (the "File" scope in the
+   *  colour picker). The "Global" scope lives in userData, not here. */
+  swatches?: Swatch[]
 
   // --- History ---
   createdAt: string   // ISO 8601

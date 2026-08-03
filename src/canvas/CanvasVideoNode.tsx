@@ -13,7 +13,8 @@ import { registerVideoElement, unregisterVideoElement } from './videoElementRegi
 import { buildFilterPipeline } from './adjustments/pipeline'
 import { buildEffectFilters } from './effects/buildEffectFilters'
 import { fitCover, snapRectInRotatedFrame } from './geometry'
-import { buildClipFunc, clipShapeToPathData, isPlainRectClip, solidColorOf } from './frameClip'
+import { buildClipFunc, clipShapeToPathData, isPlainRectClip } from './frameClip'
+import { normalizeFill, konvaFillProps } from './fill'
 import { ClipEditOverlay } from './ClipEditOverlay'
 
 interface CanvasVideoNodeProps {
@@ -234,7 +235,8 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     [obj.frameWidth, obj.frameHeight],
   )
 
-  const frameFill = solidColorOf(obj.fill)
+  // Always read `fill` through normalizeFill — see CanvasImageNode.
+  const frameFill = normalizeFill(obj.fill)
 
   // --- Media-frame clip geometry (see CanvasImageNode for the full contract) ---
   const plainRect = isPlainRectClip(obj.clipShape)
@@ -269,7 +271,15 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
       if (trace) group.clipFunc(trace)
     }
     const fr = fillRectRef.current
-    if (fr) { fr.width(width); fr.height(height) }
+    if (fr) {
+      fr.width(width)
+      fr.height(height)
+      // Gradient endpoints are absolute in the node's local space — re-resolve
+      // them or the gradient stays frozen at the pre-drag size.
+      if (frameFill && frameFill.type !== 'solid') {
+        fr.setAttrs(konvaFillProps(frameFill, width, height))
+      }
+    }
     const fs = frameStrokeRef.current
     if (fs && obj.frameStroke && obj.frameStrokeWidth) {
       fs.data(clipShapeToPathData(obj.clipShape ?? { kind: 'rect' }, width, height))
@@ -659,7 +669,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
             ref={fillRectRef}
             x={0} y={0}
             width={obj.frameWidth} height={obj.frameHeight}
-            fill={frameFill}
+            {...konvaFillProps(frameFill, obj.frameWidth, obj.frameHeight)}
             listening={false}
           />
         ) : null}

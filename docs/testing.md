@@ -36,6 +36,27 @@ note below.
 Each script uses its own debugging port. If a run crashes it can leave Electron
 holding the port — `pkill -f "remote-debugging-port=9230"` clears it.
 
+## Shutting the app down — use `terminateElectron`
+
+**Never `proc.kill()` a spawned Electron directly.** Since the unsaved-changes close
+guard landed, that hangs: Electron's browser process services POSIX signals itself,
+so a `process.on('SIGTERM')` in main **never runs** (verified — don't try to fix it
+there). SIGTERM instead reaches the window as a close, the guard sees a dirty
+document, and the app parks on the unsaved-changes prompt *still holding its
+debugging port*. The next run then dies with `DevTools port timeout`, which reads
+like a broken test rather than a stale process — it cost an afternoon once already.
+
+`scripts/terminateElectron.mjs` sends SIGTERM, waits a grace period, then escalates
+to SIGKILL:
+
+```js
+import { terminateElectron } from './terminateElectron.mjs'
+const app = { close: async () => { await browser.close(); await terminateElectron(electronProc) } }
+```
+
+Related: the guard itself must use the **async** `dialog.showMessageBox`.
+`showMessageBoxSync` freezes the whole main event loop — no IPC, no timers.
+
 ## The `window.__*__` contract
 
 `src/main.tsx` exposes internals for tests. Not dev-gated: the scripts run against a
