@@ -161,7 +161,7 @@
       "label": "hitTestCell()",
       "file_type": "code",
       "source_file": "src/canvas/CanvasGroupNode.tsx",
-      "source_location": "L13",
+      "source_location": "L12",
       "_origin": "ast",
       "id": "canvas_canvasgroupnode_hittestcell",
       "community": 9,
@@ -172,7 +172,7 @@
       "label": "CanvasGroupNodeProps",
       "file_type": "code",
       "source_file": "src/canvas/CanvasGroupNode.tsx",
-      "source_location": "L36",
+      "source_location": "L30",
       "_origin": "ast",
       "id": "canvas_canvasgroupnode_canvasgroupnodeprops",
       "community": 9,
@@ -183,7 +183,7 @@
       "label": "CanvasGroupNode()",
       "file_type": "code",
       "source_file": "src/canvas/CanvasGroupNode.tsx",
-      "source_location": "L42",
+      "source_location": "L36",
       "_origin": "ast",
       "id": "canvas_canvasgroupnode_canvasgroupnode",
       "community": 9,
@@ -194,7 +194,7 @@
       "label": "CanvasGroupNodeInner",
       "file_type": "code",
       "source_file": "src/canvas/CanvasGroupNode.tsx",
-      "source_location": "L48",
+      "source_location": "L42",
       "_origin": "ast",
       "id": "canvas_canvasgroupnode_canvasgroupnodeinner",
       "community": 9,
@@ -274,8 +274,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "canvas_canvasimagenode",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "canvasimagenode.tsx"
     },
     {
@@ -285,8 +285,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "canvas_canvasimagenode_canvasimagenodeprops",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "canvasimagenodeprops"
     },
     {
@@ -296,8 +296,8 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "canvas_canvasimagenode_canvasimagenodeinnerprops",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "canvasimagenodeinnerprops"
     },
     {
@@ -307,30 +307,30 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "canvas_canvasimagenode_canvasimagenodeinner",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "canvasimagenodeinner()"
     },
     {
       "label": "CanvasImageNode",
       "file_type": "code",
       "source_file": "src/canvas/CanvasImageNode.tsx",
-      "source_location": "L798",
+      "source_location": "L815",
       "_origin": "ast",
       "id": "canvas_canvasimagenode_canvasimagenode",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "canvasimagenode"
     },
     {
       "label": "NOTE: does not call onGuidesChange \u2014 guides are emitted by the onTransform",
       "file_type": "rationale",
       "source_file": "src/canvas/CanvasImageNode.tsx",
-      "source_location": "L268",
+      "source_location": "L257",
       "_origin": "ast",
-      "id": "canvas_canvasimagenode_rationale_268",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "id": "canvas_canvasimagenode_rationale_257",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "note: does not call onguideschange \u2014 guides are emitted by the ontransform"
     },
     {
@@ -351,8 +351,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "canvas_canvaspathnode_anchorstopathdata",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "anchorstopathdata()"
     },
     {
@@ -549,8 +549,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "canvas_canvasvideonode",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "canvasvideonode.tsx"
     },
     {
@@ -560,8 +560,8 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "canvas_canvasvideonode_canvasvideonodeprops",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "canvasvideonodeprops"
     },
     {
@@ -571,8 +571,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "canvas_canvasvideonode_canvasvideonodeinnerprops",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "canvasvideonodeinnerprops"
     },
     {
@@ -582,19 +582,19 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "canvas_canvasvideonode_canvasvideonodeinner",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "canvasvideonodeinner()"
     },
     {
       "label": "CanvasVideoNode",
       "file_type": "code",
       "source_file": "src/canvas/CanvasVideoNode.tsx",
-      "source_location": "L828",
+      "source_location": "L827",
       "_origin": "ast",
       "id": "canvas_canvasvideonode_canvasvideonode",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "canvasvideonode"
     },
     {
@@ -637,8 +637,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "canvas_clipeditoverlay",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "clipeditoverlay.tsx"
     },
     {
@@ -648,8 +648,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "canvas_clipeditoverlay_clipeditoverlayprops",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "clipeditoverlayprops"
     },
     {
@@ -659,8 +659,8 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "canvas_clipeditoverlay_clipeditoverlay",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "clipeditoverlay()"
     },
     {
@@ -1056,7 +1056,7 @@
       "_origin": "ast",
       "id": "canvas_effects_buildeffectfilters",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "buildeffectfilters.ts"
     },
     {
@@ -1067,7 +1067,7 @@
       "_origin": "ast",
       "id": "canvas_effects_buildeffectfilters_effectspipelinecache",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "effectspipelinecache"
     },
     {
@@ -1078,7 +1078,7 @@
       "_origin": "ast",
       "id": "canvas_effects_buildeffectfilters_effectsfingerprint",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "effectsfingerprint()"
     },
     {
@@ -1088,8 +1088,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "canvas_effects_buildeffectfilters_buildeffectfilters",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 5,
+      "community_name": "buildEffectFilters",
       "norm_label": "buildeffectfilters()"
     },
     {
@@ -1100,7 +1100,7 @@
       "_origin": "ast",
       "id": "canvas_effects_filmgrain",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "filmgrain.ts"
     },
     {
@@ -1111,7 +1111,7 @@
       "_origin": "ast",
       "id": "canvas_effects_filmgrain_buildfilter",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "buildfilter()"
     },
     {
@@ -1122,7 +1122,7 @@
       "_origin": "ast",
       "id": "canvas_effects_halation",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "halation.ts"
     },
     {
@@ -1133,7 +1133,7 @@
       "_origin": "ast",
       "id": "canvas_effects_halation_boxblurh",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "boxblurh()"
     },
     {
@@ -1144,7 +1144,7 @@
       "_origin": "ast",
       "id": "canvas_effects_halation_boxblurv",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "boxblurv()"
     },
     {
@@ -1155,7 +1155,7 @@
       "_origin": "ast",
       "id": "canvas_effects_halation_buildfilter",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "buildfilter()"
     },
     {
@@ -1166,7 +1166,7 @@
       "_origin": "ast",
       "id": "canvas_effects_index",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "effects/index.ts"
     },
     {
@@ -1177,7 +1177,7 @@
       "_origin": "ast",
       "id": "canvas_effects_registry",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "effects/registry.ts"
     },
     {
@@ -1188,7 +1188,7 @@
       "_origin": "ast",
       "id": "canvas_effects_registry_effectparams",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "effectparams"
     },
     {
@@ -1199,7 +1199,7 @@
       "_origin": "ast",
       "id": "canvas_effects_registry_effectcontroldescriptor",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "effectcontroldescriptor"
     },
     {
@@ -1210,7 +1210,7 @@
       "_origin": "ast",
       "id": "canvas_effects_registry_effectdefinition",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "effectdefinition"
     },
     {
@@ -1221,7 +1221,7 @@
       "_origin": "ast",
       "id": "canvas_effects_registry_effectdefinition_defaultparams",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": ".defaultparams()"
     },
     {
@@ -1232,7 +1232,7 @@
       "_origin": "ast",
       "id": "canvas_effects_registry_effectdefinition_buildfilter",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": ".buildfilter()"
     },
     {
@@ -1243,7 +1243,7 @@
       "_origin": "ast",
       "id": "canvas_effects_registry_registry",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "registry"
     },
     {
@@ -1254,7 +1254,7 @@
       "_origin": "ast",
       "id": "canvas_effects_registry_registereffect",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "registereffect()"
     },
     {
@@ -1265,7 +1265,7 @@
       "_origin": "ast",
       "id": "canvas_effects_registry_geteffectdefinition",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "geteffectdefinition()"
     },
     {
@@ -1276,7 +1276,7 @@
       "_origin": "ast",
       "id": "canvas_effects_registry_getalleffectdefinitions",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "getalleffectdefinitions()"
     },
     {
@@ -1287,7 +1287,7 @@
       "_origin": "ast",
       "id": "canvas_effects_vignette",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "vignette.ts"
     },
     {
@@ -1298,7 +1298,7 @@
       "_origin": "ast",
       "id": "canvas_effects_vignette_buildfilter",
       "community": 5,
-      "community_name": "effects/index.ts",
+      "community_name": "buildEffectFilters",
       "norm_label": "buildfilter()"
     },
     {
@@ -1374,8 +1374,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "canvas_frameclip",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "frameclip.ts"
     },
     {
@@ -1385,8 +1385,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "canvas_frameclip_pathctx",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "pathctx"
     },
     {
@@ -1396,8 +1396,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "canvas_frameclip_solidcolorof",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "solidcolorof()"
     },
     {
@@ -1407,8 +1407,8 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "canvas_frameclip_isplainrectclip",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "isplainrectclip()"
     },
     {
@@ -1429,8 +1429,8 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "canvas_frameclip_denormalizeanchors",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "denormalizeanchors()"
     },
     {
@@ -1440,8 +1440,8 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "canvas_frameclip_buildclipfunc",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "buildclipfunc()"
     },
     {
@@ -1451,8 +1451,8 @@
       "source_location": "L98",
       "_origin": "ast",
       "id": "canvas_frameclip_traceroundedrect",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "traceroundedrect()"
     },
     {
@@ -1462,8 +1462,8 @@
       "source_location": "L107",
       "_origin": "ast",
       "id": "canvas_frameclip_tracebeziers",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "tracebeziers()"
     },
     {
@@ -1473,20 +1473,9 @@
       "source_location": "L135",
       "_origin": "ast",
       "id": "canvas_frameclip_clipshapetopathdata",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "clipshapetopathdata()"
-    },
-    {
-      "label": "isPointInClipShape()",
-      "file_type": "code",
-      "source_file": "src/canvas/frameClip.ts",
-      "source_location": "L173",
-      "_origin": "ast",
-      "id": "canvas_frameclip_ispointinclipshape",
-      "community": 9,
-      "community_name": "useCanvasStore",
-      "norm_label": "ispointinclipshape()"
     },
     {
       "label": "frameModel.ts",
@@ -1561,8 +1550,8 @@
       "source_location": "L150",
       "_origin": "ast",
       "id": "canvas_framemodel_isemptyframe",
-      "community": 6,
-      "community_name": "useCanvasStore.ts",
+      "community": 9,
+      "community_name": "useCanvasStore",
       "norm_label": "isemptyframe()"
     },
     {
@@ -1605,8 +1594,8 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "canvas_geometry_snaprectinrotatedframe",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "snaprectinrotatedframe()"
     },
     {
@@ -1701,7 +1690,7 @@
       "label": "uniformGrid()",
       "file_type": "code",
       "source_file": "src/canvas/gridTemplates.ts",
-      "source_location": "L26",
+      "source_location": "L21",
       "_origin": "ast",
       "id": "canvas_gridtemplates_uniformgrid",
       "community": 6,
@@ -1712,7 +1701,7 @@
       "label": "GRID_TEMPLATES",
       "file_type": "code",
       "source_file": "src/canvas/gridTemplates.ts",
-      "source_location": "L38",
+      "source_location": "L33",
       "_origin": "ast",
       "id": "canvas_gridtemplates_grid_templates",
       "community": 6,
@@ -1723,7 +1712,7 @@
       "label": "computeGridChildPatches()",
       "file_type": "code",
       "source_file": "src/canvas/gridTemplates.ts",
-      "source_location": "L373",
+      "source_location": "L357",
       "_origin": "ast",
       "id": "canvas_gridtemplates_computegridchildpatches",
       "community": 6,
@@ -1836,8 +1825,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "canvas_textspans",
-      "community": 10,
-      "community_name": "textSpans.ts",
+      "community": 9,
+      "community_name": "useCanvasStore",
       "norm_label": "textspans.ts"
     },
     {
@@ -1858,8 +1847,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "canvas_textspans_spantext",
-      "community": 10,
-      "community_name": "textSpans.ts",
+      "community": 9,
+      "community_name": "useCanvasStore",
       "norm_label": "spantext()"
     },
     {
@@ -1869,8 +1858,8 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "canvas_textspans_resolvedspanstyle",
-      "community": 10,
-      "community_name": "textSpans.ts",
+      "community": 9,
+      "community_name": "useCanvasStore",
       "norm_label": "resolvedspanstyle"
     },
     {
@@ -1880,8 +1869,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "canvas_textspans_resolvespanstyle",
-      "community": 10,
-      "community_name": "textSpans.ts",
+      "community": 9,
+      "community_name": "useCanvasStore",
       "norm_label": "resolvespanstyle()"
     },
     {
@@ -1891,8 +1880,8 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "canvas_textspans_selectionstyle",
-      "community": 10,
-      "community_name": "textSpans.ts",
+      "community": 9,
+      "community_name": "useCanvasStore",
       "norm_label": "selectionstyle"
     },
     {
@@ -1902,8 +1891,8 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "canvas_textspans_getselectionstyle",
-      "community": 10,
-      "community_name": "textSpans.ts",
+      "community": 9,
+      "community_name": "useCanvasStore",
       "norm_label": "getselectionstyle()"
     },
     {
@@ -1913,8 +1902,8 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "canvas_textspans_splitspansat",
-      "community": 10,
-      "community_name": "textSpans.ts",
+      "community": 9,
+      "community_name": "useCanvasStore",
       "norm_label": "splitspansat()"
     },
     {
@@ -1924,8 +1913,8 @@
       "source_location": "L142",
       "_origin": "ast",
       "id": "canvas_textspans_mergeadjacentspans",
-      "community": 10,
-      "community_name": "textSpans.ts",
+      "community": 9,
+      "community_name": "useCanvasStore",
       "norm_label": "mergeadjacentspans()"
     },
     {
@@ -1935,8 +1924,8 @@
       "source_location": "L159",
       "_origin": "ast",
       "id": "canvas_textspans_stylesequal",
-      "community": 10,
-      "community_name": "textSpans.ts",
+      "community": 9,
+      "community_name": "useCanvasStore",
       "norm_label": "stylesequal()"
     },
     {
@@ -1946,8 +1935,8 @@
       "source_location": "L177",
       "_origin": "ast",
       "id": "canvas_textspans_applystyletorange",
-      "community": 10,
-      "community_name": "textSpans.ts",
+      "community": 9,
+      "community_name": "useCanvasStore",
       "norm_label": "applystyletorange()"
     },
     {
@@ -1957,8 +1946,8 @@
       "source_location": "L218",
       "_origin": "ast",
       "id": "canvas_textspans_applystyletoall",
-      "community": 10,
-      "community_name": "textSpans.ts",
+      "community": 9,
+      "community_name": "useCanvasStore",
       "norm_label": "applystyletoall()"
     },
     {
@@ -2034,8 +2023,8 @@
       "source_location": "L171",
       "_origin": "ast",
       "id": "canvas_usecanvasstore_buildshapefromframe",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "buildshapefromframe()"
     },
     {
@@ -2199,8 +2188,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "canvas_usedeleteshortcut",
-      "community": 6,
-      "community_name": "useCanvasStore.ts",
+      "community": 9,
+      "community_name": "useCanvasStore",
       "norm_label": "usedeleteshortcut.ts"
     },
     {
@@ -2210,8 +2199,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "canvas_usedeleteshortcut_usedeleteshortcut",
-      "community": 6,
-      "community_name": "useCanvasStore.ts",
+      "community": 9,
+      "community_name": "useCanvasStore",
       "norm_label": "usedeleteshortcut()"
     },
     {
@@ -2442,7 +2431,7 @@
       "_origin": "ast",
       "id": "canvas_usethumbnailstore",
       "community": 10,
-      "community_name": "textSpans.ts",
+      "community_name": "useThumbnailStore.ts",
       "norm_label": "usethumbnailstore.ts"
     },
     {
@@ -2453,7 +2442,7 @@
       "_origin": "ast",
       "id": "canvas_usethumbnailstore_thumbnailstate",
       "community": 10,
-      "community_name": "textSpans.ts",
+      "community_name": "useThumbnailStore.ts",
       "norm_label": "thumbnailstate"
     },
     {
@@ -2464,7 +2453,7 @@
       "_origin": "ast",
       "id": "canvas_usethumbnailstore_usethumbnailstore",
       "community": 10,
-      "community_name": "textSpans.ts",
+      "community_name": "useThumbnailStore.ts",
       "norm_label": "usethumbnailstore"
     },
     {
@@ -2475,7 +2464,7 @@
       "_origin": "ast",
       "id": "canvas_usethumbnailstore_pathbbox",
       "community": 10,
-      "community_name": "textSpans.ts",
+      "community_name": "useThumbnailStore.ts",
       "norm_label": "pathbbox"
     },
     {
@@ -2486,7 +2475,7 @@
       "_origin": "ast",
       "id": "canvas_usethumbnailstore_computepathbbox",
       "community": 10,
-      "community_name": "textSpans.ts",
+      "community_name": "useThumbnailStore.ts",
       "norm_label": "computepathbbox()"
     },
     {
@@ -2497,7 +2486,7 @@
       "_origin": "ast",
       "id": "canvas_usethumbnailstore_anchorstopathdata",
       "community": 10,
-      "community_name": "textSpans.ts",
+      "community_name": "useThumbnailStore.ts",
       "norm_label": "anchorstopathdata()"
     },
     {
@@ -2508,7 +2497,7 @@
       "_origin": "ast",
       "id": "canvas_usethumbnailstore_generatethumbnail",
       "community": 10,
-      "community_name": "textSpans.ts",
+      "community_name": "useThumbnailStore.ts",
       "norm_label": "generatethumbnail()"
     },
     {
@@ -2519,7 +2508,7 @@
       "_origin": "ast",
       "id": "canvas_usethumbnailstore_usethumbnailgenerator",
       "community": 10,
-      "community_name": "textSpans.ts",
+      "community_name": "useThumbnailStore.ts",
       "norm_label": "usethumbnailgenerator()"
     },
     {
@@ -2529,8 +2518,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "canvas_useundoredoshortcuts",
-      "community": 6,
-      "community_name": "useCanvasStore.ts",
+      "community": 9,
+      "community_name": "useCanvasStore",
       "norm_label": "useundoredoshortcuts.ts"
     },
     {
@@ -2540,8 +2529,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "canvas_useundoredoshortcuts_useundoredoshortcuts",
-      "community": 6,
-      "community_name": "useCanvasStore.ts",
+      "community": 9,
+      "community_name": "useCanvasStore",
       "norm_label": "useundoredoshortcuts()"
     },
     {
@@ -2650,8 +2639,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "canvas_videoelementregistry",
-      "community": 14,
-      "community_name": "exportFrames.ts",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "videoelementregistry.ts"
     },
     {
@@ -2661,8 +2650,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "canvas_videoelementregistry_registry",
-      "community": 14,
-      "community_name": "exportFrames.ts",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "registry"
     },
     {
@@ -2672,8 +2661,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "canvas_videoelementregistry_registervideoelement",
-      "community": 14,
-      "community_name": "exportFrames.ts",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "registervideoelement()"
     },
     {
@@ -2683,8 +2672,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "canvas_videoelementregistry_unregistervideoelement",
-      "community": 9,
-      "community_name": "useCanvasStore",
+      "community": 13,
+      "community_name": "CanvasVideoNode.tsx",
       "norm_label": "unregistervideoelement()"
     },
     {
@@ -2933,7 +2922,7 @@
       "label": "start()",
       "file_type": "code",
       "source_file": "src/electron/index.ts",
-      "source_location": "L476",
+      "source_location": "L466",
       "_origin": "ast",
       "id": "electron_index_start",
       "community": 2,
@@ -2944,7 +2933,7 @@
       "label": "cancel()",
       "file_type": "code",
       "source_file": "src/electron/index.ts",
-      "source_location": "L483",
+      "source_location": "L473",
       "_origin": "ast",
       "id": "electron_index_cancel",
       "community": 2,
@@ -4169,7 +4158,7 @@
       "_origin": "ast",
       "id": "ui_fontpicker",
       "community": 16,
-      "community_name": "PropertiesPanel.tsx",
+      "community_name": "shared.tsx",
       "norm_label": "fontpicker.tsx"
     },
     {
@@ -4180,7 +4169,7 @@
       "_origin": "ast",
       "id": "ui_fontpicker_mac_system_fonts",
       "community": 16,
-      "community_name": "PropertiesPanel.tsx",
+      "community_name": "shared.tsx",
       "norm_label": "mac_system_fonts"
     },
     {
@@ -4191,7 +4180,7 @@
       "_origin": "ast",
       "id": "ui_fontpicker_fontpicker",
       "community": 16,
-      "community_name": "PropertiesPanel.tsx",
+      "community_name": "shared.tsx",
       "norm_label": "fontpicker()"
     },
     {
@@ -4245,8 +4234,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ui_framesettingspopover",
-      "community": 7,
-      "community_name": "Toolbar.tsx",
+      "community": 18,
+      "community_name": "NumericInput.tsx",
       "norm_label": "framesettingspopover.tsx"
     },
     {
@@ -4256,8 +4245,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "ui_framesettingspopover_framesettingspopoverprops",
-      "community": 7,
-      "community_name": "Toolbar.tsx",
+      "community": 18,
+      "community_name": "NumericInput.tsx",
       "norm_label": "framesettingspopoverprops"
     },
     {
@@ -4267,8 +4256,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "ui_framesettingspopover_platform_labels",
-      "community": 7,
-      "community_name": "Toolbar.tsx",
+      "community": 18,
+      "community_name": "NumericInput.tsx",
       "norm_label": "platform_labels"
     },
     {
@@ -4278,8 +4267,8 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "ui_framesettingspopover_platforms",
-      "community": 7,
-      "community_name": "Toolbar.tsx",
+      "community": 18,
+      "community_name": "NumericInput.tsx",
       "norm_label": "platforms"
     },
     {
@@ -4289,8 +4278,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "ui_framesettingspopover_segmentbuttonstyle",
-      "community": 7,
-      "community_name": "Toolbar.tsx",
+      "community": 18,
+      "community_name": "NumericInput.tsx",
       "norm_label": "segmentbuttonstyle()"
     },
     {
@@ -4300,8 +4289,8 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "ui_framesettingspopover_labelstyle",
-      "community": 7,
-      "community_name": "Toolbar.tsx",
+      "community": 18,
+      "community_name": "NumericInput.tsx",
       "norm_label": "labelstyle"
     },
     {
@@ -4311,8 +4300,8 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "ui_framesettingspopover_framesettingspopover",
-      "community": 7,
-      "community_name": "Toolbar.tsx",
+      "community": 18,
+      "community_name": "NumericInput.tsx",
       "norm_label": "framesettingspopover()"
     },
     {
@@ -4454,7 +4443,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ui_propertiespanel",
-      "community": 16,
+      "community": 17,
       "community_name": "PropertiesPanel.tsx",
       "norm_label": "propertiespanel.tsx"
     },
@@ -4462,21 +4451,21 @@
       "label": "insertMediaIntoShape()",
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L30",
+      "source_location": "L29",
       "_origin": "ast",
       "id": "ui_propertiespanel_insertmediaintoshape",
-      "community": 1,
-      "community_name": "ContextMenu.tsx",
+      "community": 17,
+      "community_name": "PropertiesPanel.tsx",
       "norm_label": "insertmediaintoshape()"
     },
     {
       "label": "mediaFrameCtaButtonStyle",
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L36",
+      "source_location": "L35",
       "_origin": "ast",
       "id": "ui_propertiespanel_mediaframectabuttonstyle",
-      "community": 16,
+      "community": 17,
       "community_name": "PropertiesPanel.tsx",
       "norm_label": "mediaframectabuttonstyle"
     },
@@ -4484,10 +4473,10 @@
       "label": "CanvasSection()",
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L51",
+      "source_location": "L50",
       "_origin": "ast",
       "id": "ui_propertiespanel_canvassection",
-      "community": 16,
+      "community": 17,
       "community_name": "PropertiesPanel.tsx",
       "norm_label": "canvassection()"
     },
@@ -4495,7 +4484,7 @@
       "label": "PropertiesPanel()",
       "file_type": "code",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L64",
+      "source_location": "L63",
       "_origin": "ast",
       "id": "ui_propertiespanel_propertiespanel",
       "community": 1,
@@ -4608,8 +4597,8 @@
       "source_location": "L128",
       "_origin": "ast",
       "id": "ui_toolbar_buildprojectjson",
-      "community": 4,
-      "community_name": "relativizeVideoObjects",
+      "community": 7,
+      "community_name": "Toolbar.tsx",
       "norm_label": "buildprojectjson()"
     },
     {
@@ -4652,8 +4641,8 @@
       "source_location": "L292",
       "_origin": "ast",
       "id": "ui_toolbar_loadexportsettings",
-      "community": 4,
-      "community_name": "relativizeVideoObjects",
+      "community": 7,
+      "community_name": "Toolbar.tsx",
       "norm_label": "loadexportsettings()"
     },
     {
@@ -4663,8 +4652,8 @@
       "source_location": "L300",
       "_origin": "ast",
       "id": "ui_toolbar_titlebar",
-      "community": 4,
-      "community_name": "relativizeVideoObjects",
+      "community": 7,
+      "community_name": "Toolbar.tsx",
       "norm_label": "titlebar()"
     },
     {
@@ -4674,8 +4663,8 @@
       "source_location": "L1327",
       "_origin": "ast",
       "id": "ui_toolbar_toolbar",
-      "community": 7,
-      "community_name": "Toolbar.tsx",
+      "community": 18,
+      "community_name": "NumericInput.tsx",
       "norm_label": "toolbar()"
     },
     {
@@ -4976,50 +4965,6 @@
       "norm_label": "getshell()"
     },
     {
-      "label": "AddClipRow.tsx",
-      "file_type": "code",
-      "source_file": "src/ui/properties/AddClipRow.tsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "ui_properties_addcliprow",
-      "community": 16,
-      "community_name": "PropertiesPanel.tsx",
-      "norm_label": "addcliprow.tsx"
-    },
-    {
-      "label": "ctaButtonStyle",
-      "file_type": "code",
-      "source_file": "src/ui/properties/AddClipRow.tsx",
-      "source_location": "L22",
-      "_origin": "ast",
-      "id": "ui_properties_addcliprow_ctabuttonstyle",
-      "community": 16,
-      "community_name": "PropertiesPanel.tsx",
-      "norm_label": "ctabuttonstyle"
-    },
-    {
-      "label": "OPTIONS",
-      "file_type": "code",
-      "source_file": "src/ui/properties/AddClipRow.tsx",
-      "source_location": "L36",
-      "_origin": "ast",
-      "id": "ui_properties_addcliprow_options",
-      "community": 16,
-      "community_name": "PropertiesPanel.tsx",
-      "norm_label": "options"
-    },
-    {
-      "label": "AddClipRow()",
-      "file_type": "code",
-      "source_file": "src/ui/properties/AddClipRow.tsx",
-      "source_location": "L41",
-      "_origin": "ast",
-      "id": "ui_properties_addcliprow_addcliprow",
-      "community": 16,
-      "community_name": "PropertiesPanel.tsx",
-      "norm_label": "addcliprow()"
-    },
-    {
       "label": "AdjustmentsSection.tsx",
       "file_type": "code",
       "source_file": "src/ui/properties/AdjustmentsSection.tsx",
@@ -5082,7 +5027,7 @@
       "_origin": "ast",
       "id": "ui_properties_aligndistributesection",
       "community": 16,
-      "community_name": "PropertiesPanel.tsx",
+      "community_name": "shared.tsx",
       "norm_label": "aligndistributesection.tsx"
     },
     {
@@ -5093,7 +5038,7 @@
       "_origin": "ast",
       "id": "ui_properties_aligndistributesection_aligndistributesectionprops",
       "community": 16,
-      "community_name": "PropertiesPanel.tsx",
+      "community_name": "shared.tsx",
       "norm_label": "aligndistributesectionprops"
     },
     {
@@ -5104,7 +5049,7 @@
       "_origin": "ast",
       "id": "ui_properties_aligndistributesection_aligndistributesection",
       "community": 16,
-      "community_name": "PropertiesPanel.tsx",
+      "community_name": "shared.tsx",
       "norm_label": "aligndistributesection()"
     },
     {
@@ -5114,8 +5059,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ui_properties_effectssection",
-      "community": 18,
-      "community_name": "NumericInput.tsx",
+      "community": 8,
+      "community_name": "VideoSection.tsx",
       "norm_label": "effectssection.tsx"
     },
     {
@@ -5125,8 +5070,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "ui_properties_effectssection_effectssectionprops",
-      "community": 18,
-      "community_name": "NumericInput.tsx",
+      "community": 8,
+      "community_name": "VideoSection.tsx",
       "norm_label": "effectssectionprops"
     },
     {
@@ -5148,7 +5093,7 @@
       "_origin": "ast",
       "id": "ui_properties_framesection",
       "community": 17,
-      "community_name": "FrameSection.tsx",
+      "community_name": "PropertiesPanel.tsx",
       "norm_label": "framesection.tsx"
     },
     {
@@ -5159,7 +5104,7 @@
       "_origin": "ast",
       "id": "ui_properties_framesection_framesectionprops",
       "community": 17,
-      "community_name": "FrameSection.tsx",
+      "community_name": "PropertiesPanel.tsx",
       "norm_label": "framesectionprops"
     },
     {
@@ -5170,7 +5115,7 @@
       "_origin": "ast",
       "id": "ui_properties_framesection_rowstyle",
       "community": 17,
-      "community_name": "FrameSection.tsx",
+      "community_name": "PropertiesPanel.tsx",
       "norm_label": "rowstyle"
     },
     {
@@ -5181,7 +5126,7 @@
       "_origin": "ast",
       "id": "ui_properties_framesection_labelstyle",
       "community": 17,
-      "community_name": "FrameSection.tsx",
+      "community_name": "PropertiesPanel.tsx",
       "norm_label": "labelstyle"
     },
     {
@@ -5192,7 +5137,7 @@
       "_origin": "ast",
       "id": "ui_properties_framesection_buttonstyle",
       "community": 17,
-      "community_name": "FrameSection.tsx",
+      "community_name": "PropertiesPanel.tsx",
       "norm_label": "buttonstyle"
     },
     {
@@ -5203,29 +5148,29 @@
       "_origin": "ast",
       "id": "ui_properties_framesection_destructivebuttonstyle",
       "community": 17,
-      "community_name": "FrameSection.tsx",
+      "community_name": "PropertiesPanel.tsx",
       "norm_label": "destructivebuttonstyle"
     },
     {
-      "label": "CLIP_KINDS",
+      "label": "clipKindLabel()",
       "file_type": "code",
       "source_file": "src/ui/properties/FrameSection.tsx",
-      "source_location": "L51",
+      "source_location": "L46",
       "_origin": "ast",
-      "id": "ui_properties_framesection_clip_kinds",
+      "id": "ui_properties_framesection_clipkindlabel",
       "community": 17,
-      "community_name": "FrameSection.tsx",
-      "norm_label": "clip_kinds"
+      "community_name": "PropertiesPanel.tsx",
+      "norm_label": "clipkindlabel()"
     },
     {
       "label": "FrameSection()",
       "file_type": "code",
       "source_file": "src/ui/properties/FrameSection.tsx",
-      "source_location": "L56",
+      "source_location": "L53",
       "_origin": "ast",
       "id": "ui_properties_framesection_framesection",
       "community": 17,
-      "community_name": "FrameSection.tsx",
+      "community_name": "PropertiesPanel.tsx",
       "norm_label": "framesection()"
     },
     {
@@ -5236,7 +5181,7 @@
       "_origin": "ast",
       "id": "ui_properties_textsection",
       "community": 16,
-      "community_name": "PropertiesPanel.tsx",
+      "community_name": "shared.tsx",
       "norm_label": "textsection.tsx"
     },
     {
@@ -5247,7 +5192,7 @@
       "_origin": "ast",
       "id": "ui_properties_textsection_textsectionprops",
       "community": 16,
-      "community_name": "PropertiesPanel.tsx",
+      "community_name": "shared.tsx",
       "norm_label": "textsectionprops"
     },
     {
@@ -5258,7 +5203,7 @@
       "_origin": "ast",
       "id": "ui_properties_textsection_textsection",
       "community": 16,
-      "community_name": "PropertiesPanel.tsx",
+      "community_name": "shared.tsx",
       "norm_label": "textsection()"
     },
     {
@@ -5323,8 +5268,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "ui_properties_mediapickers",
-      "community": 1,
-      "community_name": "ContextMenu.tsx",
+      "community": 17,
+      "community_name": "PropertiesPanel.tsx",
       "norm_label": "mediapickers.tsx"
     },
     {
@@ -5334,8 +5279,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "ui_properties_mediapickers_pickimagemedia",
-      "community": 1,
-      "community_name": "ContextMenu.tsx",
+      "community": 17,
+      "community_name": "PropertiesPanel.tsx",
       "norm_label": "pickimagemedia()"
     },
     {
@@ -5345,8 +5290,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "ui_properties_mediapickers_pickvideomedia",
-      "community": 1,
-      "community_name": "ContextMenu.tsx",
+      "community": 17,
+      "community_name": "PropertiesPanel.tsx",
       "norm_label": "pickvideomedia()"
     },
     {
@@ -5357,7 +5302,7 @@
       "_origin": "ast",
       "id": "ui_properties_shared",
       "community": 16,
-      "community_name": "PropertiesPanel.tsx",
+      "community_name": "shared.tsx",
       "norm_label": "shared.tsx"
     },
     {
@@ -5368,7 +5313,7 @@
       "_origin": "ast",
       "id": "ui_properties_shared_numberfieldprops",
       "community": 16,
-      "community_name": "PropertiesPanel.tsx",
+      "community_name": "shared.tsx",
       "norm_label": "numberfieldprops"
     },
     {
@@ -5379,7 +5324,7 @@
       "_origin": "ast",
       "id": "ui_properties_shared_numberfield",
       "community": 16,
-      "community_name": "PropertiesPanel.tsx",
+      "community_name": "shared.tsx",
       "norm_label": "numberfield()"
     },
     {
@@ -5390,7 +5335,7 @@
       "_origin": "ast",
       "id": "ui_properties_shared_mixednumberfieldprops",
       "community": 16,
-      "community_name": "PropertiesPanel.tsx",
+      "community_name": "shared.tsx",
       "norm_label": "mixednumberfieldprops"
     },
     {
@@ -5401,7 +5346,7 @@
       "_origin": "ast",
       "id": "ui_properties_shared_mixednumberfield",
       "community": 16,
-      "community_name": "PropertiesPanel.tsx",
+      "community_name": "shared.tsx",
       "norm_label": "mixednumberfield()"
     },
     {
@@ -5411,8 +5356,8 @@
       "source_location": "L85",
       "_origin": "ast",
       "id": "ui_properties_shared_sectionlabelstyle",
-      "community": 16,
-      "community_name": "PropertiesPanel.tsx",
+      "community": 8,
+      "community_name": "VideoSection.tsx",
       "norm_label": "sectionlabelstyle"
     },
     {
@@ -5423,7 +5368,7 @@
       "_origin": "ast",
       "id": "ui_properties_shared_alignbuttonstyle",
       "community": 16,
-      "community_name": "PropertiesPanel.tsx",
+      "community_name": "shared.tsx",
       "norm_label": "alignbuttonstyle()"
     },
     {
@@ -5434,7 +5379,7 @@
       "_origin": "ast",
       "id": "ui_properties_shared_distributebuttonstyle",
       "community": 16,
-      "community_name": "PropertiesPanel.tsx",
+      "community_name": "shared.tsx",
       "norm_label": "distributebuttonstyle()"
     },
     {
@@ -5816,7 +5761,7 @@
       "source_location": "L106",
       "community": 10,
       "norm_label": "generatemaskthumbnail()",
-      "community_name": "textSpans.ts",
+      "community_name": "useThumbnailStore.ts",
       "id": "src_canvas_usethumbnailstore_generatemaskthumbnail"
     }
   ],
@@ -6199,7 +6144,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/CanvasGroupNode.tsx",
-      "source_location": "L42",
+      "source_location": "L36",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasgroupnode",
@@ -6210,7 +6155,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/CanvasGroupNode.tsx",
-      "source_location": "L48",
+      "source_location": "L42",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasgroupnode",
@@ -6221,7 +6166,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/CanvasGroupNode.tsx",
-      "source_location": "L36",
+      "source_location": "L30",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasgroupnode",
@@ -6232,35 +6177,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/CanvasGroupNode.tsx",
-      "source_location": "L13",
+      "source_location": "L12",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasgroupnode",
       "target": "canvas_canvasgroupnode_hittestcell",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/canvas/CanvasGroupNode.tsx",
-      "source_location": "L10",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "canvas_canvasgroupnode",
-      "target": "canvas_frameclip",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/canvas/CanvasGroupNode.tsx",
-      "source_location": "L10",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "canvas_canvasgroupnode",
-      "target": "canvas_frameclip_ispointinclipshape",
       "confidence_score": 1.0
     },
     {
@@ -6407,23 +6328,11 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/canvas/CanvasGroupNode.tsx",
-      "source_location": "L29",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "canvas_canvasgroupnode_hittestcell",
-      "target": "canvas_frameclip_ispointinclipshape",
-      "confidence_score": 1.0
-    },
-    {
       "relation": "references",
       "context": "field",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/CanvasGroupNode.tsx",
-      "source_location": "L38",
+      "source_location": "L32",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasgroupnode_canvasgroupnodeprops",
@@ -6436,7 +6345,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasGroupNode.tsx",
-      "source_location": "L43",
+      "source_location": "L37",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasgroupnode_canvasgroupnode",
@@ -6658,7 +6567,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/CanvasImageNode.tsx",
-      "source_location": "L798",
+      "source_location": "L815",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasimagenode",
@@ -6669,7 +6578,7 @@
       "relation": "indirect_call",
       "confidence": "INFERRED",
       "source_file": "src/canvas/CanvasImageNode.tsx",
-      "source_location": "L798",
+      "source_location": "L815",
       "weight": 1.0,
       "_origin": "ast",
       "context": "argument",
@@ -7025,10 +6934,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/CanvasImageNode.tsx",
-      "source_location": "L268",
+      "source_location": "L257",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "canvas_canvasimagenode_rationale_268",
+      "source": "canvas_canvasimagenode_rationale_257",
       "target": "canvas_canvasimagenode",
       "confidence_score": 1.0
     },
@@ -7074,7 +6983,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasImageNode.tsx",
-      "source_location": "L157",
+      "source_location": "L153",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasimagenode_canvasimagenodeinner",
@@ -7108,7 +7017,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasImageNode.tsx",
-      "source_location": "L161",
+      "source_location": "L157",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasimagenode_canvasimagenodeinner",
@@ -7120,7 +7029,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasImageNode.tsx",
-      "source_location": "L114",
+      "source_location": "L110",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasimagenode_canvasimagenodeinner",
@@ -7132,7 +7041,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasImageNode.tsx",
-      "source_location": "L132",
+      "source_location": "L128",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasimagenode_canvasimagenodeinner",
@@ -7144,7 +7053,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasImageNode.tsx",
-      "source_location": "L112",
+      "source_location": "L108",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasimagenode_canvasimagenodeinner",
@@ -7156,7 +7065,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasImageNode.tsx",
-      "source_location": "L107",
+      "source_location": "L103",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasimagenode_canvasimagenodeinner",
@@ -7180,7 +7089,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasImageNode.tsx",
-      "source_location": "L778",
+      "source_location": "L795",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasimagenode_canvasimagenodeinner",
@@ -7192,7 +7101,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasImageNode.tsx",
-      "source_location": "L92",
+      "source_location": "L88",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasimagenode_canvasimagenodeinner",
@@ -8675,7 +8584,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/CanvasVideoNode.tsx",
-      "source_location": "L828",
+      "source_location": "L827",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasvideonode",
@@ -8686,7 +8595,7 @@
       "relation": "indirect_call",
       "confidence": "INFERRED",
       "source_file": "src/canvas/CanvasVideoNode.tsx",
-      "source_location": "L828",
+      "source_location": "L827",
       "weight": 1.0,
       "_origin": "ast",
       "context": "argument",
@@ -9082,7 +8991,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasVideoNode.tsx",
-      "source_location": "L281",
+      "source_location": "L279",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasvideonode_canvasvideonodeinner",
@@ -9094,7 +9003,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasVideoNode.tsx",
-      "source_location": "L285",
+      "source_location": "L283",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasvideonode_canvasvideonodeinner",
@@ -9106,7 +9015,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasVideoNode.tsx",
-      "source_location": "L242",
+      "source_location": "L240",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasvideonode_canvasvideonodeinner",
@@ -9118,7 +9027,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasVideoNode.tsx",
-      "source_location": "L258",
+      "source_location": "L256",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasvideonode_canvasvideonodeinner",
@@ -9130,7 +9039,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasVideoNode.tsx",
-      "source_location": "L240",
+      "source_location": "L238",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasvideonode_canvasvideonodeinner",
@@ -9142,7 +9051,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasVideoNode.tsx",
-      "source_location": "L237",
+      "source_location": "L235",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasvideonode_canvasvideonodeinner",
@@ -9166,7 +9075,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasVideoNode.tsx",
-      "source_location": "L808",
+      "source_location": "L807",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasvideonode_canvasvideonodeinner",
@@ -9178,7 +9087,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasVideoNode.tsx",
-      "source_location": "L54",
+      "source_location": "L52",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasvideonode_canvasvideonodeinner",
@@ -9214,7 +9123,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/CanvasVideoNode.tsx",
-      "source_location": "L126",
+      "source_location": "L124",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_canvasvideonode_canvasvideonodeinner",
@@ -11670,17 +11579,6 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/frameClip.ts",
-      "source_location": "L173",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "canvas_frameclip",
-      "target": "canvas_frameclip_ispointinclipshape",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/canvas/frameClip.ts",
       "source_location": "L38",
       "weight": 1.0,
       "_origin": "ast",
@@ -11817,18 +11715,6 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/canvas/frameClip.ts",
-      "source_location": "L180",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "canvas_frameclip_ispointinclipshape",
-      "target": "canvas_frameclip_isplainrectclip",
-      "confidence_score": 1.0
-    },
-    {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -11946,18 +11832,6 @@
       "_origin": "ast",
       "source": "canvas_frameclip_buildclipfunc",
       "target": "canvas_frameclip_traceroundedrect",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/canvas/frameClip.ts",
-      "source_location": "L181",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "canvas_frameclip_ispointinclipshape",
-      "target": "canvas_frameclip_clipshapetopathdata",
       "confidence_score": 1.0
     },
     {
@@ -12348,7 +12222,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/gridTemplates.ts",
-      "source_location": "L407",
+      "source_location": "L391",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_gridtemplates_computegridchildpatches",
@@ -12393,7 +12267,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/gridTemplates.ts",
-      "source_location": "L373",
+      "source_location": "L357",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_gridtemplates",
@@ -12404,7 +12278,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/gridTemplates.ts",
-      "source_location": "L38",
+      "source_location": "L33",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_gridtemplates",
@@ -12426,7 +12300,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/canvas/gridTemplates.ts",
-      "source_location": "L26",
+      "source_location": "L21",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_gridtemplates",
@@ -12487,7 +12361,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/canvas/gridTemplates.ts",
-      "source_location": "L382",
+      "source_location": "L366",
       "weight": 1.0,
       "_origin": "ast",
       "source": "canvas_gridtemplates_computegridchildpatches",
@@ -14530,7 +14404,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L483",
+      "source_location": "L473",
       "weight": 1.0,
       "_origin": "ast",
       "source": "electron_index",
@@ -14618,7 +14492,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/electron/index.ts",
-      "source_location": "L476",
+      "source_location": "L466",
       "weight": 1.0,
       "_origin": "ast",
       "source": "electron_index",
@@ -17779,30 +17653,6 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L25",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "ui_propertiespanel",
-      "target": "ui_properties_addcliprow",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L25",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "ui_propertiespanel",
-      "target": "ui_properties_addcliprow_addcliprow",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/ui/PropertiesPanel.tsx",
       "source_location": "L22",
       "weight": 1.0,
       "_origin": "ast",
@@ -17899,7 +17749,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L26",
+      "source_location": "L25",
       "weight": 1.0,
       "_origin": "ast",
       "source": "ui_propertiespanel",
@@ -17911,7 +17761,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L26",
+      "source_location": "L25",
       "weight": 1.0,
       "_origin": "ast",
       "source": "ui_propertiespanel",
@@ -17923,7 +17773,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L26",
+      "source_location": "L25",
       "weight": 1.0,
       "_origin": "ast",
       "source": "ui_propertiespanel",
@@ -18018,7 +17868,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L51",
+      "source_location": "L50",
       "weight": 1.0,
       "_origin": "ast",
       "source": "ui_propertiespanel",
@@ -18029,7 +17879,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L30",
+      "source_location": "L29",
       "weight": 1.0,
       "_origin": "ast",
       "source": "ui_propertiespanel",
@@ -18040,7 +17890,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L36",
+      "source_location": "L35",
       "weight": 1.0,
       "_origin": "ast",
       "source": "ui_propertiespanel",
@@ -18051,7 +17901,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L64",
+      "source_location": "L63",
       "weight": 1.0,
       "_origin": "ast",
       "source": "ui_propertiespanel",
@@ -18087,7 +17937,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L31",
+      "source_location": "L30",
       "weight": 1.0,
       "_origin": "ast",
       "source": "ui_propertiespanel_insertmediaintoshape",
@@ -18099,7 +17949,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L31",
+      "source_location": "L30",
       "weight": 1.0,
       "_origin": "ast",
       "source": "ui_propertiespanel_insertmediaintoshape",
@@ -18111,7 +17961,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/PropertiesPanel.tsx",
-      "source_location": "L399",
+      "source_location": "L396",
       "weight": 1.0,
       "_origin": "ast",
       "source": "ui_propertiespanel_propertiespanel",
@@ -18455,18 +18305,6 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/ui/properties/AddClipRow.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "ui_properties_addcliprow",
-      "target": "ui_tooltip",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "src/ui/properties/AdjustmentsSection.tsx",
       "source_location": "L4",
       "weight": 1.0,
@@ -18566,18 +18404,6 @@
       "_origin": "ast",
       "source": "ui_tooltip",
       "target": "ui_tooltip_tooltipprops",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/ui/properties/AddClipRow.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "ui_properties_addcliprow",
-      "target": "ui_tooltip_tooltip",
       "confidence_score": 1.0
     },
     {
@@ -18777,7 +18603,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/ui/properties/FrameSection.tsx",
-      "source_location": "L130",
+      "source_location": "L146",
       "weight": 1.0,
       "_origin": "ast",
       "source": "ui_properties_framesection_framesection",
@@ -19208,63 +19034,6 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/ui/properties/AddClipRow.tsx",
-      "source_location": "L41",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "ui_properties_addcliprow",
-      "target": "ui_properties_addcliprow_addcliprow",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/ui/properties/AddClipRow.tsx",
-      "source_location": "L22",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "ui_properties_addcliprow",
-      "target": "ui_properties_addcliprow_ctabuttonstyle",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/ui/properties/AddClipRow.tsx",
-      "source_location": "L36",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "ui_properties_addcliprow",
-      "target": "ui_properties_addcliprow_options",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/ui/properties/AddClipRow.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "ui_properties_addcliprow",
-      "target": "ui_properties_shared",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/ui/properties/AddClipRow.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "ui_properties_addcliprow",
-      "target": "ui_properties_shared_sectionlabelstyle",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
       "source_file": "src/ui/properties/AdjustmentsSection.tsx",
       "source_location": "L52",
       "weight": 1.0,
@@ -19533,11 +19302,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/properties/FrameSection.tsx",
-      "source_location": "L51",
+      "source_location": "L46",
       "weight": 1.0,
       "_origin": "ast",
       "source": "ui_properties_framesection",
-      "target": "ui_properties_framesection_clip_kinds",
+      "target": "ui_properties_framesection_clipkindlabel",
       "confidence_score": 1.0
     },
     {
@@ -19555,7 +19324,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ui/properties/FrameSection.tsx",
-      "source_location": "L56",
+      "source_location": "L53",
       "weight": 1.0,
       "_origin": "ast",
       "source": "ui_properties_framesection",
@@ -19653,6 +19422,18 @@
       "_origin": "ast",
       "source": "ui_properties_framesection",
       "target": "ui_properties_shared_sectionlabelstyle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ui/properties/FrameSection.tsx",
+      "source_location": "L110",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "ui_properties_framesection_framesection",
+      "target": "ui_properties_framesection_clipkindlabel",
       "confidence_score": 1.0
     },
     {
@@ -20076,5 +19857,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "125f6a0c31c6e9029b00dbc5c27db71d527aaf82"
+  "built_at_commit": "abe93f70c6cdf7a9b81984cbce370b02c61f2cb4"
 }
