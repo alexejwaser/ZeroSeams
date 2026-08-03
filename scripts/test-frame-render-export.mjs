@@ -994,6 +994,45 @@ exportedPngs.forEach((b64, i) => {
 })
 console.log(`    💾 exported PNGs → ${SHOTS}/export-frame-{0,1,2}.png`)
 
+// Case 14 (#62 Phase C4). Empty grid cells mount a Transformer for the first
+// time — before C4 they took a non-interactive early return with no transformer
+// at all. So the "selection UI never reaches a PNG" proof has to be re-made with
+// an empty cell selected, not just a standalone frame.
+{
+  console.log('\nCase 14: a selected empty cell does not leak into the export')
+  const twoCol = `{ id: 'vertical-2', label: '2 Columns', cols: 2, rows: 1,
+    cells: (w, h, gap) => { const cw = (w - gap) / 2
+      return [{ x: 0, y: 0, w: cw, h }, { x: cw + gap, y: 0, w: cw, h }] } }`
+
+  await page.evaluate(async (tpl) => {
+    const gs = () => window.__canvasStore__.getState()
+    window.__zs.reset(1)
+    gs().addGrid(eval(`(${tpl})`), 200, 200)
+    const group = Object.values(gs().objects).find(o => o.type === 'group' && o.isGrid)
+    gs().setSelected(group.childIds[0]) // an EMPTY cell, selected
+  }, twoCol)
+  await wait(600)
+
+  const cellSelectionArmed = await page.evaluate(() => {
+    const ts = window.__getStage__().find('Transformer')
+    return ts.some(t => t.nodes().length > 0)
+  })
+  ok(cellSelectionArmed, 'a selected empty cell actually arms a Transformer (guards a vacuous pass)')
+
+  const leaks = await page.evaluate(async ({ FW, FH }) => {
+    const stage = window.__getStage__()
+    window.__zsBlobs = await window.__exportFrames__(stage, 1, FW, FH)
+    return window.__zs.analyzeBlobs([], [
+      { name: 'anchor', rgb: [249, 70, 8] },
+      { name: 'transformer', rgb: [0, 161, 255] },
+    ], FW)
+  }, { FW, FH })
+
+  absent(leaks.hunts.anchor, 'export: selected empty cell leaks no #f94608 selection border')
+  absent(leaks.hunts.transformer, 'export: selected empty cell leaks no Transformer handles')
+  await ss('export-empty-cell-selected')
+}
+
 // ─── Results ──────────────────────────────────────────────────────────────────
 console.log('\n' + '─'.repeat(50))
 console.log(`Results: ${passed} passed, ${failed} failed${skipped ? `, ${skipped} skipped` : ''}`)
