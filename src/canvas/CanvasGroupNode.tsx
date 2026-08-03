@@ -52,6 +52,7 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
   const isSelected = useCanvasStore((s) => s.selectedId === id)
   const setSelected = useCanvasStore((s) => s.setSelected)
+  const setContextMenu = useCanvasStore((s) => s.setContextMenu)
   const panX = useViewportStore((s) => s.panX)
   const panY = useViewportStore((s) => s.panY)
   const viewScale = useViewportStore(selectScale)
@@ -229,6 +230,15 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
           const logicalY = (pos.y - panY) / scale
           const hitCell = hitTestCell(obj, logicalX, logicalY)
           if (hitCell) setSelected(hitCell)
+        }}
+        onContextMenu={(e) => {
+          // Without this the event reaches the stage and opens the canvas
+          // Add/Remove Frame menu instead — a grid had no object menu at all,
+          // which only became reachable once cells stopped listening by default.
+          e.evt.preventDefault()
+          e.cancelBubble = true
+          if (!isSelected) setSelected(id)
+          setContextMenu({ x: e.evt.clientX, y: e.evt.clientY, targetId: id })
         }}
         onDragStart={handleDragStart}
         onDragMove={handleDragMove}

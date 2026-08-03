@@ -623,6 +623,32 @@ export const useCanvasStore = create<CanvasState>((set) => {
     return null
   }
 
+  // Expand a delete set to include every descendant of any group in it.
+  //
+  // Deleting a group must take its cells with it. A cell left behind keeps a
+  // parentGroupId pointing at an object that no longer exists, and since a cell
+  // only listens while its grid is *entered* (CanvasImageNode), those orphans are
+  // permanently unselectable — visible debris the user cannot remove. Keeping a
+  // cell is what "Disconnect from grid" is for; it detaches first, then the cell
+  // is an ordinary object.
+  function withGroupDescendants(
+    objects: Record<string, CanvasObject>,
+    ids: Iterable<string>,
+  ): Set<string> {
+    const out = new Set<string>()
+    const queue = [...ids]
+    while (queue.length > 0) {
+      const id = queue.pop()!
+      if (out.has(id)) continue
+      out.add(id)
+      const obj = objects[id]
+      // Nested groups are not built today, but the traversal costs nothing and
+      // makes this correct if they ever are.
+      if (obj?.type === 'group') queue.push(...obj.childIds)
+    }
+    return out
+  }
+
   // Id-preserving object swap: replaces state.objects[id] with `replacement`
   // (forced to the same id), keeping the object's objectOrder position and
   // parentGroupId, updating _srcVault and _openEditModeCount. Returns a state
@@ -847,22 +873,27 @@ export const useCanvasStore = create<CanvasState>((set) => {
           }
         }
         const rest = { ...state.objects }
-        delete rest[id]
+        // Deleting a grid takes its cells with it — see withGroupDescendants.
+        const removedIds = withGroupDescendants(state.objects, [id])
+        for (const rid of removedIds) delete rest[rid]
         // An ALREADY-EMPTY cell reaches here: both interceptions above require media.
         // Deleting it without detaching would leave its id dangling in the parent's
         // childIds and the slot unrecoverable (#62).
         const emptiedGroupId = existing?.parentGroupId
           ? detachCellFromParent(rest, id, existing.parentGroupId)
           : null
-        const removedIds = new Set(emptiedGroupId ? [id, emptiedGroupId] : [id])
-        // Opt #1: remove from vault
+        if (emptiedGroupId) removedIds.add(emptiedGroupId)
+        // Opt #1: remove from vault — only for the object actually targeted.
+        // Cells swept up by a group delete KEEP their vault entries, or undo would
+        // bring the grid back with every image blank (reinjectSrc reads the vault).
         let nextVault = state._srcVault
         if (state._srcVault.has(id)) {
           nextVault = new Map(state._srcVault)
           nextVault.delete(id)
         }
-        // Opt #2: decrement count if removed object was in edit mode
-        const removedInEditMode = existing ? isInEditMode(existing) : false
+        // Opt #2: decrement count for every removed object in edit mode
+        const removedInEditMode = [...removedIds]
+          .filter((rid) => state.objects[rid] && isInEditMode(state.objects[rid])).length
         return {
           past: pushHistoryFrom(state),
           future: [],
@@ -872,7 +903,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
           selectedIds: state.selectedIds.filter((sid) => !removedIds.has(sid)),
           anchorId: removedIds.has(state.anchorId ?? '') ? null : state.anchorId,
           _srcVault: nextVault,
-          _openEditModeCount: state._openEditModeCount - (removedInEditMode ? 1 : 0),
+          _openEditModeCount: state._openEditModeCount - removedInEditMode,
         }
       }),
 
@@ -957,18 +988,22 @@ export const useCanvasStore = create<CanvasState>((set) => {
 
     removeMultipleObjects: (ids) =>
       set((state) => {
-        const idSet = new Set(ids)
+        // Same rule as removeObject: a group in the selection takes its cells with it.
+        const targetedIds = new Set(ids)
+        const idSet = withGroupDescendants(state.objects, ids)
         const updatedObjects = { ...state.objects }
         // Opt #1 + #2: process removals
         let nextVault = state._srcVault
         let editModeRemoved = 0
-        for (const id of ids) {
+        for (const id of idSet) {
           const obj = state.objects[id]
           if (obj) {
             if (isInEditMode(obj)) editModeRemoved++
           }
           delete updatedObjects[id]
-          if (state._srcVault.has(id)) {
+          // Vault entries are dropped only for explicitly targeted ids — cells swept
+          // up by a group delete keep theirs so undo can reinject their media.
+          if (targetedIds.has(id) && state._srcVault.has(id)) {
             if (nextVault === state._srcVault) nextVault = new Map(state._srcVault)
             nextVault.delete(id)
           }

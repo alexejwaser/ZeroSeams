@@ -1458,6 +1458,70 @@ await page.evaluate((src) => { window.__zsImg__ = src }, TEST_IMG_SRC)
   await wait(120)
 }
 
+{
+  // L12. Deleting a grid deletes its cells. Leaving them behind stranded objects
+  // whose parentGroupId pointed at a group that no longer existed — and because a
+  // cell only listens while its grid is entered, those orphans were visible debris
+  // the user could no longer select or delete. Keeping a cell is what
+  // disconnectGridCell is for.
+  const { groupId, cellIds } = await makeGrid()
+  await fillCell(cellIds[0])
+  await wait(120)
+  const beforeLen = (await cellInfo(cellIds[0], groupId)).pastLen
+
+  await page.evaluate((id) => window.__canvasStore__.getState().removeObject(id), groupId)
+  await wait(120)
+
+  const after = await page.evaluate(({ groupId, cellIds }) => {
+    const s = window.__canvasStore__.getState()
+    return {
+      groupGone: !s.objects[groupId],
+      cellsGone: cellIds.every(id => !s.objects[id]),
+      orderClean: cellIds.every(id => !s.objectOrder.includes(id)) && !s.objectOrder.includes(groupId),
+      vaultKept: cellIds.some(id => s._srcVault.has(id)),
+      pastLen: s.past.length,
+    }
+  }, { groupId, cellIds })
+
+  ok(after.groupGone, 'L12: the grid group is deleted')
+  ok(after.cellsGone, 'L12: its cells go with it — no orphans left behind')
+  ok(after.orderClean, 'L12: objectOrder has no dangling ids')
+  // Opposite of the L2 policy on purpose: a cell swept up by a group delete was
+  // never individually targeted, so its src is kept for undo to reinject.
+  ok(after.vaultKept, 'L12: swept-up cells KEEP their _srcVault entries (undo needs them)')
+  eq(after.pastLen, beforeLen + 1, 'L12: deleting a grid is ONE history entry')
+
+  await undo()
+  await wait(120)
+  const restored = await page.evaluate(({ groupId, cellIds }) => {
+    const s = window.__canvasStore__.getState()
+    return {
+      groupBack: !!s.objects[groupId],
+      cellsBack: cellIds.every(id => !!s.objects[id]),
+      mediaBack: s.objects[cellIds[0]]?.src === window.__zsImg__,
+    }
+  }, { groupId, cellIds })
+  ok(restored.groupBack, 'L12: one undo brings the group back')
+  ok(restored.cellsBack, 'L12: …and every cell with it')
+  ok(restored.mediaBack, 'L12: …with the media reinjected from the vault')
+
+  // removeMultipleObjects must follow the same rule, or box-selecting a grid and
+  // pressing delete leaves the same debris.
+  await page.evaluate((id) => window.__canvasStore__.getState().removeMultipleObjects([id]), groupId)
+  await wait(120)
+  const multi = await page.evaluate(({ groupId, cellIds }) => {
+    const s = window.__canvasStore__.getState()
+    return { groupGone: !s.objects[groupId], cellsGone: cellIds.every(id => !s.objects[id]) }
+  }, { groupId, cellIds })
+  ok(multi.groupGone && multi.cellsGone, 'L12: removeMultipleObjects deletes a grid whole too')
+
+  await page.evaluate(() => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+  })
+  await wait(120)
+}
+
 // ─── Results ──────────────────────────────────────────────────────────────────
 console.log('\n' + '─'.repeat(50))
 console.log(`Results: ${passed} passed, ${failed} failed`)
