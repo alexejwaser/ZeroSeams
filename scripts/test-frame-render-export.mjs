@@ -59,9 +59,13 @@ const TRANSF  = [0, 161, 255]   // Konva default Transformer anchorStroke
 
 const hex = (rgb) => '#' + rgb.map(c => c.toString(16).padStart(2, '0')).join('')
 
+/** Predicate form — for assertions about what a pixel is NOT. */
+const isNear = (actual, expected, tol = TOL) =>
+  !!actual && [0, 1, 2].every(i => Math.abs(actual[i] - expected[i]) <= tol)
+
 function nearColor(actual, expected, msg, tol = TOL) {
   if (!actual) { ok(false, `${msg} — no sample returned`); return }
-  const near = [0, 1, 2].every(i => Math.abs(actual[i] - expected[i]) <= tol)
+  const near = isNear(actual, expected, tol)
   ok(near, near ? msg : `${msg} — got rgb(${actual.slice(0, 3)}), want ${hex(expected)}`)
 }
 function isOpaque(actual, msg) {
@@ -208,6 +212,41 @@ await page.evaluate(() => {
           const px = Math.round(p.x * pixelRatio)
           const py = Math.round(p.y * pixelRatio)
           out[p.name] = Array.from(ctx.getImageData(px, py, 1, 1).data)
+        }
+        return out
+      } finally {
+        stage.width(orig.w); stage.height(orig.h)
+        stage.scaleX(orig.sx); stage.scaleY(orig.sy)
+        stage.x(orig.x); stage.y(orig.y)
+        stage.draw()
+      }
+    },
+
+    /**
+     * Which Konva node owns a logical canvas point? Uses the same 1:1 stage
+     * normalisation as sampleStage so logical coords map straight to hit coords.
+     *
+     * This is how click ROUTING is asserted: nodes carry stable names
+     * ('grid-hit' on a grid's hit rect, `frame-rect-<id>` on a frame's), so the
+     * listening rules can be checked without synthesising real pointer events.
+     * points: [{name, x, y}] → { name: hitNodeName | null }.
+     */
+    intersectionNames(points) {
+      const stage = window.__getStage__()
+      const s = window.__canvasStore__.getState()
+      const orig = {
+        w: stage.width(), h: stage.height(),
+        sx: stage.scaleX(), sy: stage.scaleY(),
+        x: stage.x(), y: stage.y(),
+      }
+      try {
+        stage.width(s.frameCount * s.frameWidth)
+        stage.height(s.frameHeight)
+        stage.scaleX(1); stage.scaleY(1); stage.x(0); stage.y(0)
+        stage.draw()
+        const out = {}
+        for (const p of points) {
+          out[p.name] = stage.getIntersection({ x: p.x, y: p.y })?.name() || null
         }
         return out
       } finally {
@@ -538,6 +577,94 @@ console.log('━━━ Part 2A: rendering ━━━\n')
   nearColor(s.grownMid,    MEDIA, 'resized ellipse cell still paints media at its centre')
   nearColor(s.grownCorner, BG,    'resized ellipse cell is still clipped at its corner')
   await ss('grid-cell-clips')
+}
+
+// Cases 12-13 (#62 Phase C4). Empty grid cells used to take a non-interactive
+// early return in CanvasImageNode — no hit target, no transformer, and opacity
+// silently ignored. Both halves are asserted here.
+{
+  console.log('\nCases 12-13: empty cells are real frames now')
+  const twoCol = `{ id: 'vertical-2', label: '2 Columns', cols: 2, rows: 1,
+    cells: (w, h, gap) => { const cw = (w - gap) / 2
+      return [{ x: 0, y: 0, w: cw, h }, { x: cw + gap, y: 0, w: cw, h }] } }`
+
+  const g = await page.evaluate(async (tpl) => {
+    const z = window.__zs
+    const gs = () => window.__canvasStore__.getState()
+    z.reset(2)
+    const base = eval(`(${tpl})`)
+    gs().addGrid({ ...base }, 200, 200)
+    gs().addGrid({ ...base, cellClipShape: { kind: 'ellipse' } }, 1280, 200)
+    const s = gs()
+    const groups = Object.values(s.objects).filter(o => o.type === 'group' && o.isGrid)
+    const read = (grp) => ({
+      groupId: grp.id,
+      cells: grp.childIds.map(id => {
+        const c = s.objects[id]
+        return { id, fx: c.frameX, fy: c.frameY, fw: c.frameWidth, fh: c.frameHeight }
+      }),
+    })
+    return { plain: read(groups[0]), ellipse: read(groups[1]) }
+  }, twoCol)
+  await wait(500)
+
+  // Case 12: opacity. The deleted early return never applied obj.opacity, so a
+  // half-transparent empty cell painted at full strength.
+  const cell = g.plain.cells[0]
+  const mid = { name: 'cell', x: cell.fx + cell.fw / 2, y: cell.fy + cell.fh / 2 }
+  let s = await page.evaluate((p) => window.__zs.sampleStage(p), [mid])
+  nearColor(s.cell, EMPTY, 'opaque empty cell paints EMPTY_FRAME_FILL')
+
+  await page.evaluate((id) => window.__canvasStore__.getState().commitUpdate(id, { opacity: 0.5 }), cell.id)
+  await wait(400)
+  s = await page.evaluate((p) => window.__zs.sampleStage(p), [mid])
+  const faded = s.cell
+  ok(
+    !isNear(faded, EMPTY) && !isNear(faded, BG),
+    `empty cell honours opacity (blends toward background) — got rgb(${faded.slice(0, 3)})`,
+  )
+  await page.evaluate((id) => window.__canvasStore__.getState().commitUpdate(id, { opacity: 1 }), cell.id)
+  await wait(400)
+
+  // Case 13: click routing. Exactly one of {group hit rect, cells} listens.
+  const at = (c, tag, fx = 0.5, fy = 0.5) => ({ name: tag, x: c.fx + c.fw * fx, y: c.fy + c.fh * fy })
+  const [p0, p1] = g.plain.cells
+  const select = (id) => page.evaluate((id) => window.__canvasStore__.getState().setSelected(id), id)
+
+  await select(null)
+  await wait(200)
+  let hits = await page.evaluate((p) => window.__zs.intersectionNames(p), [at(p0, 'a'), at(p1, 'b')])
+  eq(hits.a, 'grid-hit', 'grid not entered: the group hit rect owns cell 0')
+  eq(hits.b, 'grid-hit', 'grid not entered: the group hit rect owns cell 1 too (drag works anywhere)')
+
+  await select(g.plain.groupId)
+  await wait(200)
+  hits = await page.evaluate((p) => window.__zs.intersectionNames(p), [at(p0, 'a')])
+  eq(hits.a, 'grid-hit', 'group selected but not entered: still the group hit rect')
+
+  await select(p0.id)
+  await wait(200)
+  hits = await page.evaluate((p) => window.__zs.intersectionNames(p), [at(p0, 'a'), at(p1, 'b')])
+  eq(hits.a, `frame-rect-${p0.id}`, 'grid entered: the entered cell owns its own area')
+  eq(hits.b, `frame-rect-${p1.id}`, 'grid entered: siblings listen too, so cell-to-cell clicks work')
+
+  await select(null)
+  await wait(200)
+  hits = await page.evaluate((p) => window.__zs.intersectionNames(p), [at(p0, 'a')])
+  eq(hits.a, 'grid-hit', 'grid exited: the group hit rect takes over again')
+
+  // A cell's hitFunc must follow its clip, or the excluded corner of an ellipse
+  // cell would still be grabbable.
+  const e0 = g.ellipse.cells[0]
+  await select(e0.id)
+  await wait(200)
+  hits = await page.evaluate((p) => window.__zs.intersectionNames(p),
+    [at(e0, 'mid'), at(e0, 'corner', 0.05, 0.05)])
+  eq(hits.mid, `frame-rect-${e0.id}`, 'ellipse cell is hit at its centre')
+  ok(hits.corner !== `frame-rect-${e0.id}`, 'ellipse cell is NOT hit at its clipped-away corner')
+
+  await select(null)
+  await ss('cell-routing')
 }
 
 // Grid relayout (#69). computeGridChildPatches is the single source of truth for

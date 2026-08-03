@@ -71,6 +71,9 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - `_srcVault` entries are KEPT (not deleted) on `removeMediaFromFrame` — undo needs the src back without a save round-trip
 - `clipFunc` is only set when `clipShape` is non-plain-rect; the frame `Rect`'s `hitFunc` follows the same clip geometry so hit-testing matches the visible shape
 - `computePathBBox` takes a `closed` boolean param — pass `true` for closed paths, or the bbox undercounts the closing segment
+- `isFrameObject` stays narrow on purpose: a plain image becomes a frame by *acquiring* a clip (`AddClipRow` → `commitUpdate({clipShape})`), never by widening the predicate — widening it would put clip/fill/stroke UI on every image ever dropped. "Remove Clip" is the inverse and clears clip **+ fill + stroke together**; clearing only the clip flips `isFrameObject` false and strands state that still paints but can no longer be seen or edited
+- `clipShapeToAnchors(clipShape)` seeds a `path` clip from the current silhouette (normalized 0–1). Every clip-kind switch is one `commitUpdate` — that undo step is why discarding a custom path needs no confirmation dialog
+- `isPointInClipShape` is for hit tests done in logical coords with no Konva node (entering a grid cell); on-canvas hit-testing already goes through the frame Rect's `hitFunc`
 
 **Multi-Select:**
 - `selectedId` — Properties Panel; `selectedIds[]` — group transformer + align/distribute; `anchorId` — alignment reference (gold `#f5a623` border)
@@ -150,7 +153,11 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 **Grid/Collage System** (`src/canvas/gridTemplates.ts`, `CanvasGroupNode.tsx`, `EmptyFrameOverlay.tsx`):
 - `GroupObject` with `isGrid: true` owns N `ImageObject`/`VideoObject` cells via `childIds`; `gridTemplateId` references the template used
 - `gridTemplates.ts` `cells(groupW, groupH, gap)` is pure — zero hardcoded pixels; always proportional to group dimensions
-- `parentGroupId` on `BaseCanvasObject` drives click routing: single click → select group; `listening={false}` on cells when group selected + cell not entered (passes events through to group hit rect)
+- **Listening rule:** exactly one of {a grid's group hit rect, its cells} listens at any moment — cells listen iff the grid is *entered* (some cell is `selectedId`). `CanvasGroupNode`'s `listening={!locked && !isCellSelected}` and the cell's `isGridEntered` are complements; change them together. Consequence: the group drags from anywhere on it, and once entered, clicks move directly between sibling cells
+- `EmptyFrameOverlay`'s `+image`/`+video` buttons are HTML, so they're immune to Konva listening — a cell can still be filled in one click without entering the grid. That's what makes the rule ergonomically safe
+- Grid cells get a selection border but **no resize/rotate anchors** (`obj.locked || isGridCell` branch in both node files): `computeGridChildPatches` owns cell geometry, so an individual resize is silently reverted by the next group drag or gap change. Resize a cell by detaching it (`disconnectGridCell`) or by changing the template
+- Konva node names `grid-hit` / `frame-rect-<id>` exist so click routing is assertable via `stage.getIntersection()` — see `docs/testing.md`
+- `GridTemplate.cellClipShape` applies one clip to every cell **at creation only** (`addGrid` → `makeEmptyCell`); per-cell overrides come from the Frame section's shape picker. `cells()` still returns bare rects, which is what keeps `computeGridChildPatches` free of clip logic
 - Delete on a *filled* cell restores an empty frame (`isEmpty: true`) — never removes the slot. Delete on an *already-empty* cell falls through to the generic delete (both interceptions in `removeObject` require media), which is why that path must detach too
 - `detachCellFromParent(objects, cellId, parentGroupId)` is the ONLY way a cell leaves a grid — it strips the id from `childIds` and deletes the group when that was the last cell. Skipping it leaves a dangling child id and a slot that can never be refilled. Mutates the `objects` copy; returns the deleted group's id so the caller can drop it from `objectOrder` and selection
 - `disconnectGridCell(id)` detaches, and **collapses an empty cell to a shape** in the same `set()` — one undo step, one empty state. It builds the replacement inline rather than via `swapObjectPreservingId` because that helper re-attaches `parentGroupId` from the old object, which is the exact field disconnect clears

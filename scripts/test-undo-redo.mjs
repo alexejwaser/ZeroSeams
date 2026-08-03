@@ -30,20 +30,6 @@ function eq(a, b, msg) {
   ok(pass, pass ? msg : `${msg} — got ${JSON.stringify(a)}, want ${JSON.stringify(b)}`)
 }
 
-// Assertions written against behaviour that issue #62 will introduce. They are the
-// executable spec for that work — red today, on purpose, and deliberately kept out
-// of the pass/fail tally so this script stays green. Flip each to ok()/eq() as the
-// corresponding #62 phase lands.
-let xpassed = 0, xfailed = 0
-const unexpectedPasses = []
-function xok(cond, msg) {
-  if (cond) { console.log(`  ⚑ ${msg} — NOW PASSES, promote to ok()`); xpassed++; unexpectedPasses.push(msg) }
-  else      { console.log(`  ○ ${msg} (expected fail — #62)`); xfailed++ }
-}
-function xeq(a, b, msg) {
-  xok(a === b, a === b ? msg : `${msg} — got ${JSON.stringify(a)}, want ${JSON.stringify(b)}`)
-}
-
 // ─── Launch via CDP (electron.launch + Playwright 1.60/Electron 42 has target-detection bug) ──
 console.log('Launching app…')
 const electronProc = spawn(ELECTRON_BIN, [
@@ -1435,19 +1421,49 @@ await page.evaluate((src) => { window.__zsImg__ = src }, TEST_IMG_SRC)
   await wait(120)
 }
 
+{
+  // L11 (#62 Phase C4). The store-level statement of "a grid cell gets no resize
+  // handles": whatever a cell's geometry is, the next relayout overwrites it from
+  // the template. That is why offering per-cell resize would be a control that lies.
+  const { groupId, cellIds } = await makeGrid()
+  const cellId = cellIds[0]
+
+  await page.evaluate((id) => window.__canvasStore__.getState().commitUpdate(id, {
+    frameWidth: 17, frameHeight: 17, width: 17, height: 17,
+  }), cellId)
+  await wait(80)
+  const tampered = await page.evaluate((id) =>
+    window.__canvasStore__.getState().objects[id].frameWidth, cellId)
+  eq(tampered, 17, 'L11: a cell can be written directly (nothing blocks the field)')
+
+  const widths = await page.evaluate(({ groupId }) => {
+    const s = window.__canvasStore__.getState()
+    const group = s.objects[groupId]
+    const box = { x: group.x, y: group.y, width: group.width, height: group.height }
+    const patches = window.__computeGridChildPatches__(group, s.objects, box, true)
+    s.commitMultipleUpdates(patches)
+    const after = window.__canvasStore__.getState().objects
+    // Same box in, so the template width is whatever the untouched sibling has.
+    return { resized: after[group.childIds[0]].frameWidth, sibling: after[group.childIds[1]].frameWidth }
+  }, { groupId })
+
+  eq(widths.resized, widths.sibling, 'L11: relayout restores the template width, discarding the per-cell one')
+
+  await page.evaluate(({ groupId, cellIds }) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    for (const c of cellIds) gs().removeObject(c)
+    gs().removeObject(groupId)
+  }, { groupId, cellIds })
+  await wait(120)
+}
+
 // ─── Results ──────────────────────────────────────────────────────────────────
 console.log('\n' + '─'.repeat(50))
 console.log(`Results: ${passed} passed, ${failed} failed`)
 if (failures.length > 0) {
   console.log('\nFailed:')
   failures.forEach(f => console.log(`  ✗ ${f}`))
-}
-if (xfailed > 0 || xpassed > 0) {
-  console.log(`\n#62 spec assertions: ${xfailed} still red (expected), ${xpassed} now green`)
-  if (unexpectedPasses.length > 0) {
-    console.log('These now pass — promote them to real assertions:')
-    unexpectedPasses.forEach(m => console.log(`  ⚑ ${m}`))
-  }
 }
 
 await ss('final')

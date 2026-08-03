@@ -7,6 +7,7 @@ import type { GroupObject, ImageObject } from '@/types/canvas'
 import type { SnapGuide } from './useSnapGuides'
 import { useSnapGuides } from './useSnapGuides'
 import { computeGridChildPatches } from './gridTemplates'
+import { isPointInClipShape } from './frameClip'
 
 // Returns the childId whose frame bounds contain the given logical canvas point.
 function hitTestCell(
@@ -18,11 +19,16 @@ function hitTestCell(
   return obj.childIds.find((cid) => {
     const cell = state.objects[cid] as ImageObject | undefined
     if (!cell) return false
-    return (
+    const inBox =
       logicalX >= cell.frameX &&
       logicalX <= cell.frameX + cell.frameWidth &&
       logicalY >= cell.frameY &&
       logicalY <= cell.frameY + cell.frameHeight
+    // Follow the clip too, or the excluded corner of an ellipse cell enters a
+    // cell whose visible pixels belong to its neighbour.
+    return inBox && isPointInClipShape(
+      cell.clipShape, cell.frameWidth, cell.frameHeight,
+      logicalX - cell.frameX, logicalY - cell.frameY,
     )
   })
 }
@@ -197,6 +203,7 @@ const CanvasGroupNodeInner = React.memo(function CanvasGroupNodeInner({ id, onGu
       */}
       <Rect
         ref={rectRef}
+        name="grid-hit"
         x={obj.x}
         y={obj.y}
         width={obj.width}
