@@ -459,6 +459,87 @@ console.log('━━━ Part 2A: rendering ━━━\n')
   await ss('grid-cells')
 }
 
+// Case 11 (#62 Phase C3): a template's cellClipShape reaches the pixels, and
+// survives relayout. The unclipped control grid is mandatory — without it
+// "the corner is background" passes for a grid that renders nothing at all.
+{
+  console.log('\nCase 11: template-clipped grid cells')
+  const twoCol = `{ id: 'vertical-2', label: '2 Columns', cols: 2, rows: 1,
+    cells: (w, h, gap) => { const cw = (w - gap) / 2
+      return [{ x: 0, y: 0, w: cw, h }, { x: cw + gap, y: 0, w: cw, h }] } }`
+
+  const g = await page.evaluate(async (tpl) => {
+    const z = window.__zs
+    const gs = () => window.__canvasStore__.getState()
+    z.reset(2)
+    const base = eval(`(${tpl})`)
+    // Same template twice: one ellipse-clipped, one plain (CONTROL).
+    gs().addGrid({ ...base, cellClipShape: { kind: 'ellipse' } }, 200, 200)
+    gs().addGrid({ ...base }, 1280, 200)
+    const s = gs()
+    const groups = Object.values(s.objects).filter(o => o.type === 'group' && o.isGrid)
+    const read = (g) => {
+      const c = s.objects[g.childIds[0]]
+      return { groupId: g.id, id: c.id, kind: c.clipShape?.kind,
+        fx: c.frameX, fy: c.frameY, fw: c.frameWidth, fh: c.frameHeight }
+    }
+    return { clipped: read(groups[0]), control: read(groups[1]) }
+  }, twoCol)
+  await wait(500)
+
+  eq(g.clipped.kind, 'ellipse', 'template cellClipShape reached the cell')
+  eq(g.control.kind, undefined, 'CONTROL grid cells have no clip')
+
+  // 5% inset from the cell's top-left — comfortably outside an inscribed ellipse.
+  const pts = (c, tag) => [
+    { name: `${tag}Mid`,    x: c.fx + c.fw / 2,    y: c.fy + c.fh / 2 },
+    { name: `${tag}Corner`, x: c.fx + c.fw * 0.05, y: c.fy + c.fh * 0.05 },
+  ]
+  let s = await page.evaluate((p) => window.__zs.sampleStage(p),
+    [...pts(g.clipped, 'clip'), ...pts(g.control, 'ctrl')])
+  nearColor(s.clipMid,    EMPTY, 'empty ellipse cell paints EMPTY_FRAME_FILL at its centre')
+  nearColor(s.clipCorner, BG,    'empty ellipse cell is clipped away at its corner')
+  nearColor(s.ctrlCorner, EMPTY, 'CONTROL: unclipped cell paints to its corner')
+
+  await page.evaluate(({ a, b }) => {
+    const gs = () => window.__canvasStore__.getState()
+    for (const id of [a, b]) {
+      gs().insertMediaIntoFrame(id, {
+        kind: 'image', src: window.__zs.solidSrc('#ff00ff'), naturalWidth: 64, naturalHeight: 64,
+      })
+    }
+  }, { a: g.clipped.id, b: g.control.id })
+  await wait(600)
+
+  s = await page.evaluate((p) => window.__zs.sampleStage(p),
+    [...pts(g.clipped, 'clip'), ...pts(g.control, 'ctrl')])
+  nearColor(s.clipMid,    MEDIA, 'filled ellipse cell paints media at its centre')
+  nearColor(s.clipCorner, BG,    'filled ellipse cell is still clipped at its corner')
+  nearColor(s.ctrlCorner, MEDIA, 'CONTROL: filled unclipped cell paints to its corner')
+
+  // The clip must survive a group resize. computeGridChildPatches emits geometry
+  // only, and anchors are normalized — so this should hold with no clip handling.
+  const after = await page.evaluate(({ groupId }) => {
+    const s = window.__canvasStore__.getState()
+    const group = s.objects[groupId]
+    const patches = window.__computeGridChildPatches__(
+      group, s.objects,
+      { x: group.x, y: group.y, width: group.width * 1.4, height: group.height * 1.4 },
+      true,
+    )
+    s.commitMultipleUpdates(patches)
+    const c = window.__canvasStore__.getState().objects[group.childIds[0]]
+    return { kind: c.clipShape?.kind, fx: c.frameX, fy: c.frameY, fw: c.frameWidth, fh: c.frameHeight }
+  }, { groupId: g.clipped.groupId })
+  await wait(500)
+
+  eq(after.kind, 'ellipse', 'clip survives relayout')
+  s = await page.evaluate((p) => window.__zs.sampleStage(p), pts(after, 'grown'))
+  nearColor(s.grownMid,    MEDIA, 'resized ellipse cell still paints media at its centre')
+  nearColor(s.grownCorner, BG,    'resized ellipse cell is still clipped at its corner')
+  await ss('grid-cell-clips')
+}
+
 // Grid relayout (#69). computeGridChildPatches is the single source of truth for
 // cell geometry — shared by CanvasGroupNode's drag/transform and the gap slider — so
 // it's asserted directly rather than through a gesture.

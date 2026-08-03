@@ -1212,6 +1212,100 @@ await page.evaluate((src) => { window.__zsImg__ = src }, TEST_IMG_SRC)
 }
 
 {
+  // L7 (#62 Phase C3). A template may declare one clip for all its cells.
+  // addGrid is the only place that applies it — and the clip then has to survive
+  // the fill/empty round trip, which is frameToEmptyImage's job and was untested.
+  const { groupId, cellIds } = await page.evaluate(() => {
+    const gs = () => window.__canvasStore__.getState()
+    gs().addGrid({
+      id: 'circles-3', label: '3 Circles', cols: 3, rows: 1,
+      cells: (w, h, gap) => {
+        const cw = (w - gap * 2) / 3
+        return [0, 1, 2].map(i => ({ x: i * (cw + gap), y: 0, w: cw, h }))
+      },
+      cellClipShape: { kind: 'ellipse' },
+    }, 200, 200)
+    const group = Object.values(gs().objects).find(o => o.type === 'group' && o.isGrid)
+    return { groupId: group.id, cellIds: [...group.childIds] }
+  })
+  await wait(120)
+
+  const kinds = await page.evaluate((ids) => {
+    const s = window.__canvasStore__.getState()
+    return ids.map(id => s.objects[id]?.clipShape?.kind)
+  }, cellIds)
+  ok(kinds.length === 3 && kinds.every(k => k === 'ellipse'), 'L7: every cell takes the template clip')
+
+  await fillCell(cellIds[0])
+  await wait(120)
+  const filled = await cellInfo(cellIds[0], groupId)
+  ok(!filled.isEmpty, 'L7: cell holds media')
+  eq(filled.clipShape?.kind, 'ellipse', 'L7: filling a cell keeps its clip')
+
+  await page.evaluate((id) => window.__canvasStore__.getState().removeMediaFromFrame(id), cellIds[0])
+  await wait(120)
+  const emptied = await cellInfo(cellIds[0], groupId)
+  ok(emptied.isEmpty, 'L7: emptied cell keeps its slot')
+  eq(emptied.clipShape?.kind, 'ellipse', 'L7: …and is still elliptical after the round trip')
+
+  await page.evaluate(({ groupId, cellIds }) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    for (const c of cellIds) gs().removeObject(c)
+    gs().removeObject(groupId)
+  }, { groupId, cellIds })
+  await wait(120)
+}
+
+{
+  // L9 (#62 Phase C3). Relayout must never touch the clip. This asserts an
+  // ABSENCE — computeGridChildPatches emits geometry only — which is exactly the
+  // kind of thing that rots silently, and the reason path anchors are stored
+  // normalized 0–1 rather than in display px.
+  const { groupId, cellIds } = await makeGrid()
+  const cellId = cellIds[0]
+  const anchors = [
+    { x: 0.5, y: 0, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
+    { x: 1, y: 0.5, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
+    { x: 0.5, y: 1, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
+    { x: 0, y: 0.5, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
+  ]
+  await page.evaluate(({ id, anchors }) => window.__canvasStore__.getState()
+    .commitUpdate(id, { clipShape: { kind: 'path', anchors } }), { id: cellId, anchors })
+  await wait(80)
+
+  const result = await page.evaluate(({ groupId }) => {
+    const s = window.__canvasStore__.getState()
+    const group = s.objects[groupId]
+    const patches = window.__computeGridChildPatches__(
+      group, s.objects,
+      { x: group.x, y: group.y, width: group.width * 1.7, height: group.height * 0.6 },
+      true,
+    )
+    s.commitMultipleUpdates(patches)
+    return {
+      patchKeys: [...new Set(Object.values(patches).flatMap(p => Object.keys(p)))],
+      anchors: window.__canvasStore__.getState().objects[group.childIds[0]]?.clipShape?.anchors,
+    }
+  }, { groupId })
+
+  ok(!result.patchKeys.includes('clipShape'), 'L9: relayout emits no clipShape (geometry only)')
+  eq(result.anchors?.length, 4, 'L9: the path clip survives relayout')
+  ok(
+    result.anchors?.every(a => a.x >= 0 && a.x <= 1 && a.y >= 0 && a.y <= 1),
+    'L9: anchors stay normalized 0–1 through a non-uniform resize',
+  )
+
+  await page.evaluate(({ groupId, cellIds }) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    for (const c of cellIds) gs().removeObject(c)
+    gs().removeObject(groupId)
+  }, { groupId, cellIds })
+  await wait(120)
+}
+
+{
   // L8 (#62 Phase C). The Frame section's shape picker is a plain commitUpdate per
   // switch. That is the whole argument for discarding a custom path without a
   // confirmation dialog — so the undo step it relies on has to actually exist.

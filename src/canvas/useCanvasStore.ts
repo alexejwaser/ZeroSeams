@@ -1892,7 +1892,7 @@ export const useCanvasStore = create<CanvasState>((set) => {
             y: canvasY + cell.y,
             w: cell.w,
             h: cell.h,
-          })
+          }, { clipShape: template.cellClipShape })
         })
 
         // isEmpty cells have no src — no vault entries needed
