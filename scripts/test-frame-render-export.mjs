@@ -55,13 +55,23 @@ const MEDIA   = [255, 0, 255]   // magenta fixture
 const BG      = [255, 255, 255] // frame background
 const EMPTY   = [217, 210, 199] // EMPTY_FRAME_FILL #d9d2c7
 const ANCHOR  = [249, 70, 8]    // ClipEditOverlay #f94608
-const TRANSF  = [0, 161, 255]   // Konva default Transformer anchorStroke
+// Transformer anchorStroke/borderStroke are set to the SAME accent (probed off a
+// live Transformer), not Konva's default blue — so a colour hunt cannot tell
+// resize handles from clip anchors. It only proves no accent-coloured selection
+// UI survives, which is why "is the transformer up?" is asserted on the scene
+// graph instead (Case 15). This constant previously held Konva's blue and matched
+// nothing, making every hunt using it pass vacuously.
+const TRANSF  = ANCHOR
 
 const hex = (rgb) => '#' + rgb.map(c => c.toString(16).padStart(2, '0')).join('')
 
+/** Predicate form — for assertions about what a pixel is NOT. */
+const isNear = (actual, expected, tol = TOL) =>
+  !!actual && [0, 1, 2].every(i => Math.abs(actual[i] - expected[i]) <= tol)
+
 function nearColor(actual, expected, msg, tol = TOL) {
   if (!actual) { ok(false, `${msg} — no sample returned`); return }
-  const near = [0, 1, 2].every(i => Math.abs(actual[i] - expected[i]) <= tol)
+  const near = isNear(actual, expected, tol)
   ok(near, near ? msg : `${msg} — got rgb(${actual.slice(0, 3)}), want ${hex(expected)}`)
 }
 function isOpaque(actual, msg) {
@@ -208,6 +218,73 @@ await page.evaluate(() => {
           const px = Math.round(p.x * pixelRatio)
           const py = Math.round(p.y * pixelRatio)
           out[p.name] = Array.from(ctx.getImageData(px, py, 1, 1).data)
+        }
+        return out
+      } finally {
+        stage.width(orig.w); stage.height(orig.h)
+        stage.scaleX(orig.sx); stage.scaleY(orig.sy)
+        stage.x(orig.x); stage.y(orig.y)
+        stage.draw()
+      }
+    },
+
+    /**
+     * Count matching pixels across the LIVE scene (not an export). Selection UI
+     * is hidden during export by design, so anything about what the user sees
+     * while editing has to be scanned here.
+     * hunts: [{name, rgb, tol?}] → { name: pixelCount }.
+     */
+    huntStage(hunts) {
+      const stage = window.__getStage__()
+      const s = window.__canvasStore__.getState()
+      const orig = {
+        w: stage.width(), h: stage.height(),
+        sx: stage.scaleX(), sy: stage.scaleY(),
+        x: stage.x(), y: stage.y(),
+      }
+      try {
+        stage.width(s.frameCount * s.frameWidth)
+        stage.height(s.frameHeight)
+        stage.scaleX(1); stage.scaleY(1); stage.x(0); stage.y(0)
+        stage.draw()
+        const canvas = stage.toCanvas({ pixelRatio: 1 })
+        const d = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data
+        const out = {}
+        for (const h of hunts) out[h.name] = scanFor(d, h.rgb, h.tol ?? 24)
+        return out
+      } finally {
+        stage.width(orig.w); stage.height(orig.h)
+        stage.scaleX(orig.sx); stage.scaleY(orig.sy)
+        stage.x(orig.x); stage.y(orig.y)
+        stage.draw()
+      }
+    },
+
+    /**
+     * Which Konva node owns a logical canvas point? Uses the same 1:1 stage
+     * normalisation as sampleStage so logical coords map straight to hit coords.
+     *
+     * This is how click ROUTING is asserted: nodes carry stable names
+     * ('grid-hit' on a grid's hit rect, `frame-rect-<id>` on a frame's), so the
+     * listening rules can be checked without synthesising real pointer events.
+     * points: [{name, x, y}] → { name: hitNodeName | null }.
+     */
+    intersectionNames(points) {
+      const stage = window.__getStage__()
+      const s = window.__canvasStore__.getState()
+      const orig = {
+        w: stage.width(), h: stage.height(),
+        sx: stage.scaleX(), sy: stage.scaleY(),
+        x: stage.x(), y: stage.y(),
+      }
+      try {
+        stage.width(s.frameCount * s.frameWidth)
+        stage.height(s.frameHeight)
+        stage.scaleX(1); stage.scaleY(1); stage.x(0); stage.y(0)
+        stage.draw()
+        const out = {}
+        for (const p of points) {
+          out[p.name] = stage.getIntersection({ x: p.x, y: p.y })?.name() || null
         }
         return out
       } finally {
@@ -457,6 +534,233 @@ console.log('━━━ Part 2A: rendering ━━━\n')
   nearColor(s.cell1, EMPTY, 'sibling cell stays empty')
   nearColor(s.gap,   BG,    'filled cell still clips to its slot (gap is background)')
   await ss('grid-cells')
+}
+
+// Case 11 (#62 Phase C3): a template's cellClipShape reaches the pixels, and
+// survives relayout. The unclipped control grid is mandatory — without it
+// "the corner is background" passes for a grid that renders nothing at all.
+{
+  console.log('\nCase 11: template-clipped grid cells')
+  const twoCol = `{ id: 'vertical-2', label: '2 Columns', cols: 2, rows: 1,
+    cells: (w, h, gap) => { const cw = (w - gap) / 2
+      return [{ x: 0, y: 0, w: cw, h }, { x: cw + gap, y: 0, w: cw, h }] } }`
+
+  const g = await page.evaluate(async (tpl) => {
+    const z = window.__zs
+    const gs = () => window.__canvasStore__.getState()
+    z.reset(2)
+    const base = eval(`(${tpl})`)
+    // Same template twice: one ellipse-clipped, one plain (CONTROL).
+    gs().addGrid({ ...base, cellClipShape: { kind: 'ellipse' } }, 200, 200)
+    gs().addGrid({ ...base }, 1280, 200)
+    const s = gs()
+    const groups = Object.values(s.objects).filter(o => o.type === 'group' && o.isGrid)
+    const read = (g) => {
+      const c = s.objects[g.childIds[0]]
+      return { groupId: g.id, id: c.id, kind: c.clipShape?.kind,
+        fx: c.frameX, fy: c.frameY, fw: c.frameWidth, fh: c.frameHeight }
+    }
+    return { clipped: read(groups[0]), control: read(groups[1]) }
+  }, twoCol)
+  await wait(500)
+
+  eq(g.clipped.kind, 'ellipse', 'template cellClipShape reached the cell')
+  eq(g.control.kind, undefined, 'CONTROL grid cells have no clip')
+
+  // 5% inset from the cell's top-left — comfortably outside an inscribed ellipse.
+  const pts = (c, tag) => [
+    { name: `${tag}Mid`,    x: c.fx + c.fw / 2,    y: c.fy + c.fh / 2 },
+    { name: `${tag}Corner`, x: c.fx + c.fw * 0.05, y: c.fy + c.fh * 0.05 },
+  ]
+  let s = await page.evaluate((p) => window.__zs.sampleStage(p),
+    [...pts(g.clipped, 'clip'), ...pts(g.control, 'ctrl')])
+  nearColor(s.clipMid,    EMPTY, 'empty ellipse cell paints EMPTY_FRAME_FILL at its centre')
+  nearColor(s.clipCorner, BG,    'empty ellipse cell is clipped away at its corner')
+  nearColor(s.ctrlCorner, EMPTY, 'CONTROL: unclipped cell paints to its corner')
+
+  await page.evaluate(({ a, b }) => {
+    const gs = () => window.__canvasStore__.getState()
+    for (const id of [a, b]) {
+      gs().insertMediaIntoFrame(id, {
+        kind: 'image', src: window.__zs.solidSrc('#ff00ff'), naturalWidth: 64, naturalHeight: 64,
+      })
+    }
+  }, { a: g.clipped.id, b: g.control.id })
+  await wait(600)
+
+  s = await page.evaluate((p) => window.__zs.sampleStage(p),
+    [...pts(g.clipped, 'clip'), ...pts(g.control, 'ctrl')])
+  nearColor(s.clipMid,    MEDIA, 'filled ellipse cell paints media at its centre')
+  nearColor(s.clipCorner, BG,    'filled ellipse cell is still clipped at its corner')
+  nearColor(s.ctrlCorner, MEDIA, 'CONTROL: filled unclipped cell paints to its corner')
+
+  // The clip must survive a group resize. computeGridChildPatches emits geometry
+  // only, and anchors are normalized — so this should hold with no clip handling.
+  const after = await page.evaluate(({ groupId }) => {
+    const s = window.__canvasStore__.getState()
+    const group = s.objects[groupId]
+    const patches = window.__computeGridChildPatches__(
+      group, s.objects,
+      { x: group.x, y: group.y, width: group.width * 1.4, height: group.height * 1.4 },
+      true,
+    )
+    s.commitMultipleUpdates(patches)
+    const c = window.__canvasStore__.getState().objects[group.childIds[0]]
+    return { kind: c.clipShape?.kind, fx: c.frameX, fy: c.frameY, fw: c.frameWidth, fh: c.frameHeight }
+  }, { groupId: g.clipped.groupId })
+  await wait(500)
+
+  eq(after.kind, 'ellipse', 'clip survives relayout')
+  s = await page.evaluate((p) => window.__zs.sampleStage(p), pts(after, 'grown'))
+  nearColor(s.grownMid,    MEDIA, 'resized ellipse cell still paints media at its centre')
+  nearColor(s.grownCorner, BG,    'resized ellipse cell is still clipped at its corner')
+  await ss('grid-cell-clips')
+}
+
+// Cases 12-13 (#62 Phase C4). Empty grid cells used to take a non-interactive
+// early return in CanvasImageNode — no hit target, no transformer, and opacity
+// silently ignored. Both halves are asserted here.
+{
+  console.log('\nCases 12-13: empty cells are real frames now')
+  const twoCol = `{ id: 'vertical-2', label: '2 Columns', cols: 2, rows: 1,
+    cells: (w, h, gap) => { const cw = (w - gap) / 2
+      return [{ x: 0, y: 0, w: cw, h }, { x: cw + gap, y: 0, w: cw, h }] } }`
+
+  const g = await page.evaluate(async (tpl) => {
+    const z = window.__zs
+    const gs = () => window.__canvasStore__.getState()
+    z.reset(2)
+    const base = eval(`(${tpl})`)
+    gs().addGrid({ ...base }, 200, 200)
+    gs().addGrid({ ...base, cellClipShape: { kind: 'ellipse' } }, 1280, 200)
+    const s = gs()
+    const groups = Object.values(s.objects).filter(o => o.type === 'group' && o.isGrid)
+    const read = (grp) => ({
+      groupId: grp.id,
+      cells: grp.childIds.map(id => {
+        const c = s.objects[id]
+        return { id, fx: c.frameX, fy: c.frameY, fw: c.frameWidth, fh: c.frameHeight }
+      }),
+    })
+    return { plain: read(groups[0]), ellipse: read(groups[1]) }
+  }, twoCol)
+  await wait(500)
+
+  // Case 12: opacity. The deleted early return never applied obj.opacity, so a
+  // half-transparent empty cell painted at full strength.
+  const cell = g.plain.cells[0]
+  const mid = { name: 'cell', x: cell.fx + cell.fw / 2, y: cell.fy + cell.fh / 2 }
+  let s = await page.evaluate((p) => window.__zs.sampleStage(p), [mid])
+  nearColor(s.cell, EMPTY, 'opaque empty cell paints EMPTY_FRAME_FILL')
+
+  await page.evaluate((id) => window.__canvasStore__.getState().commitUpdate(id, { opacity: 0.5 }), cell.id)
+  await wait(400)
+  s = await page.evaluate((p) => window.__zs.sampleStage(p), [mid])
+  const faded = s.cell
+  ok(
+    !isNear(faded, EMPTY) && !isNear(faded, BG),
+    `empty cell honours opacity (blends toward background) — got rgb(${faded.slice(0, 3)})`,
+  )
+  await page.evaluate((id) => window.__canvasStore__.getState().commitUpdate(id, { opacity: 1 }), cell.id)
+  await wait(400)
+
+  // Case 13: click routing. Exactly one of {group hit rect, cells} listens.
+  const at = (c, tag, fx = 0.5, fy = 0.5) => ({ name: tag, x: c.fx + c.fw * fx, y: c.fy + c.fh * fy })
+  const [p0, p1] = g.plain.cells
+  const select = (id) => page.evaluate((id) => window.__canvasStore__.getState().setSelected(id), id)
+
+  await select(null)
+  await wait(200)
+  let hits = await page.evaluate((p) => window.__zs.intersectionNames(p), [at(p0, 'a'), at(p1, 'b')])
+  eq(hits.a, 'grid-hit', 'grid not entered: the group hit rect owns cell 0')
+  eq(hits.b, 'grid-hit', 'grid not entered: the group hit rect owns cell 1 too (drag works anywhere)')
+
+  await select(g.plain.groupId)
+  await wait(200)
+  hits = await page.evaluate((p) => window.__zs.intersectionNames(p), [at(p0, 'a')])
+  eq(hits.a, 'grid-hit', 'group selected but not entered: still the group hit rect')
+
+  await select(p0.id)
+  await wait(200)
+  hits = await page.evaluate((p) => window.__zs.intersectionNames(p), [at(p0, 'a'), at(p1, 'b')])
+  eq(hits.a, `frame-rect-${p0.id}`, 'grid entered: the entered cell owns its own area')
+  eq(hits.b, `frame-rect-${p1.id}`, 'grid entered: siblings listen too, so cell-to-cell clicks work')
+
+  await select(null)
+  await wait(200)
+  hits = await page.evaluate((p) => window.__zs.intersectionNames(p), [at(p0, 'a')])
+  eq(hits.a, 'grid-hit', 'grid exited: the group hit rect takes over again')
+
+  // A cell's hitFunc must follow its clip, or the excluded corner of an ellipse
+  // cell would still be grabbable.
+  const e0 = g.ellipse.cells[0]
+  await select(e0.id)
+  await wait(200)
+  hits = await page.evaluate((p) => window.__zs.intersectionNames(p),
+    [at(e0, 'mid'), at(e0, 'corner', 0.05, 0.05)])
+  eq(hits.mid, `frame-rect-${e0.id}`, 'ellipse cell is hit at its centre')
+  ok(hits.corner !== `frame-rect-${e0.id}`, 'ellipse cell is NOT hit at its clipped-away corner')
+
+  await select(null)
+  await ss('cell-routing')
+}
+
+// Case 15: clip-edit mode owns the corners. The frame transformer's anchors land
+// on the same points as a path clip's corner anchors, so leaving it up while
+// editing the clip makes those anchors unreachable — every grab hits a resize
+// handle instead. Scanned on the LIVE scene: export hides selection UI anyway,
+// so an export-based check would pass no matter what.
+{
+  console.log('\nCase 15: the frame transformer yields to clip editing')
+  const id = await page.evaluate(async () => {
+    const z = window.__zs
+    const gs = () => window.__canvasStore__.getState()
+    z.reset(1)
+    const id = crypto.randomUUID()
+    gs().addObject({
+      id, type: 'image', scope: 'global',
+      x: 200, y: 200, width: 400, height: 400,
+      frameX: 200, frameY: 200, frameWidth: 400, frameHeight: 400,
+      contentOffsetX: 0, contentOffsetY: 0, contentWidth: 400, contentHeight: 400,
+      naturalWidth: 64, naturalHeight: 64,
+      src: z.solidSrc('#ff00ff'), backgroundRemoved: false,
+      contentEditMode: false, clipEditMode: false,
+      clipShape: { kind: 'path', anchors: [
+        { x: 0.5, y: 0, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
+        { x: 1, y: 0.5, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
+        { x: 0.5, y: 1, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
+        { x: 0, y: 0.5, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
+      ] },
+      opacity: 1, rotation: 0, visible: true, locked: false, zIndex: 0,
+      scaleX: 1, scaleY: 1,
+    })
+    gs().setSelected(id)
+    return id
+  })
+  await wait(600)
+
+  // Handles and clip anchors share the accent colour, so this is asserted on the
+  // scene graph: a Transformer with no attached nodes draws nothing.
+  const armedCount = () => page.evaluate(() =>
+    window.__getStage__().find('Transformer').filter(t => t.nodes().length > 0).length)
+
+  // Selected, not clip-editing: the transformer SHOULD be up. Without this the
+  // next assertion passes for an object that simply never had one.
+  eq(await armedCount(), 1, 'selected frame arms its resize transformer (CONTROL)')
+
+  await page.evaluate((id) => window.__canvasStore__.getState().enterClipEditMode(id), id)
+  await wait(600)
+  eq(await armedCount(), 0, 'clip-edit mode disarms the transformer, freeing the corners')
+
+  const anchorPixels = await page.evaluate((hunts) => window.__zs.huntStage(hunts), [
+    { name: 'anchor', rgb: ANCHOR, tol: 24 },
+  ])
+  ok(anchorPixels.anchor > 0, 'clip anchors are on screen and unobstructed')
+
+  await page.evaluate(() => window.__canvasStore__.getState().clearClipEditMode())
+  await wait(400)
+  eq(await armedCount(), 1, 'leaving clip-edit mode brings the resize transformer back')
+  await ss('clip-edit-transformer')
 }
 
 // Grid relayout (#69). computeGridChildPatches is the single source of truth for
@@ -785,6 +1089,45 @@ exportedPngs.forEach((b64, i) => {
   fs.writeFileSync(`${SHOTS}/export-frame-${i}.png`, Buffer.from(b64, 'base64'))
 })
 console.log(`    💾 exported PNGs → ${SHOTS}/export-frame-{0,1,2}.png`)
+
+// Case 14 (#62 Phase C4). Empty grid cells mount a Transformer for the first
+// time — before C4 they took a non-interactive early return with no transformer
+// at all. So the "selection UI never reaches a PNG" proof has to be re-made with
+// an empty cell selected, not just a standalone frame.
+{
+  console.log('\nCase 14: a selected empty cell does not leak into the export')
+  const twoCol = `{ id: 'vertical-2', label: '2 Columns', cols: 2, rows: 1,
+    cells: (w, h, gap) => { const cw = (w - gap) / 2
+      return [{ x: 0, y: 0, w: cw, h }, { x: cw + gap, y: 0, w: cw, h }] } }`
+
+  await page.evaluate(async (tpl) => {
+    const gs = () => window.__canvasStore__.getState()
+    window.__zs.reset(1)
+    gs().addGrid(eval(`(${tpl})`), 200, 200)
+    const group = Object.values(gs().objects).find(o => o.type === 'group' && o.isGrid)
+    gs().setSelected(group.childIds[0]) // an EMPTY cell, selected
+  }, twoCol)
+  await wait(600)
+
+  const cellSelectionArmed = await page.evaluate(() => {
+    const ts = window.__getStage__().find('Transformer')
+    return ts.some(t => t.nodes().length > 0)
+  })
+  ok(cellSelectionArmed, 'a selected empty cell actually arms a Transformer (guards a vacuous pass)')
+
+  const leaks = await page.evaluate(async ({ FW, FH }) => {
+    const stage = window.__getStage__()
+    window.__zsBlobs = await window.__exportFrames__(stage, 1, FW, FH)
+    return window.__zs.analyzeBlobs([], [
+      { name: 'anchor', rgb: [249, 70, 8] },
+      { name: 'transformer', rgb: [0, 161, 255] },
+    ], FW)
+  }, { FW, FH })
+
+  absent(leaks.hunts.anchor, 'export: selected empty cell leaks no #f94608 selection border')
+  absent(leaks.hunts.transformer, 'export: selected empty cell leaks no Transformer handles')
+  await ss('export-empty-cell-selected')
+}
 
 // ─── Results ──────────────────────────────────────────────────────────────────
 console.log('\n' + '─'.repeat(50))

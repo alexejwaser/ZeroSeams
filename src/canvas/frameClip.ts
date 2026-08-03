@@ -154,3 +154,33 @@ export function clipShapeToPathData(clipShape: ClipShape, w: number, h: number):
   }
   return anchorsToPathData(denormalizeAnchors(clipShape.anchors, w, h), true)
 }
+
+// ---------------------------------------------------------------------------
+// isPointInClipShape — frame-local hit test that follows the visible silhouette.
+// ---------------------------------------------------------------------------
+
+/** 1×1 scratch context — only ever used for isPointInPath, never drawn. */
+let hitCtx: CanvasRenderingContext2D | null = null
+
+/**
+ * Is a frame-local point inside the clip? Konva's own hitFunc covers canvas
+ * hit-testing; this is for the places that hit-test in logical coordinates
+ * without a node, i.e. entering a grid cell by double-click.
+ *
+ * Absent and plain-rect clips short-circuit to true — the caller has already
+ * done the bbox test those are equivalent to.
+ */
+export function isPointInClipShape(
+  clipShape: ClipShape | undefined,
+  frameW: number,
+  frameH: number,
+  localX: number,
+  localY: number,
+): boolean {
+  if (isPlainRectClip(clipShape) || !clipShape) return true
+  const d = clipShapeToPathData(clipShape, frameW, frameH)
+  if (!d) return false
+  if (!hitCtx) hitCtx = document.createElement('canvas').getContext('2d')
+  if (!hitCtx) return true // No 2D context (non-browser): fall back to the bbox.
+  return hitCtx.isPointInPath(new Path2D(d), localX, localY)
+}

@@ -30,20 +30,6 @@ function eq(a, b, msg) {
   ok(pass, pass ? msg : `${msg} — got ${JSON.stringify(a)}, want ${JSON.stringify(b)}`)
 }
 
-// Assertions written against behaviour that issue #62 will introduce. They are the
-// executable spec for that work — red today, on purpose, and deliberately kept out
-// of the pass/fail tally so this script stays green. Flip each to ok()/eq() as the
-// corresponding #62 phase lands.
-let xpassed = 0, xfailed = 0
-const unexpectedPasses = []
-function xok(cond, msg) {
-  if (cond) { console.log(`  ⚑ ${msg} — NOW PASSES, promote to ok()`); xpassed++; unexpectedPasses.push(msg) }
-  else      { console.log(`  ○ ${msg} (expected fail — #62)`); xfailed++ }
-}
-function xeq(a, b, msg) {
-  xok(a === b, a === b ? msg : `${msg} — got ${JSON.stringify(a)}, want ${JSON.stringify(b)}`)
-}
-
 // ─── Launch via CDP (electron.launch + Playwright 1.60/Electron 42 has target-detection bug) ──
 console.log('Launching app…')
 const electronProc = spawn(ELECTRON_BIN, [
@@ -1211,19 +1197,339 @@ await page.evaluate((src) => { window.__zsImg__ = src }, TEST_IMG_SRC)
   await wait(120)
 }
 
+{
+  // L7 (#62 Phase C3). A template may declare one clip for all its cells.
+  // addGrid is the only place that applies it — and the clip then has to survive
+  // the fill/empty round trip, which is frameToEmptyImage's job and was untested.
+  const { groupId, cellIds } = await page.evaluate(() => {
+    const gs = () => window.__canvasStore__.getState()
+    gs().addGrid({
+      id: 'circles-3', label: '3 Circles', cols: 3, rows: 1,
+      cells: (w, h, gap) => {
+        const cw = (w - gap * 2) / 3
+        return [0, 1, 2].map(i => ({ x: i * (cw + gap), y: 0, w: cw, h }))
+      },
+      cellClipShape: { kind: 'ellipse' },
+    }, 200, 200)
+    const group = Object.values(gs().objects).find(o => o.type === 'group' && o.isGrid)
+    return { groupId: group.id, cellIds: [...group.childIds] }
+  })
+  await wait(120)
+
+  const kinds = await page.evaluate((ids) => {
+    const s = window.__canvasStore__.getState()
+    return ids.map(id => s.objects[id]?.clipShape?.kind)
+  }, cellIds)
+  ok(kinds.length === 3 && kinds.every(k => k === 'ellipse'), 'L7: every cell takes the template clip')
+
+  await fillCell(cellIds[0])
+  await wait(120)
+  const filled = await cellInfo(cellIds[0], groupId)
+  ok(!filled.isEmpty, 'L7: cell holds media')
+  eq(filled.clipShape?.kind, 'ellipse', 'L7: filling a cell keeps its clip')
+
+  await page.evaluate((id) => window.__canvasStore__.getState().removeMediaFromFrame(id), cellIds[0])
+  await wait(120)
+  const emptied = await cellInfo(cellIds[0], groupId)
+  ok(emptied.isEmpty, 'L7: emptied cell keeps its slot')
+  eq(emptied.clipShape?.kind, 'ellipse', 'L7: …and is still elliptical after the round trip')
+
+  await page.evaluate(({ groupId, cellIds }) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    for (const c of cellIds) gs().removeObject(c)
+    gs().removeObject(groupId)
+  }, { groupId, cellIds })
+  await wait(120)
+}
+
+{
+  // L9 (#62 Phase C3). Relayout must never touch the clip. This asserts an
+  // ABSENCE — computeGridChildPatches emits geometry only — which is exactly the
+  // kind of thing that rots silently, and the reason path anchors are stored
+  // normalized 0–1 rather than in display px.
+  const { groupId, cellIds } = await makeGrid()
+  const cellId = cellIds[0]
+  const anchors = [
+    { x: 0.5, y: 0, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
+    { x: 1, y: 0.5, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
+    { x: 0.5, y: 1, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
+    { x: 0, y: 0.5, handleIn: { dx: 0, dy: 0 }, handleOut: { dx: 0, dy: 0 } },
+  ]
+  await page.evaluate(({ id, anchors }) => window.__canvasStore__.getState()
+    .commitUpdate(id, { clipShape: { kind: 'path', anchors } }), { id: cellId, anchors })
+  await wait(80)
+
+  const result = await page.evaluate(({ groupId }) => {
+    const s = window.__canvasStore__.getState()
+    const group = s.objects[groupId]
+    const patches = window.__computeGridChildPatches__(
+      group, s.objects,
+      { x: group.x, y: group.y, width: group.width * 1.7, height: group.height * 0.6 },
+      true,
+    )
+    s.commitMultipleUpdates(patches)
+    return {
+      patchKeys: [...new Set(Object.values(patches).flatMap(p => Object.keys(p)))],
+      anchors: window.__canvasStore__.getState().objects[group.childIds[0]]?.clipShape?.anchors,
+    }
+  }, { groupId })
+
+  ok(!result.patchKeys.includes('clipShape'), 'L9: relayout emits no clipShape (geometry only)')
+  eq(result.anchors?.length, 4, 'L9: the path clip survives relayout')
+  ok(
+    result.anchors?.every(a => a.x >= 0 && a.x <= 1 && a.y >= 0 && a.y <= 1),
+    'L9: anchors stay normalized 0–1 through a non-uniform resize',
+  )
+
+  await page.evaluate(({ groupId, cellIds }) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    for (const c of cellIds) gs().removeObject(c)
+    gs().removeObject(groupId)
+  }, { groupId, cellIds })
+  await wait(120)
+}
+
+{
+  // L8 (#62 Phase C). The Frame section's shape picker is a plain commitUpdate per
+  // switch. That is the whole argument for replacing a custom path without a
+  // confirmation dialog — so the undo step it relies on has to actually exist.
+  // The picker only authors rect/ellipse, but path clips still arrive via shape
+  // conversion, so the round trip below stays the behaviour that matters.
+  const { groupId, cellIds } = await makeGrid()
+  const cellId = cellIds[0]
+  const before = await cellInfo(cellId, groupId)
+
+  const setClip = (id, clipShape) => page.evaluate(
+    ({ id, clipShape }) => window.__canvasStore__.getState().commitUpdate(id, { clipShape }),
+    { id, clipShape },
+  )
+
+  await setClip(cellId, { kind: 'ellipse' })
+  await wait(80)
+  const ellipsed = await cellInfo(cellId, groupId)
+  eq(ellipsed.clipShape?.kind, 'ellipse', 'L8: cell takes an ellipse clip')
+  eq(ellipsed.pastLen, before.pastLen + 1, 'L8: a shape switch is exactly one history entry')
+
+  await undo()
+  await wait(80)
+  eq((await cellInfo(cellId, groupId)).clipShape?.kind, undefined, 'L8: undo restores the previous clip kind')
+  await redo()
+  await wait(80)
+
+  // rect → path → rect, then one undo must bring the anchors back. Seeded anchors
+  // are normalized 0–1 (frameClip.clipShapeToAnchors); anything else would not
+  // survive a frame resize.
+  const seeded = await page.evaluate(() => {
+    // Same seed the picker uses for an ellipse → path switch.
+    const k = 0.5523 * 0.5
+    return [
+      { x: 0.5, y: 0, handleIn: { dx: -k, dy: 0 }, handleOut: { dx: k, dy: 0 } },
+      { x: 1, y: 0.5, handleIn: { dx: 0, dy: -k }, handleOut: { dx: 0, dy: k } },
+      { x: 0.5, y: 1, handleIn: { dx: k, dy: 0 }, handleOut: { dx: -k, dy: 0 } },
+      { x: 0, y: 0.5, handleIn: { dx: 0, dy: k }, handleOut: { dx: 0, dy: -k } },
+    ]
+  })
+  const afterEllipse = await cellInfo(cellId, groupId)
+  await setClip(cellId, { kind: 'path', anchors: seeded })
+  await wait(80)
+  await setClip(cellId, { kind: 'rect' })
+  await wait(80)
+  const backToRect = await cellInfo(cellId, groupId)
+  eq(backToRect.clipShape?.kind, 'rect', 'L8: path collapses back to rect')
+  eq(backToRect.pastLen, afterEllipse.pastLen + 2, 'L8: path→rect round trip is two entries')
+
+  await undo()
+  await wait(80)
+  const undone = await cellInfo(cellId, groupId)
+  eq(undone.clipShape?.kind, 'path', 'L8: one undo brings the discarded path back')
+  eq(undone.clipShape?.anchors?.length, 4, 'L8: …with its anchors intact')
+  ok(
+    undone.clipShape?.anchors?.every(a => a.x >= 0 && a.x <= 1 && a.y >= 0 && a.y <= 1),
+    'L8: seeded anchors are normalized 0–1, not display px',
+  )
+
+  await page.evaluate(({ groupId, cellIds }) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    for (const c of cellIds) gs().removeObject(c)
+    gs().removeObject(groupId)
+  }, { groupId, cellIds })
+  await wait(120)
+}
+
+{
+  // L10 (#62 Phase C2). A plain dropped image is not a frame — isFrameObject
+  // requires a clipShape or isEmpty — so FrameSection is hidden and there was no
+  // way to give it a clip at all. AddClipRow makes it qualify by *acquiring* one,
+  // rather than by widening the predicate. Remove Clip is the inverse and must
+  // clear the whole frame state together.
+  const id = await addImage(TEST_IMG_SRC)
+  await wait(120)
+
+  const objInfo = (id) => page.evaluate((id) => {
+    const s = window.__canvasStore__.getState()
+    const o = s.objects[id]
+    return {
+      clipKind: o?.clipShape?.kind, isEmpty: o?.isEmpty,
+      fill: o?.fill, frameStroke: o?.frameStroke, frameStrokeWidth: o?.frameStrokeWidth,
+      pastLen: s.past.length,
+    }
+  }, id)
+
+  const plain = await objInfo(id)
+  // The two halves of isFrameObject, asserted directly — the script can't import it.
+  ok(plain.clipKind === undefined && plain.isEmpty !== true, 'L10: a plain image is not a frame')
+
+  await page.evaluate((id) => window.__canvasStore__.getState()
+    .commitUpdate(id, { clipShape: { kind: 'ellipse' } }), id)
+  await wait(80)
+  const clipped = await objInfo(id)
+  eq(clipped.clipKind, 'ellipse', 'L10: acquiring a clip makes it a frame')
+  eq(clipped.pastLen, plain.pastLen + 1, 'L10: adding a clip is one history entry')
+
+  // Give it fill + stroke so Remove Clip has something to strand if it clears
+  // only the clip.
+  await page.evaluate((id) => window.__canvasStore__.getState().commitUpdate(id, {
+    fill: { type: 'solid', color: '#123456' }, frameStroke: '#ff0000', frameStrokeWidth: 3,
+  }), id)
+  await wait(80)
+  const decorated = await objInfo(id)
+
+  await page.evaluate((id) => window.__canvasStore__.getState().commitUpdate(id, {
+    clipShape: undefined, fill: undefined, frameStroke: undefined, frameStrokeWidth: undefined,
+  }), id)
+  await wait(80)
+  const stripped = await objInfo(id)
+  ok(stripped.clipKind === undefined, 'L10: Remove Clip drops the clip')
+  ok(
+    stripped.fill === undefined && stripped.frameStroke === undefined && stripped.frameStrokeWidth === undefined,
+    'L10: …and the fill/stroke with it, so nothing is stranded behind a hidden panel',
+  )
+  eq(stripped.pastLen, decorated.pastLen + 1, 'L10: Remove Clip is one history entry')
+
+  await undo()
+  await wait(80)
+  const restored = await objInfo(id)
+  eq(restored.clipKind, 'ellipse', 'L10: one undo restores the clip')
+  eq(restored.frameStroke, '#ff0000', 'L10: …and the stroke, in the same step')
+
+  await page.evaluate((id) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    gs().removeObject(id)
+  }, id)
+  await wait(120)
+}
+
+{
+  // L11 (#62 Phase C4). The store-level statement of "a grid cell gets no resize
+  // handles": whatever a cell's geometry is, the next relayout overwrites it from
+  // the template. That is why offering per-cell resize would be a control that lies.
+  const { groupId, cellIds } = await makeGrid()
+  const cellId = cellIds[0]
+
+  await page.evaluate((id) => window.__canvasStore__.getState().commitUpdate(id, {
+    frameWidth: 17, frameHeight: 17, width: 17, height: 17,
+  }), cellId)
+  await wait(80)
+  const tampered = await page.evaluate((id) =>
+    window.__canvasStore__.getState().objects[id].frameWidth, cellId)
+  eq(tampered, 17, 'L11: a cell can be written directly (nothing blocks the field)')
+
+  const widths = await page.evaluate(({ groupId }) => {
+    const s = window.__canvasStore__.getState()
+    const group = s.objects[groupId]
+    const box = { x: group.x, y: group.y, width: group.width, height: group.height }
+    const patches = window.__computeGridChildPatches__(group, s.objects, box, true)
+    s.commitMultipleUpdates(patches)
+    const after = window.__canvasStore__.getState().objects
+    // Same box in, so the template width is whatever the untouched sibling has.
+    return { resized: after[group.childIds[0]].frameWidth, sibling: after[group.childIds[1]].frameWidth }
+  }, { groupId })
+
+  eq(widths.resized, widths.sibling, 'L11: relayout restores the template width, discarding the per-cell one')
+
+  await page.evaluate(({ groupId, cellIds }) => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+    for (const c of cellIds) gs().removeObject(c)
+    gs().removeObject(groupId)
+  }, { groupId, cellIds })
+  await wait(120)
+}
+
+{
+  // L12. Deleting a grid deletes its cells. Leaving them behind stranded objects
+  // whose parentGroupId pointed at a group that no longer existed — and because a
+  // cell only listens while its grid is entered, those orphans were visible debris
+  // the user could no longer select or delete. Keeping a cell is what
+  // disconnectGridCell is for.
+  const { groupId, cellIds } = await makeGrid()
+  await fillCell(cellIds[0])
+  await wait(120)
+  const beforeLen = (await cellInfo(cellIds[0], groupId)).pastLen
+
+  await page.evaluate((id) => window.__canvasStore__.getState().removeObject(id), groupId)
+  await wait(120)
+
+  const after = await page.evaluate(({ groupId, cellIds }) => {
+    const s = window.__canvasStore__.getState()
+    return {
+      groupGone: !s.objects[groupId],
+      cellsGone: cellIds.every(id => !s.objects[id]),
+      orderClean: cellIds.every(id => !s.objectOrder.includes(id)) && !s.objectOrder.includes(groupId),
+      vaultKept: cellIds.some(id => s._srcVault.has(id)),
+      pastLen: s.past.length,
+    }
+  }, { groupId, cellIds })
+
+  ok(after.groupGone, 'L12: the grid group is deleted')
+  ok(after.cellsGone, 'L12: its cells go with it — no orphans left behind')
+  ok(after.orderClean, 'L12: objectOrder has no dangling ids')
+  // Opposite of the L2 policy on purpose: a cell swept up by a group delete was
+  // never individually targeted, so its src is kept for undo to reinject.
+  ok(after.vaultKept, 'L12: swept-up cells KEEP their _srcVault entries (undo needs them)')
+  eq(after.pastLen, beforeLen + 1, 'L12: deleting a grid is ONE history entry')
+
+  await undo()
+  await wait(120)
+  const restored = await page.evaluate(({ groupId, cellIds }) => {
+    const s = window.__canvasStore__.getState()
+    return {
+      groupBack: !!s.objects[groupId],
+      cellsBack: cellIds.every(id => !!s.objects[id]),
+      mediaBack: s.objects[cellIds[0]]?.src === window.__zsImg__,
+    }
+  }, { groupId, cellIds })
+  ok(restored.groupBack, 'L12: one undo brings the group back')
+  ok(restored.cellsBack, 'L12: …and every cell with it')
+  ok(restored.mediaBack, 'L12: …with the media reinjected from the vault')
+
+  // removeMultipleObjects must follow the same rule, or box-selecting a grid and
+  // pressing delete leaves the same debris.
+  await page.evaluate((id) => window.__canvasStore__.getState().removeMultipleObjects([id]), groupId)
+  await wait(120)
+  const multi = await page.evaluate(({ groupId, cellIds }) => {
+    const s = window.__canvasStore__.getState()
+    return { groupGone: !s.objects[groupId], cellsGone: cellIds.every(id => !s.objects[id]) }
+  }, { groupId, cellIds })
+  ok(multi.groupGone && multi.cellsGone, 'L12: removeMultipleObjects deletes a grid whole too')
+
+  await page.evaluate(() => {
+    const gs = () => window.__canvasStore__.getState()
+    while (gs().past.length > 0) gs().undo()
+  })
+  await wait(120)
+}
+
 // ─── Results ──────────────────────────────────────────────────────────────────
 console.log('\n' + '─'.repeat(50))
 console.log(`Results: ${passed} passed, ${failed} failed`)
 if (failures.length > 0) {
   console.log('\nFailed:')
   failures.forEach(f => console.log(`  ✗ ${f}`))
-}
-if (xfailed > 0 || xpassed > 0) {
-  console.log(`\n#62 spec assertions: ${xfailed} still red (expected), ${xpassed} now green`)
-  if (unexpectedPasses.length > 0) {
-    console.log('These now pass — promote them to real assertions:')
-    unexpectedPasses.forEach(m => console.log(`  ⚑ ${m}`))
-  }
 }
 
 await ss('final')

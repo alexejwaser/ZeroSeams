@@ -277,8 +277,18 @@ ipcMain.handle('set-external-editor', async () => {
       : process.platform === 'win32'
         ? [{ name: 'Executables', extensions: ['exe'] }]
         : []
+  // This dialog is the FIRST thing "Edit Externally" shows when no editor is
+  // configured yet, so it has to explain itself — otherwise it reads as a stray
+  // "open a file" window and the feature looks broken. defaultPath matters most:
+  // landing in the apps folder makes the ask obvious without reading anything.
   const { canceled, filePaths } = await dialog.showOpenDialog(win, {
     title: 'Choose External Editor',
+    message: 'Pick the app to open images in — for example Photoshop, Affinity Photo or Pixelmator.',
+    buttonLabel: 'Use This Editor',
+    defaultPath:
+      process.platform === 'darwin' ? '/Applications'
+      : process.platform === 'win32' ? process.env.ProgramFiles ?? undefined
+      : undefined,
     properties: ['openFile'],
     filters,
   })

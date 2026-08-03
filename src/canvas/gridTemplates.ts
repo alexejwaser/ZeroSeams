@@ -2,7 +2,7 @@
 // Every cells() function computes rects proportionally from (groupW, groupH, gap).
 // Zero hardcoded pixel values. The union of all cells (with gaps) exactly fills [0,0,groupW,groupH].
 
-import type { CanvasObject, GroupObject, ImageObject, VideoObject } from '@/types/canvas'
+import type { CanvasObject, ClipShape, GroupObject, ImageObject, VideoObject } from '@/types/canvas'
 import { fitCover } from './geometry'
 
 export interface CellRect { x: number; y: number; w: number; h: number }
@@ -13,6 +13,11 @@ export interface GridTemplate {
   cols: number  // for SVG thumbnail aspect hints
   rows: number
   cells: (groupW: number, groupH: number, gap: number) => CellRect[]
+  /** Clip applied to every cell at creation time only (addGrid → makeEmptyCell).
+   *  Per-cell overrides come from the Frame section's shape picker afterwards.
+   *  Deliberately one shape for the whole template: cells() keeps returning bare
+   *  rects, which is what keeps computeGridChildPatches free of clip logic. */
+  cellClipShape?: ClipShape
 }
 
 // ---------------------------------------------------------------------------
@@ -331,6 +336,17 @@ export const GRID_TEMPLATES: GridTemplate[] = [
     cols: 5,
     rows: 3,
     cells: uniformGrid(5, 3),
+  },
+
+  // 25. circles-3 — 3 columns, ellipse-clipped cells. The only template that
+  // ships a cellClipShape; without it nobody would guess cell clips exist.
+  {
+    id: 'circles-3',
+    label: '3 Circles',
+    cols: 3,
+    rows: 1,
+    cells: uniformGrid(3, 1),
+    cellClipShape: { kind: 'ellipse' },
   },
 ]
 

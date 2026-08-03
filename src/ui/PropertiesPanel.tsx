@@ -22,6 +22,7 @@ import { EffectsSection } from './properties/EffectsSection'
 import { AdjustmentsSection } from './properties/AdjustmentsSection'
 import { VideoSection } from './properties/VideoSection'
 import { FrameSection } from './properties/FrameSection'
+import { AddClipRow } from './properties/AddClipRow'
 import { pickImageMedia, pickVideoMedia } from './properties/mediaPickers'
 
 // Converts a rect/ellipse shape or closed path into a media frame and inserts the
@@ -249,7 +250,7 @@ export function PropertiesPanel(): React.ReactElement {
         {/* Video object */}
         {!isMultiSelect && selectedObj !== null && isVideo && selectedId !== null && (
           <>
-            {isFrameObject(selectedObj) && (
+            {isFrameObject(selectedObj) ? (
               <FrameSection
                 frameObj={selectedObj as VideoObject}
                 selectedId={selectedId}
@@ -257,6 +258,8 @@ export function PropertiesPanel(): React.ReactElement {
                 onUpdate={updateObject}
                 onCommit={commitUpdate}
               />
+            ) : (
+              <AddClipRow objectId={selectedId} />
             )}
             <VideoSection
               videoObj={selectedObj as VideoObject}
@@ -652,7 +655,7 @@ export function PropertiesPanel(): React.ReactElement {
                     onCommit={v => commitUpdate(imgObj.id, { opacity: v / 100 })}
                   />
                 </div>
-                {isFrameObject(imgObj) && (
+                {isFrameObject(imgObj) ? (
                   <FrameSection
                     frameObj={imgObj}
                     selectedId={selectedId!}
@@ -660,6 +663,10 @@ export function PropertiesPanel(): React.ReactElement {
                     onUpdate={updateObject}
                     onCommit={commitUpdate}
                   />
+                ) : (
+                  // isFrameObject is a type predicate, so it narrows imgObj to
+                  // never here — take the id from selection instead.
+                  <AddClipRow objectId={selectedId!} />
                 )}
                 {imgObj.parentGroupId && (
                   <div style={{ marginTop: 8, marginBottom: 4 }}>

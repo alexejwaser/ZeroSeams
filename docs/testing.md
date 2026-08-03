@@ -97,10 +97,13 @@ the structural ones, if the decode ever proves environment-dependent.
 is instead that `exportFrames` rasterises the video's pixels correctly (it's
 format-agnostic) plus a unit test of the `videoObjectsInFrame` routing helper.
 
-## Expected failures
+## Asserting click routing
 
-`test-undo-redo.mjs` section L uses `xok`/`xeq` for assertions written against
-behaviour that issue #62 will introduce. They print as `○ … (expected fail — #62)`
-and are kept out of the pass/fail tally so the script stays green. If one starts
-passing it prints `⚑ NOW PASSES, promote to ok()` — flip it to a real assertion as
-each #62 phase lands.
+Konva nodes carry stable names so hit-testing can be asserted without synthesising
+pointer events: `grid-hit` on a grid group's hit rect, `frame-rect-<id>` on an
+image/video frame's rect. `__zs.intersectionNames(points)` normalises the stage to
+1:1 (like `sampleStage`) and returns `stage.getIntersection()?.name()` per point.
+
+This is what covers the rule that exactly one of {a grid's hit rect, its cells}
+listens at a time — a pixel test can't see it, because listening changes nothing
+about what paints.
