@@ -5,43 +5,43 @@
     "semantic_hash": ""
   },
   "src/ui/FrameSettingsPopover.tsx": {
-    "mtime": 1785152680.7544198,
-    "ast_hash": "24a87ace8c92241d59565f422cab9520",
+    "mtime": 1785764574.401519,
+    "ast_hash": "181ae8997a5d5c5967e0c893d5f9eca9",
     "semantic_hash": ""
   },
   "src/ui/PropertiesPanel.tsx": {
-    "mtime": 1785761384.2188587,
-    "ast_hash": "a9f3328597ac4ae2cd109fde01fadf06",
+    "mtime": 1785764574.401098,
+    "ast_hash": "ac8fdff0b78ef0be807f384ec74eb656",
     "semantic_hash": ""
   },
   "src/ui/FontPicker.tsx": {
-    "mtime": 1785152680.7542665,
-    "ast_hash": "7f7fa7a6ced72e36dad423d06c7e9691",
-    "semantic_hash": "7f7fa7a6ced72e36dad423d06c7e9691"
+    "mtime": 1785764574.4005897,
+    "ast_hash": "4bfbaa416d098faee5afe5cdf2b01178",
+    "semantic_hash": ""
   },
   "src/ui/Toolbar.tsx": {
-    "mtime": 1785746431.9514816,
-    "ast_hash": "21a28d75339896be998f43d397ba9bb5",
+    "mtime": 1785764574.4090307,
+    "ast_hash": "ca5259eb1da3dc320dbb7f4efb9e4ac4",
     "semantic_hash": ""
   },
   "src/ui/iconBtnStyle.ts": {
-    "mtime": 1785152680.7565637,
-    "ast_hash": "c5f049f4ac9b5fd3d7a481610bf7f3ae",
-    "semantic_hash": "c5f049f4ac9b5fd3d7a481610bf7f3ae"
+    "mtime": 1785762314.975329,
+    "ast_hash": "a0294136d950bb483b0dd3bb07a121ee",
+    "semantic_hash": ""
   },
   "src/ui/LayerPanel.tsx": {
-    "mtime": 1785746431.9506428,
-    "ast_hash": "20b339a3754fdcca2faa6335e19eba5c",
+    "mtime": 1785764574.4030974,
+    "ast_hash": "0896b9ee40f5c68187bfa2c3fec3389e",
     "semantic_hash": ""
   },
   "src/ui/Tooltip.tsx": {
-    "mtime": 1785152680.756415,
-    "ast_hash": "b80916ed6e33235db22d5c6960261137",
+    "mtime": 1785764336.1117573,
+    "ast_hash": "f399f0e371743908741f549c213d8903",
     "semantic_hash": ""
   },
   "src/ui/ContextMenu.tsx": {
-    "mtime": 1785746431.9503887,
-    "ast_hash": "c3b9785cf18e940eee64abeba115b3fc",
+    "mtime": 1785764574.4123929,
+    "ast_hash": "9b9782c17f37d6ef3d256f70207b75f7",
     "semantic_hash": ""
   },
   "src/ui/index.ts": {
@@ -75,8 +75,8 @@
     "semantic_hash": ""
   },
   "src/canvas/CanvasShapeNode.tsx": {
-    "mtime": 1785746431.9403849,
-    "ast_hash": "eb831baa75d3ef42b41abef974bf23fc",
+    "mtime": 1785764904.9560826,
+    "ast_hash": "7b754334ebd1b379e21848ba85bc3a09",
     "semantic_hash": ""
   },
   "src/canvas/useAutosave.ts": {
@@ -100,14 +100,14 @@
     "semantic_hash": ""
   },
   "src/canvas/CarouselStage.tsx": {
-    "mtime": 1785746431.9413602,
-    "ast_hash": "173f264cb64d52254c63c8c66fbd3708",
+    "mtime": 1785764031.121063,
+    "ast_hash": "4f38bbf03f9a186bfe6f706a476c7abc",
     "semantic_hash": ""
   },
   "src/canvas/SnapGuides.tsx": {
-    "mtime": 1785152680.7424827,
-    "ast_hash": "508c2b119875afc336a903e073fff5a1",
-    "semantic_hash": "508c2b119875afc336a903e073fff5a1"
+    "mtime": 1785764031.1323004,
+    "ast_hash": "2a760d97aba19a86e33e370338cd9139",
+    "semantic_hash": ""
   },
   "src/canvas/useViewportStore.ts": {
     "mtime": 1785152680.7468424,
@@ -130,13 +130,13 @@
     "semantic_hash": ""
   },
   "src/canvas/CanvasImageNode.tsx": {
-    "mtime": 1785761384.2119985,
-    "ast_hash": "33c3639666a66eeae4b9cec91bc7056d",
+    "mtime": 1785764904.9622667,
+    "ast_hash": "9adb405a1c3b9b5b26bc491f033c0857",
     "semantic_hash": ""
   },
   "src/canvas/constants.ts": {
-    "mtime": 1785152680.7426987,
-    "ast_hash": "9eacdd95801740918ae6dcb790c6ee96",
+    "mtime": 1785764140.9330473,
+    "ast_hash": "9393af370582ebaf16c3634cb7d2eb54",
     "semantic_hash": ""
   },
   "src/canvas/useCanvasStore.ts": {
@@ -145,8 +145,8 @@
     "semantic_hash": ""
   },
   "src/canvas/CanvasTextNode.tsx": {
-    "mtime": 1785746431.9406507,
-    "ast_hash": "9f2a027cb2297254438365e720c8f4e9",
+    "mtime": 1785764904.9565196,
+    "ast_hash": "268199935e8368ebb792662a85acf485",
     "semantic_hash": ""
   },
   "src/canvas/useThumbnailStore.ts": {
@@ -175,8 +175,8 @@
     "semantic_hash": "dbaff516f32504d03705e148055f9ff1"
   },
   "src/canvas/CanvasPathNode.tsx": {
-    "mtime": 1785746431.94007,
-    "ast_hash": "e9ba2ec6789e7860bccaeef6e3ee755e",
+    "mtime": 1785764904.9569468,
+    "ast_hash": "ecae4ab1d5e5568671490cc07646e5e9",
     "semantic_hash": ""
   },
   "src/canvas/adjustments/pipeline.ts": {
@@ -255,8 +255,8 @@
     "semantic_hash": "851ebe92dbec18f985ad2d65dc778048"
   },
   "src/canvas/CanvasVideoNode.tsx": {
-    "mtime": 1785761384.2126184,
-    "ast_hash": "b5090a3f445e7824adcfefcc0616071e",
+    "mtime": 1785764904.962751,
+    "ast_hash": "cc7fd71bb00badfdb525a654b0e526ef",
     "semantic_hash": ""
   },
   "src/canvas/videoExport.ts": {
@@ -310,18 +310,18 @@
     "semantic_hash": "91e34b2dfef5559816149cae0d308b38"
   },
   "src/ui/GridPicker.tsx": {
-    "mtime": 1785761384.2184956,
-    "ast_hash": "f80a909ab612fce77b97238aae143d1e",
+    "mtime": 1785764574.4024432,
+    "ast_hash": "0e4a37ebdb06f05af6efea2f1643a6a7",
     "semantic_hash": ""
   },
   "src/ui/ColorInput.tsx": {
-    "mtime": 1785152680.754044,
-    "ast_hash": "c92e0c53a954ce4b5d0a6f619b5dcbf7",
+    "mtime": 1785764529.5404084,
+    "ast_hash": "e8554d12a16b7176c175a71516723885",
     "semantic_hash": ""
   },
   "src/canvas/CanvasGroupNode.tsx": {
-    "mtime": 1785761384.211561,
-    "ast_hash": "3b51fbe8159b760c678271fdea384d9a",
+    "mtime": 1785764031.1268573,
+    "ast_hash": "a9f69d95466df9705300366149acdf1e",
     "semantic_hash": ""
   },
   "src/canvas/gridTemplates.ts": {
@@ -330,9 +330,9 @@
     "semantic_hash": ""
   },
   "src/canvas/CanvasGuidelineNode.tsx": {
-    "mtime": 1785152680.7415867,
-    "ast_hash": "f8e1b98729dc7a276c051b88dd29faff",
-    "semantic_hash": "f8e1b98729dc7a276c051b88dd29faff"
+    "mtime": 1785764153.082801,
+    "ast_hash": "e472cc8693cfbfbc6f30db4ccff09959",
+    "semantic_hash": ""
   },
   "src/canvas/geometry.ts": {
     "mtime": 1785746431.942921,
@@ -340,8 +340,8 @@
     "semantic_hash": ""
   },
   "src/ui/NumericInput.tsx": {
-    "mtime": 1785152680.7559767,
-    "ast_hash": "b3b75fba04466248050fc3a7427d0f35",
+    "mtime": 1785764411.757941,
+    "ast_hash": "5dcb9cef0787c0cc22643f047debd6bd",
     "semantic_hash": ""
   },
   "src/canvas/makeCanvasNode.tsx": {
@@ -350,13 +350,13 @@
     "semantic_hash": ""
   },
   "src/ui/ShortcutOverlay.tsx": {
-    "mtime": 1785152680.7561939,
-    "ast_hash": "5a03caf4eb138e0df0b7ef097323cb0f",
+    "mtime": 1785764574.4026923,
+    "ast_hash": "4d7b9e66768289e29911aee2397a48b4",
     "semantic_hash": ""
   },
   "src/ui/FrameLabelStrip.tsx": {
-    "mtime": 1785152680.7543528,
-    "ast_hash": "7bb7631ccba107fd09f04dbc571b5758",
+    "mtime": 1785764491.4499571,
+    "ast_hash": "e510bbefb9757edd0547c54f95155bf4",
     "semantic_hash": ""
   },
   "src/ui/shortcuts.ts": {
@@ -370,43 +370,43 @@
     "semantic_hash": ""
   },
   "src/ui/properties/VideoSection.tsx": {
-    "mtime": 1785152680.7576563,
-    "ast_hash": "a64a45d51785c1fd6f7a07e901328c58",
+    "mtime": 1785764249.8862236,
+    "ast_hash": "c4913baa3ad28532cb5188b7c7e6c96d",
     "semantic_hash": ""
   },
   "src/ui/properties/EffectsSection.tsx": {
-    "mtime": 1785152680.757378,
-    "ast_hash": "5b3db6b5115688ad337d359c712ccafd",
+    "mtime": 1785764574.4038143,
+    "ast_hash": "611e959c275438da8ff92838ae04a76a",
     "semantic_hash": ""
   },
   "src/ui/properties/AdjustmentsSection.tsx": {
-    "mtime": 1785152680.7572277,
-    "ast_hash": "b4fe4d45ff5b6586c2f3a8de90a097b5",
+    "mtime": 1785764574.4046724,
+    "ast_hash": "2c08b7683163cd8fe2e0c8e7f1b78171",
     "semantic_hash": ""
   },
   "src/ui/properties/shared.tsx": {
-    "mtime": 1785152680.7577648,
-    "ast_hash": "e9cb11c8826fb9be841f87098f3b6296",
+    "mtime": 1785764574.4126172,
+    "ast_hash": "a15d2aef39fe8a74dce5958e66ed6e3a",
     "semantic_hash": ""
   },
   "src/ui/properties/mediaPickers.tsx": {
-    "mtime": 1785746431.9520607,
+    "mtime": 1785764104.3473823,
     "ast_hash": "b291bdb75208d2dff0d83a2b8ed2983a",
     "semantic_hash": ""
   },
   "src/ui/properties/AlignDistributeSection.tsx": {
-    "mtime": 1785152680.7572885,
-    "ast_hash": "947c7c35f9729249ef35adec6f46333a",
+    "mtime": 1785764574.4043765,
+    "ast_hash": "87479c097a2a96f77d7584ba8ded1b0d",
     "semantic_hash": ""
   },
   "src/ui/properties/TextSection.tsx": {
-    "mtime": 1785152680.757557,
-    "ast_hash": "17d7f8a5d750432eb93041df8dc72b50",
+    "mtime": 1785764104.3484015,
+    "ast_hash": "49b4829a114a70bc5f556595420426a1",
     "semantic_hash": ""
   },
   "src/ui/properties/FrameSection.tsx": {
-    "mtime": 1785761384.21957,
-    "ast_hash": "0b80139b860e714ad8b124f20cfcea23",
+    "mtime": 1785764574.4049504,
+    "ast_hash": "7e608f1656342478ca290b7b6c7375f7",
     "semantic_hash": ""
   },
   "src/utils/color.ts": {
@@ -420,8 +420,8 @@
     "semantic_hash": ""
   },
   "src/canvas/ClipEditOverlay.tsx": {
-    "mtime": 1785152680.742275,
-    "ast_hash": "141506c690f88530103c8ec9357a2365",
+    "mtime": 1785764037.0779388,
+    "ast_hash": "89fe9aff9600d16afc5fa2c20ed81808",
     "semantic_hash": ""
   },
   "src/canvas/frameClip.ts": {
@@ -450,8 +450,8 @@
     "semantic_hash": ""
   },
   "src/ui/properties/AddClipRow.tsx": {
-    "mtime": 1785761384.219156,
-    "ast_hash": "5a81b2bb38e58214aeba88289e94d72e",
+    "mtime": 1785764104.3440409,
+    "ast_hash": "751f670f584b79bff238b84545f81140",
     "semantic_hash": ""
   }
 }
