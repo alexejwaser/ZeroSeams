@@ -1,5 +1,17 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" 2>/dev/null && graphify update . >/dev/null 2>&1; echo \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"SessionStart\\\",\\\"additionalContext\\\":\\\"graphify: knowledge graph refreshed at graphify-out/. Answer questions about this codebase with \\`graphify query \\\\\\\"<question>\\\\\\\"\\` before reading or grepping source files.\\\"}}\"",
+            "timeout": 60,
+            "statusMessage": "Refreshing knowledge graph"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",

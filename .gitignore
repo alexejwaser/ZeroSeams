@@ -11,3 +11,6 @@ src/**/*.js
 .claude/skills/impeccable/
 .github/skills/
 .github/hooks/
+
+# Stray graph output from `graphify update ./src` — the real graph lives in /graphify-out
+src/graphify-out/
