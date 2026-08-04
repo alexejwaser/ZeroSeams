@@ -16,6 +16,10 @@ interface SwatchDTO {
 interface Window {
   electronAPI: {
     platform: string
+    /** Absolute path of a File from a drop or paste. Synchronous — File.path was
+     *  removed in Electron 32 and the object does not survive an await. Returns
+     *  '' for a File the OS has no path for (e.g. a clipboard bitmap). */
+    getPathForFile(file: File): string
     saveFile(
       filename: string,
       base64: string,

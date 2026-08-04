@@ -17,6 +17,13 @@ interface ThumbnailState {
   clearDirty: (id: string) => void
   setThumbnail: (id: string, url: string) => void
   removeThumbnail: (id: string) => void
+  /** Redraw one row now, independent of the history-commit sweep.
+   *
+   *  The bulk subscription below only reacts to `past.length` changing, so
+   *  anything that alters a thumbnail WITHOUT committing history is invisible to
+   *  it — most importantly a video element finishing its decode, which left the
+   *  layer row showing the grey play-glyph plate until an unrelated edit (#84). */
+  regenerate: (id: string) => void
 }
 
 export const useThumbnailStore = create<ThumbnailState>((set) => ({
@@ -47,6 +54,15 @@ export const useThumbnailStore = create<ThumbnailState>((set) => ({
       const { [id]: _removed, ...rest } = state.thumbnails
       return { thumbnails: rest }
     }),
+
+  regenerate: (id) => {
+    set((state) => {
+      const next = new Set(state.pendingIds)
+      next.add(id)
+      return { pendingIds: next }
+    })
+    flushPending()
+  },
 }))
 
 // ---------------------------------------------------------------------------
@@ -370,6 +386,43 @@ export async function generateThumbnail(obj: CanvasObject): Promise<string> {
 // useThumbnailGenerator — call once in CarouselStage
 // ---------------------------------------------------------------------------
 
+// Module scope, not hook-local: `regenerate` is a store action callable from
+// anywhere (CanvasVideoNode's decode/seek path), so it and the history sweep must
+// share one debounce timer rather than each keeping their own.
+let flushTimer: ReturnType<typeof setTimeout> | null = null
+
+/** Flush pending dirty IDs → generate thumbnails, debounced 150ms. */
+function flushPending(): void {
+  if (flushTimer !== null) clearTimeout(flushTimer)
+  flushTimer = setTimeout(() => {
+    flushTimer = null
+    const { clearDirty, setThumbnail } = useThumbnailStore.getState()
+    const currentObjects = useCanvasStore.getState().objects
+    const ids = Array.from(useThumbnailStore.getState().pendingIds)
+    let idx = 0
+
+    async function worker(): Promise<void> {
+      while (idx < ids.length) {
+        const id = ids[idx++]
+        const obj = currentObjects[id]
+        if (!obj) {
+          clearDirty(id)
+          continue
+        }
+        try {
+          const url = await generateThumbnail(obj)
+          if (url) setThumbnail(id, url)
+          clearDirty(id)
+        } catch {
+          clearDirty(id)
+        }
+      }
+    }
+
+    void Promise.all(Array.from({ length: Math.min(THUMBNAIL_CONCURRENCY, ids.length) }, worker))
+  }, 150)
+}
+
 export function useThumbnailGenerator(): void {
   const markDirty = useThumbnailStore((s) => s.markDirty)
   const clearDirty = useThumbnailStore((s) => s.clearDirty)
@@ -377,38 +430,6 @@ export function useThumbnailGenerator(): void {
   const removeThumbnail = useThumbnailStore((s) => s.removeThumbnail)
   const prevObjectsRef = useRef<Record<string, CanvasObject>>({})
   const prevPastLengthRef = useRef<number>(-1)
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  // Shared: flush pending dirty IDs → generate thumbnails
-  function flushPending(): void {
-    if (timerRef.current !== null) clearTimeout(timerRef.current)
-    timerRef.current = setTimeout(() => {
-      timerRef.current = null
-      const currentObjects = useCanvasStore.getState().objects
-      const ids = Array.from(useThumbnailStore.getState().pendingIds)
-      let idx = 0
-
-      async function worker(): Promise<void> {
-        while (idx < ids.length) {
-          const id = ids[idx++]
-          const obj = currentObjects[id]
-          if (!obj) {
-            clearDirty(id)
-            continue
-          }
-          try {
-            const url = await generateThumbnail(obj)
-            if (url) setThumbnail(id, url)
-            clearDirty(id)
-          } catch {
-            clearDirty(id)
-          }
-        }
-      }
-
-      void Promise.all(Array.from({ length: Math.min(THUMBNAIL_CONCURRENCY, ids.length) }, worker))
-    }, 150)
-  }
 
   // On mount: generate thumbnails for any objects already in the store
   // (handles project loaded before this component mounted)
@@ -452,7 +473,7 @@ export function useThumbnailGenerator(): void {
 
     return () => {
       unsubscribe()
-      if (timerRef.current !== null) clearTimeout(timerRef.current)
+      if (flushTimer !== null) clearTimeout(flushTimer)
     }
   }, [markDirty, clearDirty, setThumbnail, removeThumbnail])
 }

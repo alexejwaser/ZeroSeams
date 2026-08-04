@@ -343,6 +343,76 @@ function getObjectBBox(obj: CanvasObject): { x: number; y: number; width: number
 }
 
 // ---------------------------------------------------------------------------
+// Repositioning / cloning
+// ---------------------------------------------------------------------------
+// The ONLY place that knows how to move an object to a new top-left. Image and
+// video carry frameX/frameY alongside x/y and both must move together; line and
+// arrow additionally carry a second endpoint that has to travel by the same
+// delta. This was hand-written per call site, and the copies had drifted — the
+// duplicate paths moved a *video*'s x/y without its frameX/frameY, which is the
+// pair the node actually renders from.
+
+/** Move `obj` so its top-left lands on `pos`, keeping every mirrored field in sync. */
+function repositionObject(obj: CanvasObject, pos: { x: number; y: number }): CanvasObject {
+  const dx = pos.x - obj.x
+  const dy = pos.y - obj.y
+  if (obj.type === 'image' || obj.type === 'video') {
+    const media = obj as ImageObject | VideoObject
+    return {
+      ...media,
+      frameX: media.frameX + dx,
+      frameY: media.frameY + dy,
+      x: pos.x,
+      y: pos.y,
+    }
+  }
+  if (obj.type === 'shape') {
+    const s = obj as ShapeObject
+    if ((s.kind === 'line' || s.kind === 'arrow') && s.x2 !== undefined) {
+      return {
+        ...s,
+        x: pos.x,
+        y: pos.y,
+        x2: s.x2 + dx,
+        y2: (s.y2 ?? s.y) + dy,
+      } as CanvasObject
+    }
+  }
+  return { ...obj, x: pos.x, y: pos.y } as CanvasObject
+}
+
+/** A fresh-id copy of `obj` placed at `pos`. Edit modes are cleared — a clone
+ *  must never inherit an open content/clip editor from its source. */
+function cloneObjectAt(
+  obj: CanvasObject,
+  newId: string,
+  pos: { x: number; y: number },
+): CanvasObject {
+  const moved = repositionObject(obj, pos)
+  const clone = { ...moved, id: newId, name: undefined } as CanvasObject
+  if (clone.type === 'image' || clone.type === 'video') {
+    return { ...clone, contentEditMode: false, clipEditMode: false } as CanvasObject
+  }
+  if (clone.type === 'path') {
+    return { ...clone, pathEditMode: false } as CanvasObject
+  }
+  return clone
+}
+
+/** Seed the src vault for a cloned image so undo/redo can restore its bitmap. */
+function vaultWithClone(
+  vault: Map<string, { src: string; originalSrc?: string }>,
+  clone: CanvasObject,
+): Map<string, { src: string; originalSrc?: string }> {
+  if (clone.type !== 'image') return vault
+  const img = clone as ImageObject
+  if (!img.src) return vault
+  const next = new Map(vault)
+  next.set(img.id, { src: img.src, originalSrc: img.originalSrc })
+  return next
+}
+
+// ---------------------------------------------------------------------------
 // Opt #2 helper — edit-mode detection for a single object
 // ---------------------------------------------------------------------------
 function isInEditMode(obj: CanvasObject): boolean {
@@ -516,6 +586,10 @@ interface CanvasState {
     originPos: { x: number; y: number } | { frameX: number; frameY: number },
     finalPos: { x: number; y: number } | { frameX: number; frameY: number },
   ) => void
+  /** Insert copies of `objects` centred on `target`. Ids are regenerated and
+   *  group/child links remapped within the pasted set; one history entry for the
+   *  whole paste, and the result becomes the selection. */
+  pasteObjects: (objects: CanvasObject[], target: { x: number; y: number }) => void
   addGrid: (template: GridTemplate, canvasX: number, canvasY: number) => void
   disconnectGridCell: (cellId: string) => void
   /** Transient — captures pre-drag object state so commitUpdate can save the correct pre-drag snapshot. Not in history. */
@@ -1802,49 +1876,16 @@ export const useCanvasStore = create<CanvasState>((set) => {
         const obj = state.objects[id]
         if (!obj) return state
         const newId = crypto.randomUUID()
-        let duplicate: CanvasObject
-        if (obj.type === 'image') {
-          const img = obj as ImageObject
-          duplicate = {
-            ...img,
-            id: newId,
-            name: undefined,
-            contentEditMode: false,
-            clipEditMode: false,
-            frameX: img.frameX + offsetX,
-            frameY: img.frameY + offsetY,
-            x: img.x + offsetX,
-            y: img.y + offsetY,
-          }
-        } else {
-          duplicate = {
-            ...obj,
-            id: newId,
-            name: undefined,
-            x: obj.x + offsetX,
-            y: obj.y + offsetY,
-          } as CanvasObject
-          if (obj.type === 'shape') {
-            const s = obj as ShapeObject
-            if ((s.kind === 'line' || s.kind === 'arrow') && s.x2 !== undefined) {
-              duplicate = { ...duplicate, x2: s.x2 + offsetX, y2: (s.y2 ?? s.y) + offsetY } as CanvasObject
-            }
-          }
-        }
+        const duplicate = cloneObjectAt(obj, newId, {
+          x: obj.x + offsetX,
+          y: obj.y + offsetY,
+        })
         // Insert duplicate right after the source in objectOrder
         const srcIdx = state.objectOrder.indexOf(id)
         const newOrder = [...state.objectOrder]
         newOrder.splice(srcIdx + 1, 0, newId)
 
-        // Opt #1: seed vault for duplicated image
-        let nextVault = state._srcVault
-        if (duplicate.type === 'image') {
-          const img = duplicate as ImageObject
-          if (img.src) {
-            nextVault = new Map(state._srcVault)
-            nextVault.set(newId, { src: img.src, originalSrc: img.originalSrc })
-          }
-        }
+        const nextVault = vaultWithClone(state._srcVault, duplicate)
 
         return {
           past: pushHistoryFrom(state),
@@ -1861,68 +1902,22 @@ export const useCanvasStore = create<CanvasState>((set) => {
         if (!obj) return state
         const newId = crypto.randomUUID()
 
-        // Build the clone that stays at originPos
-        let clone: CanvasObject
-        if (obj.type === 'image') {
-          const img = obj as ImageObject
-          const op = originPos as { frameX: number; frameY: number }
-          clone = {
-            ...img,
-            id: newId,
-            name: undefined,
-            contentEditMode: false,
-            clipEditMode: false,
-            frameX: op.frameX,
-            frameY: op.frameY,
-            x: op.frameX,
-            y: op.frameY,
-          }
-        } else {
-          const op = originPos as { x: number; y: number }
-          clone = {
-            ...obj,
-            id: newId,
-            name: undefined,
-            x: op.x,
-            y: op.y,
-          } as CanvasObject
-        }
+        // Callers pass frame coords for media and base coords for everything
+        // else; the two are mirrored, so normalize to one point either way.
+        const toPoint = (
+          p: { x: number; y: number } | { frameX: number; frameY: number },
+        ): { x: number; y: number } =>
+          'frameX' in p ? { x: p.frameX, y: p.frameY } : p
 
-        // Update the source object to finalPos
-        let updatedSource: CanvasObject
-        if (obj.type === 'image') {
-          const img = obj as ImageObject
-          const fp = finalPos as { frameX: number; frameY: number }
-          updatedSource = {
-            ...img,
-            frameX: fp.frameX,
-            frameY: fp.frameY,
-            x: fp.frameX,
-            y: fp.frameY,
-          }
-        } else {
-          const fp = finalPos as { x: number; y: number }
-          updatedSource = {
-            ...obj,
-            x: fp.x,
-            y: fp.y,
-          } as CanvasObject
-        }
+        const clone = cloneObjectAt(obj, newId, toPoint(originPos))
+        const updatedSource = repositionObject(obj, toPoint(finalPos))
 
         // Insert clone right before the source in objectOrder
         const srcIdx = state.objectOrder.indexOf(id)
         const newOrder = [...state.objectOrder]
         newOrder.splice(srcIdx, 0, newId)
 
-        // Opt #1: seed vault for cloned image
-        let nextVault = state._srcVault
-        if (clone.type === 'image') {
-          const img = clone as ImageObject
-          if (img.src) {
-            nextVault = new Map(state._srcVault)
-            nextVault.set(newId, { src: img.src, originalSrc: img.originalSrc })
-          }
-        }
+        const nextVault = vaultWithClone(state._srcVault, clone)
 
         return {
           past: pushHistoryFrom(state),
@@ -1934,6 +1929,65 @@ export const useCanvasStore = create<CanvasState>((set) => {
           },
           objectOrder: newOrder,
           _srcVault: nextVault,
+        }
+      }),
+
+    pasteObjects: (incoming, target) =>
+      set((state) => {
+        if (incoming.length === 0) return state
+
+        // Centre the pasted set's bounding box on the target point, so a
+        // multi-object paste keeps its internal arrangement.
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+        for (const obj of incoming) {
+          const b = getObjectBBox(obj)
+          minX = Math.min(minX, b.x)
+          minY = Math.min(minY, b.y)
+          maxX = Math.max(maxX, b.x + b.width)
+          maxY = Math.max(maxY, b.y + b.height)
+        }
+        const dx = target.x - (minX + maxX) / 2
+        const dy = target.y - (minY + maxY) / 2
+
+        // Two passes: assign every new id first, so a group's childIds and a
+        // cell's parentGroupId can be remapped to ids that all exist. A link
+        // pointing outside the pasted set is dropped rather than left dangling —
+        // a cell whose group was not copied would otherwise be unselectable.
+        const idMap = new Map<string, string>()
+        for (const obj of incoming) idMap.set(obj.id, crypto.randomUUID())
+
+        const pasted: Record<string, CanvasObject> = {}
+        const newIds: string[] = []
+        let nextVault = state._srcVault
+
+        for (const obj of incoming) {
+          const newId = idMap.get(obj.id)!
+          let clone = cloneObjectAt(obj, newId, { x: obj.x + dx, y: obj.y + dy })
+          if (clone.type === 'group') {
+            const group = clone as GroupObject
+            clone = {
+              ...group,
+              childIds: group.childIds.map((c) => idMap.get(c)).filter((c): c is string => !!c),
+            }
+          }
+          if (clone.parentGroupId) {
+            clone = { ...clone, parentGroupId: idMap.get(clone.parentGroupId) } as CanvasObject
+          }
+          clone = { ...clone, zIndex: state.objectOrder.length + newIds.length } as CanvasObject
+          nextVault = vaultWithClone(nextVault, clone)
+          pasted[newId] = clone
+          newIds.push(newId)
+        }
+
+        return {
+          past: pushHistoryFrom(state),
+          future: [],
+          objects: { ...state.objects, ...pasted },
+          objectOrder: [...state.objectOrder, ...newIds],
+          _srcVault: nextVault,
+          selectedId: newIds.length === 1 ? newIds[0] : null,
+          selectedIds: newIds,
+          anchorId: null,
         }
       }),
 

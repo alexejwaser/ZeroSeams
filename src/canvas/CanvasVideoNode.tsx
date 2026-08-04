@@ -10,6 +10,7 @@ import type { SnapGuide } from './useSnapGuides'
 import { axisLock, ACCENT, ACCENT_GOLD } from './constants'
 import { useViewportStore, selectScale } from './useViewportStore'
 import { registerVideoElement, unregisterVideoElement } from './videoElementRegistry'
+import { useThumbnailStore } from './useThumbnailStore'
 import { buildFilterPipeline } from './adjustments/pipeline'
 import { buildEffectFilters } from './effects/buildEffectFilters'
 import { fitCover, snapRectInRotatedFrame } from './geometry'
@@ -100,9 +101,20 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
       registerVideoElement(id, vid)
       // Do not auto-play — playback is gated on videoPlayingIds in a separate effect.
     }
+
+    function onSeeked(): void {
+      useThumbnailStore.getState().regenerate(id)
+    }
     // canplay fires when the browser has decoded at least one frame and can start playing.
     // loadedmetadata only guarantees readyState=1 (no pixel data) — drawImage paints nothing.
     vid.addEventListener('canplay', onLoaded, { once: true })
+    // Layer thumbnails are drawn from this element, but the thumbnail sweep only
+    // runs on history commits — and decoding a frame is not one, so the row kept
+    // the grey placeholder until an unrelated edit (#84). Regenerate on `seeked`
+    // rather than inside onLoaded: the currentTime assignment above has been made
+    // but the seek has NOT completed, so drawing there captures the wrong frame.
+    // Not `once` — this also covers the poster re-seek on pause and trim changes.
+    vid.addEventListener('seeked', onSeeked)
     vid.addEventListener('error', () => {
       console.error('[CanvasVideoNode] video load error', vid.error?.message, 'src:', vid.src)
     }, { once: true })
@@ -123,6 +135,7 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
 
     return () => {
       vid.pause()
+      vid.removeEventListener('seeked', onSeeked)
       vid.src = ''
       unregisterVideoElement(id)
       videoElRef.current = null
@@ -226,6 +239,10 @@ function CanvasVideoNodeInner({ id, obj, onGuidesChange, nodeRef }: CanvasVideoN
     const end = obj.trimEnd ?? obj.naturalDuration
     if (videoEl.currentTime < start || videoEl.currentTime > end) {
       videoEl.currentTime = start
+    } else {
+      // Already in range, so no seek and therefore no `seeked` — but the poster
+      // frame the thumbnail should show may still have moved. Ask directly.
+      useThumbnailStore.getState().regenerate(id)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [obj.trimStart, obj.trimEnd])

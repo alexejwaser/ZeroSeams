@@ -259,6 +259,14 @@ import('./canvas/exportFrames').then(m => {
   ;(window as any).__exportMixedFrames__ = m.exportMixedFrames
 })
 import('./canvas/videoElementRegistry').then(m => { (window as any).__videoRegistry__ = m.videoElementRegistry })
+//   __mediaPlacement__ / __objectClipboard__ / __thumbnailStore__
+//     — test-media-insertion.mjs; placement is pure-ish but reads two stores, so
+//       asserting it in-app is the only way to catch a frame-index regression.
+//       The thumbnail store is how #84 is proven: the layer row must stop showing
+//       the placeholder WITHOUT any history commit in between.
+import('./canvas/mediaPlacement').then(m => { (window as any).__mediaPlacement__ = m })
+import('./canvas/objectClipboard').then(m => { (window as any).__objectClipboard__ = m })
+import('./canvas/useThumbnailStore').then(m => { (window as any).__thumbnailStore__ = m.useThumbnailStore })
 //   __computeGridChildPatches__ — test-frame-render-export.mjs; the single source of
 //     truth for grid cell geometry, shared by CanvasGroupNode and the gap slider.
 import('./canvas/gridTemplates').then(m => { (window as any).__computeGridChildPatches__ = m.computeGridChildPatches })

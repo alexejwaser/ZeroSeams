@@ -1,7 +1,12 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer, webUtils } from 'electron'
 
 contextBridge.exposeInMainWorld('electronAPI', {
   platform: process.platform,
+  // Electron 32 removed File.path. webUtils.getPathForFile is its replacement and
+  // is the ONLY way to get a dropped/pasted file's absolute path. Deliberately
+  // synchronous: drop and paste handlers need the path within the event turn,
+  // because DataTransfer/ClipboardData files do not survive an await.
+  getPathForFile: (file: File): string => webUtils.getPathForFile(file),
   saveFile: (filename: string, base64: string): Promise<{ success: boolean; error?: string }> =>
     ipcRenderer.invoke('save-file', { filename, base64 }),
   createProjectFile: (

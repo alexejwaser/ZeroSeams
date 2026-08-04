@@ -16,8 +16,9 @@ import { CanvasPathNode, computePathBBox, anchorsToPathData } from './CanvasPath
 import { SnapGuides } from './SnapGuides'
 import { useSnapGuides } from './useSnapGuides'
 import type { SnapGuide } from './useSnapGuides'
-import { useImageDrop } from './useImageDrop'
-import { useVideoDrop } from './useVideoDrop'
+import { useMediaDrop } from './useMediaDrop'
+import { useClipboard } from './useClipboard'
+import { setLastPointer } from './mediaPlacement'
 import { CanvasVideoNode } from './CanvasVideoNode'
 import { useAutosave } from './useAutosave'
 import { useKeyboardShortcuts } from './useKeyboardShortcuts'
@@ -173,8 +174,8 @@ export function CarouselStage(): React.ReactElement {
   const [groupTransformKey, setGroupTransformKey] = useState(0)
   const spacePanActiveRef = useRef(false)
 
-  useImageDrop(containerRef)
-  useVideoDrop(containerRef)
+  useMediaDrop(containerRef)
+  useClipboard()
   useAutosave()
   useKeyboardShortcuts()
   useThumbnailGenerator()
@@ -816,6 +817,15 @@ export function CarouselStage(): React.ReactElement {
           }
         }}
         onMouseMove={(e) => {
+          // Remember where the cursor last was on the canvas, in logical coords.
+          // The toolbar's Add Image/Add Video have no pointer of their own and
+          // used to hardcode frame 0; this is the input that lets them place media
+          // in the frame the user is actually looking at.
+          {
+            const pos = stageRef.current?.getRelativePointerPosition()
+            if (pos) setLastPointer(pos.x, pos.y)
+          }
+
           // Block Stage events when panning
           if (isPanningRef.current) return
 

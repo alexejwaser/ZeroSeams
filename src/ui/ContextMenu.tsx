@@ -9,6 +9,8 @@ import type { ImageObject, VideoObject } from '@/types/canvas'
 import { canBecomeFrame } from '@/canvas/geometry'
 import { isFrameObject, isEmptyFrame as isEmptyFrameObject } from '@/canvas/frameModel'
 import { pickImageMedia, pickVideoMedia } from './properties/mediaPickers'
+import { copyObjects, cutObjects, getObjectClipboard, hasObjectClipboard } from '@/canvas/objectClipboard'
+import { defaultDropPoint } from '@/canvas/mediaPlacement'
 
 interface MenuItemProps {
   label: string
@@ -201,6 +203,17 @@ export function ContextMenu(): React.ReactElement | null {
                 disabled={locked}
                 onClick={() => { duplicateObject(targetId); dismiss() }}
               />
+              <MenuItem
+                label="Copy"
+                kbd="⌘C"
+                onClick={() => { copyObjects([targetId]); dismiss() }}
+              />
+              <MenuItem
+                label="Cut"
+                kbd="⌘X"
+                disabled={locked}
+                onClick={() => { cutObjects([targetId]); dismiss() }}
+              />
               <Divider />
               <MenuItem
                 label="Bring to Front"
@@ -326,6 +339,16 @@ export function ContextMenu(): React.ReactElement | null {
         })()
       ) : (
         <>
+          <MenuItem
+            label="Paste"
+            kbd="⌘V"
+            disabled={!hasObjectClipboard()}
+            onClick={() => {
+              useCanvasStore.getState().pasteObjects(getObjectClipboard(), defaultDropPoint())
+              dismiss()
+            }}
+          />
+          <Divider />
           <MenuItem
             label="Add Frame"
             onClick={() => { setFrameCount(frameCount + 1); dismiss() }}

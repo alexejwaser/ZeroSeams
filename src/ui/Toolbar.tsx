@@ -37,6 +37,8 @@ import { useExportStore } from '@/store'
 import { GridPicker } from './GridPicker'
 import type { GridTemplate } from '@/canvas/gridTemplates'
 import type { ActiveTool } from '@/canvas/useCanvasStore'
+import { buildImageObject, buildVideoObject, defaultDropPoint } from '@/canvas/mediaPlacement'
+import { loadVideoMetadataFromPath } from '@/canvas/videoMetadata'
 
 
 const CROP_ICON = (
@@ -1274,8 +1276,6 @@ export function ToolBar(): React.ReactElement {
   const setGuidelineOrientation = useCanvasStore((s) => s.setGuidelineOrientation)
   const guidelinesVisible = useCanvasStore((s) => s.guidelinesVisible)
   const toggleGuidelinesVisible = useCanvasStore((s) => s.toggleGuidelinesVisible)
-  const frameWidth = useCanvasStore((s) => s.frameWidth)
-  const frameHeight = useCanvasStore((s) => s.frameHeight)
   const resizeMode = useCanvasStore((s) => s.resizeMode)
   const setResizeMode = useCanvasStore((s) => s.setResizeMode)
   const snapEnabled = useCanvasStore((s) => s.snapEnabled)
@@ -1283,7 +1283,6 @@ export function ToolBar(): React.ReactElement {
   const activeShapeKind = useCanvasStore((s) => s.activeShapeKind)
   const setActiveShapeKind = useCanvasStore((s) => s.setActiveShapeKind)
   const addObject = useCanvasStore((s) => s.addObject)
-  const objectOrder = useCanvasStore((s) => s.objectOrder)
 
   const [gridPickerAnchor, setGridPickerAnchor] = useState<HTMLElement | null>(null)
 
@@ -1291,52 +1290,21 @@ export function ToolBar(): React.ReactElement {
     setActiveTool(tool)
   }
 
+  // Both add-media handlers place at defaultDropPoint() — the frame the cursor
+  // was last over. They used to compute `frameWidth / 2`, i.e. always frame 0,
+  // because a toolbar click carries no pointer of its own.
+
   async function handleAddVideo(): Promise<void> {
     const result = await window.electronAPI.openVideoFile()
     if (result.canceled || !result.filePath) return
     const filePath = result.filePath
-    const rawName = filePath.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'video'
-
-    await new Promise<void>((resolve) => {
-      const vid = document.createElement('video')
-      vid.preload = 'metadata'
-      const onMeta = () => {
-        // durationchange fires after loadedmetadata when duration becomes finite
-        if (!isFinite(vid.duration) || vid.duration <= 0) return
-        vid.removeEventListener('durationchange', onMeta)
-        const MAX_SIZE = 600
-        const scale = Math.min(1, MAX_SIZE / Math.max(vid.videoWidth, vid.videoHeight))
-        const w = Math.round(vid.videoWidth * scale)
-        const h = Math.round(vid.videoHeight * scale)
-        const fx = frameWidth / 2 - w / 2
-        const fy = frameHeight / 2 - h / 2
-        vid.src = ''
-        addObject({
-          id: crypto.randomUUID(),
-          type: 'video',
-          scope: 'global',
-          name: rawName,
-          filePath,
-          muted: false,
-          naturalWidth: vid.videoWidth,
-          naturalHeight: vid.videoHeight,
-          naturalDuration: vid.duration,
-          frameX: fx, frameY: fy,
-          frameWidth: w, frameHeight: h,
-          contentOffsetX: 0, contentOffsetY: 0,
-          contentWidth: w, contentHeight: h,
-          contentEditMode: false,
-          x: fx, y: fy, width: w, height: h,
-          rotation: 0, scaleX: 1, scaleY: 1,
-          opacity: 1, visible: true, locked: false,
-          zIndex: objectOrder.length,
-        })
-        resolve()
-      }
-      vid.addEventListener('durationchange', onMeta)
-      vid.onerror = () => resolve()
-      vid.src = `zeroseams-media://localhost${filePath}`
-    })
+    const name = filePath.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'video'
+    // Shared loader: resolves only once BOTH duration and dimensions are valid.
+    // Reading dimensions on durationchange alone yields 0×0 often enough to
+    // matter, and a 0 makes fitCover stretch the video instead of cover-cropping.
+    const meta = await loadVideoMetadataFromPath(filePath)
+    if (!meta) return
+    addObject(buildVideoObject({ filePath, name, at: defaultDropPoint(), ...meta }))
   }
 
   async function handleAddImage(): Promise<void> {
@@ -1345,23 +1313,13 @@ export function ToolBar(): React.ReactElement {
     const img = new Image()
     img.src = result.data
     await img.decode()
-    const MAX_SIZE = 600
-    const scale = Math.min(1, MAX_SIZE / Math.max(img.naturalWidth, img.naturalHeight))
-    const contentWidth = Math.round(img.naturalWidth * scale)
-    const contentHeight = Math.round(img.naturalHeight * scale)
-    const x = frameWidth / 2 - contentWidth / 2
-    const y = frameHeight / 2 - contentHeight / 2
-    addObject({
-      id: crypto.randomUUID(), type: 'image', scope: 'global', name: 'image',
-      src: result.data, backgroundRemoved: false,
-      naturalWidth: img.naturalWidth, naturalHeight: img.naturalHeight,
-      frameX: x, frameY: y, frameWidth: contentWidth, frameHeight: contentHeight,
-      contentOffsetX: 0, contentOffsetY: 0, contentWidth, contentHeight,
-      contentEditMode: false,
-      x, y, width: contentWidth, height: contentHeight,
-      rotation: 0, scaleX: 1, scaleY: 1, opacity: 1, visible: true, locked: false,
-      zIndex: objectOrder.length,
-    })
+    addObject(buildImageObject({
+      src: result.data,
+      naturalWidth: img.naturalWidth,
+      naturalHeight: img.naturalHeight,
+      name: 'image',
+      at: defaultDropPoint(),
+    }))
   }
 
   const segmentButtonStyle = (active: boolean): React.CSSProperties => ({

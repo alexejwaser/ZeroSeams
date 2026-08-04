@@ -43,6 +43,9 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
     entries: [
       { keys: '⌘ A', label: 'Select all' },
       { keys: '⌘ D', label: 'Duplicate' },
+      { keys: '⌘ C', label: 'Copy' },
+      { keys: '⌘ X', label: 'Cut' },
+      { keys: '⌘ V', label: 'Paste (objects, image or video)' },
       { keys: '⌘ L', label: 'Lock / unlock' },
       { keys: '⌫', label: 'Delete' },
       { keys: 'Arrows', label: 'Nudge 1 px (⇧ for 10 px)' },
