@@ -1,16 +1,16 @@
-# Graph Report - ZeroSeams  (2026-08-04)
+# Graph Report - ZeroSeams  (2026-07-27)
 
 ## Corpus Check
-- 140 files · ~637,624 words
+- 121 files · ~599,908 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1415 nodes · 2622 edges · 94 communities (70 shown, 24 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 71 edges (avg confidence: 0.75)
+- 1181 nodes · 2194 edges · 82 communities (67 shown, 15 thin omitted)
+- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 64 edges (avg confidence: 0.78)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `db832cb7`
+- Built from commit: `acbf17fb`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -37,12 +37,12 @@
 - ColorInput.tsx
 - PreviewShell.tsx
 - Zero Seams — AI Dev Guide
-- mediaPlacement.ts
+- gridTemplates.ts
 - getSocketFromFD
 - test-axis-lock.mjs
 - getWasmTableEntry
-- CanvasPathNode.tsx
-- main.tsx
+- CanvasTextNode.tsx
+- Window Store Exposure for E2E Tests (__canvasStore__, __viewportStore__, __saveStatusStore__)
 - abort
 - intArrayFromString
 - Zero Seams
@@ -50,69 +50,57 @@
 - _strftime
 - useThumbnailStore.ts
 - asyncLoad
-- CanvasGroupNode.tsx
+- useViewportStore.ts
 - callRuntimeCallbacks
 - Tooltip
-- CanvasImageNode.tsx
+- CanvasVideoNode.tsx
 - devDependencies
 - useCanvasStore.ts
 - emscripten_realloc_buffer
 - getEnvStrings
 - Electron Vite Config
 - shared.tsx
-- iconBtnProps
+- VideoSection.tsx
 - hooks
 - permissions
 - electron.d.ts
 - ExceptionInfo
-- test-frame-render-export.mjs
+- CanvasImageNode.tsx
 - Frame Labels (HTML div, not Konva Text)
 - keepRatio mirrors resizeMode
 - Shape/Ellipse bounding-box origin in store
 - Upcoming: AI background removal, SAM, LaMa
 - index.html Entry Point
-- fileManager.ts
+- Main Process (Electron)
 - Claude Settings Local
 - textSpans utilities
 - ai/index exports
 - Zero Seams Project README
 - .carousel / .zeroseams Project File Format
-- NewDocumentScreen.tsx
+- ui/index.ts
 - FrameSection.tsx
 - compilerOptions
-- scripts
+- classes.js
 - 56-update.md
 - store/index.ts
-- Testing
+- IPC: edit-in-external-app
 - color.ts
 - LazyUint8Array
 - shortcuts.ts
-- package.json
+- readFile
 - tsconfig.json
-- pathUtils.ts
-- build
-- Test fixtures
-- Zero Seams — `src/ui/`
-- electron-vite
-- playwright
-- @types/react
-- @types/react-dom
-- @types/utif
-- vite
-- canvas/CLAUDE.md
-- io/CLAUDE.md
 
 ## God Nodes (most connected - your core abstractions)
-1. `useCanvasStore` - 44 edges
+1. `useCanvasStore` - 43 edges
 2. `buildFilterPipeline()` - 22 edges
 3. `useViewportStore` - 19 edges
-4. `Tooltip()` - 19 edges
-5. `FFmpeg` - 18 edges
-6. `useSnapGuides()` - 18 edges
-7. `SnapGuide` - 17 edges
-8. `selectScale()` - 17 edges
-9. `iconBtnProps` - 17 edges
-10. `getWasmTableEntry()` - 16 edges
+4. `FFmpeg` - 18 edges
+5. `useSnapGuides()` - 18 edges
+6. `SnapGuide` - 17 edges
+7. `selectScale()` - 17 edges
+8. `getWasmTableEntry()` - 16 edges
+9. `Tooltip()` - 16 edges
+10. `CanvasImageNodeInner()` - 15 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Agent: qa-reviewer` --references--> `Zustand Store (src/store/index.ts)`  [INFERRED]
@@ -127,44 +115,42 @@
   src/store/index.ts → CLAUDE.md
 
 ## Import Cycles
-- 3-file cycle: `src/canvas/CanvasPathNode.tsx -> src/canvas/useSnapGuides.ts -> src/canvas/frameClip.ts -> src/canvas/CanvasPathNode.tsx`
-- 3-file cycle: `src/canvas/CanvasPathNode.tsx -> src/canvas/useCanvasStore.ts -> src/canvas/frameClip.ts -> src/canvas/CanvasPathNode.tsx`
+- 3-file cycle: `src/canvas/CanvasPathNode.tsx -> src/canvas/makeCanvasNode.tsx -> src/canvas/useCanvasStore.ts -> src/canvas/CanvasPathNode.tsx`
 - 4-file cycle: `src/canvas/CanvasPathNode.tsx -> src/canvas/makeCanvasNode.tsx -> src/canvas/useCanvasStore.ts -> src/canvas/frameClip.ts -> src/canvas/CanvasPathNode.tsx`
-- 4-file cycle: `src/canvas/CanvasPathNode.tsx -> src/canvas/useSnapGuides.ts -> src/canvas/useCanvasStore.ts -> src/canvas/frameClip.ts -> src/canvas/CanvasPathNode.tsx`
 
-## Communities (94 total, 24 thin omitted)
+## Communities (82 total, 15 thin omitted)
 
 ### Community 0 - "useSnapGuides.ts"
-Cohesion: 0.21
-Nodes (15): CanvasGuidelineNodeInner(), CanvasPathNodeInner(), computePathBBox(), SNAP_THRESHOLD, buildTargets(), computeSnap(), computeSnapFromTargets(), computeSnapResize() (+7 more)
+Cohesion: 0.13
+Nodes (20): CanvasGroupNodeInner, CanvasGroupNodeProps, CanvasGuidelineNodeInner(), CanvasShapeNode, CanvasShapeNodeInnerProps, CanvasShapeNodeProps, SNAP_THRESHOLD, SnapGuides() (+12 more)
 
 ### Community 1 - "ffmpeg-core.js"
 Cohesion: 0.04
 Nodes (24): bigintToI53Checked(), DEFAULT_ARGS, DEFAULT_ARGS_FFPROBE, doCallback(), done(), doReadv(), doWritev(), _emscripten_asm_const_int() (+16 more)
 
 ### Community 2 - "canvas.ts"
-Cohesion: 0.08
-Nodes (51): Frame/Content Two-Layer Model, Non-Destructive Photo Adjustments Pipeline, syncGroupOnTransform, applyStyleToAll(), applyStyleToRange(), mergeAdjacentSpans(), ResolvedSpanStyle, SelectionStyle (+43 more)
+Cohesion: 0.09
+Nodes (49): Non-Destructive Photo Adjustments Pipeline, applyStyleToAll(), applyStyleToRange(), getSelectionStyle(), mergeAdjacentSpans(), ResolvedSpanStyle, resolveSpanStyle(), SelectionStyle (+41 more)
 
 ### Community 3 - "test-multiselect-transform.mjs"
 Cohesion: 0.06
 Nodes (39): clearAll(), clickKonvaCenter(), consoleLogs, drag(), drawRect(), ELECTRON_BIN, escape(), failures (+31 more)
 
 ### Community 4 - "electron/index.ts"
-Cohesion: 0.05
-Nodes (53): currentFilePath in useSaveStatusStore, readFile(), writeFile(), addRecentFile(), IPC: autosave-project, body, buf, buffer (+45 more)
+Cohesion: 0.09
+Nodes (19): body, buf, buffer, corpHeaders, dir, editDir, editor, existing (+11 more)
 
 ### Community 5 - "PropertiesPanel.tsx"
 Cohesion: 0.09
-Nodes (24): rotateAroundCenter: Konva Rect/Text rotate around top-left not center; ellipse exempt, getSelectionStyle(), pickImageMedia(), pickVideoMedia(), AdjustmentsSectionProps, alignButtonStyle(), AlignDistributeSection(), distributeButtonStyle() (+16 more)
+Nodes (23): Photo Adjustments Bypass Toggle (hold-to-compare \ key + persistent Power button), rotateAroundCenter: Konva Rect/Text rotate around top-left not center; ellipse exempt, AdjustmentsSection(), AdjustmentsSectionProps, alignButtonStyle(), AlignDistributeSection(), distributeButtonStyle(), EffectsSection() (+15 more)
 
 ### Community 6 - "worker.js"
-Cohesion: 0.09
-Nodes (12): id, ids, trans, ERROR_IMPORT_FAILURE, ERROR_NOT_LOADED, ERROR_TERMINATED, ERROR_UNKNOWN_MESSAGE_TYPE, getMessageID (+4 more)
+Cohesion: 0.12
+Nodes (7): ERROR_IMPORT_FAILURE, ERROR_NOT_LOADED, ERROR_UNKNOWN_MESSAGE_TYPE, TODO: check if deletion works., TODO: check if creation works., TODO: check if deletion works., trans
 
 ### Community 7 - "exportFrames.ts"
-Cohesion: 0.11
-Nodes (17): utif, FFmpeg, captureVideoFrameSequence(), downloadFrames(), exportMixedFrames(), ExportResult, videoObjectsInFrame(), canvas/index exports (+9 more)
+Cohesion: 0.08
+Nodes (26): Autosave Pipeline, FFmpeg, captureVideoFrameSequence(), downloadFrames(), exportMixedFrames(), ExportResult, canvas/index exports, posixDirname() (+18 more)
 
 ### Community 8 - "pipeline.ts"
 Cohesion: 0.17
@@ -176,23 +162,23 @@ Nodes (22): ELECTRON_BIN, eq(), errors, failures, loaded, newVideoErrors, nonPro
 
 ### Community 10 - "dependencies"
 Cohesion: 0.05
-Nodes (37): chokidar, @ffmpeg/core, @ffmpeg/ffmpeg, @ffmpeg/util, @imgly/background-removal, konva, lucide-react, onnxruntime-web (+29 more)
+Nodes (41): chokidar, @ffmpeg/core, @ffmpeg/ffmpeg, @ffmpeg/util, @imgly/background-removal, konva, lucide-react, onnxruntime-web (+33 more)
 
 ### Community 11 - "Zustand Store (src/store/index.ts)"
 Cohesion: 0.10
 Nodes (25): Agent Domain Isolation (no cross-domain edits), Rationale: Agents must not cross domain boundaries (ui/canvas/ai separation), Agent: ai-engineer, src/ai/ (ai-engineer domain), Agent: canvas-engineer, src/canvas/ (canvas-engineer domain), Agent: qa-reviewer, Agent: ui-engineer (+17 more)
 
 ### Community 12 - "test-undo-redo.mjs"
-Cohesion: 0.07
-Nodes (35): terminateElectron(), cleanup(), ELECTRON_BIN, electronProc, eq(), failures, FIXTURE_VIDEO, ok() (+27 more)
+Cohesion: 0.11
+Nodes (22): addImage(), addPath(), addShape(), addText(), app, ELECTRON_BIN, electronProc, eq() (+14 more)
 
 ### Community 13 - "effects/index.ts"
 Cohesion: 0.19
 Nodes (11): boxBlurH(), boxBlurV(), buildFilter(), hexToRgb(), EffectControlDescriptor, EffectDefinition, EffectParams, getAllEffectDefinitions() (+3 more)
 
 ### Community 14 - "ContextMenu.tsx"
-Cohesion: 0.21
-Nodes (11): AIContext, AIContextValue, useAI(), AIProvider(), AIStoreState, useAIStore, useBackgroundRemoval(), UseBackgroundRemovalReturn (+3 more)
+Cohesion: 0.18
+Nodes (13): Frame/Content Two-Layer Model, AIContext, AIContextValue, useAI(), AIProvider(), AIStoreState, useAIStore, useBackgroundRemoval() (+5 more)
 
 ### Community 15 - "compilerOptions"
 Cohesion: 0.08
@@ -203,16 +189,16 @@ Cohesion: 0.12
 Nodes (7): consoleLogs, content, ELECTRON_BIN, existingPath, failures, ROOT, testFile
 
 ### Community 17 - "CarouselStage.tsx"
-Cohesion: 0.13
-Nodes (22): Autosave Pipeline, CanvasGuidelineNode, CanvasGuidelineNodeOuter(), InnerProps, Props, CarouselStage(), getStageInstance(), axisLock() (+14 more)
+Cohesion: 0.17
+Nodes (17): CanvasGroupNode(), CanvasGuidelineNode, CanvasGuidelineNodeOuter(), InnerProps, Props, computePathBBox(), CarouselStage(), getStageInstance() (+9 more)
 
 ### Community 18 - "debug-selection.mjs"
 Cohesion: 0.11
 Nodes (15): allInputs, dblLogs, div, ELECTRON_BIN, firstText, inp, labels, lbl (+7 more)
 
 ### Community 19 - "ColorInput.tsx"
-Cohesion: 0.11
-Nodes (22): react, react, ColorInput(), ColorInputProps, ColorMode, ColorPopover(), hexToHsl(), hexToRgb() (+14 more)
+Cohesion: 0.14
+Nodes (15): ColorInput(), ColorInputProps, ColorMode, ColorPopover(), hexToHsl(), hexToRgb(), hslToHex(), loadRecentColors() (+7 more)
 
 ### Community 20 - "PreviewShell.tsx"
 Cohesion: 0.24
@@ -222,9 +208,9 @@ Nodes (11): capturePreviewFrames(), FrameSlideProps, PreviewShell(), VideoOverla
 Cohesion: 0.12
 Nodes (15): code:block1 (graphify query "<your question>"), Core Concepts — never break these, Export (`src/canvas/exportFrames.ts`), Features Implemented (sprints 1–42 + issue #20), File Ownership, graphify, Key Architecture, Keyboard Shortcuts (+7 more)
 
-### Community 22 - "mediaPlacement.ts"
-Cohesion: 0.07
-Nodes (35): canBecomeFrame(), findDropTargetId(), fitCover(), pointInEllipse(), pointInRect(), CellRect, computeGridChildPatches(), GRID_TEMPLATES (+27 more)
+### Community 22 - "gridTemplates.ts"
+Cohesion: 0.31
+Nodes (6): CellRect, GridTemplate, CanvasState, HistorySnapshot, GridPicker(), GridPickerProps
 
 ### Community 23 - "getSocketFromFD"
 Cohesion: 0.14
@@ -238,13 +224,13 @@ Nodes (9): Playwright Electron Integration Testing Pattern, clickAt(), drag(), E
 Cohesion: 0.13
 Nodes (15): getWasmTableEntry(), invoke_i(), invoke_ii(), invoke_iii(), invoke_iiii(), invoke_iiiii(), invoke_iiiiii(), invoke_iiiiiiiii() (+7 more)
 
-### Community 26 - "CanvasPathNode.tsx"
-Cohesion: 0.12
-Nodes (24): Rationale: Snap absolute→logical coord conversion, Snap Guide System, CanvasPathNode, CanvasPathNodeInnerProps, CanvasPathNodeOuter(), CanvasPathNodeProps, CanvasShapeNode, CanvasShapeNodeInnerProps (+16 more)
+### Community 26 - "CanvasTextNode.tsx"
+Cohesion: 0.15
+Nodes (17): Rationale: Snap absolute→logical coord conversion, Snap Guide System, CanvasPathNode, CanvasPathNodeInnerProps, CanvasPathNodeOuter(), CanvasPathNodeProps, CanvasTextNode, CanvasTextNodeInner() (+9 more)
 
-### Community 27 - "main.tsx"
-Cohesion: 0.29
-Nodes (3): ErrorBoundary, NewDocumentGate(), rootEl
+### Community 27 - "Window Store Exposure for E2E Tests (__canvasStore__, __viewportStore__, __saveStatusStore__)"
+Cohesion: 0.25
+Nodes (4): Window Store Exposure for E2E Tests (__canvasStore__, __viewportStore__, __saveStatusStore__), App(), ErrorBoundary, rootEl
 
 ### Community 28 - "abort"
 Cohesion: 0.20
@@ -259,44 +245,44 @@ Cohesion: 0.18
 Nodes (10): code:bash (git clone https://github.com/alexejwaser/zeroseams.git), code:bash (node node_modules/electron/install.js), code:bash (npm install electron --save-dev), Download, Features, If you see `Error: Electron uninstall` after `npm install`, License, Running Locally (+2 more)
 
 ### Community 31 - "Toolbar.tsx"
-Cohesion: 0.10
-Nodes (20): Save Split-Button Pattern (Save / Save As / Save a Copy), Window Store Exposure for E2E Tests (__canvasStore__, __viewportStore__, __saveStatusStore__), App(), FrameSettingsPopover(), FrameSettingsPopoverProps, labelStyle, numberInputStyle, PLATFORM_LABELS (+12 more)
+Cohesion: 0.11
+Nodes (19): Save Split-Button Pattern (Save / Save As / Save a Copy), FrameSettingsPopover(), FrameSettingsPopoverProps, labelStyle, numberInputStyle, PLATFORM_LABELS, PLATFORMS, segmentButtonStyle() (+11 more)
 
 ### Community 32 - "_strftime"
 Cohesion: 0.14
 Nodes (13): addDays(), arraySum(), ___assert_fail(), __gmtime_js(), isLeapYear(), __localtime_js(), __mktime_js(), readI53FromI64() (+5 more)
 
 ### Community 33 - "useThumbnailStore.ts"
-Cohesion: 0.15
-Nodes (25): apply2dFill(), cssStops(), DEFAULT_GRADIENT_STOPS, fillPreviewCss(), flatStops(), isBlankColor(), konvaFillProps, linearEndpoints() (+17 more)
+Cohesion: 0.36
+Nodes (9): spanText(), anchorsToPathData(), computePathBBox(), generateMaskThumbnail(), generateThumbnail(), PathBBox, ThumbnailState, useThumbnailGenerator() (+1 more)
 
 ### Community 34 - "asyncLoad"
 Cohesion: 0.24
 Nodes (10): addRunDependency(), assert(), asyncLoad(), createWasm(), FS_createPreloadedFile(), getUniqueRunDependency(), handleMessage(), instantiateAsync() (+2 more)
 
-### Community 35 - "CanvasGroupNode.tsx"
-Cohesion: 0.18
-Nodes (17): CanvasGroupNode(), CanvasGroupNodeInner, CanvasGroupNodeProps, hitTestCell(), CanvasImageNodeInner(), CanvasShapeNodeInner(), CANVAS_SCALE, EmptyFrameOverlay() (+9 more)
+### Community 35 - "useViewportStore.ts"
+Cohesion: 0.22
+Nodes (15): CanvasImageNodeInner(), CanvasPathNodeInner(), CanvasShapeNodeInner(), CANVAS_SCALE, EmptyFrameOverlay(), computeSnapResize(), ElectronFile, getCanvasScale() (+7 more)
 
 ### Community 36 - "callRuntimeCallbacks"
 Cohesion: 0.25
 Nodes (8): addOnPostRun(), addOnPreRun(), callRuntimeCallbacks(), initRuntime(), postRun(), preRun(), run(), setTimeout()
 
 ### Community 37 - "Tooltip"
-Cohesion: 0.12
-Nodes (14): Module-level activeTooltipCount (instant tooltip on hover when any tooltip is visible), react-dom, react-dom, hudBtnStyle, FrameLabelStrip(), FrameLabelStripProps, frameSlotOffset(), LayerPanel() (+6 more)
+Cohesion: 0.17
+Nodes (9): Module-level activeTooltipCount (instant tooltip on hover when any tooltip is visible), hudBtnStyle, FrameLabelStrip(), FrameLabelStripProps, frameSlotOffset(), isEmptyFrame(), LayerPanel(), Tooltip() (+1 more)
 
-### Community 38 - "CanvasImageNode.tsx"
-Cohesion: 0.14
-Nodes (25): Masking System (pen/rect/ellipse), Photo Adjustments Pipeline, CanvasImageNode, CanvasImageNodeInnerProps, CanvasImageNodeProps, NOTE: does not call onGuidesChange — guides are emitted by the onTransform, anchorsToPathData(), CanvasVideoNode (+17 more)
+### Community 38 - "CanvasVideoNode.tsx"
+Cohesion: 0.22
+Nodes (18): anchorsToPathData(), CanvasVideoNode, CanvasVideoNodeInner(), CanvasVideoNodeInnerProps, CanvasVideoNodeOuter(), CanvasVideoNodeProps, ClipEditOverlay(), ClipEditOverlayProps (+10 more)
 
 ### Community 39 - "devDependencies"
-Cohesion: 0.13
-Nodes (15): electron, devDependencies, electron, @types/chokidar, typescript, @vitejs/plugin-react, @types/chokidar, typescript (+7 more)
+Cohesion: 0.05
+Nodes (40): electron, electron-vite, author, description, devDependencies, electron, electron-vite, playwright (+32 more)
 
 ### Community 40 - "useCanvasStore.ts"
-Cohesion: 0.09
-Nodes (20): Undo/Redo History (past/future snapshots), removeBg, denormalizeFill(), normalizeAnchors(), buildEmptyFrameImage(), EmptyFrameSpec, frameToEmptyImage(), makeEmptyCell() (+12 more)
+Cohesion: 0.12
+Nodes (13): Undo/Redo History (past/future snapshots), removeBg, normalizeAnchors(), fitCover(), ActiveTool, buildFilledFrame(), buildFrameFromShape(), frameToEmptyImage() (+5 more)
 
 ### Community 41 - "emscripten_realloc_buffer"
 Cohesion: 0.40
@@ -311,52 +297,48 @@ Cohesion: 0.25
 Nodes (7): Electron-Vite Three-Target Build (main/preload/renderer), Electron Vite Config, electron.vite.config.ts, include, src/electron/**/*, src/preload/**/*, TypeScript Root Config
 
 ### Community 44 - "shared.tsx"
-Cohesion: 0.15
-Nodes (16): FontPicker(), MAC_SYSTEM_FONTS, AlignDistributeSection(), AlignDistributeSectionProps, alignButtonStyle(), distributeButtonStyle(), Field(), FieldProps (+8 more)
+Cohesion: 0.18
+Nodes (12): FontPicker(), MAC_SYSTEM_FONTS, AlignDistributeSection(), AlignDistributeSectionProps, alignButtonStyle(), distributeButtonStyle(), MixedNumberField(), MixedNumberFieldProps (+4 more)
 
-### Community 45 - "iconBtnProps"
-Cohesion: 0.14
-Nodes (17): Photo Adjustments Bypass Toggle (hold-to-compare \ key + persistent Power button), iconBtnProps, iconBtnStyle(), AdjustmentsSection(), AdjustmentsSectionProps, subGroupLabelStyle, TRACK_GRADIENT, EFFECT_PARAM_UNITS (+9 more)
+### Community 45 - "VideoSection.tsx"
+Cohesion: 0.23
+Nodes (12): iconBtnStyle(), AdjustmentsSection(), AdjustmentsSectionProps, subGroupLabelStyle, TRACK_GRADIENT, EffectsSection(), EffectsSectionProps, sectionLabelStyle (+4 more)
 
-### Community 48 - "electron.d.ts"
-Cohesion: 0.05
-Nodes (3): ExternalEditor, SwatchDTO, Window
+### Community 50 - "CanvasImageNode.tsx"
+Cohesion: 0.17
+Nodes (12): Masking System (pen/rect/ellipse), Photo Adjustments Pipeline, CanvasImageNode, CanvasImageNodeInnerProps, CanvasImageNodeProps, NOTE: does not call onGuidesChange — guides are emitted by the onTransform, canBecomeFrame(), findDropTargetId() (+4 more)
 
-### Community 50 - "test-frame-render-export.mjs"
-Cohesion: 0.07
-Nodes (22): absent(), analyzeBlobs(), ANCHOR, app, BG, DIAMOND, dominantGreen(), ELECTRON_BIN (+14 more)
+### Community 57 - "Main Process (Electron)"
+Cohesion: 0.23
+Nodes (12): currentFilePath in useSaveStatusStore, addRecentFile(), IPC: autosave-project, createWindow(), getRecentFilesPath(), IPC: get-system-fonts, IPC: list-recent-projects, Main Process (Electron) (+4 more)
 
-### Community 57 - "fileManager.ts"
-Cohesion: 0.20
-Nodes (23): cancelNewDocument(), CreateDocumentSpec, createNew(), FileOpResult, handleMenuAction(), initFileBridges(), inTextField(), openFromDialog() (+15 more)
-
-### Community 66 - "NewDocumentScreen.tsx"
-Cohesion: 0.15
-Nodes (16): filenameError(), NewDocumentScreen(), NewDocumentScreenProps, NewDocumentSpec, PLATFORM_LABELS, PLATFORMS, RecentFile, sectionLabel (+8 more)
+### Community 66 - "ui/index.ts"
+Cohesion: 0.23
+Nodes (9): react, react, GRID_TEMPLATES, formatVal(), NumericInput(), NumericInputProps, isFrameObject(), PropertiesPanel() (+1 more)
 
 ### Community 67 - "FrameSection.tsx"
-Cohesion: 0.13
-Nodes (17): AdjustmentValue(), FillEditor(), FillEditorProps, FillKind, kindOf(), KINDS, labelStyle, rowStyle (+9 more)
+Cohesion: 0.23
+Nodes (10): buttonStyle, clipKindLabel(), destructiveButtonStyle, FrameSection(), FrameSectionProps, labelStyle, rowStyle, pickImageMedia() (+2 more)
 
 ### Community 68 - "compilerOptions"
 Cohesion: 0.18
 Nodes (11): compilerOptions, composite, module, moduleResolution, noEmit, noImplicitReturns, noUnusedLocals, noUnusedParameters (+3 more)
 
-### Community 69 - "scripts"
-Cohesion: 0.13
-Nodes (15): scripts, build, dev, lint, postinstall, preview, test, test:axis (+7 more)
+### Community 69 - "classes.js"
+Cohesion: 0.22
+Nodes (5): id, ids, trans, ERROR_TERMINATED, getMessageID
 
 ### Community 70 - "56-update.md"
 Cohesion: 0.22
 Nodes (8): Benefits, Content-Frame Relationship Consistency, Critical Considerations, Current Problem, Leverage Existing Grid System, Proposed Direction, Research & Exploration, Smart Guides & Alignment
 
 ### Community 71 - "store/index.ts"
-Cohesion: 0.20
-Nodes (11): ExportState, useExportStore, SaveStatus, SaveStatusState, trackSave(), useSaveStatusStore, makeSwatch(), normalizeColor() (+3 more)
+Cohesion: 0.33
+Nodes (6): ExportState, useExportStore, SaveStatus, SaveStatusState, trackSave(), useSaveStatusStore
 
-### Community 72 - "Testing"
-Cohesion: 0.22
-Nodes (8): Asserting click routing, Pixel assertions (`test-frame-render-export.mjs`), Running, Shutting the app down — use `terminateElectron`, Testing, The `window.__*__` contract, Two launch patterns, Video
+### Community 72 - "IPC: edit-in-external-app"
+Cohesion: 0.32
+Nodes (8): IPC: edit-in-external-app, ExternalEditor, IPC Push: external-image-changed, IPC: get-external-editor, Preferences, IPC: stop-external-edit, tempFiles, watchers
 
 ### Community 73 - "color.ts"
 Cohesion: 0.43
@@ -370,37 +352,29 @@ Nodes (3): LazyUint8Array(), writeChunks(), start()
 Cohesion: 0.40
 Nodes (3): SHORTCUT_GROUPS, ShortcutEntry, ShortcutGroup
 
-### Community 76 - "package.json"
-Cohesion: 0.29
-Nodes (6): author, description, license, main, name, version
-
-### Community 82 - "pathUtils.ts"
-Cohesion: 0.60
-Nodes (5): posixDirname(), posixRelative(), posixResolve(), relativizeVideoObjects(), resolveVideoObjects()
-
-### Community 83 - "build"
-Cohesion: 0.50
-Nodes (4): build, appId, fileAssociations, productName
+### Community 76 - "readFile"
+Cohesion: 0.40
+Nodes (5): readFile(), writeFile(), getPreferencesPath(), readPreferences(), writePreferences()
 
 ## Knowledge Gaps
-- **409 isolated node(s):** `name`, `version`, `description`, `main`, `author` (+404 more)
+- **335 isolated node(s):** `name`, `version`, `description`, `main`, `author` (+330 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **24 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **15 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `dependencies` connect `dependencies` to `ffmpeg-core.js`, `Tooltip`, `exportFrames.ts`, `package.json`, `ColorInput.tsx`?**
-  _High betweenness centrality (0.280) - this node is a cross-community bridge._
+- **Why does `dependencies` connect `dependencies` to `ffmpeg-core.js`, `ui/index.ts`, `devDependencies`?**
+  _High betweenness centrality (0.334) - this node is a cross-community bridge._
+- **Why does `react` connect `ui/index.ts` to `dependencies`, `ColorInput.tsx`, `CanvasImageNode.tsx`?**
+  _High betweenness centrality (0.166) - this node is a cross-community bridge._
 - **Why does `Electron Vite Config` connect `Electron Vite Config` to `test-axis-lock.mjs`, `test-video.mjs`, `debug-selection.mjs`, `devDependencies`?**
-  _High betweenness centrality (0.146) - this node is a cross-community bridge._
-- **Why does `react` connect `ColorInput.tsx` to `NewDocumentScreen.tsx`, `FrameSection.tsx`, `Tooltip`, `dependencies`, `CanvasPathNode.tsx`, `main.tsx`?**
-  _High betweenness centrality (0.132) - this node is a cross-community bridge._
+  _High betweenness centrality (0.133) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `description` to the rest of the system?**
-  _409 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _335 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `useSnapGuides.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.13333333333333333 - nodes in this community are weakly interconnected._
 - **Should `ffmpeg-core.js` be split into smaller, more focused modules?**
   _Cohesion score 0.03989071038251366 - nodes in this community are weakly interconnected._
 - **Should `canvas.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.08376623376623377 - nodes in this community are weakly interconnected._
-- **Should `test-multiselect-transform.mjs` be split into smaller, more focused modules?**
-  _Cohesion score 0.058279370952821465 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08874912648497554 - nodes in this community are weakly interconnected._
