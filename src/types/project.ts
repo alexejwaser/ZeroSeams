@@ -12,7 +12,8 @@ export interface FrameDimensions {
   height: number
 }
 
-/** One Instagram slide in the carousel */
+/** One slide/post in the sequence. Pixel size comes from the project's
+ *  platform + ratio (see PLATFORM_PRESETS), not from this type. */
 export interface Frame {
   /** Zero-based index in the carousel sequence */
   index: number

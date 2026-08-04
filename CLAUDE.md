@@ -5,9 +5,11 @@
 graphify query "<question>"        # BFS traversal, instant
 graphify path "<A>" "<B>"          # relationship between two nodes
 graphify explain "<concept>"       # focused concept deep-dive
-graphify update ./src              # after any code change (AST-only, no API cost)
+graphify update .                  # after any code change (AST-only, ~1.5s, no API cost)
 ```
 Only fall back to reading source files when the graph answer is incomplete or you need exact line-level detail.
+
+**Run `update` from the repo root with `.`, never `./src`.** The path argument is the project root, so `graphify update ./src` builds a second, smaller, code-only graph into `src/graphify-out/` — while `graphify query` reads `./graphify-out/graph.json`. That's how the queried graph went stale for a month. `update` merges into the existing graph, so the `document`/`concept`/`rationale` nodes extracted from CLAUDE.md survive an AST-only rebuild; re-ingesting *changed* docs still needs the `/graphify` skill (LLM-backed).
 
 `npm run typecheck` checks both tsconfig projects (web + node) — the root tsconfig is references-only (`files: []`), so never run bare `tsc -p tsconfig.json`; it validates nothing. Keep both projects at zero errors.
 
@@ -26,9 +28,7 @@ At the end of any session that introduces non-obvious patterns, invariants, or d
 - Never add sprint history or feature changelogs — those belong in git
 
 ## What this is
-Desktop Electron app for seamless Instagram carousels. One long horizontal canvas sliced into Instagram frames.
-
-**Stack:** Electron + React + TypeScript · Konva.js/react-konva · Zustand · @imgly/background-removal (WASM) · ONNX Runtime (SAM/LaMa) · FFmpeg WASM (video export)
+Desktop Electron app for seamless multi-frame social posts: one long horizontal canvas sliced into per-platform frames. Instagram carousels were the original target and are still the default preset, but nothing in the canvas is Instagram-specific — platform, aspect ratio and exact pixel dimensions are all document state.
 
 ## File Ownership
 - `src/canvas/` — canvas-agent · `src/ui/` — ui-agent · `src/ai/` — ai-agent
@@ -38,203 +38,21 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 
 ## Core Concepts — never break these
 - Canvas = one long surface, N frames wide
-- Frame = one Instagram slide — 1080×1080 or 1080×1350; controlled by `ratio` in store
-- `frameHeight` is dynamic — always read from store, never hardcode
+- Frame = one slide/post in the sequence; its pixel size comes from `platform` + `ratio` (see below), never from a constant
+- **`frameWidth` AND `frameHeight` are dynamic** — always read both from the store. There is no `FRAME_WIDTH`/`FRAME_HEIGHT` constant any more (`constants.ts` holds only `CANVAS_SCALE`), and 1080 is a preset value, not an invariant. Code that assumes a square frame, a 1080 width, or a fixed 1:1/4:5 pair is broken on tiktok/landscape/custom
 - Objects are `global` (span canvas freely) or `pinned` (locked to a frame)
 - Export = slice canvas at frame boundaries → array of PNGs via Electron IPC
 
+## Platforms & frame sizing
+- `Platform` = `instagram | tiktok | facebook | threads | custom`, `FrameRatio` = `square | portrait | story | landscape | custom` (`src/types/project.ts`). Both ride in the saved project; `platform` is optional so pre-multi-platform files load unmigrated
+- **`PLATFORM_PRESETS` (`useCanvasStore.ts`) is the ONLY place a platform's allowed sizes live** — one `{ratio, label, width, height}[]` per platform. Adding a platform = one entry there + one shell registered in `src/ui/preview/shells/` + one entry in `FrameSettingsPopover`'s `PLATFORMS` list. Never inline a width/height at a call site
+- `setPlatform(p)` resets `ratio`/`frameWidth`/`frameHeight` to `PLATFORM_PRESETS[p][0]` and pushes history — switching platform is a document-level change, not a view toggle. It deliberately does NOT try to preserve the current ratio: not every ratio exists on every platform
+- `custom` platform = free dimensions, 100–8000px per axis, entered in `FrameSettingsPopover`'s Dimensions fields → `setRatio('custom', w, h)`. Preview mode is disabled for `custom` because no phone shell can frame an arbitrary size
+- Landscape (facebook 16:9) is the one preset where the frame is **wider than tall** — the frame strip, snap boxes and export crop math are all width-driven, so this is the case that catches height-assuming code
+
 ## Key Architecture
 
-**Image Frame/Content Model** — two-layer, never collapse:
-- Frame (`frameX/Y`, `frameWidth/Height`) = visible crop viewport; `x/y/width/height` kept in sync
-- Content (`contentOffsetX/Y`, `contentWidth/Height`) = bitmap floating inside frame
-- `naturalWidth/naturalHeight` = intrinsic bitmap dims, set at drop time, never changes
-- `contentEditMode: boolean` — false = frame transformer (blue); true = content mode (orange `ACCENT`)
-- Transformer is always a sibling of the Group, never inside it; Rect (not Group) is transform target in frame mode
-- `resizeMode` (`'advanced'|'auto'`): advanced = frame resize crops; auto = cover-fits content to new frame
-- Image Transformer always `keepRatio={false}`; Group transformer always `keepRatio={true}`
-
-**Media Frames** (`src/canvas/frameClip.ts`, `src/canvas/frameModel.ts`, `src/canvas/geometry.ts`):
-- `frameModel.ts` owns frame *identity*; `frameClip.ts` owns clip *geometry* — don't merge them. `frameModel` is a leaf (type-only imports, no store, no React), so anything may import it
-- `buildEmptyFrameImage(id, spec)` is the ONLY place that knows an empty `ImageObject`'s field list; `frameToEmptyImage` (clear an existing frame), `makeEmptyCell` (fresh grid cell) and `buildFrameFromShape` all delegate to it. Three hand-written copies had already drifted before this existed
-- `isFrameObject` (has clip/fill/stroke state OR is empty) and `isEmptyFrame` (is a placeholder) are deliberately DISTINCT — a filled clipped image is the first but not the second. Never re-derive either; `EmptyFrameOverlay` layers its `visible`/`rotation` policy on top as a second filter rather than folding it into the predicate
-- `clipShape?` on `ImageObject`/`VideoObject`: `{kind:'rect', cornerRadius?}|{kind:'ellipse'}|{kind:'path', anchors}` — absent = plain rect; `path` anchors are NORMALIZED 0–1 in frame units, never display px (storing display px was the bug that killed the old mask system — it doesn't survive frame resize)
-- `fill?` is a union (`solid` | `linear` | `radial`) shared by frames, shapes AND paths. `ShapeObject.fill`/`PathObject.fill` are `string | Fill` — a bare string is still the canonical solid, which is why pre-gradient projects load unmigrated. Never touch `fill.color`; go through `src/canvas/fill.ts`: `normalizeFill` (→`Fill`), `konvaFillProps` (→Konva props), `apply2dFill` (2D thumbnails), `fillPreviewCss` (DOM swatch), `denormalizeFill` (→bare string when solid, which keeps shape→frame→shape value-identical). `solidColorOf` survives ONLY for things with no interior (line/arrow) — it returns `undefined` for a gradient, so using it as the general reader silently drops them
-- Gradient geometry is NORMALIZED like clip anchors: `angle` in degrees, `cx`/`cy`/`r` in 0–1 object units. Same reason — pixel geometry doesn't survive a resize, template change, or round-trip
-- `konvaFillProps` must return the COMPLETE key set with explicit `undefined`s plus `fillPriority`. Konva's `Context._fill` falls through to `hasLinearGradient`/`hasRadialGradient` when `fill` is falsy, so omitting keys leaves a node painting its previous gradient (gradient→none keeps painting; linear→radial keeps painting the linear). Zero cost for solids — stable `undefined`s don't re-render
-- A gradient's endpoints are absolute points in node-local space, so `syncFrameDecor`'s imperative `fr.width()/height()` during a live transform must re-apply the fill props or the gradient freezes at the old extent
-- Node-type dispatch in `CarouselStage` must stay REACTIVE (`useShallow` over the type list). Objects change type in place via `swapObjectPreservingId`, and a `getState()` read leaves the old node component mounted rendering nothing — the layer panel shows the media, the canvas doesn't
-- `makeCanvasNode(Inner, expectedType)` returns null on a type mismatch, so a stale dispatch degrades to blank instead of throwing
-- `canBecomeFrame(obj)` (`geometry.ts`) is the ONLY convertibility predicate — line/arrow/open path have no interior. Never re-derive it
-- `insertMediaIntoShape(id, media)` = convert + fill in one `set()`, one undo step; returns `false` when the target can't hold media so drop handlers fall back to standalone placement
-- `convertShapeToFrame` rejects sub-1px bboxes and `buildClipFunc` returns `undefined` for a degenerate frame — an *empty* clipFunc clips the whole group away, it does not mean "no clip"
-- There is exactly ONE empty state per object: a standalone object with no media is a `ShapeObject`/`PathObject` (with the `+ Image / + Video` CTA), NOT an empty frame. `removeMediaFromFrame` collapses a standalone frame back to its shape via `buildShapeFromFrame` — that's why there's no separate "Convert to Shape" button; they were the same action with two indistinguishable results
-- `isEmpty: true` `ImageObject` therefore means **grid cell** — a cell must keep its slot, so it's the one case `removeMediaFromFrame` leaves as a frame. `EmptyFrameOverlay` (ex-`GridCellOverlay`) renders it. Legacy projects may still contain standalone empty frames; they stay functional
-- `convertShapeToFrame`/`convertFrameToShape`/`insertMediaIntoFrame`/`removeMediaFromFrame` all go through `swapObjectPreservingId` — id-preserving, single history entry, `objectOrder` index untouched
-- `_srcVault` entries are KEPT (not deleted) on `removeMediaFromFrame` — undo needs the src back without a save round-trip
-- `clipFunc` is only set when `clipShape` is non-plain-rect; the frame `Rect`'s `hitFunc` follows the same clip geometry so hit-testing matches the visible shape
-- `computePathBBox` takes a `closed` boolean param — pass `true` for closed paths, or the bbox undercounts the closing segment
-- `isFrameObject` stays narrow on purpose: a plain image becomes a frame by *acquiring* a clip (`AddClipRow` → `commitUpdate({clipShape})`), never by widening the predicate — widening it would put clip/fill/stroke UI on every image ever dropped. "Remove Clip" is the inverse and clears clip **+ fill + stroke together**; clearing only the clip flips `isFrameObject` false and strands state that still paints but can no longer be seen or edited
-- The Frame section authors **rect and ellipse only**. A clip can only ever SUBTRACT area — the bitmap stops at the frame box — so dragging a path anchor outward changes nothing visible, which made panel-driven path editing a dead end. `path` is still a first-class `ClipShape`: it arrives by drawing a shape and inserting media into it, and renders/exports/snaps like any other. A frame carrying one shows a read-only `Custom` chip
-- `clipEditMode`, `ClipEditOverlay` and `enterClipEditMode` are retained but have **no UI entry point** since the Edit Shape button was removed — they're the machinery a pen-tool-edits-a-frame's-edges flow would reuse. Case 15 keeps them honest
-- `isPointInClipShape` is for hit tests done in logical coords with no Konva node (entering a grid cell); on-canvas hit-testing already goes through the frame Rect's `hitFunc`
-- `clipEditMode` disarms the frame Transformer (`tr.nodes([])`, same branch as multi-select) in both node files — its resize anchors sit on the exact points as a path clip's corner anchors, so leaving it up makes those corners ungrabbable
-- Transformer `anchorStroke`/`borderStroke` are the accent `ACCENT`, NOT Konva's default blue — a pixel hunt can't tell resize handles from clip anchors, so assert "is the transformer up?" on the scene graph (`find('Transformer')` + `nodes().length`), never by colour
-
-**Multi-Select:**
-- `selectedId` — Properties Panel; `selectedIds[]` — group transformer + align/distribute; `anchorId` — alignment reference (gold `#f5a623` border)
-- `setSelected(id)` sets both; `addToSelection(id)` shift+click appends; clicking already-selected → promotes to `anchorId`
-- `commitMultipleUpdates(patches)` / `removeMultipleObjects(ids)` — atomic batch ops, single history entry
-
-**Snap** (`useSnapGuides.ts`):
-- Snaps to frame edges/centers + objects' edges/centers, 8px threshold
-- `boundBoxFunc` receives absolute screen coords — convert absolute→logical before snapping, back to absolute before returning; `logicalThreshold = 8 / scale`
-- `snapEnabled: boolean` in store; `rotationSnaps=[0,45,90,135,180,225,270,315]` on all Transformers
-- Snap is **disabled** for pen anchor drag and line endpoint drag
-- Media frames expose `frameSnapBox()`, not raw `frameX/Y/Width/Height`: rotated frames snap to their rotated corners' AABB, and `path` clips snap to the clip silhouette bbox rather than the enclosing frame rect
-- Content dragged inside a frame lives in frame-local space — route it through `snapRectInRotatedFrame` (`geometry.ts`) so snapping still works on a rotated frame
-- `startSnapSession(id)` / `endSnapSession()` — call at `onDragStart`/`onDragEnd` and `onTransformStart`/`onTransformEnd` on every draggable node; caches `buildTargets` result for the drag duration so it runs once per gesture, not per mousemove
-
-**History & Drag Pattern:**
-- `past[]`/`future[]` snapshots; `commitUpdate` = push snapshot; load project resets history
-- Drag pattern (all sliders): `onMouseDown` → `startDrag()` captures pre-drag state; `onChange` → `updateObject` (live, no history push); `onMouseUp` → `commitUpdate`. Ensures undo reaches pre-drag state, not mid-drag.
-- `reorderObjects` pushes history — undoable via Cmd+Z
-- `_srcVault: Map<id, {src, originalSrc?}>` lives outside history — `normalizeObjectsForSnapshot` strips base64 `src` from snapshots; `reinjectSrc` restores on undo/redo. Background-removal `src` changes are therefore not undoable at pixel level (acceptable — feature not yet wired to history).
-- `_openEditModeCount: number` tracks objects in any edit mode — `normalizeObjectsForSnapshot` skips the edit-mode clearing loop when 0 (common case). Kept in sync by `updateObject`, `commitUpdate`, and all direct mode-set actions.
-- Normalized/reinjected image copies are WeakMap-cached by object identity (`normalizedImageCache`/`reinjectedCache`) — valid because objects are replaced immutably on update; unchanged images cost zero allocations per history push. Never mutate a `CanvasObject` in place or the caches serve stale copies.
-
-**Per-Object Subscription Pattern:**
-- `makeCanvasNode(Inner)` (`src/canvas/makeCanvasNode.tsx`) generates the memoized Outer for all five node types: subscribes to `s.objects[id]`, returns null if missing/hidden, passes typed `obj` to Inner. Contract changes go there, not in the node files.
-- Inner subscribes to `s.selectedId === id`; prevents CarouselStage re-renders from cascading to nodes during drag
-- Handlers call `useCanvasStore.getState().setSelected(id)` directly — no `onSelect` prop
-
-**Shape/Text/Pen invariants:**
-- Shape/Ellipse: store uses bounding-box top-left `(x,y)`; Konva Ellipse uses center — convert at render time
-- Text: handles resize the textbox, text reflows; `scaleX/Y` always 1 after transform
-- Pen: `PathObject` with `anchors: AnchorPoint[]`; transform bakes full affine matrix into anchors, resets node to identity
-- Pen: `penDrawingId` in store (transient) mirrors CarouselStage's `currentPenPathIdRef` — the pen selects the path on its first anchor, so `CanvasPathNode` needs this to suppress the transform box until the path is committed. Update both together at every assignment site
-- Shift+drag axis-locks via `axisLock(dx,dy)` in `constants.ts`
-- `locked: boolean` on every object — no handles, no drag, no double-click
-
-**Photo Adjustments** (`src/canvas/adjustments/pipeline.ts`):
-- `buildFilterPipeline(adj)` → `Array<(ImageData) => void>`; returns `[]` when all values are 0 (zero cost for unedited images)
-- Three module-level LUT caches: 1D per-channel, 33³ cube (saturation/vibrance/dehaze), 256-entry float (highlights/shadows/clarity)
-- `sample3DLUT` must NOT use inner functions — one closure per pixel × 1.4M pixels causes GC freeze
-- `adjustmentsBypass: boolean` in store (transient) — `\` hold-to-compare; Power button in Adjustments header toggles persistently
-- Double-click any slider label/handle resets that param to 0; one undo step per drag
-
-**Layer Effects** (`src/canvas/effects/`):
-- Adding a new effect = one file + one `registerEffect(def)` call, no framework changes
-- `buildEffectFilters(effects)` → same `Array<(ImageData) => void>` signature as adjustments pipeline
-- `CanvasImageNode` stacks: `allFilters = [...filterPipeline, ...effectFilters]`
-- `CarouselStage.tsx` imports `@/canvas/effects` as a side-effect to register all effects at startup
-
-**Export** (`src/canvas/exportFrames.ts`):
-- `stage.x()` and `stage.y()` MUST be reset to 0 before `toCanvas()` — non-zero pan offsets shift all content and break `i * frameWidth * pixelRatio` crop math
-- Hides Transformers + `guides` layer + `frame-dividers` layer before render; restores in `finally`
-- Background fills live in dedicated `background` layer (not `guides`) — ensures they appear in exported PNGs
-- `pixelRatio` (default 2) is threaded as a parameter through `exportFrames`, `captureVideoFrameSequence`, and `exportMixedFrames` — never hardcode it; user controls it via the export dialog `1×/2×/3×` selector
-- Batch export: single `show-folder-dialog` IPC call → all frames written via `write-file-to-folder`; no per-frame save dialog
-- `ImageExportSettings` (`src/types/canvas.ts`) controls format (png/jpeg/tiff), quality (0–100), and optional `maxFileSizeKB` cap (JPEG only — quality iterated down in steps of 5)
-
-**Video Layer** (`CanvasVideoNode.tsx`):
-- Frame/content model identical to ImageObject; extra fields: `trimStart/trimEnd`, `loop`, `startOffset`, `volume`, `posterFrame`
-- Use `durationchange` event (not `loadedmetadata`) to read duration — ensures finite value; listener also persists `naturalWidth/Height/Duration` to store (older saves have these as `0`/`null`)
-- Always seek to `trimStart ?? 0` after `canplay` to force first-frame decode in Chromium
-- RAF trim end: `obj.trimEnd ?? obj.naturalDuration ?? Infinity` — `Infinity` guards against `naturalDuration: null` on older saves; `null` coerces to `0` and makes the trim check always-true, causing constant seek-to-frame-0
-- `obj.effects ?? []` when calling `buildEffectFilters` — video objects saved before the effects field was introduced omit it entirely
-- RAF cache throttle: skip `.cache()` + `batchDraw()` when `currentTime` unchanged; reset throttle ref to `-1` on `allFilters` change — otherwise paused-video adjustment changes never apply
-- The cache effect MUST also depend on `contentWidth`/`contentHeight` (as `CanvasImageNode` does): `.cache()` snapshots the node at its current size and Konva scales that bitmap to the node's new box, so re-fitting content without re-caching renders the video **stretched**
-- `zeroseams-media://` scheme with Range support + CORP/COEP headers enables `SharedArrayBuffer` for FFmpeg WASM
-- Store `platform` must be subscribed as a hook in Toolbar components — `getState()` inside handlers only leaves it undefined during render
-
-**Platform Preview Mode** (`src/ui/preview/`):
-- `previewMode: boolean` + `previewFrame: number` in store (transient, not persisted); disabled for `custom` platform
-- On open: captures all frames via `getStageInstance()` → JPEG data URLs (same crop approach as `exportFrames.ts`)
-- `FrameSlide` = static JPEG background + `<VideoOverlayItem>` overlays for any video whose x-span overlaps the frame
-- Shell registry: `registerShell(platform, Component)` — adding a platform = one file + one call
-- Frame labels in `CarouselStage` hidden when `previewMode` is true
-- `PreviewShell` must be rendered at the root `App` level (sibling of `TitleBar`), NOT inside the canvas area div — the canvas area has `position:relative; zIndex:0` which creates a stacking context that causes the overlay to paint beneath the panels/toolbar
-
-**Grid/Collage System** (`src/canvas/gridTemplates.ts`, `CanvasGroupNode.tsx`, `EmptyFrameOverlay.tsx`):
-- `GroupObject` with `isGrid: true` owns N `ImageObject`/`VideoObject` cells via `childIds`; `gridTemplateId` references the template used
-- `gridTemplates.ts` `cells(groupW, groupH, gap)` is pure — zero hardcoded pixels; always proportional to group dimensions
-- **Listening rule:** exactly one of {a grid's group hit rect, its cells} listens at any moment — cells listen iff the grid is *entered* (some cell is `selectedId`). `CanvasGroupNode`'s `listening={!locked && !isCellSelected}` and the cell's `isGridEntered` are complements; change them together. Consequence: the group drags from anywhere on it, and once entered, clicks move directly between sibling cells
-- `EmptyFrameOverlay`'s `+image`/`+video` buttons are HTML, so they're immune to Konva listening — a cell can still be filled in one click without entering the grid. That's what makes the rule ergonomically safe
-- Grid cells get a selection border but **no resize/rotate anchors** (`obj.locked || isGridCell` branch in both node files): `computeGridChildPatches` owns cell geometry, so an individual resize is silently reverted by the next group drag or gap change. Resize a cell by detaching it (`disconnectGridCell`) or by changing the template
-- Konva node names `grid-hit` / `frame-rect-<id>` exist so click routing is assertable via `stage.getIntersection()` — see `docs/testing.md`
-- Deleting a group deletes its cells: `withGroupDescendants` expands the id set in both `removeObject` and `removeMultipleObjects`. A cell left behind keeps a `parentGroupId` pointing at nothing, and since cells only listen while the grid is entered, it becomes visible debris that can never be selected again. Keeping a cell is what `disconnectGridCell` is for
-- Cells swept up by a group delete **keep** their `_srcVault` entries (only the explicitly targeted id drops its entry) — `reinjectSrc` reads the vault, so dropping them would undo the delete with every image blank
-- `GridTemplate.cellClipShape` applies one clip to every cell **at creation only** (`addGrid` → `makeEmptyCell`); per-cell overrides come from the Frame section's shape picker. `cells()` still returns bare rects, which is what keeps `computeGridChildPatches` free of clip logic
-- Delete on a *filled* cell restores an empty frame (`isEmpty: true`) — never removes the slot. Delete on an *already-empty* cell falls through to the generic delete (both interceptions in `removeObject` require media), which is why that path must detach too
-- `detachCellFromParent(objects, cellId, parentGroupId)` is the ONLY way a cell leaves a grid — it strips the id from `childIds` and deletes the group when that was the last cell. Skipping it leaves a dangling child id and a slot that can never be refilled. Mutates the `objects` copy; returns the deleted group's id so the caller can drop it from `objectOrder` and selection
-- `disconnectGridCell(id)` detaches, and **collapses an empty cell to a shape** in the same `set()` — one undo step, one empty state. It builds the replacement inline rather than via `swapObjectPreservingId` because that helper re-attaches `parentGroupId` from the old object, which is the exact field disconnect clears
-- `EmptyFrameOverlay` container must be `pointerEvents: none`; only the `+image`/`+video` buttons set `pointerEvents: auto` — otherwise the div captures clicks before Konva hit-tests the group rect
-- Gap slider and group transform must update ALL child types (image + video) — filtering by `child.type === 'image'` breaks video cells
-- `computeGridChildPatches` (`gridTemplates.ts`) is the ONLY place cell geometry is derived — `CanvasGroupNode` (drag/transform) and the Properties gap slider both call it. Never re-derive `template.cells(...)` inline
-- Cell content refit goes through `fitCover` off `naturalWidth/naturalHeight`, never by scaling the previous content dims. Scaling by the group's independent x/y deltas destroys the media's aspect ratio, and scaling the previous *result* compounds when applied per-mousemove. Deriving from the source bitmap is idempotent, which is what lets live transform preview the real result (#69)
-- `refitContent` must be `false` for a plain move — the cell size hasn't changed, and refitting would discard any content offset set in content-edit mode
-
-**Guidelines** (`src/canvas/CanvasGuidelineNode.tsx`):
-- `GuidelineObject` extends `BaseCanvasObject`: `orientation: 'horizontal'|'vertical'`, `position: number` (canvas-absolute), `frameIndex: number` (-1 = global), `spanAllFrames: boolean`
-- Position encoded in Konva node `x`/`y` props, NOT in `points` — `points` are always relative to node origin; encoding position in points causes double-speed drag (React re-render + Konva offset compound)
-- Rendered in `guideline-overlay` layer, which sits above `objects` layer and is hidden during export (both export functions hide/restore it by name `.guideline-overlay`)
-- `guidelinesVisible: boolean` in store (transient) — toolbar eye toggle; guidelines excluded from LayerPanel entirely
-- `buildTargets()` in `useSnapGuides.ts` has a `'guideline'` branch: pushes `position` directly into snap targets and `continue`s — skips bbox processing
-- `getObjectBBox` in store guards `type === 'guideline'` → returns zero-size rect at `(obj.x, obj.y)`
-- Drag uses `startSnapSession`/`endSnapSession` + `computeSnap` in `onDragMove`; axis constraint enforced imperatively (`node.x(fixedX)` for horizontal, `node.y(0)` for vertical)
-
-**Frame Reordering** (`reorderFrames` in store, drag UI in `CarouselStage.tsx`):
-- `reorderFrames(from, to)` — single raw `set()` + `pushHistoryFrom`; can't use `commitMultipleUpdates` because it only patches objects, not `frames[]`
-- Object ownership = spatial center: `Math.floor((bbox.x + bbox.width/2) / frameWidth)` — the `scope` field is irrelevant here
-- `contentOffsetX/Y` is frame-relative — never shift it; only `frameX` + `x` shift for image/video objects
-- Guidelines: owned by `frameIndex` / `spanAllFrames`; global (`frameIndex === -1`) and span-all never move
-- Frame drag: `onPointerMove/Up` live on the container div, not the grip span — Chromium silently drops `setPointerCapture` when an ancestor receives `pointer-events: none` via React re-render
-- `useImageDrop` / `useVideoDrop`: early-return when `!e.dataTransfer?.types.includes('Files')` — without this they swallow the frame-drag pointer events
-- Canvas preview capture: deferred into `requestAnimationFrame`, saves/restores stage size + scale, hides UI layers, crops at `pixelRatio: 0.5`
-
-**Properties Panel** (`src/ui/PropertiesPanel.tsx` + `src/ui/properties/`):
-- Section components live one-per-file in `src/ui/properties/` (AlignDistribute, Text, Effects, Adjustments, Video, FrameSection) with shared field helpers/styles in `properties/shared.tsx`; PropertiesPanel keeps layout and selection routing
-- `VideoSection` composes `AdjustmentsSection` + `EffectsSection` — video and image share the adjustment UI
-- `<Field>` (`properties/shared.tsx`) is the ONE property row: label + `NumericInput`. `NumberField`/`MixedNumberField` are thin wrappers over it. There are no paired `<input type="range">` rows any more — dragging the field's unit affix scrubs the value. The two surviving slider families are deliberate: `AdjustmentsSection`'s `.adj-slider` gradient tracks (the track carries the meaning) and the video transport scrub bar
-- **Any NumericInput wired with BOTH a live `onChange` and a `commitUpdate`-backed `onCommit` must go through `useScrubbedValue`** (`properties/shared.tsx`). It arms `startDrag` on the first live write and disarms on commit. Without it `commitUpdate` snapshots the state the live writes already mutated, and undo lands on the edited value — i.e. does nothing
-- Units are picked per call site: `°` rotation · `%` opacity/volume/normalized-position · `px` sizes, offsets, radii, spacing · `s` trims · `×` line height · `EV` exposure. A 0–1 normalized fraction is NOT a percentage — effect params like vignette strength stay unitless and get a scrub-grip glyph instead
-
-**Adding media** (`src/canvas/mediaPlacement.ts`, `useMediaDrop.ts`, `useClipboard.ts`):
-- **`File.path` does not exist.** Electron removed it in v32 (we're on 42). The only way to get a dropped/pasted file's absolute path is `window.electronAPI.getPathForFile(file)`, bridging `webUtils.getPathForFile` — and it must stay **synchronous**, because a `DataTransfer`/`ClipboardData` File does not survive an `await`. Resolve every path before the first `await` in a handler. A video built with a falsy `filePath` still occupies a layer row while rendering nothing: `zeroseams-media://localhostundefined` 404s, `canplay` never fires, and `CanvasVideoNode` returns `null` — refuse the file instead
-- **Exactly one drop listener** on the stage container (`useMediaDrop`). The old `useImageDrop` + `useVideoDrop` pair both handled video and only avoided double-adding because the image hook bailed on that always-falsy `file.path`. Both `dragover` and `drop` must keep the `e.dataTransfer.types.includes('Files')` early-return or the frame-reorder pointer gesture is swallowed
-- `mediaPlacement.ts` is the ONLY place that builds a new `ImageObject`/`VideoObject` (`buildImageObject`/`buildVideoObject`) or does frame math (`frameIndexAt`, `frameCenter`, `fitMediaBox`). Four hand-written copies of the field list had already drifted — same rationale as `buildEmptyFrameImage`
-- `defaultDropPoint()` is what callers with no cursor (toolbar buttons, context-menu paste) use: last pointer over the stage, falling back to the viewport-centre frame. Toolbar Add Image/Add Video used to compute `frameWidth / 2` and therefore always landed in frame 0. `setLastPointer` is written from CarouselStage's stage `mousemove` and is module-level on purpose — it changes every mousemove and must never re-render or enter history
-- Video metadata always goes through `loadVideoMetadata()` — it resolves only once duration AND dimensions are valid, and a 0 dimension makes `fitCover` stretch instead of cover-crop. Drops read it off a **blob URL**, which is readable even when the on-disk path is not
-
-**Clipboard** (`src/canvas/objectClipboard.ts` + `useClipboard.ts`):
-- ⌘C/⌘X/⌘V are wired to the **`copy`/`cut`/`paste` ClipboardEvents**, never keydown. All three are native menu accelerators, so a keydown would never fire — but unlike ⌘Z/⌘A the clipboard roles dispatch their command to the focused webContents, which fires a real ClipboardEvent. That is why these do NOT need a `handleMenuAction` route, and why text fields keep working (guard returns early, default behaviour takes over)
-- The object clipboard is module-level, NOT in `useCanvasStore` — same reasoning as swatches: undoing a cut must restore the objects without emptying the clipboard. It stores `structuredClone`s, so a later edit or an undo that replaces an object can't mutate a pending paste
-- `pasteObjects(objects, target)` regenerates ids and remaps `childIds`/`parentGroupId` **within the pasted set**, dropping links that point outside it; one history entry for the whole paste. Copy expands to group descendants first, or the paste produces a group whose `childIds` point at nothing
-- `repositionObject` / `cloneObjectAt` (`useCanvasStore.ts`) are the ONLY place that knows how to move an object to a new top-left: image/video carry `frameX/frameY` alongside `x/y` and line/arrow a second endpoint, all of which must travel together. The hand-written copies in the duplicate paths had drifted — they moved a *video*'s `x/y` without its frame fields, which is the pair the node renders from
-
-**Shortcuts & discoverability:**
-- `src/ui/shortcuts.ts` is the single source of truth for the shortcut list; `ShortcutOverlay` (toggled by `?`) renders it — when adding a shortcut, update the table AND the handler in `useKeyboardShortcuts.ts`, and quote the same string in the button's `<Tooltip shortcut=>`
-- **A native menu accelerator SHADOWS the renderer's keydown handler** — macOS consumes ⌘Z/⌘A/⌘N/⌘O before the document sees them. Anything with a menu item must route through `handleMenuAction`, and guards that used to live in the keydown handler (e.g. "focus is in a text field, so undo the text not the canvas") have to be re-implemented there. The clipboard roles are the exception — see **Clipboard** above
-- Option-modified shortcuts must match on `e.code` (`'KeyS'`), not `e.key` — macOS reports `'ß'` for ⌥S
-- Zoom: `zoomIn()`/`zoomOut()` (clamped `setZoom`, MIN/MAX_ZOOM) live in `useViewportStore` and are shared by ⌘± and the bottom-right `CanvasHud` (zoom −/%/+, fit-all-frames, ? help)
-
-**File lifecycle** (`src/io/projectFile.ts` + `src/io/fileManager.ts`):
-- `projectFile.ts` is the ONLY place a `.zeroseams` payload is built or applied. It replaced three hand-maintained copies (Toolbar, useKeyboardShortcuts, useAutosave) whose `version` values had already drifted. New fields go there, never in a caller
-- `fileManager.ts` is the ONLY place create/open/save/saveAs/saveCopy behaviour lives. UI (TitleBar buttons, ⌘-shortcuts, native menu) all route into it — three copies of "save, then maybe set the path" is what this replaced
-- `applyProject` is the only place a *loaded* document sets `documentReady`. `createNew` sets it only after the write lands
-- `saveCopy` must never move `currentFilePath` or `lastFile` — it's a copy, not a Save As
-- `rememberLastFile(path)` on every save that lands a path, not just on open. Writing it only in the open path is why a ⌘S-created file wasn't restored after a restart
-- `buildNewProject(spec)` is pure and store-free ON PURPOSE: `createNew` writes the file BEFORE resetting the canvas, so a refused write (name collision) leaves the open document intact. Reset-then-write would destroy a document to report an error
-- Autosave (`useAutosave`) returns early unless `documentReady && currentFilePath`, and never creates a file. The `autosave-project` IPC channel was deleted, not just unused — it was the only path that could write a project file without consent
-- Autosave compares a content signature (objects/objectOrder/frames/frameCount/frame dims/ratio/platform/backgroundColor) before firing. The canvas store also emits on selection and tool changes; treating those as edits marked the doc dirty and rewrote the file when nothing had changed
-- OS `open-file` fires BEFORE `ready` on macOS — the handler is registered at module scope and queues the path for the renderer to pull after mount
-- The close guard uses the **async** `dialog.showMessageBox`. `showMessageBoxSync` freezes the entire main event loop — no IPC, no timers, no signal servicing
-- E2E scripts must shut Electron down via `scripts/terminateElectron.mjs`, never a bare `proc.kill()`. Electron's browser process services POSIX signals itself (a `process.on('SIGTERM')` in main **never runs**), so SIGTERM arrives as a window close, the guard sees a dirty document, and the app parks on the prompt still holding its `--remote-debugging-port`. The next run then fails with "DevTools port timeout", which looks like a broken test rather than a stale process
-
-**Save feedback:**
-- Every manual save path (⌘S, ⌘⇧S, Save menu, Save a Copy) must go through `trackSave()` from `@/store` — it drives the SaveStatusPill (saving spinner → saved/error), clears `dirty`, and treats Electron's `{success:false}` dialog-cancel as idle, not saved
-- `dirty` in useSaveStatusStore: armed on a real content change (useAutosave subscription), cleared on save success; rendered as the accent dot next to the title
+Directory-scoped invariants load on demand: `src/canvas/CLAUDE.md` (canvas, media frames, grids, export, video) · `src/ui/CLAUDE.md` (panels, preview, design system) · `src/io/CLAUDE.md` (file lifecycle).
 
 **Colour swatches** (`src/store/useSwatchStore.ts`):
 - Two scopes: `file` rides inside the project payload, `global` lives in `userData/swatches.json` behind `get-global-swatches`/`set-global-swatches`
@@ -249,48 +67,18 @@ Desktop Electron app for seamless Instagram carousels. One long horizontal canva
 - Export overlay: `useExportStore` (`src/store/`) — `exporting/exportStatus/cancelRequested`; status flows from `exportMixedFrames` → Toolbar label; mid-export Cancel button lives in the main.tsx canvas overlay
 - Export dialog settings persist in `localStorage['zeroseams:exportSettings']`; failures render an inline banner in the popover (panel stays open) — never `alert()`
 - Thumbnails: `useThumbnailStore`, HTML Canvas 2D, triggered on `past.length` changes + mount. That sweep is blind to anything that changes a thumbnail without committing history, so `regenerate(id)` is the escape hatch — it marks one id dirty and flushes directly. The video branch draws the live element from `videoElementRegistry` and falls back to a grey play plate when `readyState < 2`, so a decode landing after load left the placeholder stuck (#84); `CanvasVideoNode` calls `regenerate` from a **`seeked`** listener, not from `canplay` — at `canplay` the `currentTime` assignment has been made but the seek has NOT completed, so drawing there captures the wrong frame. `posterFrame` is a number (seconds), a seek target, not a bitmap — it can never be drawn directly
-- Frame labels: HTML div strip at `top: Math.max(4, panY - 22)` in CarouselStage (not Konva Text); grip + label pill uses `transform: translateX` for animated reorder — see ColorInput portal note below
+- Frame labels: HTML div strip at `top: Math.max(4, panY - 22)` in CarouselStage (not Konva Text); grip + label pill uses `transform: translateX` for animated reorder — see the ColorInput portal note in `src/ui/CLAUDE.md`
 - Multi-file drop: drop coords captured synchronously before async work; 30px stagger per file
 
-## Visual Design System
-Tokens in `src/ui/theme.css` — single source of truth. Imported once in `src/main.tsx`.
-
-**Palette:**
-- `--bg-base` `#fdf8f2` · `--bg-panel` `#f5ede2` · `--bg-canvas` `#ede7dc` · `--bg-surface` `#ffffff`
-- `--border` `#e8e0d5` · `--stroke` `#d4ccc2`
-- `--text-primary` `#111111` · `--text-secondary` `#555555` · `--text-tertiary` `#6f6a60` · `--text-muted` `#aaaaaa`
-- `--text-muted` is **2.0:1 on `--bg-panel`** — it is the *disabled* colour and nothing else. Anything carrying words or a meaningful glyph uses `--text-tertiary` (4.6:1), which is warm-tinted so the ramp reads as a tier rather than a shade
-- `--accent` `#d63a05` — active states, Konva handles, primary CTA. Darkened from `#f94608` so white labels on accent fills clear 4.5:1
-- `--accent-gold` `#f5a623` — multi-select anchor star/outline · `--accent-tint` `#fff4f0` — selected-row wash
-- `--success` / `--danger` / `--danger-bg` / `--danger-border` — status. Both foregrounds clear AA at 12px on `--bg-base`
-- `--bg-inverse` / `--text-inverse` / `--text-inverse-muted` — the tooltip surface
+**Konva ↔ `theme.css` binding:**
 - **Konva can't read CSS custom properties**, so `ACCENT` / `ACCENT_GOLD` / `SNAP_GUIDE_FRAME` / `GUIDELINE` in `canvas/constants.ts` mirror these by hand — change both or a selected object's handles stop matching the panel that edits it. `scripts/test-frame-render-export.mjs` also hunts `ACCENT` by RGB; a stale literal there makes its absence proofs pass on a colour the palette no longer contains
-- Use `var(--…)` tokens in components — `src/ui/` is fully tokenized; don't reintroduce raw hex for token values
-- `--font` — always use `var(--font)`, never hardcode `'Uncut Sans Variable'`
-
-**Components:**
-- Buttons: pill shape (`borderRadius: 999`). Inputs/selects: `borderRadius: 6`. Cards/popovers: `borderRadius: 16`
-- `.btn-raised` (in `theme.css`): shadow button with press-down animation — `box-shadow: 2px 4px 0 #000` at rest
-- `iconBtnProps(active, disabled?, extraStyle?)` (`src/ui/iconBtnStyle.ts`) — spread it, don't pass a separate `style=`. Colour and every state live in `.zs-icon-btn` in `theme.css`; the helper returns geometry plus `data-active`. That split exists because an inline `background` beats any `:hover` rule, which is how 32 icon buttons ended up with a `transition` and no hover for so long. `extraStyle` is where per-site width/padding overrides go
-- Focus: `theme.css` draws one `:focus-visible` ring for all interactive controls. **Never set `outline: none` on a focusable element** — an inline one wins over the ring and silently removes it. The one retarget: `NumericInput`'s input is excluded from the global rule (`input:not(.zs-num-input)`) and the ring is drawn on its `.zs-num` wrapper via `:has(input:focus-visible)`, because an outline on the inner input renders inside the wrapper's border and collides with the unit affix. Retarget the ring, never remove it
-- Sliders: global `input[type="range"]` in `theme.css` handles all. `.adj-slider` (`adjustments.css`) additionally exists for the gradient adjustment tracks
-- Tooltips: every interactive button must be wrapped in `<Tooltip label shortcut? description?>` (`src/ui/Tooltip.tsx`). Never use native `title=` on buttons — wrong font, timing, style. Tooltip chains the child's mouse/focus handlers and shows on keyboard focus. `label` always required; `shortcut` required if a shortcut exists; `description` for ambiguous labels. Empty `label=""` renders children unwrapped (no tooltip).
-- Color picker: `<ColorInput>` / `<MixedColorInput>` in `src/ui/ColorInput.tsx` (exported from `src/ui/index.ts`) — never use raw `input[type="color"]`. Popover uses `react-colorful` + HEX/RGB/HSL modes + eyedropper + 5 recent colors (localStorage `zeroseams:recentColors`). `fixed` prop portals the popover into `document.body` — required whenever the trigger has a CSS `transform` ancestor (even `translateX(0px)` creates a containing block that breaks `position:fixed`). `popoverAnchorFn?: () => {top,left}` overrides automatic `getBoundingClientRect` positioning when you need a fixed anchor (e.g. frame label strip). `MixedColorInput` renders a `—` overlay and shows `value=undefined` as mixed state.
-
-**Layout:**
-- `TitleBar` (full width, 52px) — logo, file ops, frame settings, frames counter, preview, export, undo/redo
-- `ToolBar` (center column only, `TOOL_BAR_HEIGHT`) — `position: absolute; top: 0; left/right` from `panelConstants.ts`, `zIndex: 10` — constrained to the gap between panels so it never extends under them; gradient background (`--bg-base` solid top 50% → transparent bottom); three labeled groups: **Transform** (Select, Snap, Crop/Autofill), **Add** (Text, Shape, Pen, Image, Video), **Layout** (Grid, Guideline, visibility toggle); `ToolGroup` helper at module scope renders the group label (`top: -13px, left: 0` absolute) above buttons; `alignItems: flex-end` + `paddingBottom: 10`
-- `LayerPanel` + `PropertiesPanel` are `position: absolute` inside the center column — `left: 0` / `right: 0`, `top: 0`, `zIndex: 20` (above toolbar gradient); widths from `panelConstants.ts`; height driven by `ResizeObserver`, `max-height: calc(100vh - TITLE_BAR_HEIGHT)` — and `PropertiesPanel` subtracts `HUD_LANE` on top of that so it never reaches the floor where `CanvasHud` sits; `borderRadius: 0 0 16px 16px`; sticky header; `panel-scroll` class applies slim 4px scrollbar
-- Middle row: center column only (panels float inside it) — see `src/main.tsx`
 
 **Konva handles:** every node's Transformer sets `borderStroke`/`anchorStroke` = `ACCENT` declaratively as JSX props. Setting only `borderStroke` leaves the anchors on Konva's default blue, which is what they were. Snap guides: `ACCENT` object snaps · `SNAP_GUIDE_FRAME` frame snaps (intentionally distinct).
 
 ## Keyboard Shortcuts
 `useKeyboardShortcuts.ts`, mounted once in CarouselStage. No-op in input/textarea.
 
-`V` select · `T` text · `R` shape · `P` pen · `G` guideline · `S` snap toggle · `F` frame settings · `?` shortcut cheatsheet · `\` bypass adjustments (hold) · `Esc` deselect · `⌘N` new · `⌘O` open · `⌘S/⇧S` save/save as · `⌥⇧⌘S` save a copy · `⌘A` all · `⌘D` dupe · `⌘C/X/V` copy/cut/paste · `⌘E` export · `⌘Z/⇧Z` undo/redo · `⌘]/[` layers · `⌘L` lock · `⌘±/0` zoom · `⌘→` add frame · `⌘←` remove frame · arrows nudge · `⌫` delete · `⌘⇧P` preview toggle (disabled for custom platform)
-
 Full list: `src/ui/shortcuts.ts` (renders the `?` overlay).
 
 ## Upcoming
-AI background removal UI · SAM segmentation · LaMa inpainting · Font picker + Google Fonts · Templates/presets · Windows packaging + auto-update · Video: volume meter, playback rate · Preview: TikTok/Facebook/Threads shells, dark-mode variant, phone bezel
+Tracked in GitHub issues, not here — `gh issue list`. A roadmap duplicated into this file goes stale the moment an issue closes.
